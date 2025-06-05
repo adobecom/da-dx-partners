@@ -1,10 +1,10 @@
-import { getCaasUrl, getLibs } from '../../scripts/utils.js';
-import { replaceText, getConfig, populateLocalizedTextFromListItems } from '../utils/utils.js';
-import KnowledgeBaseOverview from './KnowledgeBaseOverview.js';
+import { getCaasUrl, getLibs } from "../../scripts/utils.js";
+import { getConfig, populateLocalizedTextFromListItems, replaceText } from "../utils/utils.js";
+import DXCardCollection from "./DXCardCollection.js";
 
-function declareKnowledgeBaseOverview() {
-  if (customElements.get('knowledge-base-overview')) return;
-  customElements.define('knowledge-base-overview', KnowledgeBaseOverview);
+function declareDXCardCollection() {
+  if (customElements.get('dx-card-collection')) return;
+  customElements.define('dx-card-collection', DXCardCollection)
 }
 
 async function localizationPromises(localizedText, config) {
@@ -15,7 +15,7 @@ async function localizationPromises(localizedText, config) {
 }
 
 export default async function init(el) {
-  performance.mark('knowledge-base-overview:start');
+  performance.mark('dx-card-collection:start');
 
   const miloLibs = getLibs();
   const config = getConfig();
@@ -31,10 +31,11 @@ export default async function init(el) {
     '{{filter}}': 'Filter',
     '{{filter-by}}': 'Filter by',
     '{{filters}}': 'Filters',
+    '{{last-90-days}}': 'Last 90 days',
     '{{last-6-months}}': 'Last 6 months',
+    '{{load-more}}': 'Load more',
     '{{next}}': 'Next',
     '{{next-page}}': 'Next Page',
-    '{{load-more}}': 'Load more',
     '{{no-results-description}}': 'Try checking your spelling or broadening your search.',
     '{{no-results-title}}': 'No Results Found',
     '{{of}}': 'Of',
@@ -58,7 +59,7 @@ export default async function init(el) {
     import(`${miloLibs}/features/spectrum-web-components/dist/progress-circle.js`),
   ]);
 
-  declareKnowledgeBaseOverview();
+  declareDXCardCollection();
 
   const dateFilter = {
     key: 'date',
@@ -67,16 +68,30 @@ export default async function init(el) {
       { key: 'show-all', value: localizedText['{{show-all}}'], parentKey: 'date', checked: true, default: true },
       { key: 'current-month', value: localizedText['{{current-month}}'], parentKey: 'date', checked: false },
       { key: 'previous-month', value: localizedText['{{previous-month}}'], parentKey: 'date', checked: false },
-      { key: 'last-6-months', value: localizedText['{{last-6-months}}'], parentKey: 'date', checked: false },
+      { key: 'last-90-days', value: localizedText['{{last-90-days}}'], parentKey: 'date', checked: false },
     ],
   };
 
   const block = {
     el,
-    name: 'knowledge-base-overview',
-    collectionTag: '"caas:adobe-partners/collections/knowledge-base"',
+    name: 'dx-card-collection',
     ietf: config.locale.ietf
   }
+
+
+
+  const rows = Array.from(el.children);
+  let dateFilterValue = '';
+
+  rows.forEach((row) => {
+    const cols = Array.from(row.children);
+    const rowTitle = cols[0].innerText.trim().toLowerCase().replace(/ /g, '-');
+
+    if (rowTitle === "date-filter") {
+      dateFilterValue = cols[1]?.innerText.trim();
+    }
+  });
+
 
   const blockData = {
     localizedText,
@@ -84,17 +99,18 @@ export default async function init(el) {
     dateFilter,
     cardsPerPage: 12,
     pagination: 'default',
-    caasUrl: getCaasUrl(block)
-  };
+    caasUrl: getCaasUrl(block),
+    showDateFilter: dateFilterValue
+  }
 
-  const app = document.createElement('knowledge-base-overview');
-  app.className = 'content knowledge-base-overview-wrapper';
+  const app = document.createElement('dx-card-collection');
+  app.className = 'content dx-card-collection-wrapper';
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
   el.replaceWith(app);
 
   await deps;
-  performance.mark('knowledge-base-overview:end');
-  performance.measure('knowledge-base-overview block', 'knowledge-base-overview:start', 'knowledge-base-overview:end');
+  performance.mark('dx-card-collection:end');
+  performance.measure('dx-card-collection block', 'dx-card-collection:start', 'dx-card-collection:end');
   return app;
 }

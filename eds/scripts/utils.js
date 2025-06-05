@@ -109,23 +109,25 @@ function preloadLit(miloLibs) {
 
 export function getProgramType(path) {
   switch (true) {
-    case /solutionpartners/.test(path): return 'spp';
+    case /\/(solutionpartners|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'spp';
     case /technologypartners/.test(path): return 'tpp';
     case /channelpartners/.test(path): return 'cpp';
+    case /digitalexperience/.test(path): return 'dx';
     case /channelpartnerassets/.test(path): return 'cpp';
     default: return '';
   }
 }
 
 export function getProgramHomePage(path) {
-  switch (true) {
-    case /solutionpartners/.test(path):
+  const programType = getProgramType(path);
+  switch (programType) {
+    case 'spp':
       return '/solutionpartners/';
-    case /technologypartners/.test(path):
+    case 'tpp':
       return '/technologypartners/';
-    case /channelpartners/.test(path):
-      return '/channelpartners/';
-    case /channelpartnerassets/.test(path):
+    case 'dx':
+      return '/digitalexperience/';
+    case 'cpp':
       return '/channelpartners/';
     default:
       return '';
@@ -163,8 +165,10 @@ function extractTableCollectionTags(el) {
     const colsContent = cols.slice(1);
     if (rowTitle === 'collection-tags') {
       const [collectionTagsEl] = colsContent;
-      const collectionTags = Array.from(collectionTagsEl.querySelectorAll('li'), (li) => `"${li.textContent.trim().toLowerCase()}"`);
-      tableCollectionTags = [...tableCollectionTags, ...collectionTags];
+      const collectionTags = Array.from(collectionTagsEl.querySelectorAll('li'), (li) =>
+        li.textContent ? `"${li.textContent.trim().toLowerCase()}"` : ''
+      );
+      tableCollectionTags.push(collectionTags)
     }
   });
 
@@ -194,29 +198,27 @@ function checkForQaContent(el) {
   return false;
 }
 
-function getComplexQueryParams(el, collectionTag) {
-  const portal = getCurrentProgramType();
-  if (!portal) return;
-
-  const portalCollectionTag = `"caas:adobe-partners/${portal}"`;
+function getComplexQueryParams(el) {
   const tableTags = extractTableCollectionTags(el);
-  const collectionTags = [collectionTag, portalCollectionTag, ...tableTags];
 
-  const partnerLevelParams = getPartnerLevelParams(portal);
+  const groupedTagExpressions = tableTags
+    .filter(group => group.length)
+    .map(group => `(${group.join('+AND+')})`);
 
-  if (!collectionTags.length) return;
+  if (!groupedTagExpressions.length) return;
 
-  const collectionTagsStr = collectionTags.filter((e) => e.length).join('+AND+');
-  let resulStr = `(${collectionTagsStr})`;
+  const fullQuery = `(${groupedTagExpressions.join('+OR+')})`;
 
   const qaContentTag = '"caas:adobe-partners/qa-content"';
+  let resultStr = fullQuery;
   if (!checkForQaContent(el)) {
-    resulStr += `+NOT+${qaContentTag}`;
+    resultStr += `+NOT+${qaContentTag}`;
   }
 
-  if (partnerLevelParams) resulStr += `+AND+${partnerLevelParams}`;
-  // eslint-disable-next-line consistent-return
-  return resulStr;
+  const partnerLevelParams = getPartnerLevelParams('spp');
+  if (partnerLevelParams) resultStr += `+AND+${partnerLevelParams}`;
+
+  return resultStr;
 }
 
 export function getPartnerDataCookieObject(programType) {
@@ -315,7 +317,7 @@ export const isSPPandTPP = () => isSPP && isTPP;
 
 export function getNodesByXPath(query, context = document) {
   const nodes = [];
-  if(!context){
+  if (!context) {
     return nodes;
   }
   const xpathResult = document.evaluate(query, context, null, XPathResult.ANY_TYPE);
@@ -407,8 +409,9 @@ export function getCaasUrl(block) {
 export async function preloadResources(locales, miloLibs) {
   const locale = getLocale(locales);
   const cardBlocks = {
-    'partner-news': '"caas:adobe-partners/collections/news"',
-    'knowledge-base-overview': '"caas:adobe-partners/collections/knowledge-base"',
+    // 'partner-news': '"caas:adobe-partners/collections/news"',
+    // 'knowledge-base-overview': '"caas:adobe-partners/collections/knowledge-base"',
+    'dx-card-collection': '"caas:adobe-partners/collections/news"',
   };
   // since we are going to add search-full later
   // adding this code update now to prevent being forgotten since in search
@@ -485,11 +488,10 @@ export async function getRenewBanner(getConfig) {
 export function updateNavigation() {
   const gnavMeta = getMetadata('gnav-source');
   if (!gnavMeta) return;
-  // todo check do we need locales for spp (same for footer) and update if yes (check dme code)
   let { content } = gnavMeta;
-  if (isMember()) {
-    // todo update when we have default logged in gnav created (same for footer)
-    content = getMetadataContent('gnav-loggedin-source') ?? '/solutionpartners/spp-shared/gnav';
+  const programTypeStatus = getProgramTypeStatus();
+  if (programTypeStatus.isSPP || programTypeStatus.isTPP) {
+    content = getMetadataContent('gnav-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-gnav';
   }
   gnavMeta.content = content;
 }
@@ -498,8 +500,9 @@ export function updateFooter() {
   const footerMeta = getMetadata('footer-source');
   if (!footerMeta) return;
   let { content } = footerMeta;
-  if (isMember()) {
-    content = getMetadataContent('footer-loggedin-source') ?? '/solutionpartners/spp-shared/footer';
+  const programTypeStatus = getProgramTypeStatus();
+  if (programTypeStatus.isSPP || programTypeStatus.isTPP) {
+    content = getMetadataContent('footer-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-footer';
   }
   footerMeta.content = content;
 }

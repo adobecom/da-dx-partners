@@ -35,6 +35,7 @@ const CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
   imsClientId,
+  clientEnv: prodHosts.includes(window.location.host) ? 'prod' : null,
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   locales: {

@@ -32,7 +32,7 @@
     "@esm-bundle/chai": "4.3.4-fix.0",
     "@playwright/test": "^1.42.1",
     "@web/dev-server-import-maps": "^0.0.6",
-    "@web/test-runner": "0.13.27",
+    "@web/test-runner": "^0.13.27",
     "@web/test-runner-commands": "0.6.1",
     "babel-jest": "^29.7.0",
     "chai": "4.3.6",

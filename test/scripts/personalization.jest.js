@@ -20,7 +20,7 @@ describe('Test personalization.js', () => {
     window = Object.create(window);
     Object.defineProperties(window, {
       location: {
-        value: { pathname: '/channelpartners', hostname: 'partners.adobe.com' },
+        value: { pathname: '/solutionpartners/', hostname: 'partners.adobe.com' },
         writable: true,
       },
     });
@@ -36,7 +36,7 @@ describe('Test personalization.js', () => {
   it('Populate placeholder if user is a member', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        CPP: {
+        SPP: {
           status: 'MEMBER',
           firstName: 'Test user',
         },
@@ -45,13 +45,13 @@ describe('Test personalization.js', () => {
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const placeholderElementAfter = document.querySelector('#welcome-firstname');
-      expect(placeholderElementAfter.textContent.includes(cookieObject.CPP.firstName)).toBe(true);
+      expect(placeholderElementAfter.textContent.includes(cookieObject.SPP.firstName)).toBe(true);
     });
   });
   it('Remove placeholder if user is not a member', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        SPP: {
+        CPP: {
           status: 'MEMBER',
           firstName: 'Test use',
         },
@@ -75,7 +75,7 @@ describe('Test personalization.js', () => {
   it('Show partner-not-member block', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        SPP: {
+        CPP: {
           status: 'MEMBER',
           firstName: 'Test use',
         },
@@ -87,10 +87,10 @@ describe('Test personalization.js', () => {
       expect(notMemberBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
     });
   });
-  it('Show partner-all-levels block', () => {
+  it('Show partner-member block', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        CPP: {
+        SPP: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Gold',
@@ -99,14 +99,14 @@ describe('Test personalization.js', () => {
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const allLevelsBlock = document.querySelector('.partner-all-levels');
+      const allLevelsBlock = document.querySelector('.partner-member');
       expect(allLevelsBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
     });
   });
   it('Show partner-level-gold block', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        CPP: {
+        SPP: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Gold',
@@ -115,14 +115,14 @@ describe('Test personalization.js', () => {
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const goldBlock = document.querySelector('.partner-level-gold');
+      const goldBlock = document.querySelector('.partner-level-spp-gold');
       expect(goldBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
     });
   });
   it('Show partner-level-platinum but don\'t show partner-level-gold block', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        CPP: {
+        SPP: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Platinum',
@@ -131,8 +131,8 @@ describe('Test personalization.js', () => {
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const goldBlock = document.querySelector('.partner-level-gold');
-      const platinumBlock = document.querySelector('.partner-level-platinum');
+      const goldBlock = document.querySelector('.partner-level-spp-gold');
+      const platinumBlock = document.querySelector('.partner-level-spp-platinum');
       expect(platinumBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
       expect(goldBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(true);
     });
@@ -140,7 +140,7 @@ describe('Test personalization.js', () => {
   it('Show partner-level-platinum section', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        CPP: {
+        SPP: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Platinum',
@@ -151,6 +151,57 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
       const platinumBlock = document.querySelector('#platinum-section');
       expect(platinumBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+    });
+  });
+  it('Shows content if user matches any of multiple partner-level segments (OR logic)', () => {
+    jest.isolateModules(() => {
+      const cookieObject = {
+        SPP: {
+          status: 'MEMBER',
+          firstName: 'Test user',
+          level: 'Silver',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      const { applyPagePersonalization } = importModules();
+      applyPagePersonalization();
+      const block = document.querySelector('.partner-level-spp-silver.partner-level-spp-gold');
+      expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+    });
+  });
+  it('Shows content only if user matches all exclusive segments (AND logic)', () => {
+    jest.isolateModules(() => {
+      const cookieObject = {
+        SPP: {
+          status: 'MEMBER',
+          firstName: 'Test user',
+          level: 'gold',
+          salesCenterAccess: true,
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      const { applyPagePersonalization } = importModules();
+      applyPagePersonalization();
+      const block = document.querySelector('.partner-sales-access.partner-spp-member');
+      expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+    });
+  });
+
+  it('Hides content if user does not match all exclusive segments (AND logic)', () => {
+    jest.isolateModules(() => {
+      const cookieObject = {
+        SPP: {
+          status: 'MEMBER',
+          firstName: 'Test user',
+          level: 'gold',
+          salesCenterAccess: false,
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      const { applyPagePersonalization } = importModules();
+      applyPagePersonalization();
+      const block = document.querySelector('.partner-sales-access.partner-spp-member');
+      expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(true);
     });
   });
   describe('Gnav personalization', () => {
@@ -170,7 +221,7 @@ describe('Test personalization.js', () => {
     it('Replaces profile dropdown placeholders', () => {
       jest.isolateModules(() => {
         const cookieObject = {
-          CPP: {
+          SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Platinum',
@@ -193,7 +244,7 @@ describe('Test personalization.js', () => {
     it('Show primary contact', () => {
       jest.isolateModules(() => {
         const cookieObject = {
-          CPP: {
+          SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Platinum',
@@ -213,7 +264,7 @@ describe('Test personalization.js', () => {
         const expiredDate = new Date();
         expiredDate.setDate(expiredDate.getDate() + 30);
         const cookieObject = {
-          CPP: {
+          SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Gold',
@@ -234,7 +285,7 @@ describe('Test personalization.js', () => {
         const expiredDate = new Date();
         expiredDate.setDate(expiredDate.getDate() - 30);
         const cookieObject = {
-          CPP: {
+          SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Gold',
@@ -254,7 +305,7 @@ describe('Test personalization.js', () => {
     it('Show sales center link', () => {
       jest.isolateModules(() => {
         const cookieObject = {
-          CPP: {
+          SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Gold',
@@ -273,7 +324,7 @@ describe('Test personalization.js', () => {
     it('Should hide partner-level-platinum gnav items for non-platinum user', () => {
       jest.isolateModules(() => {
         const cookieObject = {
-          CPP: {
+          SPP: {
             status: 'MEMBER',
             firstName: 'Test user',
             level: 'Silver',
@@ -302,7 +353,7 @@ describe('Test personalization.js', () => {
     it('Should hide partner-sales-access gnav items for users without sales center access', () => {
       jest.isolateModules(() => {
         const cookieObject = {
-          CPP: {
+          SPP: {
             status: 'MEMBER',
             firstName: 'Test user',
             level: 'Silver',

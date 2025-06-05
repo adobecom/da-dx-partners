@@ -8,10 +8,9 @@ const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const DEFAULT_BACKGROUND_IMAGE_PATH = '/content/dam/solution/en/images/card-collection/sample_default.png';
 const KB_TAG = 'caas:adobe-partners/collections/knowledge-base';
 
-class SinglePartnerCard extends LitElement {
+class SinglePartnerCardHalfHeight extends LitElement {
   static properties = {
     data: { type: Object },
-    ietf: { type: String },
     design: { type: String },
   };
 
@@ -31,9 +30,7 @@ class SinglePartnerCard extends LitElement {
     const defaultBackgroundImageUrl = `${defaultBackgroundImageOrigin}${DEFAULT_BACKGROUND_IMAGE_PATH}`;
 
     img.onerror = () => {
-      if (element?.style) {
-        element.style.backgroundImage = `url(${defaultBackgroundImageUrl})`;
-      }
+      element.style.backgroundImage = `url(${defaultBackgroundImageUrl})`;
     };
 
     img.src = url;
@@ -45,21 +42,10 @@ class SinglePartnerCard extends LitElement {
 
   render() {
     return html`
-      <div class="single-partner-card">
-        <div class="card-header" style="background-image: url(${this.imageUrl})" alt="${this.data.styles?.backgroundAltText}">
-        </div>
-        <div class="card-content">
-          <div class="card-text">
-            <p class="card-title">${this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : ''}</p>
-            <p class="card-description">${this.data.contentArea?.description}</p>
-          </div>
-          <div class="card-footer">
-            <span class="card-date">${formatDate(this.data.cardDate, this.ietf)}</span>
-            <a class="card-btn" href="${transformCardUrl(this.data.contentArea?.url)}">${this.data.footer[0]?.right[0]?.text}</a>
-          </div>
-        </div>
-      </div>
+      <a class="single-partner-card--half-height" href="${transformCardUrl(this.data.contentArea?.url)}" style="background-image: url(${this.imageUrl})" alt="${this.data.styles?.backgroundAltText}">
+      <p class="card-title">${this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : ''}</p>
+      </a>
     `;
   }
 }
-customElements.define('single-partner-card', SinglePartnerCard);
+customElements.define('single-partner-card-half-height', SinglePartnerCardHalfHeight);
