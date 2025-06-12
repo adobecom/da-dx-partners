@@ -35,6 +35,7 @@ const CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
   imsClientId,
+  clientEnv: prodHosts.includes(window.location.host) ? 'prod' : null,
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   locales: {
@@ -89,7 +90,7 @@ function setUpPage() {
   updateNavigation();
   updateFooter();
 }
-(async function loadPage() {
+async function loadPage() {
   applyPagePersonalization();
   setUpPage();
   redirectLoggedinPartner();
@@ -102,4 +103,11 @@ function setUpPage() {
   await loadArea();
   applyPagePersonalization();
   rewriteLinks(document);
+}
+loadPage();
+
+(async function loadDa() {
+  if (!new URL(window.location.href).searchParams.get('dapreview')) return;
+  // eslint-disable-next-line import/no-unresolved
+  import('https://da.live/scripts/dapreview.js').then(({ default: daPreview }) => daPreview(loadPage));
 }());

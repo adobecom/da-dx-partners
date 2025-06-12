@@ -31,11 +31,23 @@ function personalizePlaceholders(placeholders, context = document) {
 }
 
 function shouldHide(conditions, conditionsConfig = PERSONALIZATION_CONDITIONS) {
-  return conditions.every((condition) => {
-    const conditionLevel = condition.startsWith(LEVEL_CONDITION) ? condition.split('-').pop() : '';
-    return conditionLevel
-      ? !conditionsConfig[LEVEL_CONDITION](conditionLevel) : !conditionsConfig[condition];
-  });
+  // eslint-disable-next-line max-len
+  const partnerLevelConditions = conditions.filter((condition) => condition.startsWith(LEVEL_CONDITION));
+
+  // eslint-disable-next-line max-len
+  const otherConditions = conditions.filter((condition) => !condition.startsWith(LEVEL_CONDITION) && Object.keys(PERSONALIZATION_CONDITIONS).includes(condition));
+
+  const matchesPartnerLevel = partnerLevelConditions.length === 0
+    || partnerLevelConditions.some((condition) => {
+      const conditionKeys = condition.split('-');
+      const level = conditionKeys.pop();
+      const program = conditionKeys.pop();
+      return conditionsConfig[LEVEL_CONDITION]?.(level, program);
+    });
+
+  const matchesOtherConditions = otherConditions.every((condition) => conditionsConfig[condition]);
+
+  return !(matchesPartnerLevel && matchesOtherConditions);
 }
 
 // eslint-disable-next-line max-len

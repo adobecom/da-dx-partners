@@ -26,9 +26,9 @@ export const PROCESSED_MARKER = '-processed';
 export const PERSONALIZATION_CONDITIONS = {
   'partner-not-member': signedInNonMember(),
   'partner-not-signed-in': !partnerIsSignedIn(),
-  'partner-all-levels': isMember(),
+  'partner-member': isMember(),
   'partner-sales-access': hasSalesCenterAccess(),
-  'partner-level': (level) => PARTNER_LEVEL === level,
+  'partner-level': (level, programType) => PARTNER_LEVEL === level && programType === PROGRAM,
   'partner-spp-member': isSPPOnly(),
   'partner-tpp-member': isTPPOnly(),
   'partner-spp-tpp-member': isSPPandTPP(),

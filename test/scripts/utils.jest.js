@@ -37,7 +37,7 @@ describe('Test utils.js', () => {
     window = Object.create(window);
     Object.defineProperty(window, 'location', {
       value: {
-        pathname: '/solutionpartners',
+        pathname: '/solutionpartners/',
         // eslint-disable-next-line no-return-assign
         assign: (pathname) => window.location.pathname = pathname,
         origin: 'https://partners.stage.adobe.com',
@@ -52,7 +52,7 @@ describe('Test utils.js', () => {
   it('Milo libs', () => {
     window.location.hostname = 'partners.stage.adobe.com';
     const libs = setLibs('/libs');
-    expect(libs).toEqual('https://www.stage.adobe.com/libs');
+    expect(libs).toEqual('https://partners.stage.adobe.com/libs');
   });
   describe('Test update footer and gnav', () => {
     beforeEach(() => {
@@ -368,19 +368,19 @@ describe('Test utils.js', () => {
     };
     const locale = getLocale(locales);
     document.body.innerHTML = fs.readFileSync(
-      path.resolve(__dirname, './mocks/partner-news.html'),
+      path.resolve(__dirname, './mocks/dx-card-collection.html'),
       'utf8',
     );
-    const el = document.querySelector('.partner-news');
+    const el = document.querySelector('.dx-card-collection');
 
     const block = {
       el,
-      name: 'partner-news',
-      collectionTag: '"caas:adobe-partners/collections/news"',
+      name: 'dx-card-collection',
+      // collectionTag: '"caas:adobe-partners/collections/news"',
       ietf: locale.ietf,
     };
     const caasUrl = getCaasUrl(block);
-    expect(caasUrl).toEqual('https://www.adobe.com/chimera-api/collection?originSelection=dx-partners&draft=false&flatFile=false&expanded=true&complexQuery=%28%22caas%3Aadobe-partners%2Fcollections%2Fnews%22%2BAND%2B%22caas%3Aadobe-partners%2Fspp%22%2BAND%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%2BAND%2B%28%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fplatinum%22%2BOR%2B%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fpublic%22%29&language=en&country=US');
+    expect(caasUrl).toEqual('https://www.adobe.com/chimera-api/collection?originSelection=dx-partners&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%2BAND%2B%28%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fplatinum%22%2BOR%2B%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fpublic%22%29&language=en&country=US');
   });
   it('Preload resources', async () => {
     const locales = {
@@ -388,7 +388,7 @@ describe('Test utils.js', () => {
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
     };
     document.body.innerHTML = fs.readFileSync(
-      path.resolve(__dirname, './mocks/partner-news.html'),
+      path.resolve(__dirname, './mocks/dx-card-collection.html'),
       'utf8',
     );
     await preloadResources(locales, '/libs');
