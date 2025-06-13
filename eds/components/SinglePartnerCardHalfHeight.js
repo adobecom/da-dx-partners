@@ -42,8 +42,17 @@ class SinglePartnerCardHalfHeight extends LitElement {
 
   render() {
     return html`
-      <a class="single-partner-card--half-height" href="${transformCardUrl(this.data.contentArea?.url)}" style="background-image: url(${this.imageUrl})" alt="${this.data.styles?.backgroundAltText}">
-      <p class="card-title">${this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : ''}</p>
+      <a
+        class="single-partner-card--half-height"
+        href="${transformCardUrl(this.data.contentArea?.url)}"
+        style="background-image: url(${this.imageUrl})"
+        alt="${this.data.styles?.backgroundAltText}"
+      >
+        <div class="card-title-wrapper">
+          <p class="card-title">
+            ${this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : ''}
+          </p>
+        </div>
       </a>
     `;
   }
