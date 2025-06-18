@@ -132,13 +132,6 @@ class ProfileDropdown {
           <div class="feds-profile-details">
             <p data-cs-mask class="feds-profile-name">${this.profileData.displayName}</p>
             <p data-cs-mask class="feds-profile-email">${this.decorateEmail(this.profileData.email)}</p>
-            <a  href="${decorateProfileLink('account', `?lang=${lang}`)}"
-                target="_blank" 
-                daa-ll="${this.placeholders.viewAccount}"
-                aria-label="${this.placeholders.viewAccount}" 
-                class="feds-profile-account">
-                    ${this.placeholders.viewAccount}
-            </a>
           </div>
         </div>
         ${this.localMenu ? this.decorateLocalMenu() : ''}

@@ -182,7 +182,7 @@ describe('Test personalization.js', () => {
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const block = document.querySelector('.partner-sales-access.partner-spp-member');
+      const block = document.querySelector('.partner-spp-sales-access.partner-spp-member');
       expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
     });
   });
@@ -200,7 +200,7 @@ describe('Test personalization.js', () => {
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const block = document.querySelector('.partner-sales-access.partner-spp-member');
+      const block = document.querySelector('.partner-spp-sales-access.partner-spp-member');
       expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(true);
     });
   });
@@ -225,14 +225,14 @@ describe('Test personalization.js', () => {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Platinum',
-            company: 'Test Company',
+            accountName: 'Test Company',
           },
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const companyPlaceholder = gnav.querySelector('#test-company-placeholder');
         const levelPlaceholder = gnav.querySelector('#test-level-placeholder');
-        expect(companyPlaceholder.textContent).toEqual('$company');
-        expect(levelPlaceholder.textContent).toEqual('$level');
+        expect(companyPlaceholder.textContent).toEqual('$spp-accountName');
+        expect(levelPlaceholder.textContent).toEqual('$spp-level');
         const { applyGnavPersonalization } = importModules();
         const personalizedGnav = applyGnavPersonalization(gnav);
         const companyPlaceholderUpdated = personalizedGnav.querySelector('#test-company-placeholder');
@@ -321,6 +321,25 @@ describe('Test personalization.js', () => {
         expect(salesCenterLink.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
       });
     });
+    it('Hide manage profile link if it is marked with partner-tpp-account and user does not have account data for tpp', () => {
+      jest.isolateModules(() => {
+        const cookieObject = {
+          SPP: {
+            status: 'MEMBER',
+            firstName: 'Test Name',
+            level: 'Gold',
+            company: 'Test Company',
+            primaryContact: true,
+            salesCenterAccess: true,
+          },
+        };
+        document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+        const salesCenterLink = gnav.querySelector('#manage-profile-link');
+        const { applyGnavPersonalization } = importModules();
+        applyGnavPersonalization(gnav);
+        expect(salesCenterLink.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeTruthy();
+      });
+    });
     it('Should hide partner-level-platinum gnav items for non-platinum user', () => {
       jest.isolateModules(() => {
         const cookieObject = {
@@ -350,7 +369,7 @@ describe('Test personalization.js', () => {
       });
     });
 
-    it('Should hide partner-sales-access gnav items for users without sales center access', () => {
+    it('Should hide partner-spp-sales-access gnav items for users without sales center access', () => {
       jest.isolateModules(() => {
         const cookieObject = {
           SPP: {

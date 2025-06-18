@@ -2,6 +2,7 @@ import {
   isMember,
   getNodesByXPath,
   isRenew,
+  getPartnerDataCookieObject
 } from './utils.js';
 import { getConfig } from '../blocks/utils/utils.js';
 import {
@@ -15,17 +16,25 @@ import {
   COOKIE_OBJECT,
   PERSONALIZATION_HIDE,
 } from './personalizationUtils.js';
+import {PROGRAM_TYPES} from "../blocks/utils/dxConstants.js";
 
 function personalizePlaceholders(placeholders, context = document) {
-  Object.entries(placeholders).forEach(([key, value]) => {
-    const placeholderValue = COOKIE_OBJECT[key];
-    getNodesByXPath(value, context).forEach((el) => {
-      if (!placeholderValue) {
-        el.remove();
+  PROGRAM_TYPES.forEach((programType) => {
+    const programData = getPartnerDataCookieObject(programType);
+    Object.entries(placeholders).forEach(([key, value]) => {
+      if (!key.startsWith(programType)) {
         return;
       }
-      el.textContent = el.textContent.replace(`$${key}`, placeholderValue);
-      el.classList.add(`${key.toLowerCase()}-placeholder`);
+      const transformedKey = key.replace(`${programType}-`, '')
+      const placeholderValue = programData[transformedKey];
+      getNodesByXPath(value, context).forEach((el) => {
+        if (!placeholderValue) {
+          el.remove();
+          return;
+        }
+        el.textContent = el.textContent.replace(`$${key}`, placeholderValue);
+        el.classList.add(`${transformedKey.toLowerCase()}-placeholder`);
+      });
     });
   });
 }

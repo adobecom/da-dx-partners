@@ -411,11 +411,11 @@ describe('Test utils.js', () => {
   it('Should have access if sales center is present in partner data cookie', async () => {
     const cookieObject = { SPP: { salesCenterAccess: true } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(hasSalesCenterAccess()).toBe(true);
+    expect(hasSalesCenterAccess('spp')).toBe(true);
   });
   it('Should not have access if sales center is not present in partner data cookie', async () => {
     const cookieObject = { SPP: { salesCenterAccess: false } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(hasSalesCenterAccess()).toBe(false);
+    expect(hasSalesCenterAccess('spp')).toBe(false);
   });
 });

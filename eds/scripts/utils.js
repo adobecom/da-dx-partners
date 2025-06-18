@@ -231,8 +231,8 @@ export function getPartnerDataCookieObject(programType) {
   return portalData;
 }
 
-export function hasSalesCenterAccess() {
-  const { salesCenterAccess } = getPartnerDataCookieObject(getCurrentProgramType());
+export function hasSalesCenterAccess(programType) {
+  const { salesCenterAccess } = getPartnerDataCookieObject(programType);
   return !!salesCenterAccess;
 }
 
@@ -315,6 +315,11 @@ const { isSPP, isTPP } = getProgramTypeStatus();
 export const isSPPOnly = () => isSPP && !isTPP;
 export const isTPPOnly = () => !isSPP && isTPP;
 export const isSPPandTPP = () => isSPP && isTPP;
+
+export const hasProgramData = (programType) => {
+  const accountStatus = getPartnerDataCookieValue(programType, 'status');
+  return accountStatus && accountStatus !== 'NOT_PARTNER';
+}
 
 export function getNodesByXPath(query, context = document) {
   const nodes = [];

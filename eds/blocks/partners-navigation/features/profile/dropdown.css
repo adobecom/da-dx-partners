@@ -160,6 +160,11 @@
   padding-top: 4px;
   padding-bottom: 0px;
 }
+/* MWPW-172075 - if no section title is present add padding top */
+.partners-navigation .feds-local-menu .no-section-title {
+  padding-top: 12px;
+  padding-bottom: 0px;
+}
 
 .partners-navigation .feds-local-menu > h5,
 .partners-navigation .feds-profile-menu .feds-profile-action {
@@ -190,14 +195,14 @@
   text-transform: none;
   font-size: 14px;
   padding: 16px 0;
-  color: #505050;
+  color: #2680EB; /* MWPW-172075 different link colors */
   font-style: normal;
   line-height: 1;
 }
 
 .partners-navigation .feds-local-menu a:hover {
   background: transparent;
-  color: #505050;
+  color: #2680EB; /* MWPW-172075 different link colors */
   text-decoration: underline;
 }
 
