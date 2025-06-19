@@ -232,28 +232,43 @@ export function getPartnerDataCookieObject(programType) {
 }
 
 export function hasSalesCenterAccess() {
-  const { salesCenterAccess } = getPartnerDataCookieObject(getCurrentProgramType());
-  return !!salesCenterAccess;
+  const sppData = getPartnerDataCookieObject('spp');
+  const tppData = getPartnerDataCookieObject('tpp');
+  
+  const sppSalesAccess = sppData?.salesCenterAccess;
+  const tppSalesAccess = tppData?.salesCenterAccess;
+  
+  return !!(sppSalesAccess || tppSalesAccess);
 }
 
 export function isAdminUser() {
-  const { isAdmin } = getPartnerDataCookieObject(getCurrentProgramType());
-  return !!isAdmin;
+  const sppData = getPartnerDataCookieObject('spp');
+  const tppData = getPartnerDataCookieObject('tpp');
+  
+  const sppIsAdmin = sppData?.isAdmin;
+  const tppIsAdmin = tppData?.isAdmin;
+
+  return !!(sppIsAdmin || tppIsAdmin);
 }
 
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
-  const programType = getCurrentProgramType();
-
-  const accountCreated = getPartnerDataCookieValue(programType, 'createddate');
-  if (!accountCreated) return;
-
-  const accountCreatedDate = new Date(accountCreated);
+  
+  const sppCreated = getPartnerDataCookieValue('spp', 'createddate');
+  const tppCreated = getPartnerDataCookieValue('tpp', 'createddate');
+  
+  const createdDates = [sppCreated, tppCreated]
+    .filter(date => date)
+    .map(date => new Date(date));
+  
+  if (createdDates.length === 0) return false;
+  
+  const newestCreatedDate = new Date(Math.max(...createdDates));
   const now = new Date();
-
-  const differenceInMilliseconds = now - accountCreatedDate;
+  
+  const differenceInMilliseconds = now - newestCreatedDate;
   const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
-
+  
   return differenceInMilliseconds > 0 && differenceInDays < 31;
 }
 
