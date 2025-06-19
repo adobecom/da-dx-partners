@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import {PROGRAM_TYPES} from "../blocks/utils/dxConstants.js";
+
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
 export const PARTNER_LOGIN_QUERY = 'partnerLogin';
@@ -36,8 +38,8 @@ export const [setLibs, getLibs] = (() => {
 })();
 
 export const prodHosts = [
-  'main--dx-partners--adobecom.aem.page',
-  'main--dx-partners--adobecom.aem.live',
+  'main--da-dx-partners--adobecom.aem.page',
+  'main--da-dx-partners--adobecom.aem.live',
   'partners.adobe.com',
 ];
 
@@ -291,8 +293,7 @@ export function isRenew() {
 }
 
 export function isMember() {
-  const { status } = getPartnerDataCookieObject(getCurrentProgramType());
-  return status === 'MEMBER';
+  return PROGRAM_TYPES.some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
 }
 
 export function partnerIsSignedIn() {

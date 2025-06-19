@@ -1,5 +1,5 @@
 
-name: DX-Partners Nala Tests
+name: DA-DX-Partners Nala Tests
 
 on:
   pull_request:
@@ -8,14 +8,14 @@ on:
 jobs:
   action:
     name: Running E2E & IT
-    if: contains(github.event.pull_request.labels.*.name, 'run-on-dx')
+    if: contains(github.event.pull_request.labels.*.name, 'run-on-da-dx')
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
       - name: Run Nala
-        uses: adobecom/dx-partners@stage # Change if doing dev work
+        uses: adobecom/da-dx-partners@stage # Change if doing dev work
         env:
           labels: ${{ '@anonymous' }}
           branch: ${{ github.event.pull_request.head.ref }}

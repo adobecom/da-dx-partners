@@ -1460,9 +1460,16 @@ html:has(body.disable-ios-scroll) {
   justify-content: space-between;
   gap: 15px;
 }
+.shortcut-icons-desktop .icons-wrapper {
+  display: flex;
+  margin: 0 auto;
+  gap: 15px;
+}
 .shortcut-icons-desktop{
   display: flex;
+  flex-grow: 1;
 }
+
 .shortcut-icons-mobile{
   display: none;
 }

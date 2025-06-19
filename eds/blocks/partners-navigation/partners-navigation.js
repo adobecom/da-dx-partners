@@ -345,10 +345,17 @@ class Gnav {
       if (icon.querySelectorAll('div').length !== 2) {
         return;
       }
-      const iconKey = icon.querySelectorAll('div')[0]?.textContent;
-      if (iconKey.includes(PERSONALIZATION_MARKER)) return;
+
+      const iconText = icon.querySelectorAll('div')[0]?.textContent?.trim(); // for example: 'search, bell (partner-personalization, partner-member)'
+      let iconKey = iconText.replace(/\s*\(.*\)/, '').trim(); // outside of parenthesis
+      const personalizationMarkersInParenthesis = iconText.match(/\(([^)]+)\)/); // inside parenthesis
+      const personalizationMarkers = personalizationMarkersInParenthesis ? personalizationMarkersInParenthesis[1] : ''; // for example: 'partner-personalization, partner-member'
+
+      iconKey = iconKey.split(',');
+      if(personalizationMarkers.includes(PERSONALIZATION_MARKER)) return;
       shortcutIcons.push({
-        iconKey,
+        iconKey: iconKey[0]?.trim(),
+        mobileIconKey: iconKey[1]?.trim(),
         iconLink: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('href'),
       });
     });
@@ -360,7 +367,7 @@ class Gnav {
       },
       search: { config: { icon: CONFIG.icons.search } },
       breadcrumbs: { wrapper: '' },
-      shortcutIcons: shortcutIcons, // MWPW-168681
+      shortcutIcons, // MWPW-168681
     };
 
     this.setupUniversalNav();
@@ -387,15 +394,15 @@ class Gnav {
 
   // MWPW-168681 START
   decorateShortcutIcons = (isMobile) => {
-    const origin = window.location.origin.includes('adobecom')
-      ? 'https://main--dx-partners--adobecom.aem.page' : window.location.origin;
-    const html = this.blocks.shortcutIcons.filter(el => el.iconLink && el.iconKey).map((obj) => `
+    let html = this.blocks.shortcutIcons.filter((el) => el.iconLink && el.iconKey).map((obj) => `
     <a href="${obj.iconLink}" class="shortcut-icons-link">
-      <img src="${origin}/eds/partners-shared/mnemonics/${obj.iconKey}.svg" alt="Image" class="shortcut-icons-img" />
+      <img src="/eds/partners-shared/mnemonics/${isMobile && obj.mobileIconKey? obj.mobileIconKey : obj.iconKey}.svg" alt="Image" class="shortcut-icons-img" />
     </a>
   `).join('');
-
-    return toFragment`<div class="shortcut-icons shortcut-icons-${isMobile? 'mobile' : 'desktop'}">${html}</div>`;
+    if (!isMobile) {
+      html = `<div class="icons-wrapper"> ${html}</div>`;
+    }
+    return toFragment`<div class="shortcut-icons shortcut-icons-${isMobile ? 'mobile' : 'desktop'}">${html}</div>`;
   };
   // MWPW-168681 END
 
@@ -912,11 +919,6 @@ class Gnav {
   toggleMenuMobile = () => {
     const toggle = this.elements.mobileToggle;
     const isExpanded = this.isToggleExpanded();
-    // MWPW-168681 START
-    if (this.blocks.shortcutIcons?.length > 0) {
-      document.querySelector('header')?.classList.add('with-shortcut-icons');
-    }
-    // MWPW-168681 END
     if (!isExpanded && this.newMobileNav) {
       const sections = document.querySelectorAll('header.new-nav .feds-nav > section.feds-navItem > button.feds-navLink');
       animateInSequence(sections, 0.075);

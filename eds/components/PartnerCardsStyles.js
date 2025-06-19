@@ -27,7 +27,11 @@ export const partnerCardsStyles = css`
     grid-template-columns: 204px auto;
     gap: 32px;
   }
-  
+
+  .partner-cards.filters-disabled {
+    grid-template-columns: none;
+  }
+
   @media screen and (max-width: 1200px) {
     .partner-cards {
       grid-template-columns: unset;
@@ -346,6 +350,10 @@ export const partnerCardsStyles = css`
       align-items: center;
       justify-content: space-between;
     }
+
+    .partner-cards-header .partner-cards-sort-wrapper.filters-disabled {
+      justify-content: flex-end;
+    }
   }
   
   .partner-cards-header .partner-cards-sort-wrapper .filters-btn-mobile {
@@ -405,6 +413,9 @@ export const partnerCardsStyles = css`
     border-left: 1px solid ${borderColor};
     margin-left: 20px;
     padding-left: 20px;
+  }
+  .partner-cards-header .partner-cards-sort-wrapper .sort-wrapper.border-disabled {
+    border-left: none;
   }
   
   @media screen and (max-width: 1200px) {
@@ -506,6 +517,10 @@ export const partnerCardsStyles = css`
     max-width: 100%;
     grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
     gap: 32px;
+  }
+
+  .partner-cards-collection.layout-4-up {
+    grid-template-columns: repeat(auto-fit, minmax(275px, max-content));
   }
   
   .partner-cards-collection .card-wrapper {
@@ -1142,7 +1157,12 @@ export const singlePartnerCardStyles = css`
   .single-partner-card--half-height .card-title {
     color: #fff;
     z-index: 1;
+  }
+
+  .single-partner-card--half-height .card-title-wrapper {
     padding: 8px 24px 32px;
+    color: #fff;
+    z-index: 1;
   }
 
   .single-partner-card .card-description {

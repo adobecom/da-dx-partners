@@ -19,7 +19,7 @@ function displayHelp() {
   \x1b[33m* -g, --g=<@tag>\x1b[0m                     Tags to filter tests by annotations ex: @test1 @accordion @marquee
   \x1b[33m* mode=<headless|ui|debug|headed>\x1b[0m    Mode (default: headless)
   \x1b[33m* config=<config-file>\x1b[0m               Configuration file (default: Playwright default)
-  \x1b[33m* project=<project-name>\x1b[0m             Project configuration (default: dx-partners-live-chromium)
+  \x1b[33m* project=<project-name>\x1b[0m             Project configuration (default: da-dx-partners-live-chromium)
   \x1b[33m* milolibs=<local|prod|code|feature>\x1b[0m Milo library environment (default: none)
 
 \x1b[1mExamples:\x1b[0m
@@ -90,7 +90,7 @@ function getLocalTestLiveUrl(env, milolibs) {
     } else if (env === 'libs') {
       return `http://127.0.0.1:6456/?milolibs=${milolibs}`;
     } else {
-      return `https://${env}--dx-partners--adobecom.aem.live/?milolibs=${milolibs}`;
+      return `https://${env}--da-dx-partners--adobecom.aem.live/?milolibs=${milolibs}`;
     }
   } else {
     if (env === 'local') {
@@ -100,7 +100,7 @@ function getLocalTestLiveUrl(env, milolibs) {
     } else if (env === 'partners.stage') {
       return 'https://partners.stage.adobe.com';
     } else {
-      return `https://${env}--dx-partners--adobecom.aem.live`;
+      return `https://${env}--da-dx-partners--adobecom.aem.live`;
     }
   }
 }
