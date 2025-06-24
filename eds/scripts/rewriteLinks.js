@@ -7,7 +7,6 @@ import { prodHosts } from './utils.js';
  */
 const domainConfigs = {
   'partners.adobe.com': { stage: { domain: 'partners.stage.adobe.com' } },
-  'solutionpartners.adobe.com': { stage: { domain: 'solutionpartners.stage2.adobe.com' } },
   'exchange.adobe.com': { stage: { domain: 'stage.exchange.adobe.com' } },
   'cbconnection.adobe.com': { stage: { domain: 'cbconnection-stage.adobe.com' } },
 };

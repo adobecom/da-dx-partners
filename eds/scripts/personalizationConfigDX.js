@@ -7,9 +7,6 @@ import {
   isMember,
   partnerIsSignedIn,
   signedInNonMember,
-  isSPPOnly,
-  isTPPOnly,
-  isSPPandTPP,
 } from './utils.js';
 import { PARTNER_LEVEL, PROGRAM } from '../blocks/utils/dxConstants.js';
 
@@ -28,10 +25,7 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-not-signed-in': !partnerIsSignedIn(),
   'partner-member': isMember(),
   'partner-sales-access': hasSalesCenterAccess(),
-  'partner-level': (level, programType) => PARTNER_LEVEL === level && programType === PROGRAM,
-  'partner-spp-member': isSPPOnly(),
-  'partner-tpp-member': isTPPOnly(),
-  'partner-spp-tpp-member': isSPPandTPP(),
+  'partner-level': (level) => PARTNER_LEVEL === level,
   'partner-admin': isAdminUser(),
   'partner-primary': COOKIE_OBJECT.primaryContact,
   'partner-newly-registered': isPartnerNewlyRegistered(),

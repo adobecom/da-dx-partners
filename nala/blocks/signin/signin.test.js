@@ -89,7 +89,7 @@ test.describe('MAPP sign in flow', () => {
       await page.waitForLoadState('domcontentloaded');
     });
 
-    await test.step('Sign in with spp community user', async () => {
+    await test.step('Sign in with dx community user', async () => {
       await signInPage.signIn(page, `${features[2].data.partnerLevel}`);
       await signInPage.userNameDisplay.waitFor({ state: 'visible', timeout: 15000 });
     });
@@ -117,7 +117,7 @@ test.describe('MAPP sign in flow', () => {
       await page.waitForLoadState('domcontentloaded');
     });
 
-      await test.step('Sign in with spp platinum user', async () => {
+      await test.step('Sign in with dx platinum user', async () => {
         await signInPage.signIn(page, `${feature.data.partnerLevel}`);
         await signInPage.userNameDisplay.waitFor({ state: 'visible', timeout: 30000 });
     });
@@ -162,7 +162,7 @@ test.describe('MAPP sign in flow', () => {
       await page.waitForLoadState('domcontentloaded');
     });
 
-    await test.step('Sign in with spp community user', async () => {
+    await test.step('Sign in with dx community user', async () => {
       await signInPage.signIn(page, `${features[7].data.partnerLevel}`);
     });
 

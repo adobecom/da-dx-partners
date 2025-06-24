@@ -9,8 +9,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {PROGRAM_TYPES} from "../blocks/utils/dxConstants.js";
-
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
 export const PARTNER_LOGIN_QUERY = 'partnerLogin';
@@ -111,11 +109,7 @@ function preloadLit(miloLibs) {
 
 export function getProgramType(path) {
   switch (true) {
-    case /\/(solutionpartners|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'spp';
-    case /technologypartners/.test(path): return 'tpp';
-    case /channelpartners/.test(path): return 'cpp';
     case /digitalexperience/.test(path): return 'dx';
-    case /channelpartnerassets/.test(path): return 'cpp';
     default: return '';
   }
 }
@@ -123,14 +117,8 @@ export function getProgramType(path) {
 export function getProgramHomePage(path) {
   const programType = getProgramType(path);
   switch (programType) {
-    case 'spp':
-      return '/solutionpartners/';
-    case 'tpp':
-      return '/technologypartners/';
     case 'dx':
       return '/digitalexperience/';
-    case 'cpp':
-      return '/channelpartners/';
     default:
       return '';
   }
@@ -177,9 +165,9 @@ function extractTableCollectionTags(el) {
   return tableCollectionTags;
 }
 
-function getPartnerLevelParams(portal) {
-  const partnerLevel = getPartnerDataCookieValue(portal, 'level');
-  const partnerTagBase = `"caas:adobe-partners/${portal}/partner-level/`;
+function getPartnerLevelParams() {
+  const partnerLevel = getPartnerDataCookieValue(getCurrentProgramType(), 'level');
+  const partnerTagBase = `"caas:adobe-partners/dx/partner-level/`;
   return partnerLevel ? `(${partnerTagBase}${partnerLevel}"+OR+${partnerTagBase}public")` : `(${partnerTagBase}public")`;
 }
 
@@ -217,7 +205,7 @@ function getComplexQueryParams(el) {
     resultStr += `+NOT+${qaContentTag}`;
   }
 
-  const partnerLevelParams = getPartnerLevelParams('spp');
+  const partnerLevelParams = getPartnerLevelParams();
   if (partnerLevelParams) resultStr += `+AND+${partnerLevelParams}`;
 
   return resultStr;
@@ -232,11 +220,13 @@ export function getPartnerDataCookieObject(programType) {
 }
 
 export function hasSalesCenterAccess() {
+  // Check sales center access for DX portal
   const { salesCenterAccess } = getPartnerDataCookieObject(getCurrentProgramType());
   return !!salesCenterAccess;
 }
 
 export function isAdminUser() {
+  // Check admin access for DX portal
   const { isAdmin } = getPartnerDataCookieObject(getCurrentProgramType());
   return !!isAdmin;
 }
@@ -293,7 +283,8 @@ export function isRenew() {
 }
 
 export function isMember() {
-  return PROGRAM_TYPES.some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
+  // For DX portal, check if user is a member of the current program
+  return getPartnerDataCookieObject(getCurrentProgramType())?.status === 'MEMBER';
 }
 
 export function partnerIsSignedIn() {
@@ -303,18 +294,6 @@ export function partnerIsSignedIn() {
 export function signedInNonMember() {
   return partnerIsSignedIn() && !isMember();
 }
-
-function getProgramTypeStatus() {
-  const isSPP = getPartnerDataCookieValue('spp', 'status') === 'member';
-  const isTPP = getPartnerDataCookieValue('tpp', 'status') === 'member';
-  return { isSPP, isTPP };
-}
-
-const { isSPP, isTPP } = getProgramTypeStatus();
-
-export const isSPPOnly = () => isSPP && !isTPP;
-export const isTPPOnly = () => !isSPP && isTPP;
-export const isSPPandTPP = () => isSPP && isTPP;
 
 export function getNodesByXPath(query, context = document) {
   const nodes = [];
@@ -490,8 +469,7 @@ export function updateNavigation() {
   const gnavMeta = getMetadata('gnav-source');
   if (!gnavMeta) return;
   let { content } = gnavMeta;
-  const programTypeStatus = getProgramTypeStatus();
-  if (programTypeStatus.isSPP || programTypeStatus.isTPP) {
+  if (isMember()) {
     content = getMetadataContent('gnav-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-gnav';
   }
   gnavMeta.content = content;
@@ -501,8 +479,7 @@ export function updateFooter() {
   const footerMeta = getMetadata('footer-source');
   if (!footerMeta) return;
   let { content } = footerMeta;
-  const programTypeStatus = getProgramTypeStatus();
-  if (programTypeStatus.isSPP || programTypeStatus.isTPP) {
+  if (isMember()) {
     content = getMetadataContent('footer-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-footer';
   }
   footerMeta.content = content;

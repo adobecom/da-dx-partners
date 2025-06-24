@@ -21,7 +21,6 @@ jest.mock('../../eds/scripts/utils.js', () => ({
 document.body.innerHTML = `
   <div>
     <a href="https://partners.adobe.com">Partner prod Link</a>
-    <a id="spp-link" href="https://solutionpartners.adobe.com/solution-partners/contact.html">SPP prod Link</a>
     <a id="exchange-link" href="https://exchange.adobe.com/">Adobe Exchange prod Link</a>
     <a id="cbc-link" href="https://cbconnection.adobe.com/en/apc-helpdesk">CBC prod Link</a>
   </div>
@@ -61,12 +60,6 @@ describe('Test rewrite links', () => {
       expect(links[0].href).toBe('https://partners.stage.adobe.com/');
     },
   );
-
-  test('should update SPP prod link when on non prod', () => {
-    rewriteLinks(document);
-    const link = document.querySelector('#spp-link');
-    expect(link.href).toBe('https://solutionpartners.stage2.adobe.com/solution-partners/contact.html');
-  });
 
   test('should update Adobe Exchange prod link when on non prod', () => {
     rewriteLinks(document);

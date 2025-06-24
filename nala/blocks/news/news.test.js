@@ -61,7 +61,7 @@ const { features } = News;
 //       await expect(parseInt(result.split(' ')[0], 10)).toBe(data.numberOfPublicCards);
 //     });
 
-//     await test.step('Enter Automation regression news card SPP Public no1 in search field', async () => {
+//     await test.step('Enter Automation regression news card DX Public no1 in search field', async () => {
 //       await newsPage.searchField.fill(data.publicCard1);
 //       const result = await newsPage.resultNumber.textContent();
 //       await expect(parseInt(result.split(' ')[0], 10)).toBe(data.numberOfMatchingTitleCards);
@@ -73,7 +73,7 @@ const { features } = News;
 //       await expect(parseInt(result.split(' ')[0], 10)).toBe(data.numberOfPublicCards);
 //     });
 
-//     await test.step('Enter Automation regression news card SPP Public no2 in search field', async () => {
+//     await test.step('Enter Automation regression news card DX Public no2 in search field', async () => {
 //       await newsPage.searchField.fill(data.publicCard2);
 //       const result = await newsPage.resultNumber.textContent();
 //       await expect(parseInt(result.split(' ')[0], 10)).toBe(data.numberOfMatchingTitleCards);
@@ -247,8 +247,8 @@ const { features } = News;
 //       const resultDateInPastCard = await newsPage.resultNumber.textContent();
 //       await expect(parseInt(resultDateInPastCard.split(' ')[0], 10)).toBe(data.oneCard);
 //       await newsPage.searchField.fill(data.publicCard6);
-//       const resultSppPublicCardNo6 = await newsPage.resultNumber.textContent();
-//       await expect(parseInt(resultSppPublicCardNo6.split(' ')[0], 10)).toBe(data.oneCard);
+//       const resultDxPublicCardNo6 = await newsPage.resultNumber.textContent();
+//       await expect(parseInt(resultDxPublicCardNo6.split(' ')[0], 10)).toBe(data.oneCard);
 //       await newsPage.searchField.fill(data.cardWithSpecialChars);
 //       const resultSpecialCharsCard = await newsPage.resultNumber.textContent();
 //       await expect(parseInt(resultSpecialCharsCard.split(' ')[0], 10)).toBe(data.oneCard);
