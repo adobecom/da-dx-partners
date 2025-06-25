@@ -7,18 +7,18 @@ export default {
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
       tags: '@da-dx-signin @regression @circleCi @anonymous',
       data: {
-        partnerLevel: 'dx-platinum:',
+        partnerLevel: 'spp-platinum:',
         expectedProtectedURL: '/digitalexperience/drafts/automation/regression/protected-home',
         expectedPublicURL: '/digitalexperience/drafts/automation/regression/public-page',
       },
     },
     {
       tcid: '2',
-      name: '@login-redirection-to-dx-gold-page',
+      name: '@login-redirection-to-spp-gold-page',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/gold-page',
       tags: '@da-dx-signin @regression @circleCi @anonymous',
       data: {
-        partnerLevel: 'dx-gold:',
+        partnerLevel: 'spp-gold:',
         expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/gold-page',
       },
     },
@@ -29,7 +29,7 @@ export default {
       baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi @anonymous',
       data: {
-        partnerLevel: 'dx-community:',
+        partnerLevel: 'spp-community:',
         expectedProtectedURL: '/digitalexperience/drafts/automation/regression/protected-home',
       },
     },
@@ -40,7 +40,7 @@ export default {
       baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi @anonymous',
       data: {
-        partnerLevel: 'dx-platinum:',
+        partnerLevel: 'spp-platinum:',
         expectedProtectedURL: '/digitalexperience/drafts/automation/regression/protected-home',
       },
     },
@@ -51,7 +51,7 @@ export default {
       baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi @anonymous',
       data: {
-        partnerLevel: 'dx-non-member:',
+        partnerLevel: 'cpp-distributor-india:',
         expectedProtectedURL: '/digitalexperience/drafts/automation/regression/public-page',
       },
     },
@@ -62,7 +62,7 @@ export default {
       baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi @anonymous',
       data: {
-        partnerLevel: 'dx-non-member:',
+        partnerLevel: 'cpp-distributor-india:',
         expectedProtectedURL: '/digitalexperience/error/contact-not-found',
       },
     },

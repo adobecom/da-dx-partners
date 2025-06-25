@@ -220,13 +220,11 @@ export function getPartnerDataCookieObject(programType) {
 }
 
 export function hasSalesCenterAccess() {
-  // Check sales center access for DX portal
   const { salesCenterAccess } = getPartnerDataCookieObject(getCurrentProgramType());
   return !!salesCenterAccess;
 }
 
 export function isAdminUser() {
-  // Check admin access for DX portal
   const { isAdmin } = getPartnerDataCookieObject(getCurrentProgramType());
   return !!isAdmin;
 }
@@ -283,7 +281,6 @@ export function isRenew() {
 }
 
 export function isMember() {
-  // For DX portal, check if user is a member of the current program
   return getPartnerDataCookieObject(getCurrentProgramType())?.status === 'MEMBER';
 }
 
