@@ -293,7 +293,7 @@ export function isRenew() {
 }
 
 export function isMember() {
-  return PROGRAM_TYPES.some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
+  return Object.keys(PROGRAM_TYPES).some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
 }
 
 export function partnerIsSignedIn() {

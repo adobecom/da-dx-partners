@@ -182,7 +182,7 @@ describe('Test personalization.js', () => {
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const block = document.querySelector('.partner-spp-sales-access.partner-spp-member');
+      const block = document.querySelector('.partner-sales-access.partner-spp-member');
       expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
     });
   });
@@ -200,7 +200,7 @@ describe('Test personalization.js', () => {
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const block = document.querySelector('.partner-spp-sales-access.partner-spp-member');
+      const block = document.querySelector('.partner-sales-access.partner-spp-member');
       expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(true);
     });
   });
@@ -321,7 +321,7 @@ describe('Test personalization.js', () => {
         expect(salesCenterLink.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
       });
     });
-    it('Hide manage profile link if it is marked with partner-tpp-account and user does not have account data for tpp', () => {
+    it('Do not hide sales center link if it is marked with partner-tpp-account and user has access to sales center on spp or tpp program', () => {
       jest.isolateModules(() => {
         const cookieObject = {
           SPP: {
@@ -337,7 +337,7 @@ describe('Test personalization.js', () => {
         const salesCenterLink = gnav.querySelector('#manage-profile-link');
         const { applyGnavPersonalization } = importModules();
         applyGnavPersonalization(gnav);
-        expect(salesCenterLink.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeTruthy();
+        expect(salesCenterLink.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
       });
     });
     it('Should hide partner-level-platinum gnav items for non-platinum user', () => {
@@ -369,7 +369,7 @@ describe('Test personalization.js', () => {
       });
     });
 
-    it('Should hide partner-spp-sales-access gnav items for users without sales center access', () => {
+    it('Should hide partner-sales-access gnav items for users without sales center access', () => {
       jest.isolateModules(() => {
         const cookieObject = {
           SPP: {

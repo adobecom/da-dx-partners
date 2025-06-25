@@ -17,7 +17,7 @@ export function processPrimaryContact(el) {
 }
 
 export function processSalesAccess(el, programType) {
-  const salesAccess = hasSalesCenterAccess(programType);
+  const salesAccess = hasSalesCenterAccess();
   const element = el.parentElement;
   if (!salesAccess) {
     element.classList.add(PERSONALIZATION_HIDE);
