@@ -38,8 +38,8 @@ export const [setLibs, getLibs] = (() => {
 })();
 
 export const prodHosts = [
-  'main--dx-partners--adobecom.aem.page',
-  'main--dx-partners--adobecom.aem.live',
+  'main--da-dx-partners--adobecom.aem.page',
+  'main--da-dx-partners--adobecom.aem.live',
   'partners.adobe.com',
 ];
 
@@ -231,27 +231,42 @@ export function getPartnerDataCookieObject(programType) {
   return portalData;
 }
 
-export function hasSalesCenterAccess(programType) {
-  const { salesCenterAccess } = getPartnerDataCookieObject(programType);
-  return !!salesCenterAccess;
+export function hasSalesCenterAccess() {
+  const sppData = getPartnerDataCookieObject('spp');
+  const tppData = getPartnerDataCookieObject('tpp');
+
+  const sppSalesAccess = sppData?.salesCenterAccess;
+  const tppSalesAccess = tppData?.salesCenterAccess;
+
+  return !!(sppSalesAccess || tppSalesAccess);
 }
 
 export function isAdminUser() {
-  const { isAdmin } = getPartnerDataCookieObject(getCurrentProgramType());
-  return !!isAdmin;
+  const sppData = getPartnerDataCookieObject('spp');
+  const tppData = getPartnerDataCookieObject('tpp');
+
+  const sppIsAdmin = sppData?.isAdmin;
+  const tppIsAdmin = tppData?.isAdmin;
+
+  return !!(sppIsAdmin || tppIsAdmin);
 }
 
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
-  const programType = getCurrentProgramType();
 
-  const accountCreated = getPartnerDataCookieValue(programType, 'createddate');
-  if (!accountCreated) return;
+  const sppCreated = getPartnerDataCookieValue('spp', 'createddate');
+  const tppCreated = getPartnerDataCookieValue('tpp', 'createddate');
 
-  const accountCreatedDate = new Date(accountCreated);
+  const createdDates = [sppCreated, tppCreated]
+    .filter(date => date)
+    .map(date => new Date(date));
+
+  if (createdDates.length === 0) return false;
+
+  const newestCreatedDate = new Date(Math.max(...createdDates));
   const now = new Date();
 
-  const differenceInMilliseconds = now - accountCreatedDate;
+  const differenceInMilliseconds = now - newestCreatedDate;
   const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
 
   return differenceInMilliseconds > 0 && differenceInDays < 31;
@@ -315,11 +330,6 @@ const { isSPP, isTPP } = getProgramTypeStatus();
 export const isSPPOnly = () => isSPP && !isTPP;
 export const isTPPOnly = () => !isSPP && isTPP;
 export const isSPPandTPP = () => isSPP && isTPP;
-
-export const hasProgramData = (programType) => {
-  const accountStatus = getPartnerDataCookieValue(programType, 'status');
-  return accountStatus && accountStatus !== 'NOT_PARTNER';
-}
 
 export function getNodesByXPath(query, context = document) {
   const nodes = [];

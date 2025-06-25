@@ -23,7 +23,7 @@ class SinglePartnerCard extends LitElement {
   }
 
   checkBackgroundImage(element) {
-    const url = this.imageUrl;
+    const url = 'https://stage--dx-partners--adobecom.aem.page' + this.imageUrl;
     const img = new Image();
 
     const isProd = prodHosts.includes(window.location.host);
@@ -46,7 +46,7 @@ class SinglePartnerCard extends LitElement {
   render() {
     return html`
       <div class="single-partner-card">
-        <div class="card-header" style="background-image: url(${this.imageUrl})" alt="${this.data.styles?.backgroundAltText}">
+        <div class="card-header" style="background-image: url(https://stage--dx-partners--adobecom.aem.page${this.imageUrl})" alt="${this.data.styles?.backgroundAltText}">
         </div>
         <div class="card-content">
           <div class="card-text">

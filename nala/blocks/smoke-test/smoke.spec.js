@@ -6,13 +6,13 @@ export default {
       name: '@desc-partner-directory-validate-access',
       testId: '@MWPW-168683',
       path: '/join',
-      tags: '@dx-smoke-test',
+      tags: '@da-dx-smoke-test',
     },
     {
       tcid: '2',
       name: '@desc-partner-directory-validate-links',
       testId: '@MWPW-168683',
-      tags: '@dx-smoke-test',
+      tags: '@da-dx-smoke-test',
       data: {
         contactUsSPURL: 'https://solutionpartners.stage2.adobe.com/solution-partners/contact.html',
         findPartnerSPURL: '/s/directory/solution',
@@ -31,7 +31,7 @@ export default {
       name: '@desc-partner-directory-join-validate-links',
       testId: '@MWPW-168683',
       path: '/join',
-      tags: '@dx-smoke-test',
+      tags: '@da-dx-smoke-test',
       data: {
         learnMoreSPURL: 'https://solutionpartners.stage2.adobe.com/solution-partners/about.html',
         joinNowSPURL: 'https://solutionpartners.stage2.adobe.com/solution-partners/registration.html',

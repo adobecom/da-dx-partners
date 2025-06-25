@@ -10,6 +10,7 @@ export default class SignInPage {
     this.newsletterLink = page.locator('a:has-text("product newsletter")');
     this.logoutButton = page.locator('[daa-ll="Sign Out"]');
     this.userNameDisplay = page.locator('.user-name');
+    this.adobeProfile = page.locator('[data-test-id="unav-profile"]');
 
     this.IMSEmailPage = page.locator('form#EmailForm');
     this.emailField = page.locator('#EmailPage-EmailField');
