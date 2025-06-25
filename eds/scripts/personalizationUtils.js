@@ -16,7 +16,7 @@ export function processPrimaryContact(el) {
   el.replaceWith(primaryContactWrapper);
 }
 
-export function processSalesAccess(el, programType) {
+export function processSalesAccess(el) {
   const salesAccess = hasSalesCenterAccess();
   const element = el.parentElement;
   if (!salesAccess) {
