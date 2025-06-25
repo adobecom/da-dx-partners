@@ -1,7 +1,7 @@
 # Milo goes to college
 Use this project template to create a Milo site.
 
-# codecov test
+# codecov test 1
 
 ## Steps
 
