@@ -234,17 +234,17 @@ export function getPartnerDataCookieObject(programType) {
 export function hasSalesCenterAccess() {
   const sppData = getPartnerDataCookieObject('spp');
   const tppData = getPartnerDataCookieObject('tpp');
-  
+
   const sppSalesAccess = sppData?.salesCenterAccess;
   const tppSalesAccess = tppData?.salesCenterAccess;
-  
+
   return !!(sppSalesAccess || tppSalesAccess);
 }
 
 export function isAdminUser() {
   const sppData = getPartnerDataCookieObject('spp');
   const tppData = getPartnerDataCookieObject('tpp');
-  
+
   const sppIsAdmin = sppData?.isAdmin;
   const tppIsAdmin = tppData?.isAdmin;
 
@@ -253,22 +253,22 @@ export function isAdminUser() {
 
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
-  
+
   const sppCreated = getPartnerDataCookieValue('spp', 'createddate');
   const tppCreated = getPartnerDataCookieValue('tpp', 'createddate');
-  
+
   const createdDates = [sppCreated, tppCreated]
     .filter(date => date)
     .map(date => new Date(date));
-  
+
   if (createdDates.length === 0) return false;
-  
+
   const newestCreatedDate = new Date(Math.max(...createdDates));
   const now = new Date();
-  
+
   const differenceInMilliseconds = now - newestCreatedDate;
   const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
-  
+
   return differenceInMilliseconds > 0 && differenceInDays < 31;
 }
 
@@ -308,7 +308,7 @@ export function isRenew() {
 }
 
 export function isMember() {
-  return PROGRAM_TYPES.some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
+  return Object.keys(PROGRAM_TYPES).some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
 }
 
 export function partnerIsSignedIn() {

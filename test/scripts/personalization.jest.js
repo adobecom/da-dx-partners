@@ -225,14 +225,14 @@ describe('Test personalization.js', () => {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Platinum',
-            company: 'Test Company',
+            accountName: 'Test Company',
           },
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const companyPlaceholder = gnav.querySelector('#test-company-placeholder');
         const levelPlaceholder = gnav.querySelector('#test-level-placeholder');
-        expect(companyPlaceholder.textContent).toEqual('$company');
-        expect(levelPlaceholder.textContent).toEqual('$level');
+        expect(companyPlaceholder.textContent).toEqual('$spp-accountName');
+        expect(levelPlaceholder.textContent).toEqual('$spp-level');
         const { applyGnavPersonalization } = importModules();
         const personalizedGnav = applyGnavPersonalization(gnav);
         const companyPlaceholderUpdated = personalizedGnav.querySelector('#test-company-placeholder');
@@ -316,6 +316,25 @@ describe('Test personalization.js', () => {
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const salesCenterLink = gnav.querySelector('#sales-link');
+        const { applyGnavPersonalization } = importModules();
+        applyGnavPersonalization(gnav);
+        expect(salesCenterLink.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
+      });
+    });
+    it('Do not hide sales center link if it is marked with partner-tpp-account and user has access to sales center on spp or tpp program', () => {
+      jest.isolateModules(() => {
+        const cookieObject = {
+          SPP: {
+            status: 'MEMBER',
+            firstName: 'Test Name',
+            level: 'Gold',
+            company: 'Test Company',
+            primaryContact: true,
+            salesCenterAccess: true,
+          },
+        };
+        document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+        const salesCenterLink = gnav.querySelector('#manage-profile-link');
         const { applyGnavPersonalization } = importModules();
         applyGnavPersonalization(gnav);
         expect(salesCenterLink.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();

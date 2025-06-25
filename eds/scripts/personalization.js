@@ -2,6 +2,7 @@ import {
   isMember,
   getNodesByXPath,
   isRenew,
+  getPartnerDataCookieObject, isSPPOnly, isTPPOnly, isSPPandTPP
 } from './utils.js';
 import { getConfig } from '../blocks/utils/utils.js';
 import {
@@ -12,20 +13,25 @@ import {
   PROFILE_PERSONALIZATION_ACTIONS, LEVEL_CONDITION,
 } from './personalizationConfigDX.js';
 import {
-  COOKIE_OBJECT,
   PERSONALIZATION_HIDE,
 } from './personalizationUtils.js';
+import {PROGRAM_TYPES} from "../blocks/utils/dxConstants.js";
 
-function personalizePlaceholders(placeholders, context = document) {
+function personalizePlaceholders(placeholders, context = document, programType) {
   Object.entries(placeholders).forEach(([key, value]) => {
-    const placeholderValue = COOKIE_OBJECT[key];
+    if (!key.startsWith(programType.toLowerCase())) {
+      return;
+    }
+    const programData = getPartnerDataCookieObject(programType);
+    const transformedKey = key.replace(`${programType.toLowerCase()}-`, '');
+    const placeholderValue = programData[transformedKey];
     getNodesByXPath(value, context).forEach((el) => {
       if (!placeholderValue) {
         el.remove();
         return;
       }
       el.textContent = el.textContent.replace(`$${key}`, placeholderValue);
-      el.classList.add(`${key.toLowerCase()}-placeholder`);
+      el.classList.add(`${transformedKey.toLowerCase()}-placeholder`);
     });
   });
 }
@@ -92,7 +98,9 @@ function personalizePage(page) {
 
 export function applyPagePersonalization() {
   const main = document.querySelector('main') ?? document;
-  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, main);
+  Object.keys(PROGRAM_TYPES).forEach(programType => {
+    personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, main, programType);
+  })
   personalizePage(main);
 }
 
@@ -176,7 +184,38 @@ export function shouldHideLinkGroup(elem) {
 
 function personalizeProfile(gnav) {
   const profile = gnav.querySelector('.profile');
-  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, profile);
+
+  const sppSection = profile.children[0];
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, sppSection, PROGRAM_TYPES.SPP);
+  const tppSection = profile.children[1];
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, tppSection, PROGRAM_TYPES.TPP);
+
+  if (isSPPOnly()) {
+    const sppSectionTitle = sppSection.querySelector('h5');
+    sppSectionTitle.classList.add(PERSONALIZATION_HIDE);
+    sppSectionTitle.nextElementSibling.classList.add('no-section-title');
+    tppSection?.remove();
+  } else if (isTPPOnly()) {
+    const tppSectionTitle = tppSection.querySelector('h5');
+    tppSectionTitle.classList.add(PERSONALIZATION_HIDE);
+    tppSectionTitle.nextElementSibling.classList.add('no-section-title');
+    sppSection?.remove();
+  } else if (isSPPandTPP()) {
+    const unifiedProgramWrapper = document.createElement('div');
+    const outerWrapper = profile.appendChild(unifiedProgramWrapper);
+    const innerWrapper = outerWrapper.appendChild(unifiedProgramWrapper.cloneNode());
+
+    innerWrapper.append(...sppSection.firstElementChild.children);
+    innerWrapper.append(document.createElement('hr'));
+    innerWrapper.append(...tppSection.firstElementChild.children);
+
+    sppSection.remove();
+    tppSection.remove();
+  } else {
+    sppSection.remove();
+    tppSection.remove();
+  }
+
   personalizeDropdownElements(profile);
   processRenew(profile);
 }

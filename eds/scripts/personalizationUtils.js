@@ -21,8 +21,5 @@ export function processSalesAccess(el) {
   const element = el.parentElement;
   if (!salesAccess) {
     element.classList.add(PERSONALIZATION_HIDE);
-    return;
   }
-  const divider = document.createElement('hr');
-  element.insertBefore(divider, el);
 }

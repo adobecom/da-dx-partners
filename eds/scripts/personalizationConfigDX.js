@@ -1,6 +1,5 @@
 import { processPrimaryContact, processSalesAccess, COOKIE_OBJECT } from './personalizationUtils.js';
 import {
-  getPartnerDataCookieObject,
   hasSalesCenterAccess,
   isAdminUser,
   isPartnerNewlyRegistered,
@@ -14,9 +13,14 @@ import {
 import { PARTNER_LEVEL, PROGRAM } from '../blocks/utils/dxConstants.js';
 
 export const PERSONALIZATION_PLACEHOLDERS = {
-  firstName: '//*[contains(text(), "$firstName")]',
-  company: '//*[contains(text(), "$company")]',
-  level: '//*[contains(text(), "$level")]',
+  'spp-firstName': '//*[contains(text(), "$spp-firstName")]',
+  'tpp-firstName': '//*[contains(text(), "$tpp-firstName")]',
+  'spp-level': '//*[contains(text(), "$spp-level")]',
+  'tpp-level': '//*[contains(text(), "$tpp-level")]',
+  'spp-primaryJobRole': '//*[contains(text(), "$spp-primaryJobRole")]',
+  'tpp-primaryJobRole': '//*[contains(text(), "$tpp-primaryJobRole")]',
+  'spp-accountName': '//*[contains(text(), "$spp-accountName")]',
+  'tpp-accountName': '//*[contains(text(), "$tpp-accountName")]',
 };
 
 export const LEVEL_CONDITION = 'partner-level';
