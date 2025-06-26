@@ -203,7 +203,7 @@ describe('Test utils.js', () => {
     const expiredDate = new Date();
     expiredDate.setDate(expiredDate.getDate() + 30);
     const cookieObject = {
-      DX: {
+      SPP: {
         primaryContact: true,
         status: 'MEMBER',
         level: 'gold',
@@ -219,7 +219,7 @@ describe('Test utils.js', () => {
     const expiredDate = new Date();
     expiredDate.setDate(expiredDate.getDate() - 30);
     const cookieObject = {
-      DX: {
+      SPP: {
         primaryContact: true,
         status: 'MEMBER',
         level: 'gold',
@@ -249,7 +249,7 @@ describe('Test utils.js', () => {
     const expiredDate = new Date();
     expiredDate.setDate(expiredDate.getDate() + 30);
     const cookieObject = {
-      DX: {
+      SPP: {
         primaryContact: true,
         status: 'MEMBER',
         level: 'gold',
@@ -296,7 +296,7 @@ describe('Test utils.js', () => {
     const expiredDate = new Date();
     expiredDate.setDate(expiredDate.getDate() + 30);
     const cookieObject = {
-      DX: {
+      SPP: {
         primaryContact: true,
         status: 'MEMBER',
         level: 'gold',

@@ -106,7 +106,7 @@ describe('Test personalization.js', () => {
   it('Show partner-level-gold block', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        DX: {
+        SPP: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Gold',
@@ -116,13 +116,13 @@ describe('Test personalization.js', () => {
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const goldBlock = document.querySelector('.partner-level-gold');
-      expect(goldBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+      expect(goldBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false); // dobijem TRUE
     });
   });
   it('Show partner-level-platinum but don\'t show partner-level-gold block', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        DX: {
+        SPP: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Platinum',
@@ -140,7 +140,7 @@ describe('Test personalization.js', () => {
   it('Show partner-level-platinum section', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        DX: {
+        SPP: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Platinum',
@@ -156,7 +156,7 @@ describe('Test personalization.js', () => {
   it('Shows content if user matches any of multiple partner-level segments (OR logic)', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        DX: {
+        SPP: {
           status: 'MEMBER',
           firstName: 'Test user',
           level: 'Silver',
@@ -275,12 +275,6 @@ describe('Test personalization.js', () => {
             firstName: 'Test Name',
             level: 'Gold',
             company: 'Test Company',
-          },
-          DX: {
-            status: 'MEMBER',
-            firstName: 'Test Name',
-            level: 'Gold',
-            company: 'Test Company',
             primaryContact: true,
             accountAnniversary: expiredDate,
           },
@@ -297,13 +291,7 @@ describe('Test personalization.js', () => {
         const expiredDate = new Date();
         expiredDate.setDate(expiredDate.getDate() - 30);
         const cookieObject = {
-          SPP: {
-            status: 'MEMBER',
-            firstName: 'Test Name',
-            level: 'Gold',
-            company: 'Test Company',
-          },
-          DX: {
+          SPP:{
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Gold',

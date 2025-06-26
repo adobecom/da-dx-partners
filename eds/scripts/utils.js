@@ -268,7 +268,7 @@ export function isPartnerNewlyRegistered() {
 
 export function isRenew() {
   const programType = getCurrentProgramType();
-
+  
   const primaryContact = getPartnerDataCookieValue(programType, 'primarycontact');
   if (!primaryContact) return;
 
