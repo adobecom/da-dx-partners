@@ -111,10 +111,8 @@ function preloadLit(miloLibs) {
 
 export function getProgramType(path) {
   switch (true) {
-    case /\/(solutionpartners|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'spp';
-    case /technologypartners/.test(path): return 'tpp';
+    case /\/(digitalexperience|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'dx';
     case /channelpartners/.test(path): return 'cpp';
-    case /digitalexperience/.test(path): return 'dx';
     case /channelpartnerassets/.test(path): return 'cpp';
     default: return '';
   }
@@ -123,10 +121,6 @@ export function getProgramType(path) {
 export function getProgramHomePage(path) {
   const programType = getProgramType(path);
   switch (programType) {
-    case 'spp':
-      return '/solutionpartners/';
-    case 'tpp':
-      return '/technologypartners/';
     case 'dx':
       return '/digitalexperience/';
     case 'cpp':

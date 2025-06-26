@@ -20,7 +20,7 @@ describe('Test personalization.js', () => {
     window = Object.create(window);
     Object.defineProperties(window, {
       location: {
-        value: { pathname: '/solutionpartners/', hostname: 'partners.adobe.com' },
+        value: { pathname: '/digitalexperience/', hostname: 'partners.adobe.com' },
         writable: true,
       },
     });
@@ -106,7 +106,7 @@ describe('Test personalization.js', () => {
   it('Show partner-level-gold block', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        SPP: {
+        DX: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Gold',
@@ -122,7 +122,7 @@ describe('Test personalization.js', () => {
   it('Show partner-level-platinum but don\'t show partner-level-gold block', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        SPP: {
+        DX: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Platinum',
@@ -140,7 +140,7 @@ describe('Test personalization.js', () => {
   it('Show partner-level-platinum section', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        SPP: {
+        DX: {
           status: 'MEMBER',
           firstName: 'Test use',
           level: 'Platinum',
@@ -156,7 +156,7 @@ describe('Test personalization.js', () => {
   it('Shows content if user matches any of multiple partner-level segments (OR logic)', () => {
     jest.isolateModules(() => {
       const cookieObject = {
-        SPP: {
+        DX: {
           status: 'MEMBER',
           firstName: 'Test user',
           level: 'Silver',
@@ -249,6 +249,12 @@ describe('Test personalization.js', () => {
             firstName: 'Test Name',
             level: 'Platinum',
             company: 'Test Company',
+          },
+          DX: {
+            status: 'MEMBER',
+            firstName: 'Test Name',
+            level: 'Platinum',
+            company: 'Test Company',
             primaryContact: true,
           },
         };
@@ -265,6 +271,12 @@ describe('Test personalization.js', () => {
         expiredDate.setDate(expiredDate.getDate() + 30);
         const cookieObject = {
           SPP: {
+            status: 'MEMBER',
+            firstName: 'Test Name',
+            level: 'Gold',
+            company: 'Test Company',
+          },
+          DX: {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Gold',
@@ -286,6 +298,12 @@ describe('Test personalization.js', () => {
         expiredDate.setDate(expiredDate.getDate() - 30);
         const cookieObject = {
           SPP: {
+            status: 'MEMBER',
+            firstName: 'Test Name',
+            level: 'Gold',
+            company: 'Test Company',
+          },
+          DX: {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Gold',
