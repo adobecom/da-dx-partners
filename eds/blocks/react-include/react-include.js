@@ -18,7 +18,7 @@ export default async function init(el) {
   performance.mark('react-include:start');
 
   let root = document.createElement('div');
-  root.id = 'root';
+  let rootId = 'root';
 
   document.querySelector("main").append(root);
 
@@ -51,7 +51,12 @@ export default async function init(el) {
         document.head.appendChild(createStyle( script.getAttribute("href")));
       }
     }
+    if (rowTitle === "root-id") {
+      rootId = cols[1].textContent || rootId;
+    }
   });
+
+  root.id = rootId;
 
   performance.mark('react-include:end');
   performance.measure('react-include block', 'react-include:start', 'react-include:end');
