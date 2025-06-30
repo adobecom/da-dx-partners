@@ -17,8 +17,7 @@
         field[textRow][col] = message[i];
       }
       // Join the field into a string
-      const fieldString = field.map(row => row.join('')).join('\n');
-      target.asciiDiv.textContent = fieldString;
+      target.asciiDiv.textContent = field.map(row => row.join('')).join('\n');
       offset = (offset + 1) % fieldCols;
     }
   }
