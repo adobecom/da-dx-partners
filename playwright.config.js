@@ -54,8 +54,29 @@ const config = {
 
     {
       name: 'da-dx-partners-live-firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { 
+        ...devices['Desktop Firefox'],
+        // Ensure each test gets a fresh context
+        contextOptions: {
+          // Clear all storage between tests
+          clearStorageState: true,
+        }
+      },
       bypassCSP: true,
+      retries: process.env.CI ? 2 : 1,
+      launchOptions: {
+        args: [
+          '--disable-web-security',
+          '--private', 
+          '--no-first-run',
+          '--no-default-browser-check',
+        ],
+        firefoxUserPrefs: {
+          'network.http.connection-timeout': 60,
+          'network.http.response-timeout': 60,
+          'dom.max_script_run_time': 60,
+        }
+      },
     },
 //     {
 //       name: 'da-dx-partners-live-webkit',

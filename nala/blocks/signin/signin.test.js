@@ -33,6 +33,8 @@ test.describe('MAPP sign in flow', () => {
 
     await test.step('Sign in', async () => {
       await signInPage.signIn(page, `${features[0].data.partnerLevel}`);
+      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 })
+      await signInPage.profileIconButton .waitFor({ state: 'visible', timeout: 10000 });
     });
 
     await test.step('Verify redirection to protected home page after successful login', async () => {
@@ -48,6 +50,7 @@ test.describe('MAPP sign in flow', () => {
     });
 
     await test.step('Verify redirection to public home page after logout', async () => {
+      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 })
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 10000 });
       const pages = await page.context().pages();
       await expect(pages[0].url())
@@ -63,6 +66,8 @@ test.describe('MAPP sign in flow', () => {
 
     await test.step('Sign in', async () => {
       await signInPage.signIn(page, `${features[1].data.partnerLevel}`);
+      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 })
+      await signInPage.profileIconButton .waitFor({ state: 'visible', timeout: 10000 });
     });
 
     await test.step('Verify restricted news after successful login', async () => {
@@ -119,6 +124,7 @@ test.describe('MAPP sign in flow', () => {
 
       await test.step('Sign in with spp platinum user', async () => {
         await signInPage.signIn(page, `${feature.data.partnerLevel}`);
+        await signInPage.adobeGnav.waitFor({ state: 'visible', timeout: 30000 });
         await signInPage.adobeProfile.waitFor({ state: 'visible', timeout: 30000 });
     });
 
@@ -164,6 +170,7 @@ test.describe('MAPP sign in flow', () => {
 
     await test.step('Sign in with spp community user', async () => {
       await signInPage.signIn(page, `${features[7].data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
     await test.step('Open public page in a new tab', async () => {
