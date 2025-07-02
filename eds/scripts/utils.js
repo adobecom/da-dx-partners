@@ -246,7 +246,7 @@ export function getPartnerDataCookieObject(programType) {
 }
 
 export function hasSalesCenterAccess() {
-  return getPartnerDataCookieRootValue('salesCenterAccess');
+  return getPartnerDataCookieRootValue('salescenteraccess');
 }
 
 export function isAdminUser() {
@@ -262,7 +262,7 @@ export function isAdminUser() {
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
 
-  const createdDate = getPartnerDataCookieRootValue('createdDate');
+  const createdDate = getPartnerDataCookieRootValue('createddate');
 
   const newestCreatedDate = new Date(createdDate);
   const now = new Date();
