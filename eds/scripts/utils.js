@@ -153,6 +153,20 @@ export function getPartnerDataCookieValue(programType, key) {
   }
 }
 
+export function getPartnerDataCookieRootValue(key) {
+  try {
+    const partnerDataCookie = getCookieValue('partner_data');
+    if (!partnerDataCookie) return;
+    const rootLevelData = JSON.parse(decodeURIComponent(partnerDataCookie.toLowerCase()));
+    // eslint-disable-next-line consistent-return
+    return rootLevelData?.[key];
+  } catch (error) {
+    console.error('Error parsing partner data object:', error);
+    // eslint-disable-next-line consistent-return
+    return '';
+  }
+}
+
 function extractTableCollectionTags(el) {
   let tableCollectionTags = [];
   Array.from(el.children).forEach((row) => {
@@ -172,7 +186,7 @@ function extractTableCollectionTags(el) {
 }
 
 function getPartnerLevelParams(portal) {
-  const partnerLevel = getPartnerDataCookieValue(portal, 'level');
+  const partnerLevel = getPartnerDataCookieRootValue('level');
   const partnerTagBase = `"caas:adobe-partners/${portal}/partner-level/`;
   return partnerLevel ? `(${partnerTagBase}${partnerLevel}"+OR+${partnerTagBase}public")` : `(${partnerTagBase}public")`;
 }
@@ -226,13 +240,7 @@ export function getPartnerDataCookieObject(programType) {
 }
 
 export function hasSalesCenterAccess() {
-  const sppData = getPartnerDataCookieObject('spp');
-  const tppData = getPartnerDataCookieObject('tpp');
-
-  const sppSalesAccess = sppData?.salesCenterAccess;
-  const tppSalesAccess = tppData?.salesCenterAccess;
-
-  return !!(sppSalesAccess || tppSalesAccess);
+  return getPartnerDataCookieRootValue('salesCenterAccess');
 }
 
 export function isAdminUser() {
@@ -248,16 +256,9 @@ export function isAdminUser() {
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
 
-  const sppCreated = getPartnerDataCookieValue('spp', 'createddate');
-  const tppCreated = getPartnerDataCookieValue('tpp', 'createddate');
+  const createdDate = getPartnerDataCookieRootValue('createdDate');
 
-  const createdDates = [sppCreated, tppCreated]
-    .filter(date => date)
-    .map(date => new Date(date));
-
-  if (createdDates.length === 0) return false;
-
-  const newestCreatedDate = new Date(Math.max(...createdDates));
+  const newestCreatedDate = new Date(createdDate);
   const now = new Date();
 
   const differenceInMilliseconds = now - newestCreatedDate;
@@ -268,11 +269,11 @@ export function isPartnerNewlyRegistered() {
 
 export function isRenew() {
   const programType = getCurrentProgramType();
-  
-  const primaryContact = getPartnerDataCookieValue(programType, 'primarycontact');
+
+  const primaryContact = getPartnerDataCookieRootValue('primarycontact');
   if (!primaryContact) return;
 
-  const partnerLevel = getPartnerDataCookieValue(programType, 'level');
+  const partnerLevel = getPartnerDataCookieRootValue('level');
   if (partnerLevel !== 'gold' && partnerLevel !== 'registered' && partnerLevel !== 'certified') return;
 
   const accountExpiration = getPartnerDataCookieValue(programType, 'accountanniversary');

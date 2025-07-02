@@ -109,8 +109,8 @@ describe('Test personalization.js', () => {
         SPP: {
           status: 'MEMBER',
           firstName: 'Test use',
-          level: 'Gold',
         },
+        level: 'Gold',
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
@@ -124,9 +124,9 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         SPP: {
           status: 'MEMBER',
-          firstName: 'Test use',
-          level: 'Platinum',
+          firstName: 'Test use'
         },
+        level: 'Platinum'
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
@@ -142,9 +142,9 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         SPP: {
           status: 'MEMBER',
-          firstName: 'Test use',
-          level: 'Platinum',
+          firstName: 'Test use'
         },
+        level: 'Platinum'
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
@@ -159,8 +159,8 @@ describe('Test personalization.js', () => {
         SPP: {
           status: 'MEMBER',
           firstName: 'Test user',
-          level: 'Silver',
         },
+        level: 'Silver'
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
@@ -273,11 +273,11 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
-            level: 'Gold',
             company: 'Test Company',
-            primaryContact: true,
-            accountAnniversary: expiredDate,
+            accountAnniversary: expiredDate
           },
+          level: 'Gold',
+          primaryContact: true
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const { applyGnavPersonalization } = importModules();
@@ -294,11 +294,11 @@ describe('Test personalization.js', () => {
           SPP:{
             status: 'MEMBER',
             firstName: 'Test Name',
-            level: 'Gold',
             company: 'Test Company',
-            primaryContact: true,
-            accountAnniversary: expiredDate,
+            accountAnniversary: expiredDate
           },
+          level: 'Gold',
+          primaryContact: true
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const { applyGnavPersonalization } = importModules();
