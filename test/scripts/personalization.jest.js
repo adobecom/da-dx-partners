@@ -174,10 +174,10 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         SPP: {
           status: 'MEMBER',
-          firstName: 'Test user',
-          level: 'gold',
-          salesCenterAccess: true,
+          firstName: 'Test user'
         },
+        level: 'gold',
+        salesCenterAccess: true
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();

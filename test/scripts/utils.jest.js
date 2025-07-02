@@ -405,13 +405,13 @@ describe('Test utils.js', () => {
     expect(elements[0].id).toEqual('test-id');
   });
   it('Should have access if sales center is present in partner data cookie', async () => {
-    const cookieObject = { SPP: { salesCenterAccess: true } };
+    const cookieObject = { SPP: { firstName: 'test' }, salesCenterAccess: true };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(hasSalesCenterAccess('spp')).toBe(true);
+    expect(hasSalesCenterAccess()).toBe(true);
   });
   it('Should not have access if sales center is not present in partner data cookie', async () => {
-    const cookieObject = { SPP: { salesCenterAccess: false } };
+    const cookieObject = { SPP: { firstName: 'test' }, salesCenterAccess: false };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(hasSalesCenterAccess('spp')).toBe(false);
+    expect(hasSalesCenterAccess()).toBe(false);
   });
 });
