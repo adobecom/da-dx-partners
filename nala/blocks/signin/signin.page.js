@@ -11,6 +11,8 @@ export default class SignInPage {
     this.logoutButton = page.locator('[daa-ll="Sign Out"]');
     this.userNameDisplay = page.locator('.user-name');
     this.adobeProfile = page.locator('[data-test-id="unav-profile"]');
+    this.adobeGnav = page.locator('[data-test-id="top-app-bar-content"]')
+    this.globalFooter = page.getByRole('contentinfo');
 
     this.IMSEmailPage = page.locator('form#EmailForm');
     this.emailField = page.locator('#EmailPage-EmailField');
