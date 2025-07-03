@@ -25,8 +25,8 @@ export default {
     {
       tcid: '3',
       name: '@login-accessing-public-home-page-with-member-user-logged-in-to-adobe',
-      path: 'http://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
-      baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
+      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
+      baseURL: 'http://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'spp-community:',
@@ -36,8 +36,8 @@ export default {
     {
       tcid: '4',
       name: '@login-accessing-restricted-home-page-with-member-user-logged-in-to-adobe',
-      path: 'http://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
-      baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
+      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
+      baseURL: 'http://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'spp-platinum:',
@@ -47,8 +47,8 @@ export default {
     {
       tcid: '5',
       name: '@login-accessing-public-page-with-non-member-user-logged-in-to-adobe',
-      path: 'http://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
-      baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
+      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
+      baseURL: 'http://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'cpp-distributor-india:',
@@ -58,8 +58,8 @@ export default {
     {
       tcid: '6',
       name: '@login-accessing-protected-page-with-non-member-user-logged-in-to-adobe',
-      path: 'http://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
-      baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
+      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
+      baseURL: 'http://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'cpp-distributor-india:',
