@@ -144,7 +144,7 @@ describe('Test utils.js', () => {
   });
   it('Should get empty string if cookie JSON is not valid', () => {
     document.cookie = 'partner_data={spp: {test1:test, test2:test}}';
-    expect(getPartnerDataCookieValue('spp', 'test_cookie')).toEqual('');
+    expect(getPartnerDataCookieValue('test_cookie', 'spp')).toEqual('');
   });
   it('Should return partner data cookie object', () => {
     const cookieObject = { SPP: { status: 'MEMBER' } };
@@ -208,11 +208,11 @@ describe('Test utils.js', () => {
     expiredDate.setDate(expiredDate.getDate() + 30);
     const cookieObject = {
       SPP: {
-        primaryContact: true,
         status: 'MEMBER',
-        level: 'gold',
-        accountAnniversary: expiredDate,
+        accountAnniversary: expiredDate
       },
+      level: 'gold',
+      primaryContact: true
     };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     const { accountStatus, daysNum } = isRenew();
@@ -224,11 +224,11 @@ describe('Test utils.js', () => {
     expiredDate.setDate(expiredDate.getDate() - 30);
     const cookieObject = {
       SPP: {
-        primaryContact: true,
         status: 'MEMBER',
-        level: 'gold',
-        accountAnniversary: expiredDate,
+        accountAnniversary: expiredDate
       },
+      level: 'gold',
+      primaryContact: true
     };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     const { accountStatus, daysNum } = isRenew();
@@ -254,11 +254,11 @@ describe('Test utils.js', () => {
     expiredDate.setDate(expiredDate.getDate() + 30);
     const cookieObject = {
       SPP: {
-        primaryContact: true,
         status: 'MEMBER',
-        level: 'gold',
-        accountAnniversary: expiredDate,
+        accountAnniversary: expiredDate
       },
+      level: 'gold',
+      primaryContact: true
     };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     const getConfig = () => ({ locale: '' });
@@ -301,11 +301,11 @@ describe('Test utils.js', () => {
     expiredDate.setDate(expiredDate.getDate() + 30);
     const cookieObject = {
       SPP: {
-        primaryContact: true,
         status: 'MEMBER',
-        level: 'gold',
-        accountAnniversary: expiredDate,
+        accountAnniversary: expiredDate
       },
+      level: 'gold',
+      primaryContact: true
     };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     const getConfig = () => ({ locale: '' });
@@ -361,7 +361,7 @@ describe('Test utils.js', () => {
     expect(locale).toStrictEqual({ ietf: 'en-US', tk: 'hah7vzn.css', prefix: '' });
   });
   it('Get caas url', () => {
-    document.cookie = 'partner_data={"SPP":{"accountAnniversary":1890777600000%2C"company":"Yugo SPP Stage Platinum Spain"%2C"firstName":"SPP Stage"%2C"lastName":"Spain Platinum"%2C"level":"Platinum"%2C"permissionRegion":"Europe West"%2C"primaryContact":true%2C"salesCenterAccess":true%2C"status":"MEMBER"}}';
+    document.cookie = 'partner_data={"SPP":{"accountAnniversary":1890777600000%2C"company":"Yugo SPP Stage Platinum Spain"%2C"firstName":"SPP Stage"%2C"lastName":"Spain Platinum"%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"}%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}';
     const locales = {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
@@ -409,13 +409,13 @@ describe('Test utils.js', () => {
     expect(elements[0].id).toEqual('test-id');
   });
   it('Should have access if sales center is present in partner data cookie', async () => {
-    const cookieObject = { SPP: { salesCenterAccess: true } };
+    const cookieObject = { SPP: { firstName: 'test' }, salesCenterAccess: true };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(hasSalesCenterAccess('spp')).toBe(true);
+    expect(hasSalesCenterAccess()).toBe(true);
   });
   it('Should not have access if sales center is not present in partner data cookie', async () => {
-    const cookieObject = { SPP: { salesCenterAccess: false } };
+    const cookieObject = { SPP: { firstName: 'test' }, salesCenterAccess: false };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(hasSalesCenterAccess('spp')).toBe(false);
+    expect(hasSalesCenterAccess()).toBe(false);
   });
 });
