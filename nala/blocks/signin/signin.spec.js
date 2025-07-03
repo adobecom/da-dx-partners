@@ -25,7 +25,7 @@ export default {
     {
       tcid: '3',
       name: '@login-accessing-public-home-page-with-member-user-logged-in-to-adobe',
-      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
+      path: 'http://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
       baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
@@ -36,7 +36,7 @@ export default {
     {
       tcid: '4',
       name: '@login-accessing-restricted-home-page-with-member-user-logged-in-to-adobe',
-      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
+      path: 'http://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
       baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
@@ -47,7 +47,7 @@ export default {
     {
       tcid: '5',
       name: '@login-accessing-public-page-with-non-member-user-logged-in-to-adobe',
-      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
+      path: 'http://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
       baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
@@ -58,7 +58,7 @@ export default {
     {
       tcid: '6',
       name: '@login-accessing-protected-page-with-non-member-user-logged-in-to-adobe',
-      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
+      path: 'http://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
       baseURL: 'https://www.stage.adobe.com?akamaiLocale=us',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
