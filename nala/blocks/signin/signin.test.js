@@ -96,6 +96,8 @@ test.describe('MAPP sign in flow', () => {
 
     await test.step('Sign in with spp community user', async () => {
       await signInPage.signIn(page, `${features[2].data.partnerLevel}`);
+      await page.waitForTimeout(5000);
+      await signInPage.adobeGnav.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.adobeProfile.waitFor({ state: 'visible', timeout: 30000 });
     });
 
@@ -124,6 +126,7 @@ test.describe('MAPP sign in flow', () => {
 
       await test.step('Sign in with spp platinum user', async () => {
         await signInPage.signIn(page, `${feature.data.partnerLevel}`);
+        await page.waitForTimeout(5000);
         await signInPage.adobeGnav.waitFor({ state: 'visible', timeout: 30000 });
         await signInPage.adobeProfile.waitFor({ state: 'visible', timeout: 30000 });
     });
