@@ -140,7 +140,7 @@ describe('Test utils.js', () => {
   });
   it('Should get empty string if cookie JSON is not valid', () => {
     document.cookie = 'partner_data={spp: {test1:test, test2:test}}';
-    expect(getPartnerDataCookieValue('spp', 'test_cookie')).toEqual('');
+    expect(getPartnerDataCookieValue('test_cookie', 'spp')).toEqual('');
   });
   it('Should return partner data cookie object', () => {
     const cookieObject = { SPP: { status: 'MEMBER' } };
