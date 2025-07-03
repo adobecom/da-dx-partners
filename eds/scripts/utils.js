@@ -144,28 +144,14 @@ export function getCookieValue(key) {
   const cookie = cookies.find((el) => el.startsWith(`${key}=`));
   return cookie?.substring((`${key}=`).length);
 }
-export function getPartnerDataCookieValue(programType, key) {
+export function getPartnerDataCookieValue(key, programType) {
   try {
     const partnerDataCookie = getCookieValue('partner_data');
     if (!partnerDataCookie) return;
     const partnerDataObj = JSON.parse(decodeURIComponent(partnerDataCookie.toLowerCase()));
-    const portalData = partnerDataObj?.[programType];
+    const targetData = programType ? partnerDataObj?.[programType] : partnerDataObj;
     // eslint-disable-next-line consistent-return
-    return portalData?.[key];
-  } catch (error) {
-    console.error('Error parsing partner data object:', error);
-    // eslint-disable-next-line consistent-return
-    return '';
-  }
-}
-
-export function getPartnerDataCookieRootValue(key) {
-  try {
-    const partnerDataCookie = getCookieValue('partner_data');
-    if (!partnerDataCookie) return;
-    const rootLevelData = JSON.parse(decodeURIComponent(partnerDataCookie.toLowerCase()));
-    // eslint-disable-next-line consistent-return
-    return rootLevelData?.[key];
+    return targetData?.[key];
   } catch (error) {
     console.error('Error parsing partner data object:', error);
     // eslint-disable-next-line consistent-return
@@ -192,7 +178,7 @@ function extractTableCollectionTags(el) {
 }
 
 function getPartnerLevelParams(portal) {
-  const partnerLevel = getPartnerDataCookieRootValue('level');
+  const partnerLevel = getPartnerDataCookieValue('level');
   const partnerTagBase = `"caas:adobe-partners/${portal}/partner-level/`;
   return partnerLevel ? `(${partnerTagBase}${partnerLevel}"+OR+${partnerTagBase}public")` : `(${partnerTagBase}public")`;
 }
@@ -246,7 +232,7 @@ export function getPartnerDataCookieObject(programType) {
 }
 
 export function hasSalesCenterAccess() {
-  return getPartnerDataCookieRootValue('salescenteraccess');
+  return getPartnerDataCookieValue('salescenteraccess');
 }
 
 export function isAdminUser() {
@@ -262,7 +248,7 @@ export function isAdminUser() {
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
 
-  const createdDate = getPartnerDataCookieRootValue('createddate');
+  const createdDate = getPartnerDataCookieValue('createddate');
 
   const newestCreatedDate = new Date(createdDate);
   const now = new Date();
@@ -276,13 +262,13 @@ export function isPartnerNewlyRegistered() {
 export function isRenew() {
   const programType = getCurrentProgramType();
 
-  const primaryContact = getPartnerDataCookieRootValue('primarycontact');
+  const primaryContact = getPartnerDataCookieValue('primarycontact');
   if (!primaryContact) return;
 
-  const partnerLevel = getPartnerDataCookieRootValue('level');
+  const partnerLevel = getPartnerDataCookieValue('level');
   if (partnerLevel !== 'gold' && partnerLevel !== 'registered' && partnerLevel !== 'certified') return;
 
-  const accountExpiration = getPartnerDataCookieValue(programType, 'accountanniversary');
+  const accountExpiration = getPartnerDataCookieValue('accountanniversary', programType);
   if (!accountExpiration) return;
 
   const expirationDate = new Date(accountExpiration);
@@ -321,8 +307,8 @@ export function signedInNonMember() {
 }
 
 function getProgramTypeStatus() {
-  const isSPP = getPartnerDataCookieValue('spp', 'status') === 'member';
-  const isTPP = getPartnerDataCookieValue('tpp', 'status') === 'member';
+  const isSPP = getPartnerDataCookieValue('status', 'spp') === 'member';
+  const isTPP = getPartnerDataCookieValue('status', 'tpp') === 'member';
   return { isSPP, isTPP };
 }
 
