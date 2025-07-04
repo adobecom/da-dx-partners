@@ -27,8 +27,6 @@ import {
   preloadResources,
   getCaasUrl,
   getNodesByXPath,
-  isRenew,
-  getRenewBanner,
   setLibs,
 } from '../../eds/scripts/utils.js';
 
@@ -37,11 +35,11 @@ describe('Test utils.js', () => {
     window = Object.create(window);
     Object.defineProperty(window, 'location', {
       value: {
-        pathname: '/solutionpartners/',
+        pathname: '/digitalexperience/',
         // eslint-disable-next-line no-return-assign
         assign: (pathname) => window.location.pathname = pathname,
         origin: 'https://partners.stage.adobe.com',
-        href: 'https://partners.stage.adobe.com/solutionpartners',
+        href: 'https://partners.stage.adobe.com/digitalexperience/',
       },
       writable: true,
     });
@@ -115,28 +113,24 @@ describe('Test utils.js', () => {
     expect(formatDate(cardDate)).toEqual('Jul 9, 2024');
   });
   it('Should get correct program based on url path', () => {
-    const pathSpp = '/solutionpartners/test';
-    expect(getProgramType(pathSpp)).toEqual('spp');
-    const pathTpp = '/technologypartners/test';
-    expect(getProgramType(pathTpp)).toEqual('tpp');
-    const pathCpp = '/solutionpartners/test';
-    expect(getProgramType(pathCpp)).toEqual('spp');
+    const pathDx = '/digitalexperience/test';
+    expect(getProgramType(pathDx)).toEqual('dx');
+    const pathCpp = '/channelpartners/test';
+    expect(getProgramType(pathCpp)).toEqual('cpp');
     const invalidPath = '/invalidpartners/test';
     expect(getProgramType(invalidPath)).toEqual('');
   });
   it('Should get correct program home page based on url path', () => {
-    const pathSpp = '/solutionpartners/test';
-    expect(getProgramHomePage(pathSpp)).toEqual('/solutionpartners/');
-    const pathTpp = '/technologypartners/test';
-    expect(getProgramHomePage(pathTpp)).toEqual('/technologypartners/');
-    const pathCpp = '/solutionpartners/test';
-    expect(getProgramHomePage(pathCpp)).toEqual('/solutionpartners/');
+    const pathDx = '/digitalexperience/test';
+    expect(getProgramHomePage(pathDx)).toEqual('/digitalexperience/');
+    const pathCpp = '/channelpartners/test';
+    expect(getProgramHomePage(pathCpp)).toEqual('/channelpartners/');
     const invalidPath = '/invalidpartners/test';
     expect(getProgramHomePage(invalidPath)).toEqual('');
   });
   it('Should get current program based on url path', () => {
-    window.location.pathname = '/solutionpartners/';
-    expect(getCurrentProgramType()).toEqual('spp');
+    window.location.pathname = '/digitalexperience/';
+    expect(getCurrentProgramType()).toEqual('dx');
   });
   it('Should get correct cookie value for given cookie name', () => {
     document.cookie = 'test_cookie=test_value';
@@ -193,126 +187,15 @@ describe('Test utils.js', () => {
     expect(redirectLoggedinPartner()).toBeFalsy();
   });
   it('Redirect logged in partner to protected home', () => {
-    window.location.pathname = '/solutionpartners/';
+    window.location.pathname = '/digitalexperience/';
     const cookieObjectMember = { SPP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
     const metaTag = document.createElement('meta');
     metaTag.name = 'adobe-target-after-login';
-    metaTag.content = '/solutionpartners/home';
+    metaTag.content = '/digitalexperience/home';
     document.head.appendChild(metaTag);
     redirectLoggedinPartner();
     expect(window.location.pathname).toEqual(metaTag.content);
-  });
-  it('Check if partners account is expired', () => {
-    const expiredDate = new Date();
-    expiredDate.setDate(expiredDate.getDate() + 30);
-    const cookieObject = {
-      SPP: {
-        status: 'MEMBER',
-        accountAnniversary: expiredDate
-      },
-      level: 'gold',
-      primaryContact: true
-    };
-    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    const { accountStatus, daysNum } = isRenew();
-    expect(accountStatus).toEqual('expired');
-    expect(daysNum).toBeLessThanOrEqual(30);
-  });
-  it('Check if partners account is suspended', () => {
-    const expiredDate = new Date();
-    expiredDate.setDate(expiredDate.getDate() - 30);
-    const cookieObject = {
-      SPP: {
-        status: 'MEMBER',
-        accountAnniversary: expiredDate
-      },
-      level: 'gold',
-      primaryContact: true
-    };
-    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    const { accountStatus, daysNum } = isRenew();
-    expect(accountStatus).toEqual('suspended');
-    expect(daysNum).toBeLessThanOrEqual(60);
-  });
-  it('Don\'t show renew banner if partner has valid account', async () => {
-    const expiredDate = new Date();
-    expiredDate.setDate(expiredDate.getDate() + 40);
-    const cookieObject = {
-      SPP: {
-        primaryContact: true,
-        status: 'MEMBER',
-        level: 'gold',
-        accountAnniversary: expiredDate,
-      },
-    };
-    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(await getRenewBanner()).toBeFalsy();
-  });
-  it('Show renew banner', async () => {
-    const expiredDate = new Date();
-    expiredDate.setDate(expiredDate.getDate() + 30);
-    const cookieObject = {
-      SPP: {
-        status: 'MEMBER',
-        accountAnniversary: expiredDate
-      },
-      level: 'gold',
-      primaryContact: true
-    };
-    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    const getConfig = () => ({ locale: '' });
-    global.fetch = jest.fn(() => Promise.resolve({
-      ok: true,
-      text: () => Promise.resolve('<div class="notification">Test</div>'),
-    }));
-    const main = document.createElement('main');
-    document.body.appendChild(main);
-    await getRenewBanner(getConfig);
-    const banner = document.querySelector('.notification');
-    expect(banner).toBeTruthy();
-  });
-  it('Don\'t show renew banner', async () => {
-    const expiredDate = new Date();
-    expiredDate.setDate(expiredDate.getDate() + 80);
-    const cookieObject = {
-      SPP: {
-        primaryContact: true,
-        status: 'MEMBER',
-        level: 'gold',
-        accountAnniversary: expiredDate,
-      },
-    };
-    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    const getConfig = () => ({ locale: '' });
-    global.fetch = jest.fn(() => Promise.resolve({
-      ok: true,
-      text: () => Promise.resolve('<div class="notification">Test</div>'),
-    }));
-
-    const main = document.createElement('main');
-    document.body.appendChild(main);
-    await getRenewBanner(getConfig);
-    const banner = document.querySelector('.notification');
-    expect(banner).toBeFalsy();
-  });
-  it('Renew banner fetch error', async () => {
-    const expiredDate = new Date();
-    expiredDate.setDate(expiredDate.getDate() + 30);
-    const cookieObject = {
-      SPP: {
-        status: 'MEMBER',
-        accountAnniversary: expiredDate
-      },
-      level: 'gold',
-      primaryContact: true
-    };
-    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    const getConfig = () => ({ locale: '' });
-    global.fetch = jest.fn(() => Promise.resolve({ ok: false }));
-    const main = document.createElement('main');
-    document.body.appendChild(main);
-    expect(await getRenewBanner(getConfig)).toEqual(null);
   });
   it('Update ims config if user is signed in', () => {
     jest.useFakeTimers();
@@ -323,7 +206,7 @@ describe('Test utils.js', () => {
     // document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     const metaTag = document.createElement('meta');
     metaTag.name = 'adobe-target-after-logout';
-    metaTag.content = '/solutionpartners/home';
+    metaTag.content = '/digitalexperience/home';
     document.head.appendChild(metaTag);
     updateIMSConfig();
     jest.advanceTimersByTime(1000);
@@ -339,7 +222,7 @@ describe('Test utils.js', () => {
     document.cookie = 'partner_data=';
     const metaTag = document.createElement('meta');
     metaTag.name = 'adobe-target-after-login';
-    metaTag.content = '/solutionpartners/home';
+    metaTag.content = '/digitalexperience/home';
     document.head.appendChild(metaTag);
     updateIMSConfig();
     jest.advanceTimersByTime(1000);
@@ -352,7 +235,7 @@ describe('Test utils.js', () => {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
     };
-    window.location.pathname = '/de/solutionpartners';
+    window.location.pathname = '/de/digitalexperience/';
     const locale = getLocale(locales);
     expect(locale).toStrictEqual({ ietf: 'de-DE', tk: 'hah7vzn.css', prefix: '/de', region: 'de' });
   });

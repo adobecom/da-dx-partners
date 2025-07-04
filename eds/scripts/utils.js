@@ -111,10 +111,8 @@ function preloadLit(miloLibs) {
 
 export function getProgramType(path) {
   switch (true) {
-    case /\/(solutionpartners|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'spp';
-    case /technologypartners/.test(path): return 'tpp';
+    case /\/(digitalexperience|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'dx';
     case /channelpartners/.test(path): return 'cpp';
-    case /digitalexperience/.test(path): return 'dx';
     case /channelpartnerassets/.test(path): return 'cpp';
     default: return '';
   }
@@ -123,10 +121,6 @@ export function getProgramType(path) {
 export function getProgramHomePage(path) {
   const programType = getProgramType(path);
   switch (programType) {
-    case 'spp':
-      return '/solutionpartners/';
-    case 'tpp':
-      return '/technologypartners/';
     case 'dx':
       return '/digitalexperience/';
     case 'cpp':
@@ -257,41 +251,6 @@ export function isPartnerNewlyRegistered() {
   const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
 
   return differenceInMilliseconds > 0 && differenceInDays < 31;
-}
-
-export function isRenew() {
-  const programType = getCurrentProgramType();
-
-  const primaryContact = getPartnerDataCookieValue('primarycontact');
-  if (!primaryContact) return;
-
-  const partnerLevel = getPartnerDataCookieValue('level');
-  if (partnerLevel !== 'gold' && partnerLevel !== 'registered' && partnerLevel !== 'certified') return;
-
-  const accountExpiration = getPartnerDataCookieValue('accountanniversary', programType);
-  if (!accountExpiration) return;
-
-  const expirationDate = new Date(accountExpiration);
-  const now = new Date();
-
-  let accountStatus;
-  let daysNum;
-
-  const differenceInMilliseconds = expirationDate - now;
-  const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
-  const differenceInDaysRounded = Math.floor(differenceInDays);
-
-  if (differenceInMilliseconds > 0 && differenceInDays < 31) {
-    accountStatus = 'expired';
-    daysNum = differenceInDaysRounded;
-  } else if (differenceInMilliseconds < 0 && differenceInDays <= 90) {
-    accountStatus = 'suspended';
-    daysNum = 90 - differenceInDaysRounded;
-  } else {
-    return;
-  }
-  // eslint-disable-next-line consistent-return
-  return { accountStatus, daysNum };
 }
 
 export function isMember() {
@@ -447,45 +406,6 @@ export async function preloadResources(locales, miloLibs) {
     preload(caasUrl);
     preload(CAAS_TAGS_URL);
   });
-}
-
-export async function getRenewBanner(getConfig) {
-  const renew = isRenew();
-  if (!renew) return;
-  const { accountStatus, daysNum } = renew;
-  const bannerFragments = {
-    expired: 'banner-account-expires',
-    suspended: 'banner-account-suspended',
-  };
-  const metadataKey = bannerFragments[accountStatus];
-
-  const config = getConfig();
-  const { prefix } = config.locale;
-  const defaultPath = `${prefix}/edsdme/partners-shared/fragments/${metadataKey}`;
-  const path = getMetadataContent(metadataKey) ?? defaultPath;
-  const url = new URL(path, window.location.origin);
-
-  try {
-    const response = await fetch(`${url}.plain.html`);
-    if (!response.ok) throw new Error(`Network response was not ok ${response.statusText}`);
-
-    const data = await response.text();
-    const componentData = data.replace('$daysNum', daysNum);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(componentData, 'text/html');
-    const block = doc.querySelector('.notification');
-
-    const div = document.createElement('div');
-    div.appendChild(block);
-
-    const main = document.querySelector('main');
-    if (main) main.insertBefore(div, main.firstChild);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('There has been a problem with your fetch operation:', error);
-    // eslint-disable-next-line consistent-return
-    return null;
-  }
 }
 
 export function updateNavigation() {
