@@ -1,7 +1,6 @@
 import {
   isMember,
   getNodesByXPath,
-  isRenew,
   getPartnerDataCookieObject, isSPPOnly, isTPPOnly, isSPPandTPP
 } from './utils.js';
 import { getConfig } from '../blocks/utils/utils.js';
@@ -104,23 +103,6 @@ export function applyPagePersonalization() {
   personalizePage(main);
 }
 
-function processRenew(profile) {
-  if(!profile){
-    return;
-  }
-  const { env } = getConfig();
-  const renew = isRenew();
-  const renewElements = Array.from(profile.querySelectorAll('.partner-renew'));
-  renewElements.forEach((el) => {
-    el.classList.add(PERSONALIZATION_HIDE);
-    if (!renew) return;
-    const { accountStatus } = renew;
-    if (el.classList.contains(`partner-${accountStatus}`)) {
-      el.classList.remove(PERSONALIZATION_HIDE);
-    }
-  });
-}
-
 function processGnavElements(elements) {
   const regex = /\((.*?)\)/g;
   return elements.map((el) => {
@@ -217,7 +199,6 @@ function personalizeProfile(gnav) {
   }
 
   personalizeDropdownElements(profile);
-  processRenew(profile);
 }
 
 export function applyGnavPersonalization(gnav) {

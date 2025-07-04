@@ -20,7 +20,7 @@ describe('Test personalization.js', () => {
     window = Object.create(window);
     Object.defineProperties(window, {
       location: {
-        value: { pathname: '/solutionpartners/', hostname: 'partners.adobe.com' },
+        value: { pathname: '/digitalexperience/', hostname: 'partners.adobe.com' },
         writable: true,
       },
     });
@@ -247,58 +247,16 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
-            level: 'Platinum',
             company: 'Test Company',
-            primaryContact: true,
           },
+          level: 'Platinum',
+          primaryContact: true,
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const { applyGnavPersonalization } = importModules();
         const personalizedGnav = applyGnavPersonalization(gnav);
         const primaryContact = personalizedGnav.querySelector('.primary-contact-wrapper');
         expect(primaryContact).toBeTruthy();
-      });
-    });
-    it('Show renew expired', () => {
-      jest.isolateModules(() => {
-        const expiredDate = new Date();
-        expiredDate.setDate(expiredDate.getDate() + 30);
-        const cookieObject = {
-          SPP: {
-            status: 'MEMBER',
-            firstName: 'Test Name',
-            company: 'Test Company',
-            accountAnniversary: expiredDate
-          },
-          level: 'Gold',
-          primaryContact: true
-        };
-        document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-        const { applyGnavPersonalization } = importModules();
-        const personalizedGnav = applyGnavPersonalization(gnav);
-        const renewExpired = personalizedGnav.querySelector('.partner-expired');
-        expect(renewExpired.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
-      });
-    });
-    it('Show renew suspended', () => {
-      jest.isolateModules(() => {
-        const expiredDate = new Date();
-        expiredDate.setDate(expiredDate.getDate() - 30);
-        const cookieObject = {
-          SPP: {
-            status: 'MEMBER',
-            firstName: 'Test Name',
-            company: 'Test Company',
-            accountAnniversary: expiredDate
-          },
-          level: 'Gold',
-          primaryContact: true
-        };
-        document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-        const { applyGnavPersonalization } = importModules();
-        const personalizedGnav = applyGnavPersonalization(gnav);
-        const renewExpired = personalizedGnav.querySelector('.partner-suspended');
-        expect(renewExpired.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
       });
     });
 
@@ -308,11 +266,11 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
-            level: 'Gold',
             company: 'Test Company',
-            primaryContact: true,
-            salesCenterAccess: true,
           },
+          level: 'Gold',
+          primaryContact: true,
+          salesCenterAccess: true,
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const salesCenterLink = gnav.querySelector('#sales-link');
@@ -327,11 +285,11 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
-            level: 'Gold',
             company: 'Test Company',
-            primaryContact: true,
-            salesCenterAccess: true,
           },
+          level: 'Gold',
+          primaryContact: true,
+          salesCenterAccess: true,
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const salesCenterLink = gnav.querySelector('#manage-profile-link');
@@ -346,8 +304,8 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test user',
-            level: 'Silver',
           },
+          level: 'Silver',
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const { applyGnavPersonalization } = importModules();
@@ -375,9 +333,9 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test user',
-            level: 'Silver',
-            salesCenterAccess: false,
           },
+          level: 'Silver',
+          salesCenterAccess: false,
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const { applyGnavPersonalization } = importModules();
