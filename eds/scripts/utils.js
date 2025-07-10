@@ -111,10 +111,8 @@ function preloadLit(miloLibs) {
 
 export function getProgramType(path) {
   switch (true) {
-    case /\/(solutionpartners|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'spp';
-    case /technologypartners/.test(path): return 'tpp';
+    case /\/(digitalexperience|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'dx';
     case /channelpartners/.test(path): return 'cpp';
-    case /digitalexperience/.test(path): return 'dx';
     case /channelpartnerassets/.test(path): return 'cpp';
     default: return '';
   }
@@ -123,10 +121,6 @@ export function getProgramType(path) {
 export function getProgramHomePage(path) {
   const programType = getProgramType(path);
   switch (programType) {
-    case 'spp':
-      return '/solutionpartners/';
-    case 'tpp':
-      return '/technologypartners/';
     case 'dx':
       return '/digitalexperience/';
     case 'cpp':
@@ -144,14 +138,14 @@ export function getCookieValue(key) {
   const cookie = cookies.find((el) => el.startsWith(`${key}=`));
   return cookie?.substring((`${key}=`).length);
 }
-export function getPartnerDataCookieValue(programType, key) {
+export function getPartnerDataCookieValue(key, programType) {
   try {
     const partnerDataCookie = getCookieValue('partner_data');
     if (!partnerDataCookie) return;
     const partnerDataObj = JSON.parse(decodeURIComponent(partnerDataCookie.toLowerCase()));
-    const portalData = partnerDataObj?.[programType];
+    const targetData = programType ? partnerDataObj?.[programType] : partnerDataObj;
     // eslint-disable-next-line consistent-return
-    return portalData?.[key];
+    return targetData?.[key];
   } catch (error) {
     console.error('Error parsing partner data object:', error);
     // eslint-disable-next-line consistent-return
@@ -178,7 +172,7 @@ function extractTableCollectionTags(el) {
 }
 
 function getPartnerLevelParams(portal) {
-  const partnerLevel = getPartnerDataCookieValue(portal, 'level');
+  const partnerLevel = getPartnerDataCookieValue('level');
   const partnerTagBase = `"caas:adobe-partners/${portal}/partner-level/`;
   return partnerLevel ? `(${partnerTagBase}${partnerLevel}"+OR+${partnerTagBase}public")` : `(${partnerTagBase}public")`;
 }
@@ -232,68 +226,35 @@ export function getPartnerDataCookieObject(programType) {
 }
 
 export function hasSalesCenterAccess() {
-  const { salesCenterAccess } = getPartnerDataCookieObject(getCurrentProgramType());
-  return !!salesCenterAccess;
+  return getPartnerDataCookieValue('salescenteraccess');
 }
 
 export function isAdminUser() {
-  const { isAdmin } = getPartnerDataCookieObject(getCurrentProgramType());
-  return !!isAdmin;
+  const sppData = getPartnerDataCookieObject('spp');
+  const tppData = getPartnerDataCookieObject('tpp');
+
+  const sppIsAdmin = sppData?.isAdmin;
+  const tppIsAdmin = tppData?.isAdmin;
+
+  return !!(sppIsAdmin || tppIsAdmin);
 }
 
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
-  const programType = getCurrentProgramType();
 
-  const accountCreated = getPartnerDataCookieValue(programType, 'createddate');
-  if (!accountCreated) return;
+  const createdDate = getPartnerDataCookieValue('createddate');
 
-  const accountCreatedDate = new Date(accountCreated);
+  const newestCreatedDate = new Date(createdDate);
   const now = new Date();
 
-  const differenceInMilliseconds = now - accountCreatedDate;
+  const differenceInMilliseconds = now - newestCreatedDate;
   const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
 
   return differenceInMilliseconds > 0 && differenceInDays < 31;
 }
 
-export function isRenew() {
-  const programType = getCurrentProgramType();
-
-  const primaryContact = getPartnerDataCookieValue(programType, 'primarycontact');
-  if (!primaryContact) return;
-
-  const partnerLevel = getPartnerDataCookieValue(programType, 'level');
-  if (partnerLevel !== 'gold' && partnerLevel !== 'registered' && partnerLevel !== 'certified') return;
-
-  const accountExpiration = getPartnerDataCookieValue(programType, 'accountanniversary');
-  if (!accountExpiration) return;
-
-  const expirationDate = new Date(accountExpiration);
-  const now = new Date();
-
-  let accountStatus;
-  let daysNum;
-
-  const differenceInMilliseconds = expirationDate - now;
-  const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
-  const differenceInDaysRounded = Math.floor(differenceInDays);
-
-  if (differenceInMilliseconds > 0 && differenceInDays < 31) {
-    accountStatus = 'expired';
-    daysNum = differenceInDaysRounded;
-  } else if (differenceInMilliseconds < 0 && differenceInDays <= 90) {
-    accountStatus = 'suspended';
-    daysNum = 90 - differenceInDaysRounded;
-  } else {
-    return;
-  }
-  // eslint-disable-next-line consistent-return
-  return { accountStatus, daysNum };
-}
-
 export function isMember() {
-  return PROGRAM_TYPES.some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
+  return Object.keys(PROGRAM_TYPES).some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
 }
 
 export function partnerIsSignedIn() {
@@ -305,8 +266,8 @@ export function signedInNonMember() {
 }
 
 function getProgramTypeStatus() {
-  const isSPP = getPartnerDataCookieValue('spp', 'status') === 'member';
-  const isTPP = getPartnerDataCookieValue('tpp', 'status') === 'member';
+  const isSPP = getPartnerDataCookieValue('status', 'spp') === 'member';
+  const isTPP = getPartnerDataCookieValue('status', 'tpp') === 'member';
   return { isSPP, isTPP };
 }
 
@@ -445,45 +406,6 @@ export async function preloadResources(locales, miloLibs) {
     preload(caasUrl);
     preload(CAAS_TAGS_URL);
   });
-}
-
-export async function getRenewBanner(getConfig) {
-  const renew = isRenew();
-  if (!renew) return;
-  const { accountStatus, daysNum } = renew;
-  const bannerFragments = {
-    expired: 'banner-account-expires',
-    suspended: 'banner-account-suspended',
-  };
-  const metadataKey = bannerFragments[accountStatus];
-
-  const config = getConfig();
-  const { prefix } = config.locale;
-  const defaultPath = `${prefix}/edsdme/partners-shared/fragments/${metadataKey}`;
-  const path = getMetadataContent(metadataKey) ?? defaultPath;
-  const url = new URL(path, window.location.origin);
-
-  try {
-    const response = await fetch(`${url}.plain.html`);
-    if (!response.ok) throw new Error(`Network response was not ok ${response.statusText}`);
-
-    const data = await response.text();
-    const componentData = data.replace('$daysNum', daysNum);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(componentData, 'text/html');
-    const block = doc.querySelector('.notification');
-
-    const div = document.createElement('div');
-    div.appendChild(block);
-
-    const main = document.querySelector('main');
-    if (main) main.insertBefore(div, main.firstChild);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('There has been a problem with your fetch operation:', error);
-    // eslint-disable-next-line consistent-return
-    return null;
-  }
 }
 
 export function updateNavigation() {

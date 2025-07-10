@@ -20,7 +20,7 @@ describe('Test personalization.js', () => {
     window = Object.create(window);
     Object.defineProperties(window, {
       location: {
-        value: { pathname: '/solutionpartners/', hostname: 'partners.adobe.com' },
+        value: { pathname: '/digitalexperience/', hostname: 'partners.adobe.com' },
         writable: true,
       },
     });
@@ -109,13 +109,13 @@ describe('Test personalization.js', () => {
         SPP: {
           status: 'MEMBER',
           firstName: 'Test use',
-          level: 'Gold',
         },
+        level: 'Gold',
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const goldBlock = document.querySelector('.partner-level-spp-gold');
+      const goldBlock = document.querySelector('.partner-level-gold');
       expect(goldBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
     });
   });
@@ -124,15 +124,15 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         SPP: {
           status: 'MEMBER',
-          firstName: 'Test use',
-          level: 'Platinum',
+          firstName: 'Test use'
         },
+        level: 'Platinum'
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const goldBlock = document.querySelector('.partner-level-spp-gold');
-      const platinumBlock = document.querySelector('.partner-level-spp-platinum');
+      const goldBlock = document.querySelector('.partner-level-gold');
+      const platinumBlock = document.querySelector('.partner-level-platinum');
       expect(platinumBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
       expect(goldBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(true);
     });
@@ -142,9 +142,9 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         SPP: {
           status: 'MEMBER',
-          firstName: 'Test use',
-          level: 'Platinum',
+          firstName: 'Test use'
         },
+        level: 'Platinum'
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
@@ -159,13 +159,13 @@ describe('Test personalization.js', () => {
         SPP: {
           status: 'MEMBER',
           firstName: 'Test user',
-          level: 'Silver',
         },
+        level: 'Silver'
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
-      const block = document.querySelector('.partner-level-spp-silver.partner-level-spp-gold');
+      const block = document.querySelector('.partner-level-silver.partner-level-gold');
       expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
     });
   });
@@ -174,10 +174,10 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         SPP: {
           status: 'MEMBER',
-          firstName: 'Test user',
-          level: 'gold',
-          salesCenterAccess: true,
+          firstName: 'Test user'
         },
+        level: 'gold',
+        salesCenterAccess: true
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
@@ -225,14 +225,14 @@ describe('Test personalization.js', () => {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Platinum',
-            company: 'Test Company',
+            accountName: 'Test Company',
           },
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const companyPlaceholder = gnav.querySelector('#test-company-placeholder');
         const levelPlaceholder = gnav.querySelector('#test-level-placeholder');
-        expect(companyPlaceholder.textContent).toEqual('$company');
-        expect(levelPlaceholder.textContent).toEqual('$level');
+        expect(companyPlaceholder.textContent).toEqual('$spp-accountName');
+        expect(levelPlaceholder.textContent).toEqual('$spp-level');
         const { applyGnavPersonalization } = importModules();
         const personalizedGnav = applyGnavPersonalization(gnav);
         const companyPlaceholderUpdated = personalizedGnav.querySelector('#test-company-placeholder');
@@ -247,58 +247,16 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
-            level: 'Platinum',
             company: 'Test Company',
-            primaryContact: true,
           },
+          level: 'Platinum',
+          primaryContact: true,
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const { applyGnavPersonalization } = importModules();
         const personalizedGnav = applyGnavPersonalization(gnav);
         const primaryContact = personalizedGnav.querySelector('.primary-contact-wrapper');
         expect(primaryContact).toBeTruthy();
-      });
-    });
-    it('Show renew expired', () => {
-      jest.isolateModules(() => {
-        const expiredDate = new Date();
-        expiredDate.setDate(expiredDate.getDate() + 30);
-        const cookieObject = {
-          SPP: {
-            status: 'MEMBER',
-            firstName: 'Test Name',
-            level: 'Gold',
-            company: 'Test Company',
-            primaryContact: true,
-            accountAnniversary: expiredDate,
-          },
-        };
-        document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-        const { applyGnavPersonalization } = importModules();
-        const personalizedGnav = applyGnavPersonalization(gnav);
-        const renewExpired = personalizedGnav.querySelector('.partner-expired');
-        expect(renewExpired.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
-      });
-    });
-    it('Show renew suspended', () => {
-      jest.isolateModules(() => {
-        const expiredDate = new Date();
-        expiredDate.setDate(expiredDate.getDate() - 30);
-        const cookieObject = {
-          SPP: {
-            status: 'MEMBER',
-            firstName: 'Test Name',
-            level: 'Gold',
-            company: 'Test Company',
-            primaryContact: true,
-            accountAnniversary: expiredDate,
-          },
-        };
-        document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-        const { applyGnavPersonalization } = importModules();
-        const personalizedGnav = applyGnavPersonalization(gnav);
-        const renewExpired = personalizedGnav.querySelector('.partner-suspended');
-        expect(renewExpired.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
       });
     });
 
@@ -308,14 +266,33 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test Name',
-            level: 'Gold',
             company: 'Test Company',
-            primaryContact: true,
-            salesCenterAccess: true,
           },
+          level: 'Gold',
+          primaryContact: true,
+          salesCenterAccess: true,
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const salesCenterLink = gnav.querySelector('#sales-link');
+        const { applyGnavPersonalization } = importModules();
+        applyGnavPersonalization(gnav);
+        expect(salesCenterLink.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
+      });
+    });
+    it('Do not hide sales center link if it is marked with partner-tpp-account and user has access to sales center on spp or tpp program', () => {
+      jest.isolateModules(() => {
+        const cookieObject = {
+          SPP: {
+            status: 'MEMBER',
+            firstName: 'Test Name',
+            company: 'Test Company',
+          },
+          level: 'Gold',
+          primaryContact: true,
+          salesCenterAccess: true,
+        };
+        document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+        const salesCenterLink = gnav.querySelector('#manage-profile-link');
         const { applyGnavPersonalization } = importModules();
         applyGnavPersonalization(gnav);
         expect(salesCenterLink.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBeFalsy();
@@ -327,8 +304,8 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test user',
-            level: 'Silver',
           },
+          level: 'Silver',
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const { applyGnavPersonalization } = importModules();
@@ -356,9 +333,9 @@ describe('Test personalization.js', () => {
           SPP: {
             status: 'MEMBER',
             firstName: 'Test user',
-            level: 'Silver',
-            salesCenterAccess: false,
           },
+          level: 'Silver',
+          salesCenterAccess: false,
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
         const { applyGnavPersonalization } = importModules();
