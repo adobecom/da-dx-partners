@@ -1,4 +1,4 @@
-import { processPrimaryContact, processSalesAccess, COOKIE_OBJECT } from './personalizationUtils.js';
+import { processPrimaryContact, processSalesAccess } from './personalizationUtils.js';
 import {
   hasSalesCenterAccess,
   isAdminUser,
@@ -9,8 +9,9 @@ import {
   isSPPOnly,
   isTPPOnly,
   isSPPandTPP,
+  getPartnerDataCookieValue
 } from './utils.js';
-import { PARTNER_LEVEL, PROGRAM } from '../blocks/utils/dxConstants.js';
+import { PARTNER_LEVEL } from '../blocks/utils/dxConstants.js';
 
 export const PERSONALIZATION_PLACEHOLDERS = {
   'spp-firstName': '//*[contains(text(), "$spp-firstName")]',
@@ -37,7 +38,7 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-tpp-member': isTPPOnly(),
   'partner-spp-tpp-member': isSPPandTPP(),
   'partner-admin': isAdminUser(),
-  'partner-primary': COOKIE_OBJECT.primaryContact,
+  'partner-primary': getPartnerDataCookieValue('primarycontact'),
   'partner-newly-registered': isPartnerNewlyRegistered(),
 };
 
