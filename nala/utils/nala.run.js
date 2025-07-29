@@ -99,6 +99,8 @@ function getLocalTestLiveUrl(env, milolibs) {
       return 'http://127.0.0.1:6456';
     } else if (env === 'partners.stage') {
       return 'https://partners.stage.adobe.com';
+    } else if (env === 'partners') {
+      return 'https://partners.adobe.com';
     } else {
       return `https://${env}--da-dx-partners--adobecom.aem.live`;
     }

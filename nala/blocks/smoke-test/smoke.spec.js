@@ -14,17 +14,17 @@ export default {
       testId: '@MWPW-168683',
       tags: '@da-dx-smoke-test',
       data: {
-        contactUsSPURL: 'https://solutionpartners.stage2.adobe.com/solution-partners/contact.html',
+        contactUsSPURL: '/solution-partners/contact.html',
         findPartnerSPURL: '/s/directory/solution',
-        learnMoreSPURL: 'https://solutionpartners.stage2.adobe.com/solution-partners/about.html',
+        learnMoreSPURL: '/solution-partners/about.html',
         contactUsTPURL: '/technologyprogram/experiencecloud/support.html',
         findPartnerTPURL: '/s/directory/technology',
         learnMoreTPURL: '/technologyprogram/experiencecloud/about.html',
-        contactUsARURL: 'https://cbconnection-stage.adobe.com/en/apc-helpdesk',
-        findPartnerARURL: 'https://adobe.my.salesforce-sites.com/PartnerSearch?lang=en',
+        contactUsARURL: '/en/apc-helpdesk',
+        findPartnerARURL: '/PartnerSearch?lang=en',
         learnMoreARURL: '/na/channelpartners/program/',
-        visitAdobeExchangeURL: 'https://stage.exchange.adobe.com/',
-      }
+        visitAdobeExchangeURL: 'exchange.adobe.com/',
+      },
     },
     {
       tcid: '3',
@@ -33,13 +33,13 @@ export default {
       path: '/join',
       tags: '@da-dx-smoke-test',
       data: {
-        learnMoreSPURL: 'https://solutionpartners.stage2.adobe.com/solution-partners/about.html',
-        joinNowSPURL: 'https://solutionpartners.stage2.adobe.com/solution-partners/registration.html',
+        learnMoreSPURL: '/solution-partners/about.html',
+        joinNowSPURL: '/solution-partners/registration.html',
         learnMoreTPURL: '/technologyprogram/experiencecloud/about.html',
         joinNowTPURL: '/technologyprogram/experiencecloud/registration.html',
         learnMoreARURL: '/na/channelpartners/program/',
         joinNowARURL: '/na/channelpartners/enrollment/',
-      }
+      },
     },
   ],
 };
