@@ -298,7 +298,10 @@ export default class PartnerCards extends LitElement {
         apiData.cards.forEach((card, index) => {
           card.orderNum = index + 1;
           this.mergeTagAndArbitraryFilters(card);
-          card.arbitrary.forEach((filter) => {
+          card.arbitrary?.forEach((filter) => {
+            if(Object.keys(filter).length === 0){
+              return;
+            }
             const [key, value] = Object.entries(filter)[0]; // Extract key-value pair
             this.cardFiltersSet.add(`${key}:${value}`);
           });
