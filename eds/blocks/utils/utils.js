@@ -1,4 +1,4 @@
-import { getLocale, setLibs } from '../../scripts/utils.js';
+import {getLocale, prodHosts, setLibs} from '../../scripts/utils.js';
 import { RT_SEARCH_ACTION_PATH } from './dxConstants.js';
 
 const miloLibs = setLibs('/libs');
@@ -77,6 +77,9 @@ export function setDownloadParam(url) {
     return '';
   }
 }
+const PARTNERS_PREVIEW_DOMAIN = 'partnerspreview.adobe.com';
+const PARTNERS_STAGE_DOMAIN = 'partners.stage.adobe.com';
+const PARTNERS_PROD_DOMAIN = 'partners.adobe.com';
 
 // eslint-disable-next-line class-methods-use-this
 export function transformCardUrl(url) {
@@ -85,8 +88,14 @@ export function transformCardUrl(url) {
     console.error('URL is null or undefined');
     return '';
   }
+  const isProd = prodHosts.includes(window.location.host);
+  if(url.startsWith("/")){
+    url = `https://${PARTNERS_STAGE_DOMAIN}${url}`;
+  }
   const newUrl = new URL(url);
   newUrl.protocol = window.location.protocol;
-  newUrl.host = window.location.host;
+  if(!newUrl.host || newUrl.host === PARTNERS_PREVIEW_DOMAIN || newUrl.host === PARTNERS_STAGE_DOMAIN|| newUrl.host === PARTNERS_PROD_DOMAIN ) {
+    newUrl.host = isProd ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
+  }
   return newUrl;
 }

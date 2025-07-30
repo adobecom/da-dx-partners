@@ -416,18 +416,23 @@ function setApiParams(api, block) {
 }
 
 export function getCaasUrl(block) {
-  const useStageCaasEndpoint = block.name === 'knowledge-base-overview';
-  const domain = `${(useStageCaasEndpoint && !prodHosts.includes(window.location.host)) ? 'https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1' : 'https://www.adobe.com/chimera-api'}`;
-  const api = new URL(`${domain}/collection?originSelection=dx-partners&draft=false&flatFile=false&expanded=true`);
+  const domain = `${(!prodHosts.includes(window.location.host)) ? 'https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1' : 'https://www.adobe.com/chimera-api'}`;
+  let sources = 'da-dx-partners';
+  Array.from(block.el.children).forEach((row) => {
+    const cols = Array.from(row.children);
+    const rowTitle = cols[0].textContent.trim().toLowerCase().replace(/ /g, '-');
+    if (rowTitle === 'sources' && cols.length>1) {
+      sources = cols[1].textContent.trim()
+    }
+  });
+  const api = new URL(`${domain}/collection?originSelection=${sources}&draft=false&flatFile=false&expanded=true`);
   return setApiParams(api, block);
 }
 
 export async function preloadResources(locales, miloLibs) {
   const locale = getLocale(locales);
   const cardBlocks = {
-    // 'partner-news': '"caas:adobe-partners/collections/news"',
-    // 'knowledge-base-overview': '"caas:adobe-partners/collections/knowledge-base"',
-    'dx-card-collection': '"caas:adobe-partners/collections/news"',
+    'dx-card-collection': '',
   };
   // since we are going to add search-full later
   // adding this code update now to prevent being forgotten since in search
@@ -453,7 +458,6 @@ export async function preloadResources(locales, miloLibs) {
     const block = {
       el,
       name: key,
-      collectionTag: value,
       ietf: locale.ietf,
     };
     const caasUrl = getCaasUrl(block);
