@@ -380,7 +380,7 @@ describe('Test utils.js', () => {
       ietf: locale.ietf,
     };
     const caasUrl = getCaasUrl(block);
-    expect(caasUrl).toEqual('https://www.adobe.com/chimera-api/collection?originSelection=dx-partners&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%2BAND%2B%28%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fplatinum%22%2BOR%2B%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fpublic%22%29&language=en&country=US');
+    expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%2BAND%2B%28%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fplatinum%22%2BOR%2B%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fpublic%22%29&language=en&country=US');
   });
   it('Preload resources', async () => {
     const locales = {
@@ -395,7 +395,7 @@ describe('Test utils.js', () => {
     const linkPreload = document.head.querySelectorAll('link[rel="preload"]');
     const linkModulepreload = document.head.querySelector('link[rel="modulepreload"]');
     expect(linkPreload[0].href).toContain('placeholders.json');
-    expect(linkPreload[1].href).toContain('adobe.com/chimera-api');
+    expect(linkPreload[1].href).toContain('14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection');
     expect(linkModulepreload.href).toContain('lit-all.min.js');
   });
   it('Get nodes by XPath', () => {
