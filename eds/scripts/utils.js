@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {DX_PROGRAM_TYPE, PROGRAM_TYPES} from "../blocks/utils/dxConstants.js";
+import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
@@ -138,7 +138,7 @@ export function getCookieValue(key) {
   const cookie = cookies.find((el) => el.startsWith(`${key}=`));
   return cookie?.substring((`${key}=`).length);
 }
-export function getPartnerDataCookieValue(key, programType) {
+export function getPartnerDataCookieValue(key, programType = DX_PROGRAM_TYPE) {
   try {
     if(!programType){
       programType = getCurrentProgramType();
@@ -250,7 +250,7 @@ export function isPartnerNewlyRegistered() {
 }
 
 export function isMember() {
-  return Object.keys(PROGRAM_TYPES).some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
+  return getPartnerDataCookieObject(getCurrentProgramType())?.status === 'MEMBER';
 }
 
 export function partnerIsSignedIn() {

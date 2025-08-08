@@ -29,6 +29,7 @@ import {
   getNodesByXPath,
   setLibs,
 } from '../../eds/scripts/utils.js';
+import {DX_PROGRAM_TYPE} from "../../eds/blocks/utils/dxConstants.js";
 
 describe('Test utils.js', () => {
   beforeEach(() => {
@@ -114,7 +115,7 @@ describe('Test utils.js', () => {
   });
   it('Should get correct program based on url path', () => {
     const pathDx = '/digitalexperience/test';
-    expect(getProgramType(pathDx)).toEqual('dx');
+    expect(getProgramType(pathDx)).toEqual(DX_PROGRAM_TYPE);
     const pathCpp = '/channelpartners/test';
     expect(getProgramType(pathCpp)).toEqual('cpp');
     const invalidPath = '/invalidpartners/test';
@@ -130,7 +131,7 @@ describe('Test utils.js', () => {
   });
   it('Should get current program based on url path', () => {
     window.location.pathname = '/digitalexperience/';
-    expect(getCurrentProgramType()).toEqual('dx');
+    expect(getCurrentProgramType()).toEqual(DX_PROGRAM_TYPE);
   });
   it('Should get correct cookie value for given cookie name', () => {
     document.cookie = 'test_cookie=test_value';

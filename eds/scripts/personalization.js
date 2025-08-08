@@ -1,7 +1,7 @@
 import {
   isMember,
   getNodesByXPath,
-  getPartnerDataCookieObject, isSPPOnly, isTPPOnly, isSPPandTPP
+  getPartnerDataCookieObject, isSPPOnly, isTPPOnly, isSPPandTPP, getCurrentProgramType
 } from './utils.js';
 import { getConfig } from '../blocks/utils/utils.js';
 import {
@@ -14,7 +14,7 @@ import {
 import {
   PERSONALIZATION_HIDE,
 } from './personalizationUtils.js';
-import {PROGRAM_TYPES} from "../blocks/utils/dxConstants.js";
+import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
 function personalizePlaceholders(placeholders, context = document, programType) {
   Object.entries(placeholders).forEach(([key, value]) => {
@@ -97,9 +97,7 @@ function personalizePage(page) {
 
 export function applyPagePersonalization() {
   const main = document.querySelector('main') ?? document;
-  Object.keys(PROGRAM_TYPES).forEach(programType => {
-    personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, main, programType);
-  })
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, main, getCurrentProgramType());
   personalizePage(main);
 }
 
@@ -168,9 +166,7 @@ function personalizeProfile(gnav) {
   const profile = gnav.querySelector('.profile');
 
   const sppSection = profile.children[0];
-  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, sppSection, PROGRAM_TYPES.SPP);
-  const tppSection = profile.children[1];
-  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, tppSection, PROGRAM_TYPES.TPP);
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, sppSection, DX_PROGRAM_TYPE);
 
   if (isSPPOnly()) {
     const sppSectionTitle = sppSection.querySelector('h5');
