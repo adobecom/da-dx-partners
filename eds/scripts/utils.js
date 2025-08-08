@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {PROGRAM_TYPES} from "../blocks/utils/dxConstants.js";
+import {DX_PROGRAM_TYPE, PROGRAM_TYPES} from "../blocks/utils/dxConstants.js";
 
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
@@ -111,7 +111,7 @@ function preloadLit(miloLibs) {
 
 export function getProgramType(path) {
   switch (true) {
-    case /\/(digitalexperience|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'dx';
+    case /\/(digitalexperience|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return DX_PROGRAM_TYPE;
     case /channelpartners/.test(path): return 'cpp';
     case /channelpartnerassets/.test(path): return 'cpp';
     default: return '';
@@ -121,7 +121,7 @@ export function getProgramType(path) {
 export function getProgramHomePage(path) {
   const programType = getProgramType(path);
   switch (programType) {
-    case 'dx':
+    case DX_PROGRAM_TYPE:
       return '/digitalexperience/';
     case 'cpp':
       return '/channelpartners/';
@@ -140,12 +140,13 @@ export function getCookieValue(key) {
 }
 export function getPartnerDataCookieValue(key, programType) {
   try {
+    if(!programType){
+      programType = getCurrentProgramType();
+    }
     const partnerDataCookie = getCookieValue('partner_data');
     if (!partnerDataCookie) return;
     const partnerDataObj = JSON.parse(decodeURIComponent(partnerDataCookie.toLowerCase()));
-    const targetData = programType ? partnerDataObj?.[programType] : partnerDataObj;
-    // eslint-disable-next-line consistent-return
-    return targetData?.[key];
+    return partnerDataObj?.[programType]?.[key];
   } catch (error) {
     console.error('Error parsing partner data object:', error);
     // eslint-disable-next-line consistent-return
@@ -172,7 +173,7 @@ function extractTableCollectionTags(el) {
 }
 
 function getPartnerLevelParams(portal) {
-  const partnerLevel = getPartnerDataCookieValue('level');
+  const partnerLevel = getPartnerDataCookieValue('level', portal);
   const partnerTagBase = `"caas:adobe-partners/${portal}/partner-level/`;
   return partnerLevel ? `(${partnerTagBase}${partnerLevel}"+OR+${partnerTagBase}public")` : `(${partnerTagBase}public")`;
 }
@@ -211,7 +212,7 @@ function getComplexQueryParams(el) {
     resultStr += `+NOT+${qaContentTag}`;
   }
 
-  const partnerLevelParams = getPartnerLevelParams('spp');
+  const partnerLevelParams = getPartnerLevelParams(DX_PROGRAM_TYPE);
   if (partnerLevelParams) resultStr += `+AND+${partnerLevelParams}`;
 
   return resultStr;
@@ -230,13 +231,8 @@ export function hasSalesCenterAccess() {
 }
 
 export function isAdminUser() {
-  const sppData = getPartnerDataCookieObject('spp');
-  const tppData = getPartnerDataCookieObject('tpp');
-
-  const sppIsAdmin = sppData?.isAdmin;
-  const tppIsAdmin = tppData?.isAdmin;
-
-  return !!(sppIsAdmin || tppIsAdmin);
+  const { isAdmin } = getPartnerDataCookieObject(getCurrentProgramType());
+  return !!isAdmin;
 }
 
 export function isPartnerNewlyRegistered() {

@@ -2,10 +2,6 @@ import {getCurrentProgramType, getPartnerDataCookieValue} from '../../scripts/ut
 
 export const RT_SEARCH_ACTION_PATH = '/api/v1/web/da-dx-partners-runtime/search-apc/search-apc?';
 
-export const PROGRAM_TYPES = {
-    SPP: 'SPP',
-    TPP: 'TPP'
-};
+export const DX_PROGRAM_TYPE = 'spp';
 
-export const PROGRAM = getCurrentProgramType();
 export const PARTNER_LEVEL = getPartnerDataCookieValue('level');
