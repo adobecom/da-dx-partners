@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {PROGRAM_TYPES} from "../blocks/utils/dxConstants.js";
+import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
@@ -111,7 +111,7 @@ function preloadLit(miloLibs) {
 
 export function getProgramType(path) {
   switch (true) {
-    case /\/(digitalexperience|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return 'dx';
+    case /\/(digitalexperience|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return DX_PROGRAM_TYPE;
     case /channelpartners/.test(path): return 'cpp';
     case /channelpartnerassets/.test(path): return 'cpp';
     default: return '';
@@ -121,7 +121,7 @@ export function getProgramType(path) {
 export function getProgramHomePage(path) {
   const programType = getProgramType(path);
   switch (programType) {
-    case 'dx':
+    case DX_PROGRAM_TYPE:
       return '/digitalexperience/';
     case 'cpp':
       return '/channelpartners/';
@@ -138,14 +138,15 @@ export function getCookieValue(key) {
   const cookie = cookies.find((el) => el.startsWith(`${key}=`));
   return cookie?.substring((`${key}=`).length);
 }
-export function getPartnerDataCookieValue(key, programType) {
+export function getPartnerDataCookieValue(key, programType = DX_PROGRAM_TYPE) {
   try {
+    if(!programType){
+      programType = getCurrentProgramType();
+    }
     const partnerDataCookie = getCookieValue('partner_data');
     if (!partnerDataCookie) return;
     const partnerDataObj = JSON.parse(decodeURIComponent(partnerDataCookie.toLowerCase()));
-    const targetData = programType ? partnerDataObj?.[programType] : partnerDataObj;
-    // eslint-disable-next-line consistent-return
-    return targetData?.[key];
+    return partnerDataObj?.[programType]?.[key];
   } catch (error) {
     console.error('Error parsing partner data object:', error);
     // eslint-disable-next-line consistent-return
@@ -172,9 +173,21 @@ function extractTableCollectionTags(el) {
 }
 
 function getPartnerLevelParams(portal) {
-  const partnerLevel = getPartnerDataCookieValue('level');
-  const partnerTagBase = `"caas:adobe-partners/${portal}/partner-level/`;
-  return partnerLevel ? `(${partnerTagBase}${partnerLevel}"+OR+${partnerTagBase}public")` : `(${partnerTagBase}public")`;
+  const partnerLevel = getPartnerDataCookieValue('level', portal);
+  const partnerTagBase = `caas:adobe-partners/px/partner-level/`;
+
+  const partnerLevels = ['gold', 'silver', 'platinum', 'community'];
+
+  // Build the NOT conditions for all partner levels (excluding the target one)
+  const notConditions = partnerLevels
+    .map(level => `NOT+"${partnerTagBase}${level}"`)
+    .join('+AND+');
+
+  if(partnerLevel){
+    return `("${partnerTagBase}${partnerLevel}"+OR+(${notConditions}))`
+  } else {
+    return `(${notConditions})`;
+  }
 }
 
 function checkForQaContent(el) {
@@ -200,21 +213,21 @@ function getComplexQueryParams(el) {
   const groupedTagExpressions = tableTags
     .filter(group => group.length)
     .map(group => `(${group.join('+AND+')})`);
-
-  if (!groupedTagExpressions.length) return;
-
-  const fullQuery = `(${groupedTagExpressions.join('+OR+')})`;
-
-  const qaContentTag = '"caas:adobe-partners/qa-content"';
-  let resultStr = fullQuery;
-  if (!checkForQaContent(el)) {
-    resultStr += `+NOT+${qaContentTag}`;
+  let fullQuery = '';
+  if (groupedTagExpressions.length){
+    fullQuery  = `(${groupedTagExpressions.join('+OR+')})`;
   }
 
-  const partnerLevelParams = getPartnerLevelParams('spp');
-  if (partnerLevelParams) resultStr += `+AND+${partnerLevelParams}`;
 
-  return resultStr;
+  const qaContentTag = '"caas:adobe-partners/qa-content"';
+  if (!checkForQaContent(el)) {
+    fullQuery += `${fullQuery.length>0?'+AND+':''}(+NOT+${qaContentTag})`;
+  }
+
+  const partnerLevelParams = getPartnerLevelParams(DX_PROGRAM_TYPE);
+  if (partnerLevelParams) fullQuery += `+AND+${partnerLevelParams}`;
+
+  return fullQuery;
 }
 
 export function getPartnerDataCookieObject(programType) {
@@ -230,13 +243,8 @@ export function hasSalesCenterAccess() {
 }
 
 export function isAdminUser() {
-  const sppData = getPartnerDataCookieObject('spp');
-  const tppData = getPartnerDataCookieObject('tpp');
-
-  const sppIsAdmin = sppData?.isAdmin;
-  const tppIsAdmin = tppData?.isAdmin;
-
-  return !!(sppIsAdmin || tppIsAdmin);
+  const { isAdmin } = getPartnerDataCookieObject(getCurrentProgramType());
+  return !!isAdmin;
 }
 
 export function isPartnerNewlyRegistered() {
@@ -254,7 +262,7 @@ export function isPartnerNewlyRegistered() {
 }
 
 export function isMember() {
-  return Object.keys(PROGRAM_TYPES).some((programType) => getPartnerDataCookieObject(programType)?.status === 'MEMBER');
+  return getPartnerDataCookieObject(getCurrentProgramType())?.status === 'MEMBER';
 }
 
 export function partnerIsSignedIn() {
