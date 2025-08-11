@@ -174,8 +174,20 @@ function extractTableCollectionTags(el) {
 
 function getPartnerLevelParams(portal) {
   const partnerLevel = getPartnerDataCookieValue('level', portal);
-  const partnerTagBase = `"caas:adobe-partners/${portal}/partner-level/`;
-  return partnerLevel ? `(${partnerTagBase}${partnerLevel}"+OR+${partnerTagBase}public")` : `(${partnerTagBase}public")`;
+  const partnerTagBase = `caas:adobe-partners/px/partner-level/`;
+
+  const partnerLevels = ['gold', 'silver', 'platinum', 'community'];
+
+  // Build the NOT conditions for all partner levels (excluding the target one)
+  const notConditions = partnerLevels
+    .map(level => `NOT+"${partnerTagBase}${level}"`)
+    .join('+AND+');
+
+  if(partnerLevel){
+    return `("${partnerTagBase}${partnerLevel}"+OR+(${notConditions}))`
+  } else {
+    return `(${notConditions})`;
+  }
 }
 
 function checkForQaContent(el) {
