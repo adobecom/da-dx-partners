@@ -264,7 +264,7 @@ describe('Test utils.js', () => {
       ietf: locale.ietf,
     };
     const caasUrl = getCaasUrl(block);
-    expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fplatinum%22%2BOR%2B%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fpublic%22%29&language=en&country=US');
+    expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
   });
   it('Preload resources', async () => {
     const locales = {
