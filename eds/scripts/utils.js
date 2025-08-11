@@ -201,21 +201,21 @@ function getComplexQueryParams(el) {
   const groupedTagExpressions = tableTags
     .filter(group => group.length)
     .map(group => `(${group.join('+AND+')})`);
+  let fullQuery = '';
+  if (groupedTagExpressions.length){
+    fullQuery  = `(${groupedTagExpressions.join('+OR+')})`;
+  }
 
-  if (!groupedTagExpressions.length) return;
-
-  const fullQuery = `(${groupedTagExpressions.join('+OR+')})`;
 
   const qaContentTag = '"caas:adobe-partners/qa-content"';
-  let resultStr = fullQuery;
   if (!checkForQaContent(el)) {
-    resultStr += `+NOT+${qaContentTag}`;
+    fullQuery += `${fullQuery.length>0?'+AND+':''}(+NOT+${qaContentTag})`;
   }
 
   const partnerLevelParams = getPartnerLevelParams(DX_PROGRAM_TYPE);
-  if (partnerLevelParams) resultStr += `+AND+${partnerLevelParams}`;
+  if (partnerLevelParams) fullQuery += `+AND+${partnerLevelParams}`;
 
-  return resultStr;
+  return fullQuery;
 }
 
 export function getPartnerDataCookieObject(programType) {

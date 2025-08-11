@@ -172,7 +172,6 @@ function personalizeProfile(gnav) {
     const sppSectionTitle = sppSection.querySelector('h5');
     sppSectionTitle.classList.add(PERSONALIZATION_HIDE);
     sppSectionTitle.nextElementSibling.classList.add('no-section-title');
-    tppSection?.remove();
   } else if (isTPPOnly()) {
     const tppSectionTitle = tppSection.querySelector('h5');
     tppSectionTitle.classList.add(PERSONALIZATION_HIDE);
@@ -188,7 +187,6 @@ function personalizeProfile(gnav) {
     innerWrapper.append(...tppSection.firstElementChild.children);
 
     sppSection.remove();
-    tppSection.remove();
   } else {
     sppSection.remove();
     tppSection.remove();
