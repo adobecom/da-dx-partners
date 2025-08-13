@@ -76,7 +76,7 @@ export default {
         expectedToSeeInURL: '/digitalexperience/error/contact-not-found',
       },
     },
-     {
+    {
       tcid: '8',
       name: '@login-accessing-protected-page-with-non-member-user-logged-in-partner-portal',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
@@ -85,6 +85,56 @@ export default {
       data: {
         partnerLevel: 'cpp-distributor-india:',
         expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/protected-home',
+      },
+    },
+    {
+      tcid: '9',
+      name: '@error-flow-abandoned-user-case',
+      path: ' https://partners.stage.adobe.com/digitalexperience/',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'app-abandoned:',
+        expectedToSeeInURL: '/digitalexperience/error/account-inactive',
+      },
+    },
+    {
+      tcid: '10',
+      name: '@error-flow-terminated-user-case',
+      path: ' https://partners.stage.adobe.com/digitalexperience/',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'app-terminated:',
+        expectedToSeeInURL: '/digitalexperience/error/ineligible',
+      },
+    },
+    {
+      tcid: '11',
+      name: '@error-flow-rejected-user-case',
+      path: ' https://partners.stage.adobe.com/digitalexperience/',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'app-rejected:',
+        expectedToSeeInURL: '/digitalexperience/error/decline',
+      },
+    },
+    {
+      tcid: '12',
+      name: '@error-flow-non-member-user-case',
+      path: ' https://partners.stage.adobe.com/digitalexperience/',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'cpp-distributor-india:',
+        expectedToSeeInURL: '/digitalexperience/error/contact-not-found',
+      },
+    },
+    {
+      tcid: '13',
+      name: '@error-flow-404-user-case',
+      path: ' https://partners.stage.adobe.com/digitalexperience/home-page',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'spp-gold:',
+        expectedToSeeInURL: '/digitalexperience/home-page',
       },
     },
   ],

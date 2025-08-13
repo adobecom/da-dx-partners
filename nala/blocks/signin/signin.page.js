@@ -1,17 +1,17 @@
 export default class SignInPage {
   constructor(page) {
     this.page = page;
-    this.signInButton = page.locator('button[daa-ll="Sign In"].feds-signIn');
+    this.signInButton = page.locator('.feds-profile');
     this.signInButtonStageAdobe = page.locator('.profile-comp.secondary-button');
     this.profileIconButton = page.locator('.feds-profile-button');
     this.joinNowButton = page.locator('a:has-text("Join now")');
     this.gnavJoinNowButton = page.locator('.feds-cta-wrapper a:has-text("Join now")');
     this.explorePastArticles = page.locator('a:has-text("Explore past articles")');
     this.newsletterLink = page.locator('a:has-text("product newsletter")');
-    this.logoutButton = page.locator('[daa-ll="Sign Out"]');
+    this.logoutButton = page.locator('.feds-profile-actions');
     this.userNameDisplay = page.locator('.user-name');
     this.adobeProfile = page.locator('[data-test-id="unav-profile"]');
-    this.adobeGnav = page.locator('[data-test-id="top-app-bar-content"]')
+    this.adobeGnav = page.locator('[data-test-id="top-app-bar-content"]');
     this.globalFooter = page.getByRole('contentinfo');
 
     this.IMSEmailPage = page.locator('form#EmailForm');
@@ -20,6 +20,7 @@ export default class SignInPage {
     this.IMSPasswordPage = page.locator('form#PasswordForm');
     this.passwordField = page.locator('#PasswordPage-PasswordField');
     this.passwordPageContinueButton = page.locator('//button[@data-id="PasswordPage-ContinueButton"]');
+    this.notFound = page.getByRole('heading', { name: 'Not Found' });
   }
 
   async signIn(page, partnerLevel) {
