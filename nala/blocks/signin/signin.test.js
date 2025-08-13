@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
 import SignInPage from './signin.page.js';
+import signin from './signin.spec.js';
 
 let signInPage;
-import signin from './signin.spec.js';
 
 const { features } = signin;
 const loggedInAdobe = features.slice(3, 6);
+const errorFlowCases = features.slice(8, 12);
 
 test.describe('MAPP sign in flow', () => {
   test.beforeEach(async ({ page, browserName, baseURL, context }) => {
@@ -34,7 +35,7 @@ test.describe('MAPP sign in flow', () => {
     await test.step('Sign in', async () => {
       await signInPage.signIn(page, `${features[0].data.partnerLevel}`);
       await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 })
-      await signInPage.profileIconButton .waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
 
     await test.step('Verify redirection to protected home page after successful login', async () => {
@@ -50,7 +51,7 @@ test.describe('MAPP sign in flow', () => {
     });
 
     await test.step('Verify redirection to public home page after logout', async () => {
-      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 })
+      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 10000 });
       const pages = await page.context().pages();
       await expect(pages[0].url())
@@ -66,8 +67,8 @@ test.describe('MAPP sign in flow', () => {
 
     await test.step('Sign in', async () => {
       await signInPage.signIn(page, `${features[1].data.partnerLevel}`);
-      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 })
-      await signInPage.profileIconButton .waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
 
     await test.step('Verify restricted news after successful login', async () => {
@@ -118,14 +119,14 @@ test.describe('MAPP sign in flow', () => {
           window.location.href = navigationUrl;
         }, url);
 
-      await signInPage.signInButtonStageAdobe.click();
-      await page.waitForLoadState('domcontentloaded');
-    });
+        await signInPage.signInButtonStageAdobe.click();
+        await page.waitForLoadState('domcontentloaded');
+      });
 
       await test.step('Sign in with spp platinum user', async () => {
         await signInPage.signIn(page, `${feature.data.partnerLevel}`);
         await page.waitForTimeout(5000);
-    });
+      });
 
       await test.step('Open restricted page in a new tab', async () => {
         const newTab = await context.newPage();
@@ -156,7 +157,7 @@ test.describe('MAPP sign in flow', () => {
     });
   });
 
-    test(`${features[7].name},${features[7].tags}`, async ({ page, context }) => {
+  test(`${features[7].name},${features[7].tags}`, async ({ page, context }) => {
     await test.step('Go to stage.adobe.com', async () => {
       const url = `${features[7].path}`;
       await page.evaluate((navigationUrl) => {
@@ -178,6 +179,43 @@ test.describe('MAPP sign in flow', () => {
       const pages = await page.context().pages();
       await expect(pages[1].url())
         .toContain(`${features[7].data.expectedToSeeInURL}`);
+    });
+  });
+
+  errorFlowCases.forEach((feature) => {
+    test(`${feature.name},${feature.tags}`, async ({ page }) => {
+      await test.step('Go to public home page', async () => {
+        await page.goto(`${feature.path}`);
+        await page.waitForLoadState('domcontentloaded');
+        await signInPage.signInButton.click();
+
+        await signInPage.signIn(page, `${feature.data.partnerLevel}`);
+        await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      });
+      await test.step('Verify error message', async () => {
+        await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+        const pages = await page.context().pages();
+        await expect(pages[0].url())
+          .toContain(`${feature.data.expectedToSeeInURL}`);
+      });
+    });
+  });
+  // @error-flow-non-member-user-case
+  test(`${features[12].name},${features[12].tags}`, async ({ page }) => {
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${features[12].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      const pages = await page.context().pages();
+      await expect(pages[0].url())
+        .toContain(`${features[12].data.expectedToSeeInURL}`);
+      await expect(signInPage.notFound).toBeVisible();
+      await signInPage.signInButton.click();
+
+      await signInPage.signIn(page, `${features[12].data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(pages[0].url())
+        .toContain(`${features[12].data.expectedToSeeInURL}`);
+      await expect(signInPage.notFound).toBeVisible();
     });
   });
 });
