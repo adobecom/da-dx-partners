@@ -15,11 +15,11 @@ export default {
     {
       tcid: '2',
       name: '@login-redirection-to-spp-gold-page',
-      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/gold-page',
+      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/gold/gold-page',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'spp-gold:',
-        expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/gold-page',
+        expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/gold/gold-page',
       },
     },
     {
