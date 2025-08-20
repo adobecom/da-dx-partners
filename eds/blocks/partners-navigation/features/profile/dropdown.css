@@ -1,5 +1,8 @@
-/* MWPW-159021 */
+/* PARTNERS_NAVIGATION START */
+
+/* MWPW-159021 - Fix eslint errors */
 /* stylelint-disable */
+/* PARTNERS_NAVIGATION END */
 :root {
   --feds-color-profile-heading: #707070;
   --feds-color-profile: #4b4b4b;
@@ -24,10 +27,12 @@
   transform: translate3d(0,0,0); /* Fix Safari issues w/ position: sticky */
 }
 
-/*MWPW-158926*/
+/* PARTNERS_NAVIGATION START */
+/* MWPW-158926 - The company name is cut when it is long */
 .feds-profile-menu .company-placeholder {
   white-space: normal;
 }
+/* PARTNERS_NAVIGATION END */
 
 [dir = "rtl"] .feds-profile-menu {
   right: initial;
@@ -49,9 +54,10 @@
 .feds-profile-header .feds-profile-img {
   max-height: 64px;
   max-width: 64px;
-
-  /* MWPW-157753 - profile image should not be clickable */
+  /* PARTNERS_NAVIGATION START */
+  /* MWPW-157753 - Make profile picture, firstName, lastName and email unclickable */
   pointer-events: none;
+  /* PARTNERS_NAVIGATION END */
 }
 
 .feds-profile-details {
@@ -82,9 +88,10 @@
   margin: 0;
   font-size: 14px;
   text-decoration: underline;
-
-  /* MWPW-157753 - to meet requirements */
+  /* PARTNERS_NAVIGATION START */
+  /* MWPW-157753 - Make profile picture, firstName, lastName and email unclickable */
   color: var(--link-color);
+  /* PARTNERS_NAVIGATION END */
 }
 
 .feds-local-menu {
@@ -134,6 +141,13 @@
   border-top: var(--feds-border-profile);
 }
 
+/* NOT SURE ABOUT THIS */
+/* I assume everything in this block bellow is related to
+   ticket https://jira.corp.adobe.com/browse/MWPW-172075,
+   but need to confirm
+*/
+/* PARTNERS_NAVIGATION START */
+/* MWPW-172075 - Implement redesigned for the combined Profile Dropdown */
 /* Partners navigation */
 .partners-navigation .feds-profile-menu {
   padding: 0 24px;
@@ -160,7 +174,9 @@
   padding-top: 4px;
   padding-bottom: 0px;
 }
-/* MWPW-172075 - if no section title is present add padding top */
+/* MWPW-172075 - Implement redesigned for the combined Profile Dropdown
+   if no section title is present add padding top
+ */
 .partners-navigation .feds-local-menu .no-section-title {
   padding-top: 12px;
   padding-bottom: 0px;
@@ -255,3 +271,4 @@
   font-size: 12px;
   color: #FFFFFF;
 }
+/* PARTNERS_NAVIGATION END */

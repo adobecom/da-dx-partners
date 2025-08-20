@@ -1,5 +1,9 @@
-// MWPW-159021
+// PARTNERS_NAVIGATION START
+// MWPW-159021 - Fix eslint errors
 /* eslint-disable */
+// PARTNERS_NAVIGATION END
+/* eslint import/no-relative-packages: 0 */
+/* eslint-disable no-promise-executor-return, no-async-promise-executor */
 import { getConfig } from '../../../utils/utils.js';
 
 let userEventHistory;

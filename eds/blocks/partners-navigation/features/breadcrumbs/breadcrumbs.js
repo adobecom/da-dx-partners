@@ -1,5 +1,7 @@
-// MWPW-159021
+// PARTNERS_NAVIGATION START
+// MWPW-159021 - Fix eslint errors
 /* eslint-disable */
+// PARTNERS_NAVIGATION END
 import { getMetadata, getConfig, getFederatedUrl } from '../../../../utils/utils.js';
 import { toFragment, lanaLog } from '../../utilities/utilities.js';
 
@@ -22,14 +24,19 @@ const setBreadcrumbSEO = (breadcrumbs) => {
     '@type': 'BreadcrumbList',
     itemListElement: [],
   };
-  breadcrumbs.querySelectorAll('ul > li').forEach((item, idx) => {
+
+  breadcrumbs.querySelectorAll('ul > li').forEach((item, idx, list) => {
     const link = item.querySelector('a');
     const name = link ? link.innerText.trim() : [...item.childNodes].filter((node) => !node.matches?.('span[aria-hidden="true"]')).map((node) => node.textContent.trim()).join('');
+    let itemUrl = link?.href;
+    if (!itemUrl && idx === list.length - 1) {
+      itemUrl = window.location.href;
+    }
     breadcrumbsSEO.itemListElement.push({
       '@type': 'ListItem',
       position: idx + 1,
       name,
-      item: link?.href,
+      item: itemUrl,
     });
   });
   const script = toFragment`<script type="application/ld+json">${JSON.stringify(
@@ -82,7 +89,7 @@ const createWithBase = async (el) => {
     element.querySelector('ul')?.prepend(...base.querySelectorAll('li'));
     return createBreadcrumbs(element);
   } catch (e) {
-    lanaLog({ e, message: 'Breadcrumbs failed fetching base', tags: 'gnav-breadcrumbs', errorType: 'info' });
+    lanaLog({ e, message: 'Breadcrumbs failed fetching base', tags: 'gnav-breadcrumbs', errorType: 'i' });
     return null;
   }
 };
@@ -111,7 +118,7 @@ export default async function init(el) {
     setBreadcrumbSEO(breadcrumbsEl);
     return breadcrumbsEl;
   } catch (e) {
-    lanaLog({ e, message: 'Breadcrumbs failed rendering', tags: 'gnav-breadcrumbs', errorType: 'error' });
+    lanaLog({ e, message: 'Breadcrumbs failed rendering', tags: 'gnav-breadcrumbs', errorType: 'e' });
     return null;
   }
 }

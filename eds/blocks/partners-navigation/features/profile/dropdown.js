@@ -1,6 +1,6 @@
 import { toFragment, trigger, closeAllDropdowns, logErrorFor } from '../../utilities/utilities.js';
 
-// MWPW-157751
+// MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
 import { getLibs } from '../../../../scripts/utils.js';
 
 const miloLibs = getLibs();
@@ -60,7 +60,7 @@ class ProfileDropdown {
     this.sections = sections;
     this.openOnInit = openOnInit;
     this.localMenu = rawElem.querySelector('h5')?.parentElement;
-    logErrorFor(this.init.bind(this), 'ProfileDropdown.init()', 'gnav-profile', 'error');
+    logErrorFor(this.init.bind(this), 'ProfileDropdown.init()', 'gnav-profile', 'e');
   }
 
   async init() {
@@ -69,8 +69,10 @@ class ProfileDropdown {
     this.dropdown = this.decorateDropdown();
     this.addEventListeners();
 
-    if (this.openOnInit) trigger({ element: this.buttonElem, type: 'profile' }); // MWPW-157752
-
+    // PARTNERS_NAVIGATION START
+    // MWPW-157752 - Profile dropdown not closing when clicking outside of it on mobile view
+    if (this.openOnInit) trigger({ element: this.buttonElem, type: 'profile' });
+    // PARTNERS_NAVIGATION END
     this.decoratedElem.append(this.dropdown);
   }
 
@@ -84,21 +86,25 @@ class ProfileDropdown {
         this.placeholders.manageEnterprise,
         this.placeholders.profileAvatar,
       ],
+      // PARTNERS_NAVIGATION START
+      // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
       [
-        this.placeholders.editProfile, // MWPW-157751
+        this.placeholders.editProfile,
       ],
+      // PARTNERS_NAVIGATION END
       { displayName: this.profileData.displayName, email: this.profileData.email },
     ] = await Promise.all([
       replaceKeyArray(
         ['profile-button', 'sign-out', 'view-account', 'manage-teams', 'manage-enterprise', 'profile-avatar'],
         getFedsPlaceholderConfig(),
       ),
-      // MWPW-157751
+      // PARTNERS_NAVIGATION START
+      // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
       replaceKeyArray(
         ['edit-profile'],
         getConfig(),
       ),
-      // End
+      // PARTNERS_NAVIGATION END
       window.adobeIMS.getProfile(),
     ]);
   }
@@ -108,23 +114,25 @@ class ProfileDropdown {
   }
 
   decorateDropdown() {
-    // MWPW-157751
+    // PARTNERS_NAVIGATION START
+    // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
     const { locale } = getConfig();
     const lang = getLanguage(locale.ietf);
-    // End
+    // PARTNERS_NAVIGATION END
 
     // TODO: the account name and email might need a bit of adaptive behavior;
     // historically we shrunk the font size and displayed the account name on two lines;
     // the email had some special logic as well;
     // for MVP, we took a simpler approach ("Some very long name, very l...")
+    // PARTNERS_NAVIGATION START
+    // MWPW-157753 - only Edit user profile link should be clickable
     this.avatarElem = toFragment`<img
       data-cs-mask
       class="feds-profile-img"
       src="${this.avatar}"
       tabindex="0"
       alt="${this.placeholders.profileAvatar}"
-      data-url="${decorateProfileLink('account', `?lang=${lang}`)}"></img>`;
-    // MWPW-157753 - only Edit user profile link should be clickable
+      data-url="${decorateProfileLink('account', `?lang=${lang}`)}"></img>`; // IN MILO IT SAYS profile?lang INSTEAD OF JUST ?lang
     return toFragment`
       <div id="feds-profile-menu" class="feds-profile-menu">
         <div class="feds-profile-header">
@@ -132,6 +140,7 @@ class ProfileDropdown {
           <div class="feds-profile-details">
             <p data-cs-mask class="feds-profile-name">${this.profileData.displayName}</p>
             <p data-cs-mask class="feds-profile-email">${this.decorateEmail(this.profileData.email)}</p>
+            <p class="feds-profile-account">${this.placeholders.viewAccount}</p>
           </div>
         </div>
         ${this.localMenu ? this.decorateLocalMenu() : ''}
@@ -142,6 +151,7 @@ class ProfileDropdown {
         </ul>
       </div>
     `;
+    // PARTNERS_NAVIGATION END
   }
 
   decorateEmail() {
@@ -183,7 +193,10 @@ class ProfileDropdown {
   }
 
   addEventListeners() {
-    this.buttonElem.addEventListener('click', (e) => trigger({ element: this.buttonElem, event: e, type: 'profile' })); // MWPW-157752
+    // PARTNERS_NAVIGATION START
+    // MWPW-157752 - Profile dropdown not closing when clicking outside of it on mobile view
+    this.buttonElem.addEventListener('click', (e) => trigger({ element: this.buttonElem, event: e, type: 'profile' }));
+    // PARTNERS_NAVIGATION END
     this.buttonElem.addEventListener('keydown', (e) => e.code === 'Escape' && closeAllDropdowns());
     this.dropdown.addEventListener('keydown', (e) => e.code === 'Escape' && closeAllDropdowns());
     this.avatarElem.addEventListener('click', (e) => {
