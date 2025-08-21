@@ -125,7 +125,7 @@ function showError(message, link = null) {
   daTagBrowser.tabIndex = 0;
   daTagBrowser.rootTags = rootTags;
   daTagBrowser.getTags = async (tag) => getTags(tag.path, tagOpts, aemConfig);
-  daTagBrowser.tagValue = aemConfig.namespaces ? 'title' : 'path';
+  daTagBrowser.tagValue = 'path';
   daTagBrowser.actions = actions;
   document.body.querySelector('main').append(daTagBrowser);
 }());

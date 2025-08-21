@@ -29,6 +29,7 @@ import {
   getNodesByXPath,
   setLibs,
 } from '../../eds/scripts/utils.js';
+import {DX_PROGRAM_TYPE} from "../../eds/blocks/utils/dxConstants.js";
 
 describe('Test utils.js', () => {
   beforeEach(() => {
@@ -114,7 +115,7 @@ describe('Test utils.js', () => {
   });
   it('Should get correct program based on url path', () => {
     const pathDx = '/digitalexperience/test';
-    expect(getProgramType(pathDx)).toEqual('dx');
+    expect(getProgramType(pathDx)).toEqual(DX_PROGRAM_TYPE);
     const pathCpp = '/channelpartners/test';
     expect(getProgramType(pathCpp)).toEqual('cpp');
     const invalidPath = '/invalidpartners/test';
@@ -130,7 +131,7 @@ describe('Test utils.js', () => {
   });
   it('Should get current program based on url path', () => {
     window.location.pathname = '/digitalexperience/';
-    expect(getCurrentProgramType()).toEqual('dx');
+    expect(getCurrentProgramType()).toEqual(DX_PROGRAM_TYPE);
   });
   it('Should get correct cookie value for given cookie name', () => {
     document.cookie = 'test_cookie=test_value';
@@ -138,7 +139,7 @@ describe('Test utils.js', () => {
   });
   it('Should get empty string if cookie JSON is not valid', () => {
     document.cookie = 'partner_data={spp: {test1:test, test2:test}}';
-    expect(getPartnerDataCookieValue('test_cookie', 'spp')).toEqual('');
+    expect(getPartnerDataCookieValue('test_cookie', DX_PROGRAM_TYPE)).toEqual('');
   });
   it('Should return partner data cookie object', () => {
     const cookieObject = { SPP: { status: 'MEMBER' } };
@@ -244,7 +245,7 @@ describe('Test utils.js', () => {
     expect(locale).toStrictEqual({ ietf: 'en-US', tk: 'hah7vzn.css', prefix: '' });
   });
   it('Get caas url', () => {
-    document.cookie = 'partner_data={"SPP":{"accountAnniversary":1890777600000%2C"company":"Yugo SPP Stage Platinum Spain"%2C"firstName":"SPP Stage"%2C"lastName":"Spain Platinum"%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"}%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}';
+    document.cookie = 'partner_data={"SPP":{"accountAnniversary":1890777600000%2C"company":"Yugo SPP Stage Platinum Spain"%2C"firstName":"SPP Stage"%2C"lastName":"Spain Platinum"%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}}';
     const locales = {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
@@ -263,7 +264,7 @@ describe('Test utils.js', () => {
       ietf: locale.ietf,
     };
     const caasUrl = getCaasUrl(block);
-    expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%2BAND%2B%28%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fplatinum%22%2BOR%2B%22caas%3Aadobe-partners%2Fspp%2Fpartner-level%2Fpublic%22%29&language=en&country=US');
+    expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
   });
   it('Preload resources', async () => {
     const locales = {
@@ -292,12 +293,12 @@ describe('Test utils.js', () => {
     expect(elements[0].id).toEqual('test-id');
   });
   it('Should have access if sales center is present in partner data cookie', async () => {
-    const cookieObject = { SPP: { firstName: 'test' }, salesCenterAccess: true };
+    const cookieObject = { SPP: { firstName: 'test' , salesCenterAccess: true }};
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     expect(hasSalesCenterAccess()).toBe(true);
   });
   it('Should not have access if sales center is not present in partner data cookie', async () => {
-    const cookieObject = { SPP: { firstName: 'test' }, salesCenterAccess: false };
+    const cookieObject = { SPP: { firstName: 'test' , salesCenterAccess: false }};
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     expect(hasSalesCenterAccess()).toBe(false);
   });
