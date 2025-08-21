@@ -256,25 +256,16 @@ header.global-navigation.ready {
     /* Margin different than LTR due to transform origin effect */
     margin-right: 5px;
   }
-  /* NOT SURE ABOUT THIS */
-  /* Milo added .global-navigation class name in front of .feds-navLink-image
-     as a descendant of global-navigation.
-   */
+
   .global-navigation .feds-navLink-image {
     display: flex;
   }
-  /* NOT SURE ABOUT THIS */
-  /* Milo added .global-navigation class name in front of .feds-navLink-image
-     as a descendant of global-navigation.
-   */
+
   .global-navigation .feds-navLink-image picture,
   .global-navigation .feds-navLink-image img {
     display: block;
   }
-  /* NOT SURE ABOUT THIS */
-  /* Milo added .global-navigation class name in front of .feds-navLink-image
-     as a descendant of global-navigation.
-   */
+
   .global-navigation .feds-navLink-image picture {
     width: max-content;
     max-width: 25px;

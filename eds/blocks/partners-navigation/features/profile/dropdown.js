@@ -1,6 +1,5 @@
 import { toFragment, trigger, closeAllDropdowns, logErrorFor } from '../../utilities/utilities.js';
 
-// MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
 import { getLibs } from '../../../../scripts/utils.js';
 
 const miloLibs = getLibs();
@@ -114,11 +113,8 @@ class ProfileDropdown {
   }
 
   decorateDropdown() {
-    // PARTNERS_NAVIGATION START
-    // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
     const { locale } = getConfig();
     const lang = getLanguage(locale.ietf);
-    // PARTNERS_NAVIGATION END
 
     // TODO: the account name and email might need a bit of adaptive behavior;
     // historically we shrunk the font size and displayed the account name on two lines;
@@ -132,7 +128,7 @@ class ProfileDropdown {
       src="${this.avatar}"
       tabindex="0"
       alt="${this.placeholders.profileAvatar}"
-      data-url="${decorateProfileLink('account', `?lang=${lang}`)}"></img>`; // IN MILO IT SAYS profile?lang INSTEAD OF JUST ?lang
+      data-url="${decorateProfileLink('account', `?lang=${lang}`)}"></img>`;
     return toFragment`
       <div id="feds-profile-menu" class="feds-profile-menu">
         <div class="feds-profile-header">

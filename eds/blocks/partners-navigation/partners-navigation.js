@@ -65,7 +65,6 @@ const { replaceKey, replaceKeyArray } = await import(`${miloLibs}/features/place
 
 const { getMiloLocaleSettings } = await import(`${miloLibs}/blocks/merch/merch.js`);
 
-// NOT SURE ABOUT THIS BLOCK OF CODE START //
 (async () => {
   const { codeRoot, theme } = getConfig();
   const url = `${miloLibs || codeRoot}/blocks/global-navigation/`;
@@ -103,15 +102,9 @@ const plainHTMLPromise = (async () => {
   return res;
 })();
 
-// NOT SURE ABOUT THIS BLOCK OF CODE END //
-
 const asideJsPromise = getMetadata('gnav-promo-source') ? import('./features/aside/aside.js') : null;
 
 const breadCrumbsJsPromise = document.querySelector('header')?.classList.contains('has-breadcrumbs') ? import('./features/breadcrumbs/breadcrumbs.js') : null;
-
-// const [{ processTrackingLabels }] = await Promise.all([
-//   import('./utilities/utilities.js'),
-// ]);
 
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 

@@ -4,7 +4,6 @@
 // PARTNERS_NAVIGATION END
 import { loadBlock, decorateAutoBlock } from '../../../../utils/utils.js';
 import { toFragment, lanaLog } from '../../utilities/utilities.js';
-// import { processTrackingLabels } from '../../../../martech/attributes.js';
 import { getLibs } from '../../../../scripts/utils.js';
 const miloLibs = getLibs();
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);

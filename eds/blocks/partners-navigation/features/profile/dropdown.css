@@ -141,14 +141,8 @@
   border-top: var(--feds-border-profile);
 }
 
-/* NOT SURE ABOUT THIS */
-/* I assume everything in this block bellow is related to
-   ticket https://jira.corp.adobe.com/browse/MWPW-172075,
-   but need to confirm
-*/
 /* PARTNERS_NAVIGATION START */
 /* MWPW-172075 - Implement redesigned for the combined Profile Dropdown */
-/* Partners navigation */
 .partners-navigation .feds-profile-menu {
   padding: 0 24px;
   box-sizing: border-box;

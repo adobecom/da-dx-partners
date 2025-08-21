@@ -176,13 +176,13 @@ class Search {
         this.resultsList.replaceChildren(this.getResultsTemplate(suggestions));
         // PARTNERS_NAVIGATION START
         // MWPW-154138 - Search icon - Restricted global navigation
-        this.resultsList.appendChild(this.getViewAllResultsTemplate());  // MWPW-154138
+        this.resultsList.appendChild(this.getViewAllResultsTemplate());
         if (this.parent instanceof HTMLElement) {
           this.parent.classList.add(CONFIG.selectors.hasResults);
         }
       })
       .catch(() => {
-        this.resultsList.replaceChildren(this.getViewAllResultsTemplate());  // MWPW-154138
+        this.resultsList.replaceChildren(this.getViewAllResultsTemplate());
         if (this.parent instanceof HTMLElement) {
           this.parent.classList.remove(CONFIG.selectors.hasResults);
         }
