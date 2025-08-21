@@ -249,10 +249,6 @@ export async function loadDecorateMenu() {
 
   const [menu] = await Promise.all([
     import('./menu/menu.js'),
-    // NOT SURE ABOUT THIS
-    /* Same as above, Milo's code has rootPath,
-       currently here is ours code with absolute path
-    */
     loadStyles('/eds/blocks/partners-navigation/utilities/menu/menu.css'),
   ]);
 
