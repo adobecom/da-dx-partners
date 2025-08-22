@@ -476,7 +476,7 @@ class Gnav {
       // PARTNERS_NAVIGATION START
       // MWPW-168681 - GNAV Links & Authorable Icons
       shortcutIcons,
-      // PARTNERS_NAVIGATION START
+      // PARTNERS_NAVIGATION END
 
     };
 
@@ -516,7 +516,7 @@ class Gnav {
     }
     return toFragment`<div class="shortcut-icons shortcut-icons-${isMobile ? 'mobile' : 'desktop'}">${html}</div>`;
   };
-  // PARTNERS_NAVIGATION START
+  // PARTNERS_NAVIGATION END
 
   init = () => logErrorFor(async () => {
     branchBannerLoadCheck(this.updatePopupPosition);
