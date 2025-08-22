@@ -7,6 +7,8 @@ let signInPage;
 const { features } = signin;
 const loggedInAdobe = features.slice(3, 6);
 const errorFlowCases = features.slice(8, 12);
+const forbiddenAccess = features.slice(13, 15);
+const silverPlatinumPage = features.slice(15, 17);
 
 test.describe('MAPP sign in flow', () => {
   test.beforeEach(async ({ page, browserName, baseURL, context }) => {
@@ -216,6 +218,51 @@ test.describe('MAPP sign in flow', () => {
       await expect(pages[0].url())
         .toContain(`${features[12].data.expectedToSeeInURL}`);
       await expect(signInPage.notFound).toBeVisible();
+    });
+  });
+
+  forbiddenAccess.forEach((feature) => {
+    test(`${feature.name},${features.tags}`, async ({ page }) => {
+      await test.step('Go to a page in folder', async () => {
+        await page.goto(`${feature.path}`);
+        await page.waitForLoadState('domcontentloaded');
+      });
+
+      await test.step('Sign in', async () => {
+        await signInPage.signIn(page, `${feature.data.partnerLevel}`);
+        await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
+        await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      });
+
+      await test.step('Verify restricted news after successful login', async () => {
+        await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 20000 });
+        const pages = await page.context().pages();
+        await expect(pages[0].url())
+          .toContain(`${feature.data.expectedToSeeInURL}`);
+        await expect(signInPage.notFound).toBeVisible();
+      });
+    });
+  });
+
+  silverPlatinumPage.forEach((feature) => {
+    test(`${feature.name},${feature.tags}`, async ({ page }) => {
+      await test.step('Go to public home page', async () => {
+        await page.goto(`${feature.path}`);
+        await page.waitForLoadState('domcontentloaded');
+      });
+
+      await test.step('Sign in', async () => {
+        await signInPage.signIn(page, `${feature.data.partnerLevel}`);
+        await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
+        await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      });
+
+      await test.step('Verify restricted news after successful login', async () => {
+        await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 20000 });
+        const pages = await page.context().pages();
+        await expect(pages[0].url())
+          .toContain(`${feature.data.expectedToSeeInURL}`);
+      });
     });
   });
 });
