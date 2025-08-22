@@ -114,7 +114,7 @@ class Search {
         // MWPW-154138 - Search icon - Restricted global navigation
         if (!this.input) return;
         window.location.href = Search.getSearchLink(this.input.value?.trim());
-        // PARTNERS_NAVIGATION START
+        // PARTNERS_NAVIGATION END
       }
     });
 
