@@ -137,5 +137,45 @@ export default {
         expectedToSeeInURL: '/digitalexperience/home-page',
       },
     },
+    {
+      tcid: '14',
+      name: '@login-redirection-to-spp-platinum-page-forbidden-access',
+      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/platinum/platinum-page',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'spp-gold:',
+        expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/platinum/platinum-page',
+      },
+    },
+    {
+      tcid: '15',
+      name: '@login-redirection-to-spp-gold-page-forbidden-access',
+      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/gold/gold-page',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'spp-silver:',
+        expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/gold/gold-page',
+      },
+    },
+    {
+      tcid: '16',
+      name: '@login-redirection-to-platinum-page-folder',
+      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/platinum/platinum-page',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'spp-platinum:',
+        expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/platinum/platinum-page',
+      },
+    },
+    {
+      tcid: '17',
+      name: '@login-redirection-to-silver-page-folder',
+      path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/silver/silver-page',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'spp-silver:',
+        expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/silver/silver-page',
+      },
+    },
   ],
 };
