@@ -23,16 +23,23 @@ export default async function init(el) {
 
   const sectionIndex = el.parentNode.getAttribute('data-idx');
 
-  const localizedText = {};
+  const localizedText = {
+    '{{Date}}': 'Date',
+    '{{Asset detail}}': 'Asset detail',
+    '{{Audience}}': 'Audience',
+    '{{Summary}}': 'Summary',
+    '{{Type}}': 'Type',
+    '{{Tags}}': 'Tags',
+    '{{Size}}': 'Size',
+    '{{View}}': 'View',
+    '{{Download}}': 'Download',
+    '{{Back to previous}}': 'Back to previous',
+    '{{Asset not found}}': 'Asset does not exist',
+  };
   populateLocalizedTextFromListItems(el, localizedText);
 
   const deps = await Promise.all([
     localizationPromises(localizedText, config),
-    // import(`${miloLibs}/features/spectrum-web-components/dist/theme.js`),
-    // import(`${miloLibs}/features/spectrum-web-components/dist/search.js`),
-    // import(`${miloLibs}/features/spectrum-web-components/dist/checkbox.js`),
-    import(`${miloLibs}/features/spectrum-web-components/dist/button.js`),
-    // import(`${miloLibs}/features/spectrum-web-components/dist/progress-circle.js`),
   ]);
 
 
@@ -48,12 +55,11 @@ export default async function init(el) {
     }
   });
 
-
+console.log('localised text', localizedText);
   const blockData = {
     localizedText,
     tableData: el.children,
   }
-
 
   declareAssetPreview();
   const app = document.createElement('asset-preview');
