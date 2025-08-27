@@ -4,9 +4,12 @@
 // PARTNERS_NAVIGATION END
 import { loadBlock, decorateAutoBlock } from '../../../../utils/utils.js';
 import { toFragment, lanaLog } from '../../utilities/utilities.js';
+// PARTNERS_NAVIGATION START
+// MWPW-159021 - Fix eslint errors
 import { getLibs } from '../../../../scripts/utils.js';
 const miloLibs = getLibs();
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
+// PARTNERS_NAVIGATION END
 
 export default async function decorateAside({ headerElem, fedsPromoWrapper, promoPath } = {}) {
   const onError = () => {
