@@ -41,6 +41,7 @@ export const prodHosts = [
   'main--da-dx-partners--adobecom.aem.page',
   'main--da-dx-partners--adobecom.aem.live',
   'partners.adobe.com',
+  'partnerspreview.adobe.com',
 ];
 
 /*
@@ -225,7 +226,7 @@ function getComplexQueryParams(el) {
   }
 
   const partnerLevelParams = getPartnerLevelParams(DX_PROGRAM_TYPE);
-  if (partnerLevelParams) fullQuery += `+AND+${partnerLevelParams}`;
+  if (partnerLevelParams) fullQuery += `${fullQuery.length>0?'+AND+':''}${partnerLevelParams}`;
 
   return fullQuery;
 }
