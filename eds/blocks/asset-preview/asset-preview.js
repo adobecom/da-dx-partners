@@ -33,7 +33,7 @@ export default async function init(el) {
     '{{View}}': 'View',
     '{{Download}}': 'Download',
     '{{Back to previous}}': 'Back to previous',
-    '{{Asset not found}}': 'Asset does not exist',
+    '{{Asset data not found}}': 'Asset data not found',
     '{{Loading data}}': 'Loading data',
   };
   populateLocalizedTextFromListItems(el, localizedText);

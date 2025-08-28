@@ -36,14 +36,14 @@ export default class AssetPreview extends LitElement {
     ctaText: { type: String },
     backButtonUrl: { type: String },
     createdDate: { type: Date },
-    assetExist: { type: Boolean },
+    assetHasData: { type: Boolean },
     isVideoPlaying: { type: Boolean, reflect: true },
     isLoading: { type: Boolean, reflect: true },
   };
 
   constructor() {
     super();
-    this.assetExist = false;
+    this.assetHasData = false;
     this.tags = [];
     this.allAssetTags = [];
     this.allCaaSTags = [];
@@ -62,8 +62,6 @@ export default class AssetPreview extends LitElement {
     if (this._video && this._video.paused) {
       // eslint-disable-next-line no-underscore-dangle
       this._video.play();
-      // this.isVideoPlaying = true;
-
       // eslint-disable-next-line no-underscore-dangle
     } else if (this._video) {
       // eslint-disable-next-line no-underscore-dangle
@@ -146,7 +144,12 @@ export default class AssetPreview extends LitElement {
     this.audienceTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:audience') : [];
     this.fileFormatTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:file-format') : [];
     this.isVideo = this.fileFormatTags && this.fileFormatTags.length && this.fileFormatTags[0].tagId === 'caas:file-format/video';
-    this.assetExist = true;
+    console.log('assetmetadata', assetMetadata);
+    if (!assetMetadata.title || !assetMetadata.url) {
+      this.assetHasData = false;
+    } else {
+      this.assetHasData = true;
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -165,7 +168,7 @@ export default class AssetPreview extends LitElement {
 
   render() {
     return html`<div class="asset-preview-block-container">
-      ${this.assetExist && !this.isLoading ? html`
+      ${this.assetHasData && !this.isLoading ? html`
           <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${this.title}  ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}</p></div>
           <div class="asset-preview-block-details ">
             <div class="asset-preview-block-details-left">
@@ -207,7 +210,7 @@ export default class AssetPreview extends LitElement {
             </a>
           </div>
         </div>`
-    : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset not found}}']}</div>`}
+    : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset data not found}}']}</div>`}
     `;
   }
 
@@ -288,11 +291,8 @@ export default class AssetPreview extends LitElement {
       PX_PARTNER_LEVELS_ROOT,
     ).map((t) => t.tagId);
     const userPartnerLevel = PARTNER_LEVEL ? PX_PARTNER_LEVELS[PARTNER_LEVEL.toUpperCase()] : '';
-    if (!assetPxPartnerLevels.length
+    return !(!assetPxPartnerLevels.length
       || assetPxPartnerLevels.includes(PX_PARTNER_LEVELS.PUBLIC)
-      || assetPxPartnerLevels.includes(userPartnerLevel)) {
-      return false;
-    }
-    return true;
+      || assetPxPartnerLevels.includes(userPartnerLevel));
   }
 }
