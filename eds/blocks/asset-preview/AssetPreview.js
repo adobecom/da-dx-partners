@@ -189,7 +189,7 @@ export default class AssetPreview extends LitElement {
               <div class="asset-preview-block-actions">
               ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button 
                 class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.url.replace(DIGITALEXPERIENCE_PREVIEW_PATH, DIGITALEXPERIENCE_ASSETS_PATH)}"> View </a></button>` : ''}
-                <button class="filled" download="${this.title}"><a href="${this.getDownloadUrl()}">${this.blockData.localizedText['{{Download}}']}</a></button>
+                <button class="filled""><a  download="${this.title} href="${this.getDownloadUrl()}">${this.blockData.localizedText['{{Download}}']}</a></button>
               ${this.backButtonUrl ? html`<a 
                 class="link" href="${this.backButtonUrl}">${this.blockData.localizedText['{{Back to previous}}']}</a>` : ''}
               </div>` : ''}
@@ -251,6 +251,7 @@ export default class AssetPreview extends LitElement {
   }
 
   getTagChildTagsObjects(tags, allTags, rootTag) {
+    if (!tags) return [];
     const filteredTags = tags.filter((t) => t.startsWith(rootTag));
     const tagsArray = [];
     filteredTags.forEach((tag) => {
@@ -274,6 +275,7 @@ export default class AssetPreview extends LitElement {
   }
 
   getDownloadUrl() {
+    if (!this.url) return '#';
     return setDownloadParam(
       this.url.replace(DIGITALEXPERIENCE_PREVIEW_PATH, DIGITALEXPERIENCE_ASSETS_PATH),
     );
