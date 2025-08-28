@@ -3,7 +3,11 @@
 /* eslint-disable */
 // PARTNERS_NAVIGATION END
 import { getConfig, shouldBlockFreeTrialLinks } from '../../../utils/utils.js';
-import { debounce } from '../../../utils/action.js';
+// PARTNERS_NAVIGATION START
+import { getLibs } from '../../../../scripts/utils.js';
+const miloLibs = getLibs();
+const { debounce } = await import(`${miloLibs}/utils/action.js`);
+// PARTNERS_NAVIGATION END
 import {
   fetchAndProcessPlainHtml,
   getActiveLink,
@@ -25,8 +29,6 @@ import {
 } from '../utilities.js';
 
 import { personalizeMainNav, shouldHideLinkGroup } from "../../../../scripts/personalization.js";
-import { getLibs } from '../../../../scripts/utils.js';
-const miloLibs = getLibs();
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 function getAnalyticsValue(str, index) {

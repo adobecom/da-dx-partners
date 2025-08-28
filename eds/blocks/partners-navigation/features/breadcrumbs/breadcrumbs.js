@@ -2,7 +2,12 @@
 // MWPW-159021 - Fix eslint errors
 /* eslint-disable */
 // PARTNERS_NAVIGATION END
-import { getMetadata, getConfig, getFederatedUrl } from '../../../../utils/utils.js';
+// PARTNERS_NAVIGATION START
+// import utils from miloLibs
+import { getLibs } from '../../../../scripts/utils.js';
+const miloLibs = getLibs();
+const { getMetadata, getConfig, getFederatedUrl } = await import(`${miloLibs}/utils/utils.js`);
+// PARTNERS_NAVIGATION END
 import { toFragment, lanaLog } from '../../utilities/utilities.js';
 
 const metadata = {
