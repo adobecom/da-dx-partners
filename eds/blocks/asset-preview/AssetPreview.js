@@ -7,7 +7,9 @@ import {
   transformCardUrl,
 } from '../utils/utils.js';
 import {
-  PARTNER_LEVEL,
+  DIGITALEXPERIENCE_ASSETS_PATH,
+  DIGITALEXPERIENCE_PREVIEW_PATH,
+  PARTNER_LEVEL, PX_ASSETS_AEM_PATH,
   PX_PARTNER_LEVELS,
   PX_PARTNER_LEVELS_ROOT,
 } from '../utils/dxConstants.js';
@@ -36,6 +38,7 @@ export default class AssetPreview extends LitElement {
     createdDate: { type: Date },
     assetExist: { type: Boolean },
     isVideoPlaying: { type: Boolean, reflect: true },
+    isLoading: { type: Boolean, reflect: true },
   };
 
   constructor() {
@@ -46,6 +49,7 @@ export default class AssetPreview extends LitElement {
     this.allCaaSTags = [];
     this.isVideoPlaying = false;
     this.isVideo = false;
+    this.isLoading = true;
   }
 
   // eslint-disable-next-line no-underscore-dangle
@@ -113,6 +117,7 @@ export default class AssetPreview extends LitElement {
     } catch (e) {
       console.log(`Error on fetch of asset ${mappedAssetUrl} :`, e);
     }
+    this.isLoading = false;
   }
 
   async setData(assetMetadata) {
@@ -129,9 +134,14 @@ export default class AssetPreview extends LitElement {
     this.ctaText = assetMetadata.ctaText;
     this.size = this.getSizeInMb(assetMetadata.size);
     this.createdDate = (() => {
-      if (!assetMetadata.createdDate) return null;
-      const date = new Date(assetMetadata.createdDate);
-      return !isNaN(date.getTime()) ? date.toLocaleDateString('en-US') : null;
+      if (!assetMetadata.createdDate) return '';
+
+      try {
+        const date = new Date(assetMetadata.createdDate);
+        return date.toLocaleDateString('en-US');
+      } catch (error) {
+        return '';
+      }
     })();
     this.audienceTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:audience') : [];
     this.fileFormatTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:file-format') : [];
@@ -141,7 +151,7 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   getRealAssetUrl() {
-    const assetMetadataPath = window.location.href.replace('/digitalexperience/preview/', '/content/dam/solution/en/').concat('.assetmetadata.json');
+    const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_AEM_PATH).concat('.assetmetadata.json');
     try {
       const url = new URL(assetMetadataPath);
       const isProd = prodHosts.includes(window.location.host);
@@ -155,8 +165,8 @@ export default class AssetPreview extends LitElement {
 
   render() {
     return html`<div class="asset-preview-block-container">
-      ${this.assetExist ? html`
-          <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${this.title}  (${this.getFileTypeFromTag()})</p></div>
+      ${this.assetExist && !this.isLoading ? html`
+          <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${this.title}  ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}</p></div>
           <div class="asset-preview-block-details ">
             <div class="asset-preview-block-details-left">
               <p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Date}}']}: </span>${this.createdDate}</p>
@@ -178,7 +188,7 @@ export default class AssetPreview extends LitElement {
           ${!this.isRestrictedAssetForUser() ? html`
               <div class="asset-preview-block-actions">
               ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button 
-                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.url}"> View </a></button>` : ''}
+                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.url.replace(DIGITALEXPERIENCE_PREVIEW_PATH, DIGITALEXPERIENCE_ASSETS_PATH)}"> View </a></button>` : ''}
                 <button class="filled" download="${this.title}"><a href="${this.getDownloadUrl()}">${this.blockData.localizedText['{{Download}}']}</a></button>
               ${this.backButtonUrl ? html`<a 
                 class="link" href="${this.backButtonUrl}">${this.blockData.localizedText['{{Back to previous}}']}</a>` : ''}
@@ -197,7 +207,7 @@ export default class AssetPreview extends LitElement {
             </a>
           </div>
         </div>`
-    : ''}` : html`<div class="asset-preview-block-header">${this.blockData.localizedText['{{Asset not found}}']}</div>`}
+    : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset not found}}']}</div>`}
     `;
   }
 
@@ -209,7 +219,6 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   getSizeInMb(size) {
-    if (!size || isNaN(Number(size))) return '';
     const sizeInMb = Number(size / (1024 * 1024)).toFixed(2);
     const sizeInKb = Number(size / 1024).toFixed(2);
     return sizeInMb >= 1 ? `${sizeInMb} MB` : `${sizeInKb} KB`;
@@ -229,14 +238,16 @@ export default class AssetPreview extends LitElement {
   findTagByPath(caasTags, tag) {
     const tagParts = tag.split('caas:')[1].split('/');
     let caasPointer = caasTags;
+    // eslint-disable-next-line consistent-return
     tagParts.forEach((tagPart, i) => {
+      if (!caasPointer) return null;
       if (tagParts.length - 1 > i) {
         caasPointer = caasPointer[tagPart]?.tags;
       } else {
         caasPointer = caasPointer[tagPart];
       }
     });
-    return caasPointer || null;
+    return caasPointer;
   }
 
   getTagChildTagsObjects(tags, allTags, rootTag) {
@@ -264,7 +275,7 @@ export default class AssetPreview extends LitElement {
 
   getDownloadUrl() {
     return setDownloadParam(
-      this.url,
+      this.url.replace(DIGITALEXPERIENCE_PREVIEW_PATH, DIGITALEXPERIENCE_ASSETS_PATH),
     );
   }
 

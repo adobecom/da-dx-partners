@@ -15,5 +15,5 @@ export const PX_PARTNER_LEVELS = Object.freeze({
 });
 export const PX_PARTNER_LEVELS_ROOT = 'caas:adobe-partners/px/partner-level';
 export const DIGITALEXPERIENCE_PREVIEW_PATH = '/digitalexperience/preview/';
-export const DIGITALEXPERIENCE_ASSETS_PATH = '"/digitalexperience-assets/"';
-
+export const DIGITALEXPERIENCE_ASSETS_PATH = '/digitalexperience-assets/';
+export const PX_ASSETS_AEM_PATH = '/content/dam/solution/en/';

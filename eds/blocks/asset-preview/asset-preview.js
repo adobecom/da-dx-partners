@@ -34,6 +34,7 @@ export default async function init(el) {
     '{{Download}}': 'Download',
     '{{Back to previous}}': 'Back to previous',
     '{{Asset not found}}': 'Asset does not exist',
+    '{{Loading data}}': 'Loading data',
   };
   populateLocalizedTextFromListItems(el, localizedText);
 
