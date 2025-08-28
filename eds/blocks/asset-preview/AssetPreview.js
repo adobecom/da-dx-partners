@@ -58,11 +58,13 @@ export default class AssetPreview extends LitElement {
     if (this._video && this._video.paused) {
       // eslint-disable-next-line no-underscore-dangle
       this._video.play();
+      // this.isVideoPlaying = true;
 
       // eslint-disable-next-line no-underscore-dangle
     } else if (this._video) {
       // eslint-disable-next-line no-underscore-dangle
       this._video.pause();
+      // this.isVideoPlaying = false;
     }
   }
 
@@ -100,7 +102,7 @@ export default class AssetPreview extends LitElement {
     // but will always fetch asset metadata from stage
     // so we should delete assets from lower env if they make us problem on stage
     const mappedAssetUrl = this.getRealAssetUrl();
-    if(!mappedAssetUrl) return;
+    if (!mappedAssetUrl) return;
     try {
       await fetch(mappedAssetUrl).then(async (res) => {
         if (res && res.status === 200) {
@@ -109,7 +111,7 @@ export default class AssetPreview extends LitElement {
         }
       });
     } catch (e) {
-      console.log(`Error on fetch of asset ${mappedAssetUrl} :`, error);
+      console.log(`Error on fetch of asset ${mappedAssetUrl} :`, e);
     }
   }
 
@@ -133,7 +135,7 @@ export default class AssetPreview extends LitElement {
     })();
     this.audienceTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:audience') : [];
     this.fileFormatTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:file-format') : [];
-    this.isVideo = this.fileFormatTags && this.fileFormatTags[0].tagId === 'caas:file-format/video';
+    this.isVideo = this.fileFormatTags && this.fileFormatTags.length && this.fileFormatTags[0].tagId === 'caas:file-format/video';
     this.assetExist = true;
   }
 
@@ -154,7 +156,7 @@ export default class AssetPreview extends LitElement {
   render() {
     return html`<div class="asset-preview-block-container">
       ${this.assetExist ? html`
-          <div class="asset-preview-block-header">${this.blockData.localizedText['{{Asset detail}}']}: ${this.title}  (${this.getFileTypeFromTag()})</div>
+          <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${this.title}  (${this.getFileTypeFromTag()})</p></div>
           <div class="asset-preview-block-details ">
             <div class="asset-preview-block-details-left">
               <p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Date}}']}: </span>${this.createdDate}</p>
@@ -185,10 +187,10 @@ export default class AssetPreview extends LitElement {
         ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
         <div class="asset-preview-block-video">
           <div class="video-container video-holder">
-            <video  
-              playsinline="" autoplay muted="" loop="" data-video-source="${this.getDownloadUrl()}"><source src="${this.getDownloadUrl()}" type="video/mp4"></video>
+            <video autoplay @play="${() => { this.isVideoPlaying = true; }}" @pause="${() => { this.isVideoPlaying = false; }}"
+              playsinline="" muted="" loop="" data-video-source="${this.getDownloadUrl()}"><source src="${this.getDownloadUrl()}" type="video/mp4"></video>
             <a @click="${() => this.togglePlay()}" class="pause-play-wrapper" title="Pause motion 3" aria-label="Pause motion 3 " role="button" tabindex="0" aria-pressed="true" video-index="3" daa-ll="Pause motion-1--">
-              <div class="${this._video?.paused ? 'is-playing' : ''} offset-filler" >
+              <div class="${this.isVideoPlaying ? 'is-playing' : ''} offset-filler">
                 <img class="accessibility-control pause-icon" alt="Pause motion" src="https://milo.adobe.com/federal/assets/svgs/accessibility-pause.svg">
                 <img class="accessibility-control play-icon" alt="Play motion" src="https://milo.adobe.com/federal/assets/svgs/accessibility-play.svg">
               </div>
@@ -229,7 +231,7 @@ export default class AssetPreview extends LitElement {
     let caasPointer = caasTags;
     tagParts.forEach((tagPart, i) => {
       if (tagParts.length - 1 > i) {
-        caasPointer = caasPointer[tagPart].tags;
+        caasPointer = caasPointer[tagPart]?.tags;
       } else {
         caasPointer = caasPointer[tagPart];
       }

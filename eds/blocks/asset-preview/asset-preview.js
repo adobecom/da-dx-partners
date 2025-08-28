@@ -1,6 +1,6 @@
-import {getLibs} from "../../scripts/utils.js";
-import AssetPreview from "./AssetPreview.js";
-import {getConfig, populateLocalizedTextFromListItems, replaceText} from "../utils/utils.js";
+import { getLibs } from '../../scripts/utils.js';
+import AssetPreview from './AssetPreview.js';
+import { getConfig, populateLocalizedTextFromListItems, replaceText } from '../utils/utils.js';
 
 function declareAssetPreview() {
   if (customElements.get('asset-preview')) return;
@@ -15,7 +15,6 @@ async function localizationPromises(localizedText, config) {
 }
 
 export default async function init(el) {
-  console.log('in block');
   performance.mark('asset-preview:start');
 
   const miloLibs = getLibs();
@@ -42,24 +41,10 @@ export default async function init(el) {
     localizationPromises(localizedText, config),
   ]);
 
-
-  const rows = Array.from(el.children);
-  let dateFilterValue = '';
-
-  rows.forEach((row) => {
-    const cols = Array.from(row.children);
-    const rowTitle = cols[0].innerText.trim().toLowerCase().replace(/ /g, '-');
-
-    if (rowTitle === "date-filter") {
-      dateFilterValue = cols[1]?.innerText.trim();
-    }
-  });
-
-console.log('localised text', localizedText);
   const blockData = {
     localizedText,
     tableData: el.children,
-  }
+  };
 
   declareAssetPreview();
   const app = document.createElement('asset-preview');
