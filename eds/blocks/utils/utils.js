@@ -118,8 +118,8 @@ export function setDownloadParam(url) {
   }
 }
 const PARTNERS_PREVIEW_DOMAIN = 'partnerspreview.adobe.com';
-const PARTNERS_STAGE_DOMAIN = 'partners.stage.adobe.com';
-const PARTNERS_PROD_DOMAIN = 'partners.adobe.com';
+export const PARTNERS_STAGE_DOMAIN = 'partners.stage.adobe.com';
+export const PARTNERS_PROD_DOMAIN = 'partners.adobe.com';
 
 // eslint-disable-next-line class-methods-use-this
 export function transformCardUrl(url) {
