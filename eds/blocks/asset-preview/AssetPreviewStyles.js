@@ -124,14 +124,17 @@ export const assetPreviewStyles = css`
     color: inherit;
     text-decoration: none;
   }
-
+  .asset-preview-block-video {
+    display: flex;
+    margin: 24px auto;
+    width: 83.4%;
+  }
   .asset-preview-block-video .video-container.video-holder {
     display: flex;
     position: relative;
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     aspect-ratio: 16/9;
-    margin: auto;
     margin-bottom: 0;
   }
 
