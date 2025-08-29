@@ -10,8 +10,6 @@ import {
   DIGITALEXPERIENCE_ASSETS_PATH,
   DIGITALEXPERIENCE_PREVIEW_PATH,
   PARTNER_LEVEL, PX_ASSETS_AEM_PATH,
-  PX_PARTNER_LEVELS,
-  PX_PARTNER_LEVELS_ROOT,
 } from '../utils/dxConstants.js';
 
 const DEFAULT_BACKGROUND_IMAGE_PATH = '/content/dam/solution/en/images/card-collection/sample_default.png';
@@ -39,6 +37,7 @@ export default class AssetPreview extends LitElement {
     assetHasData: { type: Boolean },
     isVideoPlaying: { type: Boolean, reflect: true },
     isLoading: { type: Boolean, reflect: true },
+    assetPartnerLevel: { type: Array },
   };
 
   constructor() {
@@ -50,6 +49,7 @@ export default class AssetPreview extends LitElement {
     this.isVideoPlaying = false;
     this.isVideo = false;
     this.isLoading = true;
+    this.assetPartnerLevel = [];
   }
 
   // eslint-disable-next-line no-underscore-dangle
@@ -131,6 +131,7 @@ export default class AssetPreview extends LitElement {
     this.allAssetTags = assetMetadata.tags;
     this.ctaText = assetMetadata.ctaText;
     this.size = this.getSizeInMb(assetMetadata.size);
+    this.assetPartnerLevel = assetMetadata.partnerLevel;
     this.createdDate = (() => {
       if (!assetMetadata.createdDate) return '';
 
@@ -144,7 +145,6 @@ export default class AssetPreview extends LitElement {
     this.audienceTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:audience') : [];
     this.fileFormatTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:file-format') : [];
     this.isVideo = this.fileFormatTags && this.fileFormatTags.length && this.fileFormatTags[0].tagId === 'caas:file-format/video';
-    console.log('assetmetadata', assetMetadata);
     if (!assetMetadata.title || !assetMetadata.url) {
       this.assetHasData = false;
     } else {
@@ -285,14 +285,8 @@ export default class AssetPreview extends LitElement {
   }
 
   isRestrictedAssetForUser() {
-    const assetPxPartnerLevels = this.getTagChildTagsObjects(
-      this.allAssetTags,
-      this.allCaaSTags,
-      PX_PARTNER_LEVELS_ROOT,
-    ).map((t) => t.tagId);
-    const userPartnerLevel = PARTNER_LEVEL ? PX_PARTNER_LEVELS[PARTNER_LEVEL.toUpperCase()] : '';
-    return !(!assetPxPartnerLevels.length
-      || assetPxPartnerLevels.includes(PX_PARTNER_LEVELS.PUBLIC)
-      || assetPxPartnerLevels.includes(userPartnerLevel));
+    return !(!this.assetPartnerLevel.length
+      || this.assetPartnerLevel.includes('Public')
+      || this.assetPartnerLevel.includes(PARTNER_LEVEL));
   }
 }
