@@ -172,12 +172,12 @@ export default class AssetPreview extends LitElement {
           <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${this.title}  ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}</p></div>
           <div class="asset-preview-block-details ">
             <div class="asset-preview-block-details-left">
-              <p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Date}}']}: </span>${this.createdDate}</p>
-              <p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Audience}}']}: </span>${this.getTagsTitlesString(this.audienceTags)}</p>
-              <p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Summary}}']}: </span>${this.isVideo ? this.description : this.summary || this.description}</p>
-              <p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Type}}']}: </span>${this.getTagsTitlesString(this.fileFormatTags)}</p>
-              <p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Tags}}']}: </span>${this.getTagsTitlesString(this.tags)}</p>
-              <p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span class="bold">${this.size}</p>
+              ${this.createdDate ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Date}}']}: </span>${this.createdDate}</p>` : ''}
+              ${this.getTagsTitlesString(this.audienceTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Audience}}']}: </span>${this.getTagsTitlesString(this.audienceTags)}</p>` : ''}
+              ${(this.isVideo ? this.description : this.summary || this.description) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Summary}}']}: </span>${this.isVideo ? this.description : this.summary || this.description}</p>` : ''}
+              ${this.getTagsTitlesString(this.fileFormatTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Type}}']}: </span>${this.getTagsTitlesString(this.fileFormatTags)}</p>` : ''}
+              ${this.getTagsTitlesString(this.tags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Tags}}']}: </span>${this.getTagsTitlesString(this.tags)}</p>` : ''}
+              ${this.size ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span class="bold">${this.size}</p>` : ''}
             </div>
             <div class="asset-preview-block-details-right"
                  style="background-image:
