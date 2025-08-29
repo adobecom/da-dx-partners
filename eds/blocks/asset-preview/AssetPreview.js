@@ -37,6 +37,7 @@ export default class AssetPreview extends LitElement {
     assetHasData: { type: Boolean },
     isVideoPlaying: { type: Boolean, reflect: true },
     isLoading: { type: Boolean, reflect: true },
+    isVideoLoading: { type: Boolean, reflect: true },
     assetPartnerLevel: { type: Array },
   };
 
@@ -49,6 +50,7 @@ export default class AssetPreview extends LitElement {
     this.isVideoPlaying = false;
     this.isVideo = false;
     this.isLoading = true;
+    this.isVideoLoading = false;
     this.assetPartnerLevel = [];
   }
 
@@ -211,14 +213,33 @@ export default class AssetPreview extends LitElement {
         ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
         <div class="asset-preview-block-video">
           <div class="video-container video-holder">
-            <video @play="${() => { this.isVideoPlaying = true; }}" @pause="${() => { this.isVideoPlaying = false; }}"
-              playsinline="" loop="" data-video-source="${this.getDownloadUrl()}"><source src="${this.getDownloadUrl()}" type="video/mp4"></video>
-            <a @click="${() => this.togglePlay()}" class="pause-play-wrapper" title="Pause motion 3" aria-label="Pause motion 3 " role="button" tabindex="0" aria-pressed="true" video-index="3" daa-ll="Pause motion-1--">
-              <div class="${this.isVideoPlaying ? 'is-playing' : ''} offset-filler">
-                <img class="accessibility-control pause-icon" alt="Pause motion" src="https://milo.adobe.com/federal/assets/svgs/accessibility-pause.svg">
-                <img class="accessibility-control play-icon" alt="Play motion" src="https://milo.adobe.com/federal/assets/svgs/accessibility-play.svg">
+            ${this.isVideoLoading ? html`
+              <div class="video-loading-overlay">
+                <div class="video-loading-spinner"></div>
               </div>
-            </a>
+            ` : ''}
+            <video 
+              preload="auto" 
+              @play="${() => { this.isVideoPlaying = true; }}" 
+              @pause="${() => { this.isVideoPlaying = false; }}"
+              @loadstart="${() => { this.isVideoLoading = true; }}"
+              @canplay="${() => { this.isVideoLoading = false; }}"
+              @error="${() => { this.isVideoLoading = false; }}"
+              playsinline="" 
+              loop="" 
+              data-video-source="${this.getDownloadUrl()}"
+            >
+              <source src="${this.getDownloadUrl()}" type="${this.fileType}">
+              <source src="${this.getDownloadUrl()}" type="video/mp4">
+            </video>
+            ${!this.isVideoLoading ? html`
+              <a @click="${() => this.togglePlay()}" class="pause-play-wrapper" title="Pause motion 3" aria-label="Pause motion 3 " role="button" tabindex="0" aria-pressed="true" video-index="3" daa-ll="Pause motion-1--">
+                <div class="${this.isVideoPlaying ? 'is-playing' : ''} offset-filler">
+                  <img class="accessibility-control pause-icon" alt="Pause motion" src="https://milo.adobe.com/federal/assets/svgs/accessibility-pause.svg">
+                  <img class="accessibility-control play-icon" alt="Play motion" src="https://milo.adobe.com/federal/assets/svgs/accessibility-play.svg">
+                </div>
+              </a>
+            ` : ''}
           </div>
         </div>`
     : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset data not found}}']}</div>`}

@@ -128,16 +128,17 @@ export const assetPreviewStyles = css`
   .asset-preview-block-video .video-container.video-holder {
     display: flex;
     position: relative;
-    height: 100%;
-    width: fit-content;
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16/9;
     margin: auto;
     margin-bottom: 0;
   }
 
   .asset-preview-block-video .video-container.video-holder video {
-    max-width: 100%;
-    height: auto;
-    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
   .asset-preview-block-video .video-container.video-holder .pause-play-wrapper {
@@ -204,4 +205,38 @@ export const assetPreviewStyles = css`
   .is-playing .pause-icon {
     display: block;
   }
+
+  /* Video loading overlay styles */
+  .video-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    color: ${white};
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .video-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid ${white};
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+
 `;
