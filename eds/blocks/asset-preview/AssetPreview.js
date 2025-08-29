@@ -73,7 +73,18 @@ export default class AssetPreview extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
     this.setBlockData();
-    this.allCaaSTags = await fetch(CAAS_TAGS_URL).then((res) => res.json());
+    try {
+      const caasTagsResponse = await fetch(
+        CAAS_TAGS_URL,
+      );
+      if (!caasTagsResponse.ok) {
+        throw new Error(`Get caas tags HTTP error! Status: ${caasTagsResponse.status}`);
+      }
+      this.allCaaSTags = await caasTagsResponse.json();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log('error', error);
+    }
     await this.getAssetMetadata();
   }
 
@@ -200,8 +211,8 @@ export default class AssetPreview extends LitElement {
         ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
         <div class="asset-preview-block-video">
           <div class="video-container video-holder">
-            <video autoplay @play="${() => { this.isVideoPlaying = true; }}" @pause="${() => { this.isVideoPlaying = false; }}"
-              playsinline="" muted="" loop="" data-video-source="${this.getDownloadUrl()}"><source src="${this.getDownloadUrl()}" type="video/mp4"></video>
+            <video @play="${() => { this.isVideoPlaying = true; }}" @pause="${() => { this.isVideoPlaying = false; }}"
+              playsinline="" loop="" data-video-source="${this.getDownloadUrl()}"><source src="${this.getDownloadUrl()}" type="video/mp4"></video>
             <a @click="${() => this.togglePlay()}" class="pause-play-wrapper" title="Pause motion 3" aria-label="Pause motion 3 " role="button" tabindex="0" aria-pressed="true" video-index="3" daa-ll="Pause motion-1--">
               <div class="${this.isVideoPlaying ? 'is-playing' : ''} offset-filler">
                 <img class="accessibility-control pause-icon" alt="Pause motion" src="https://milo.adobe.com/federal/assets/svgs/accessibility-pause.svg">
@@ -273,8 +284,9 @@ export default class AssetPreview extends LitElement {
     return '';
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getTagsTitlesString(tags) {
-    return tags?.map((tag, i) => `${tag.title}${this.tags.length - 1 > i ? ', ' : ''}`);
+    return tags?.map((tag) => tag.title).join(', ');
   }
 
   getDownloadUrl() {
