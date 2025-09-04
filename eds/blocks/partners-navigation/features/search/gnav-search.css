@@ -1,5 +1,8 @@
-/* MWPW-159021 */
+/* PARTNERS_NAVIGATION START */
+
+/* MWPW-159021 - Fix eslint errors */
 /* stylelint-disable */
+/* PARTNERS_NAVIGATION END */
 .feds-nav-wrapper.has-results .feds-nav {
   display: none;
 }
@@ -105,7 +108,8 @@
   border-color: #d3d3d3;
   border-radius: 0 0 3px 3px;
 }
-/*MWPW-154138*/
+/* PARTNERS_NAVIGATION START */
+/* MWPW-154138 - Search icon - Restricted global navigation */
 .feds-search-result,
 .feds-search-view-all-results {
   display: block;
@@ -115,6 +119,7 @@
   font-weight: 700;
   color: #2d2d2d;
 }
+/* PARTNERS_NAVIGATION END */
 
 .feds-search-result:hover,
 .feds-search-result:focus {
@@ -125,10 +130,12 @@
   font-weight: 400;
 }
 
-/*MWPW-154138*/
+/* PARTNERS_NAVIGATION START */
+/* MWPW-154138 - Search icon - Restricted global navigation */
 .feds-search-view-all-results {
   color: var(--link-color);
 }
+/* PARTNERS_NAVIGATION END */
 
 @media screen and (min-width: 900px) {
   .feds-nav-wrapper.has-results .feds-nav {
