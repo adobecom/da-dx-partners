@@ -133,18 +133,19 @@ export default class AssetPreview extends LitElement {
 
   async setData(assetMetadata) {
     this.title = assetMetadata.title;
+    document.title = assetMetadata.title;
     this.summary = assetMetadata.summary;
     this.description = assetMetadata.description;
     this.fileType = assetMetadata.fileType;
     this.url = assetMetadata.url;
-    this.thumbnailUrl = assetMetadata.thumbnailUrl;
+    this.previewImage = assetMetadata.previewImage || assetMetadata.thumbnailUrl;
     this.backButtonUrl = this.blockData.backButtonUrl;
     this.tags = assetMetadata.tags
       ? this.getTagsDisplayValues(this.allCaaSTags, assetMetadata.tags) : [];
     this.allAssetTags = assetMetadata.tags;
     this.ctaText = assetMetadata.ctaText;
     this.size = this.getSizeInMb(assetMetadata.size);
-    this.assetPartnerLevel = assetMetadata.partnerLevel;
+    this.assetPartnerLevel = assetMetadata.partnerLevel?.map((level) => level.toLowerCase());
     this.createdDate = (() => {
       if (!assetMetadata.createdDate) return '';
 
@@ -194,7 +195,7 @@ export default class AssetPreview extends LitElement {
             </div>
             <div class="asset-preview-block-details-right"
                  style="background-image:
-                  url(${transformCardUrl(this.thumbnailUrl)}),
+                  url(${transformCardUrl(this.previewImage)}),
                    url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})"
             >
             </div>
