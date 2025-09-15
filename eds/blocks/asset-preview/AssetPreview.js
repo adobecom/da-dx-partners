@@ -16,6 +16,7 @@ const DEFAULT_BACKGROUND_IMAGE_PATH = '/content/dam/solution/en/images/card-coll
 
 const miloLibs = getLibs();
 const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
 export default class AssetPreview extends LitElement {
   static styles = [
     assetPreviewStyles,
@@ -33,6 +34,7 @@ export default class AssetPreview extends LitElement {
     allAssetTags: { type: Array },
     ctaText: { type: String },
     backButtonUrl: { type: String },
+    backButtonLabel: { type: String },
     createdDate: { type: Date },
     assetHasData: { type: Boolean },
     isVideoPlaying: { type: Boolean, reflect: true },
@@ -90,6 +92,13 @@ export default class AssetPreview extends LitElement {
     await this.getAssetMetadata();
   }
 
+  addDynamicKeyForLocalization(key) {
+    const localizationKey = `{{${key}}}`;
+    if (!this.blockData.localizedText[localizationKey]) {
+      this.blockData.localizedText[localizationKey] = key;
+    }
+  }
+
   setBlockData() {
     this.blockData = { ...this.blockData };
 
@@ -97,6 +106,11 @@ export default class AssetPreview extends LitElement {
       'back-button-url': (cols) => {
         const [backButtonUrlEl] = cols;
         this.blockData.backButtonUrl = backButtonUrlEl.innerText.trim();
+      },
+      'back-button-label': (cols) => {
+        const [backButtonLabelEl] = cols;
+        this.blockData.backButtonLabel = backButtonLabelEl.innerText.trim();
+        this.addDynamicKeyForLocalization(this.blockData.backButtonLabel);
       },
     };
     const rows = Array.from(this.blockData.tableData);
@@ -140,6 +154,7 @@ export default class AssetPreview extends LitElement {
     this.url = assetMetadata.url;
     this.previewImage = assetMetadata.previewImage || assetMetadata.thumbnailUrl;
     this.backButtonUrl = this.blockData.backButtonUrl;
+    this.backButtonLabel = this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL;
     this.tags = assetMetadata.tags
       ? this.getTagsDisplayValues(this.allCaaSTags, assetMetadata.tags) : [];
     this.allAssetTags = assetMetadata.tags;
@@ -208,7 +223,7 @@ export default class AssetPreview extends LitElement {
                 class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.url.replace(DIGITALEXPERIENCE_PREVIEW_PATH, DIGITALEXPERIENCE_ASSETS_PATH)}"> View </a></button>` : ''}
                 <button class="filled"><a  download="${this.title}" href="${this.getDownloadUrl()}">${this.blockData.localizedText['{{Download}}']}</a></button>
               ${this.backButtonUrl ? html`<a 
-                class="link" href="${this.backButtonUrl}">${this.blockData.localizedText['{{Back to previous}}']}</a>` : ''}
+                class="link" href="${this.backButtonUrl}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
               </div>` : ''}
   
         ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
