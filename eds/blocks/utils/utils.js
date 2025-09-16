@@ -84,8 +84,8 @@ export function generateRequestForSearchAPI(pageOptions, body) {
   const url = getRuntimeActionUrl(RT_SEARCH_ACTION_PATH);
   const localesData = getLocale(locales);
   const queryParams = new URLSearchParams(url.search);
-  queryParams.append('geo', localesData.prefix && localesData.region);
-  queryParams.append('language', localesData.ietf);
+  // queryParams.append('geo', localesData.prefix && localesData.region);
+  queryParams.append('language', localesData.ietf); // en-US
 
   // eslint-disable-next-line array-callback-return
   Object.keys(pageOptions).map((option) => {
@@ -99,7 +99,7 @@ export function generateRequestForSearchAPI(pageOptions, body) {
     method: 'POST',
     headers,
     body: JSON.stringify(body),
-    credentials: 'include',
+    // credentials: 'include', // UNCOMMENT FOR PROD
   });
 }
 
