@@ -8,4 +8,4 @@ export const PARTNER_LEVEL = getPartnerDataCookieValue('level', DX_PROGRAM_TYPE)
 
 export const DIGITALEXPERIENCE_PREVIEW_PATH = '/digitalexperience/preview/';
 export const DIGITALEXPERIENCE_ASSETS_PATH = '/digitalexperience-assets/';
-export const PX_ASSETS_AEM_PATH = '/content/dam/solution/en/';
+export const PX_ASSETS_AEM_PATH = '/content/dam/dxp/';
