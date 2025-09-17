@@ -183,7 +183,7 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   getRealAssetUrl() {
-    const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_AEM_PATH).concat('.assetmetadata.json');
+    const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_AEM_PATH).replace('.html','.assetmetadata.json');
     try {
       const url = new URL(assetMetadataPath);
       const isProd = prodHosts.includes(window.location.host);
