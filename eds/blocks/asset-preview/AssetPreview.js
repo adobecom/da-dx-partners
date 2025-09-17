@@ -3,7 +3,6 @@ import { assetPreviewStyles } from './AssetPreviewStyles.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,
-  setDownloadParam,
   transformCardUrl,
 } from '../utils/utils.js';
 import {
@@ -179,6 +178,7 @@ export default class AssetPreview extends LitElement {
     } else {
       this.assetHasData = true;
     }
+    this.aemPath = assetMetadata.aemPath;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -220,7 +220,7 @@ export default class AssetPreview extends LitElement {
           ${!this.isRestrictedAssetForUser() ? html`
               <div class="asset-preview-block-actions">
               ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button 
-                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.url.replace(DIGITALEXPERIENCE_PREVIEW_PATH, DIGITALEXPERIENCE_ASSETS_PATH)}"> View </a></button>` : ''}
+                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}"> View </a></button>` : ''}
                 <button class="filled"><a  download="${this.title}" href="${this.getDownloadUrl()}">${this.blockData.localizedText['{{Download}}']}</a></button>
               ${this.backButtonUrl ? html`<a 
                 class="link" href="${this.backButtonUrl}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
@@ -327,10 +327,12 @@ export default class AssetPreview extends LitElement {
   }
 
   getDownloadUrl() {
+    //TODO: remove as soon as asset metadata json contains the correct asset URL
+    if(this.aemPath){
+      return this.aemPath.replace('/content/dam/dxp/', DIGITALEXPERIENCE_ASSETS_PATH);
+    }
     if (!this.url) return '#';
-    return setDownloadParam(
-      this.url.replace(DIGITALEXPERIENCE_PREVIEW_PATH, DIGITALEXPERIENCE_ASSETS_PATH),
-    );
+    return this.url;
   }
 
   isRestrictedAssetForUser() {
