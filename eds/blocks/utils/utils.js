@@ -103,20 +103,6 @@ export function generateRequestForSearchAPI(pageOptions, body) {
   });
 }
 
-// eslint-disable-next-line class-methods-use-this
-export function setDownloadParam(url) {
-  try {
-    if (!url) return '';
-    const urlWithParam = new URL(url);
-    urlWithParam.search = 'download';
-    // eslint-disable-next-line consistent-return
-    return urlWithParam;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Invalid URL provided:', url, error.message);
-    return '';
-  }
-}
 const PARTNERS_PREVIEW_DOMAIN = 'partnerspreview.adobe.com';
 export const PARTNERS_STAGE_DOMAIN = 'partners.stage.adobe.com';
 export const PARTNERS_PROD_DOMAIN = 'partners.adobe.com';

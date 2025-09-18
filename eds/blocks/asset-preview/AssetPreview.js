@@ -3,7 +3,6 @@ import { assetPreviewStyles } from './AssetPreviewStyles.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,
-  setDownloadParam,
   transformCardUrl,
 } from '../utils/utils.js';
 import {
@@ -16,6 +15,7 @@ const DEFAULT_BACKGROUND_IMAGE_PATH = '/content/dam/solution/en/images/card-coll
 
 const miloLibs = getLibs();
 const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
 export default class AssetPreview extends LitElement {
   static styles = [
     assetPreviewStyles,
@@ -33,6 +33,7 @@ export default class AssetPreview extends LitElement {
     allAssetTags: { type: Array },
     ctaText: { type: String },
     backButtonUrl: { type: String },
+    backButtonLabel: { type: String },
     createdDate: { type: Date },
     assetHasData: { type: Boolean },
     isVideoPlaying: { type: Boolean, reflect: true },
@@ -90,6 +91,13 @@ export default class AssetPreview extends LitElement {
     await this.getAssetMetadata();
   }
 
+  addDynamicKeyForLocalization(key) {
+    const localizationKey = `{{${key}}}`;
+    if (!this.blockData.localizedText[localizationKey]) {
+      this.blockData.localizedText[localizationKey] = key;
+    }
+  }
+
   setBlockData() {
     this.blockData = { ...this.blockData };
 
@@ -97,6 +105,11 @@ export default class AssetPreview extends LitElement {
       'back-button-url': (cols) => {
         const [backButtonUrlEl] = cols;
         this.blockData.backButtonUrl = backButtonUrlEl.innerText.trim();
+      },
+      'back-button-label': (cols) => {
+        const [backButtonLabelEl] = cols;
+        this.blockData.backButtonLabel = backButtonLabelEl.innerText.trim();
+        this.addDynamicKeyForLocalization(this.blockData.backButtonLabel);
       },
     };
     const rows = Array.from(this.blockData.tableData);
@@ -133,18 +146,20 @@ export default class AssetPreview extends LitElement {
 
   async setData(assetMetadata) {
     this.title = assetMetadata.title;
+    document.title = assetMetadata.title;
     this.summary = assetMetadata.summary;
     this.description = assetMetadata.description;
     this.fileType = assetMetadata.fileType;
     this.url = assetMetadata.url;
-    this.thumbnailUrl = assetMetadata.thumbnailUrl;
+    this.previewImage = assetMetadata.previewImage || assetMetadata.thumbnailUrl;
     this.backButtonUrl = this.blockData.backButtonUrl;
+    this.backButtonLabel = this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL;
     this.tags = assetMetadata.tags
       ? this.getTagsDisplayValues(this.allCaaSTags, assetMetadata.tags) : [];
     this.allAssetTags = assetMetadata.tags;
     this.ctaText = assetMetadata.ctaText;
     this.size = this.getSizeInMb(assetMetadata.size);
-    this.assetPartnerLevel = assetMetadata.partnerLevel;
+    this.assetPartnerLevel = assetMetadata.partnerLevel?.map((level) => level.toLowerCase());
     this.createdDate = (() => {
       if (!assetMetadata.createdDate) return '';
 
@@ -163,11 +178,12 @@ export default class AssetPreview extends LitElement {
     } else {
       this.assetHasData = true;
     }
+    this.aemPath = assetMetadata.aemPath;
   }
 
   // eslint-disable-next-line class-methods-use-this
   getRealAssetUrl() {
-    const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_AEM_PATH).concat('.assetmetadata.json');
+    const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_AEM_PATH).replace('.html','.assetmetadata.json');
     try {
       const url = new URL(assetMetadataPath);
       const isProd = prodHosts.includes(window.location.host);
@@ -194,7 +210,7 @@ export default class AssetPreview extends LitElement {
             </div>
             <div class="asset-preview-block-details-right"
                  style="background-image:
-                  url(${transformCardUrl(this.thumbnailUrl)}),
+                  url(${transformCardUrl(this.previewImage)}),
                    url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})"
             >
             </div>
@@ -204,10 +220,10 @@ export default class AssetPreview extends LitElement {
           ${!this.isRestrictedAssetForUser() ? html`
               <div class="asset-preview-block-actions">
               ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button 
-                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.url.replace(DIGITALEXPERIENCE_PREVIEW_PATH, DIGITALEXPERIENCE_ASSETS_PATH)}"> View </a></button>` : ''}
+                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}"> View </a></button>` : ''}
                 <button class="filled"><a  download="${this.title}" href="${this.getDownloadUrl()}">${this.blockData.localizedText['{{Download}}']}</a></button>
               ${this.backButtonUrl ? html`<a 
-                class="link" href="${this.backButtonUrl}">${this.blockData.localizedText['{{Back to previous}}']}</a>` : ''}
+                class="link" href="${this.backButtonUrl}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
               </div>` : ''}
   
         ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
@@ -311,10 +327,12 @@ export default class AssetPreview extends LitElement {
   }
 
   getDownloadUrl() {
+    //TODO: remove as soon as asset metadata json contains the correct asset URL
+    if(this.aemPath){
+      return this.aemPath.replace('/content/dam/dxp/', DIGITALEXPERIENCE_ASSETS_PATH);
+    }
     if (!this.url) return '#';
-    return setDownloadParam(
-      this.url.replace(DIGITALEXPERIENCE_PREVIEW_PATH, DIGITALEXPERIENCE_ASSETS_PATH),
-    );
+    return this.url;
   }
 
   isRestrictedAssetForUser() {
