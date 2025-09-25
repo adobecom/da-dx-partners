@@ -50,6 +50,10 @@ const searchCardStyles = css`
   .card-title-wrapper .card-title {
     font-size: 16px;
     font-weight: bold;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
   
   .card-header .card-icons {

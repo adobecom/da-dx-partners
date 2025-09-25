@@ -1,6 +1,6 @@
 import searchCardStyles from './SearchCardStyles.js';
 import { formatDate, getLibs } from '../scripts/utils.js';
-import { setDownloadParam, getConfig, replaceText } from '../blocks/utils/utils.js';
+import { getConfig, replaceText } from '../blocks/utils/utils.js';
 
 const miloLibs = getLibs();
 const config = getConfig();
@@ -18,9 +18,11 @@ class SearchCard extends LitElement {
   get cardTags() {
     const tags = this.data.arbitrary;
     if (!tags.length) return;
+    const filteredTags = tags.filter((tag) => !Object.keys(tag).includes('partnerlevel'));
+    if (!filteredTags.length) return;
     // eslint-disable-next-line consistent-return
     return html`${repeat(
-      tags,
+      filteredTags,
       (tag) => tag.key,
       (tag) => {
         const key = Object.values(tag)[0];
@@ -69,7 +71,7 @@ class SearchCard extends LitElement {
           </div>
           <div class="card-icons">
             <sp-theme theme="spectrum" color="light" scale="medium">
-              <sp-action-button @click=${(e) => e.stopPropagation()} ?disabled=${this.isDownloadDisabled(this.data.contentArea?.type)} href="${setDownloadParam(this.data.contentArea?.url)}" download="${this.data.contentArea?.title}" aria-label="${this.localizedText['{{download}}']}"><sp-icon-download /></sp-action-button>
+              <sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} ?disabled=${this.isDownloadDisabled(this.data.contentArea?.type)} href="${this.data.contentArea?.url}" download="${this.data.contentArea?.title}" aria-label="${this.localizedText['{{download}}']}"><sp-icon-download /></sp-action-button>
               ${this.isPreviewEnabled(this.data.contentArea?.type)
                 ? html`<sp-action-button @click=${(e) => e.stopPropagation()} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}"><sp-icon-open-in /></sp-action-button>`
                 : html`<sp-action-button disabled selected aria-label="${this.localizedText['{{open-in-disabled}}']}"><sp-icon-open-in /></sp-action-button>`
