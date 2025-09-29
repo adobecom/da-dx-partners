@@ -327,17 +327,13 @@ export default class AssetPreview extends LitElement {
   }
 
   getDownloadUrl() {
-    //TODO: remove as soon as asset metadata json contains the correct asset URL
-    if(this.aemPath){
-      return this.aemPath.replace('/content/dam/dxp/', DIGITALEXPERIENCE_ASSETS_PATH);
-    }
     if (!this.url) return '#';
     return this.url;
   }
 
   isRestrictedAssetForUser() {
     return !(!this.assetPartnerLevel.length
-      || this.assetPartnerLevel.includes('Public')
+      || this.assetPartnerLevel.includes('public')
       || this.assetPartnerLevel.includes(PARTNER_LEVEL));
   }
 }
