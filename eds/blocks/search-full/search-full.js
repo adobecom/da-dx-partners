@@ -8,7 +8,6 @@ function declareSearch() {
 }
 
 export default async function init(el) {
-  console.info('search full kartica')
   performance.mark('search-cards:start');
 
   const miloLibs = getLibs();
