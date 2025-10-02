@@ -275,16 +275,10 @@ export function signedInNonMember() {
 }
 
 function getProgramTypeStatus() {
-  const isSPP = getPartnerDataCookieValue('status', 'spp') === 'member';
-  const isTPP = getPartnerDataCookieValue('status', 'tpp') === 'member';
-  return { isSPP, isTPP };
+  const isDXP = getPartnerDataCookieValue('status', 'dxp') === 'member';
+  return { isDXP };
 }
 
-const { isSPP, isTPP } = getProgramTypeStatus();
-
-export const isSPPOnly = () => isSPP && !isTPP;
-export const isTPPOnly = () => !isSPP && isTPP;
-export const isSPPandTPP = () => isSPP && isTPP;
 
 export function getNodesByXPath(query, context = document) {
   const nodes = [];
@@ -426,7 +420,7 @@ export function updateNavigation() {
   if (!gnavMeta) return;
   let { content } = gnavMeta;
   const programTypeStatus = getProgramTypeStatus();
-  if (programTypeStatus.isSPP || programTypeStatus.isTPP) {
+  if (programTypeStatus.isDXP) {
     content = getMetadataContent('gnav-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-gnav';
   }
   gnavMeta.content = content;
@@ -437,7 +431,7 @@ export function updateFooter() {
   if (!footerMeta) return;
   let { content } = footerMeta;
   const programTypeStatus = getProgramTypeStatus();
-  if (programTypeStatus.isSPP || programTypeStatus.isTPP) {
+  if (programTypeStatus.isDXP) {
     content = getMetadataContent('footer-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-footer';
   }
   footerMeta.content = content;
