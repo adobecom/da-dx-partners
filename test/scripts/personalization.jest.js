@@ -330,7 +330,7 @@ describe('Test personalization.js', () => {
     it('Should hide partner-sales-access gnav items for users without sales center access', () => {
       jest.isolateModules(() => {
         const cookieObject = {
-          SPP: {
+          DXP: {
             status: 'MEMBER',
             firstName: 'Test user',
           },

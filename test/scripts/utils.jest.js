@@ -69,7 +69,7 @@ describe('Test utils.js', () => {
       expect(footerPath).toEqual(footerPathModified);
     });
     it('Protected footer is shown for members', async () => {
-      const cookieObject = { SPP: { status: 'MEMBER' } };
+      const cookieObject = { DXP: { status: 'MEMBER' } };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const locales = {
         '': { ietf: 'en-US', tk: 'hah7vzn.css' },
@@ -95,7 +95,7 @@ describe('Test utils.js', () => {
       expect(gnavPath).toEqual(gnavPathModified);
     });
     it('Protected navigation is shown for members', async () => {
-      const cookieObject = { SPP: { status: 'MEMBER' } };
+      const cookieObject = { DXP: { status: 'MEMBER' } };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const locales = {
         '': { ietf: 'en-US', tk: 'hah7vzn.css' },
@@ -138,19 +138,19 @@ describe('Test utils.js', () => {
     expect(getCookieValue('test_cookie')).toEqual('test_value');
   });
   it('Should get empty string if cookie JSON is not valid', () => {
-    document.cookie = 'partner_data={spp: {test1:test, test2:test}}';
+    document.cookie = 'partner_data={dxp: {test1:test, test2:test}}';
     expect(getPartnerDataCookieValue('test_cookie', DX_PROGRAM_TYPE)).toEqual('');
   });
   it('Should return partner data cookie object', () => {
-    const cookieObject = { SPP: { status: 'MEMBER' } };
+    const cookieObject = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(getPartnerDataCookieObject('spp')).toStrictEqual(cookieObject.SPP);
+    expect(getPartnerDataCookieObject('dxp')).toStrictEqual(cookieObject.DXP);
   });
   it('Check if user is a member', () => {
-    const cookieObjectMember = { SPP: { status: 'MEMBER' } };
+    const cookieObjectMember = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
     expect(isMember()).toEqual(true);
-    const cookieObjectNotMember = { SPP: { status: 'NOT_PARTNER' } };
+    const cookieObjectNotMember = { DXP: { status: 'NOT_PARTNER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectNotMember)}`;
     expect(isMember()).toEqual(false);
   });
@@ -159,7 +159,7 @@ describe('Test utils.js', () => {
     expect(partnerIsSignedIn()).toBeTruthy();
   });
   it('Check if signed in partner is non member', () => {
-    const cookieObjectNotMember = { SPP: { status: 'NOT_PARTNER' } };
+    const cookieObjectNotMember = { DXP: { status: 'NOT_PARTNER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectNotMember)}`;
     expect(signedInNonMember()).toBeTruthy();
   });
@@ -178,18 +178,18 @@ describe('Test utils.js', () => {
     expect(getMetadata('test')).toStrictEqual(metaTag);
   });
   it('Don\'t redirect logged in partner to protected home if he is not a member', () => {
-    const cookieObjectNotMember = { SPP: { status: 'NOT_MEMBER' } };
+    const cookieObjectNotMember = { DXP: { status: 'NOT_MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectNotMember)}`;
     expect(redirectLoggedinPartner()).toBeFalsy();
   });
   it('Don\'t redirect logged in partner to protected home if metadata is not set', () => {
-    const cookieObjectMember = { SPP: { status: 'MEMBER' } };
+    const cookieObjectMember = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
     expect(redirectLoggedinPartner()).toBeFalsy();
   });
   it('Redirect logged in partner to protected home', () => {
     window.location.pathname = '/digitalexperience/';
-    const cookieObjectMember = { SPP: { status: 'MEMBER' } };
+    const cookieObjectMember = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
     const metaTag = document.createElement('meta');
     metaTag.name = 'adobe-target-after-login';
@@ -245,7 +245,7 @@ describe('Test utils.js', () => {
     expect(locale).toStrictEqual({ ietf: 'en-US', tk: 'hah7vzn.css', prefix: '' });
   });
   it('Get caas url', () => {
-    document.cookie = 'partner_data={"SPP":{"accountAnniversary":1890777600000%2C"company":"Yugo SPP Stage Platinum Spain"%2C"firstName":"SPP Stage"%2C"lastName":"Spain Platinum"%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}}';
+    document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"company":"Yugo DXP Stage Platinum Spain"%2C"firstName":"DXP Stage"%2C"lastName":"Spain Platinum"%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}}';
     const locales = {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
@@ -293,12 +293,12 @@ describe('Test utils.js', () => {
     expect(elements[0].id).toEqual('test-id');
   });
   it('Should have access if sales center is present in partner data cookie', async () => {
-    const cookieObject = { SPP: { firstName: 'test' , salesCenterAccess: true }};
+    const cookieObject = { DXP: { firstName: 'test' , salesCenterAccess: true }};
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     expect(hasSalesCenterAccess()).toBe(true);
   });
   it('Should not have access if sales center is not present in partner data cookie', async () => {
-    const cookieObject = { SPP: { firstName: 'test' , salesCenterAccess: false }};
+    const cookieObject = { DXP: { firstName: 'test' , salesCenterAccess: false }};
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     expect(hasSalesCenterAccess()).toBe(false);
   });

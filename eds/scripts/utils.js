@@ -274,17 +274,15 @@ export function signedInNonMember() {
   return partnerIsSignedIn() && !isMember();
 }
 
-function getProgramTypeStatus() {
-  const isSPP = getPartnerDataCookieValue('status', 'spp') === 'member';
-  const isTPP = getPartnerDataCookieValue('status', 'tpp') === 'member';
-  return { isSPP, isTPP };
+function isDxpMember() {
+  return getPartnerDataCookieValue('status', 'dxp') === 'member';
 }
 
-const { isSPP, isTPP } = getProgramTypeStatus();
+// const { isSPP, isTPP } = getProgramTypeStatus();
 
-export const isSPPOnly = () => isSPP && !isTPP;
-export const isTPPOnly = () => !isSPP && isTPP;
-export const isSPPandTPP = () => isSPP && isTPP;
+// export const isSPPOnly = () => isSPP && !isTPP;
+// export const isTPPOnly = () => !isSPP && isTPP;
+// export const isSPPandTPP = () => isSPP && isTPP;
 
 export function getNodesByXPath(query, context = document) {
   const nodes = [];
@@ -425,8 +423,7 @@ export function updateNavigation() {
   const gnavMeta = getMetadata('gnav-source');
   if (!gnavMeta) return;
   let { content } = gnavMeta;
-  const programTypeStatus = getProgramTypeStatus();
-  if (programTypeStatus.isSPP || programTypeStatus.isTPP) {
+  if (isDxpMember()) {
     content = getMetadataContent('gnav-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-gnav';
   }
   gnavMeta.content = content;
@@ -436,8 +433,7 @@ export function updateFooter() {
   const footerMeta = getMetadata('footer-source');
   if (!footerMeta) return;
   let { content } = footerMeta;
-  const programTypeStatus = getProgramTypeStatus();
-  if (programTypeStatus.isSPP || programTypeStatus.isTPP) {
+  if (isDxpMember()) {
     content = getMetadataContent('footer-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-footer';
   }
   footerMeta.content = content;
