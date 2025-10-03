@@ -73,8 +73,7 @@ export async function localizationPromises(localizedText, config) {
 
 export function getRuntimeActionUrl(action) {
   const { env } = getConfig();
-  // let domain = 'https://io-partners-dx.stage.adobe.com';
-  let domain = 'https://14257-dxpartners-dekidev.adobeioruntime.net';
+  let domain = 'https://io-partners-dx.stage.adobe.com';
   if (env.name === 'prod') {
     domain = 'https://io-partners-dx.adobe.com';
   }
@@ -88,8 +87,7 @@ export function generateRequestForSearchAPI(pageOptions, body) {
   const url = getRuntimeActionUrl(RT_SEARCH_ACTION_PATH);
   const localesData = getLocale(locales);
   const queryParams = new URLSearchParams(url.search);
-  // queryParams.append('geo', localesData.prefix && localesData.region);
-  queryParams.append('language', localesData.ietf); // en-US
+  queryParams.append('language', localesData.ietf);
 
   // eslint-disable-next-line array-callback-return
   Object.keys(pageOptions).map((option) => {

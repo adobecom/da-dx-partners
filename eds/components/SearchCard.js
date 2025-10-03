@@ -59,57 +59,6 @@ class SearchCard extends LitElement {
     return supportedFileTypes.includes(type) ? type : 'default';
   }
 
-  handleDownloadClick(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    const fileType = this.data.contentArea?.type ?? this.data.contentArea?.contentType;
-    if (this.isDownloadDisabled(fileType)) {
-      return;
-    }
-    
-    const url = this.data.contentArea?.url;
-    const filename = this.data.contentArea?.title;
-    this.downloadFile(url, filename);
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  downloadFile(url, filename) {
-    try {
-      // For files on the same domain, use direct download
-      if (url.startsWith(window.location.origin) || url.startsWith('/') || url.startsWith('./')) {
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename || 'download';
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        fetch(url)
-          .then(response => response.blob())
-          .then(blob => {
-            const objectUrl = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = objectUrl;
-            link.download = filename || 'download';
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(objectUrl);
-          })
-          .catch(() => {
-            console.warn('Download failed, opening in new tab:', url);
-            window.open(url, '_blank');
-          });
-      }
-    } catch (error) {
-      console.error('Download failed:', error);
-      window.open(url, '_blank');
-    }
-  }
-
   /* eslint-disable indent */
   render() {
     return html`
@@ -122,7 +71,7 @@ class SearchCard extends LitElement {
           </div>
           <div class="card-icons">
             <sp-theme theme="spectrum" color="light" scale="medium">
-              <sp-action-button @click=${(e) => this.handleDownloadClick(e)} ?disabled=${this.isDownloadDisabled(this.data.contentArea?.type ?? this.data.contentArea?.contentType)} aria-label="${this.localizedText['{{download}}']}"><sp-icon-download /></sp-action-button>
+              <sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} ?disabled=${this.isDownloadDisabled(this.data.contentArea?.type ?? this.data.contentArea?.contentType)} href="${this.data.contentArea?.url}" aria-label="${this.localizedText['{{download}}']}"><sp-icon-download /></sp-action-button>
               ${this.isPreviewEnabled(this.data.contentArea?.type ?? this.data.contentArea?.contentType)
                 ? html`<sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}"><sp-icon-open-in /></sp-action-button>`
                 : html`<sp-action-button disabled selected aria-label="${this.localizedText['{{open-in-disabled}}']}"><sp-icon-open-in /></sp-action-button>`
