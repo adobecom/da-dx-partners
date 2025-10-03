@@ -6,9 +6,9 @@ import {
   isMember,
   partnerIsSignedIn,
   signedInNonMember,
-  isSPPOnly,
-  isTPPOnly,
-  isSPPandTPP,
+  // isSPPOnly,
+  // isTPPOnly,
+  // isSPPandTPP,
   getPartnerDataCookieValue
 } from './utils.js';
 import { PARTNER_LEVEL } from '../blocks/utils/dxConstants.js';
@@ -34,9 +34,9 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-member': isMember(),
   'partner-sales-access': hasSalesCenterAccess(),
   'partner-level': (level) => PARTNER_LEVEL === level,
-  'partner-spp-member': isSPPOnly(),
-  'partner-tpp-member': isTPPOnly(),
-  'partner-spp-tpp-member': isSPPandTPP(),
+  // 'partner-spp-member': isSPPOnly(),
+  // 'partner-tpp-member': isTPPOnly(),
+  // 'partner-spp-tpp-member': isSPPandTPP(),
   'partner-admin': isAdminUser(),
   'partner-primary': getPartnerDataCookieValue('primarycontact'),
   'partner-newly-registered': isPartnerNewlyRegistered(),
