@@ -58,7 +58,7 @@ class ProfileDropdown {
     this.decoratedElem = decoratedElem;
     this.sections = sections;
     this.openOnInit = openOnInit;
-    this.localMenu = rawElem.querySelector('h5')?.parentElement;
+    this.localMenu = rawElem.querySelector('p')?.parentElement;
     logErrorFor(this.init.bind(this), 'ProfileDropdown.init()', 'gnav-profile', 'e');
   }
 
@@ -169,18 +169,6 @@ class ProfileDropdown {
   decorateLocalMenu() {
     if (this.localMenu) {
       this.localMenu.classList.add('feds-local-menu');
-      
-      // Change h5 tag to p tag
-      const h5Element = this.localMenu.querySelector('h5');
-      if (h5Element) {
-        const pElement = document.createElement('p');
-        pElement.innerHTML = h5Element.innerHTML;
-        // Copy attributes from h5 to p
-        Array.from(h5Element.attributes).forEach(attr => {
-          pElement.setAttribute(attr.name, attr.value);
-        });
-        h5Element.parentNode.replaceChild(pElement, h5Element);
-      }
     }
 
     return this.localMenu;
