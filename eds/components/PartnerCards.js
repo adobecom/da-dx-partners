@@ -565,8 +565,8 @@ export default class PartnerCards extends LitElement {
       extractedTags.sort((a, b) => a.value.localeCompare(b.value)),
       (tag) => tag.key,
       (tag) => html`
-        <button class="sidebar-chosen-filter-btn" @click="${() => this.handleRemoveTag(tag)}" aria-label="${tag.value}">
-          ${tag.value}
+        <button class="sidebar-chosen-filter-btn" @click="${() => this.handleRemoveTag(tag)}" aria-label="${tag.value?.split('/')[1] || tag.value}">
+          ${tag.value?.split('/')[1] || tag.value}
         </button>`,
     )}`;
 
@@ -585,7 +585,7 @@ export default class PartnerCards extends LitElement {
         ?checked=${tag.checked}
         @change=${(event) => this.handleTag(event, tag, filter.key)}
       >
-        ${tag.value}
+        ${tag.value?.split('/')[1] || tag.value}
       </sp-checkbox></li>`,
     )}`;
   }

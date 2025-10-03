@@ -61,9 +61,12 @@ export function populateLocalizedTextFromListItems(el, localizedText) {
 }
 export async function localizationPromises(localizedText, config) {
   return Promise.all(Object.keys(localizedText).map(async (key) => {
-    const value = await replaceText(key, config);
-    if (value.length) {
-      localizedText[key] = value;
+    const originalValue = localizedText[key];
+    const replacedValue = await replaceText(key, config);
+    
+    // Only replace if we got a meaningful result that's not just lowercase of the original
+    if (replacedValue.length && replacedValue !== originalValue.toLowerCase()) {
+      localizedText[key] = replacedValue;
     }
   }));
 }
@@ -84,7 +87,6 @@ export function generateRequestForSearchAPI(pageOptions, body) {
   const url = getRuntimeActionUrl(RT_SEARCH_ACTION_PATH);
   const localesData = getLocale(locales);
   const queryParams = new URLSearchParams(url.search);
-  queryParams.append('geo', localesData.prefix && localesData.region);
   queryParams.append('language', localesData.ietf);
 
   // eslint-disable-next-line array-callback-return
@@ -101,6 +103,7 @@ export function generateRequestForSearchAPI(pageOptions, body) {
     body: JSON.stringify(body),
     credentials: 'include',
   });
+
 }
 
 const PARTNERS_PREVIEW_DOMAIN = 'partnerspreview.adobe.com';
