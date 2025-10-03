@@ -58,7 +58,7 @@ class ProfileDropdown {
     this.decoratedElem = decoratedElem;
     this.sections = sections;
     this.openOnInit = openOnInit;
-    this.localMenu = rawElem.querySelector('h5')?.parentElement;
+    this.localMenu = rawElem.querySelector('p')?.parentElement;
     logErrorFor(this.init.bind(this), 'ProfileDropdown.init()', 'gnav-profile', 'e');
   }
 
@@ -167,7 +167,9 @@ class ProfileDropdown {
   }
 
   decorateLocalMenu() {
-    if (this.localMenu) this.localMenu.classList.add('feds-local-menu');
+    if (this.localMenu) {
+      this.localMenu.classList.add('feds-local-menu');
+    }
 
     return this.localMenu;
   }

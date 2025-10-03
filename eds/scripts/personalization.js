@@ -3,7 +3,6 @@ import {
   getNodesByXPath,
   getPartnerDataCookieObject, getCurrentProgramType
 } from './utils.js';
-import { getConfig } from '../blocks/utils/utils.js';
 import {
   PERSONALIZATION_PLACEHOLDERS,
   PERSONALIZATION_MARKER,
@@ -18,19 +17,15 @@ import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
 function personalizePlaceholders(placeholders, context = document, programType) {
   Object.entries(placeholders).forEach(([key, value]) => {
-    if (!key.startsWith(programType.toLowerCase())) {
-      return;
-    }
     const programData = getPartnerDataCookieObject(programType);
-    const transformedKey = key.replace(`${programType.toLowerCase()}-`, '');
-    const placeholderValue = programData[transformedKey];
+    const placeholderValue = programData[key];
     getNodesByXPath(value, context).forEach((el) => {
       if (!placeholderValue) {
         el.remove();
         return;
       }
       el.textContent = el.textContent.replace(`$${key}`, placeholderValue);
-      el.classList.add(`${transformedKey.toLowerCase()}-placeholder`);
+      el.classList.add(`${key.toLowerCase()}-placeholder`);
     });
   });
 }
@@ -165,32 +160,7 @@ export function shouldHideLinkGroup(elem) {
 function personalizeProfile(gnav) {
   const profile = gnav.querySelector('.profile');
 
-  // const sppSection = profile.children[0];
   personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, profile, DX_PROGRAM_TYPE);
-
-  // if (isSPPOnly()) {
-  //   const sppSectionTitle = sppSection.querySelector('h5');
-  //   sppSectionTitle.classList.add(PERSONALIZATION_HIDE);
-  //   sppSectionTitle.nextElementSibling.classList.add('no-section-title');
-  // } else if (isTPPOnly()) {
-  //   const tppSectionTitle = tppSection.querySelector('h5');
-  //   tppSectionTitle.classList.add(PERSONALIZATION_HIDE);
-  //   tppSectionTitle.nextElementSibling.classList.add('no-section-title');
-  //   sppSection?.remove();
-  // } else if (isSPPandTPP()) {
-  //   const unifiedProgramWrapper = document.createElement('div');
-  //   const outerWrapper = profile.appendChild(unifiedProgramWrapper);
-  //   const innerWrapper = outerWrapper.appendChild(unifiedProgramWrapper.cloneNode());
-  //
-  //   innerWrapper.append(...sppSection.firstElementChild.children);
-  //   innerWrapper.append(document.createElement('hr'));
-  //   innerWrapper.append(...tppSection.firstElementChild.children);
-  //
-  //   sppSection.remove();
-  // } else {
-  //   sppSection.remove();
-  // }
-
   personalizeDropdownElements(profile);
 }
 

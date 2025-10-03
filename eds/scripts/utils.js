@@ -278,12 +278,6 @@ function isDxpMember() {
   return getPartnerDataCookieValue('status', 'dxp') === 'member';
 }
 
-// const { isSPP, isTPP } = getProgramTypeStatus();
-
-// export const isSPPOnly = () => isSPP && !isTPP;
-// export const isTPPOnly = () => !isSPP && isTPP;
-// export const isSPPandTPP = () => isSPP && isTPP;
-
 export function getNodesByXPath(query, context = document) {
   const nodes = [];
   if (!context) {
