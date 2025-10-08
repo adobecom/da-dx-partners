@@ -48,12 +48,6 @@ class SearchCard extends LitElement {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  isPreviewEnabled(fileType) {
-    const enabledTypes = ['pdf', 'html', 'announcement', 'page', 'event', 'course'];
-    return enabledTypes.includes(fileType);
-  }
-
-  // eslint-disable-next-line class-methods-use-this
   getFileType(type) {
     const supportedFileTypes = ['excel', 'pdf', 'powerpoint', 'video', 'word', 'zip', 'html', 'announcement'];
     return supportedFileTypes.includes(type) ? type : 'default';
@@ -71,11 +65,7 @@ class SearchCard extends LitElement {
           </div>
           <div class="card-icons">
             <sp-theme theme="spectrum" color="light" scale="medium">
-              <sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} ?disabled=${this.isDownloadDisabled(this.data.contentArea?.type ?? this.data.contentArea?.contentType)} href="${this.data.contentArea?.url}" aria-label="${this.localizedText['{{download}}']}"><sp-icon-download /></sp-action-button>
-              ${this.isPreviewEnabled(this.data.contentArea?.type ?? this.data.contentArea?.contentType)
-                ? html`<sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}"><sp-icon-open-in /></sp-action-button>`
-                : html`<sp-action-button disabled selected aria-label="${this.localizedText['{{open-in-disabled}}']}"><sp-icon-open-in /></sp-action-button>`
-              }
+                <sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}"><sp-icon-open-in /></sp-action-button>
             </sp-theme>
           </div>
         </div>
