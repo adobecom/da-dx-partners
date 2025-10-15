@@ -54,6 +54,7 @@ const searchCardStyles = css`
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    overflow-wrap: anywhere;
   }
   
   .card-header .card-icons {
