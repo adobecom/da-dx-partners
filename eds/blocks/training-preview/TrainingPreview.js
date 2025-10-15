@@ -3,6 +3,7 @@ import { trainingPreviewStyles } from './TrainingPreviewStyles.js';
 // test page http://localhost:3000/digitalexperience/drafts/sonja/trainings/preview
 //https://mwpw-181343-tp--da-dx-partners--adobecom.aem.page/digitalexperience/drafts/sonja/trainings/preview
 //https://mwpw-181343-tp--da-dx-partners--adobecom.aem.page/digitalexperience/drafts/sonja/trainings/learningprogram74197
+// https://partners.stage.adobe.com/digitalexperience/drafts/sonja/trainings/learningprogram74197
 const miloLibs = getLibs();
 const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
 export default class TrainingPreview extends LitElement {
