@@ -30,8 +30,8 @@ export default class TrainingPreview extends LitElement {
     if (!document.querySelector('link[href="/eds/blocks/training-preview/dist/css/cptraining.min.css"]')) {
       const cssLink = document.createElement('link');
       cssLink.rel = 'stylesheet';
-      // cssLink.href = '/eds/blocks/training-preview/dist/css/cptraining.min.css';
-      cssLink.href = 'https://mwpw-181343-tp--da-dx-partners--adobecom.aem.page/eds/blocks/training-preview/dist/css/cptraining.min.css'; // adjust path
+      cssLink.href = '/eds/blocks/training-preview/dist/css/cptraining.min.css';
+      // cssLink.href = 'https://mwpw-181343-tp--da-dx-partners--adobecom.aem.page/eds/blocks/training-preview/dist/css/cptraining.min.css'; // adjust path
 
       document.head.appendChild(cssLink);
 
@@ -40,8 +40,8 @@ export default class TrainingPreview extends LitElement {
     // Inject the React bundle (once)
     if (!document.querySelector('script[src="/eds/blocks/training-preview/dist/js/cptraining.min.js"]')) {
       const script = document.createElement('script');
-      // script.src = '/eds/blocks/training-preview/dist/js/cptraining.min.js';
-      script.src = 'https://mwpw-181343-tp--da-dx-partners--adobecom.aem.page/eds/blocks/training-preview/dist/js/cptraining.min.js'; // adjust path
+      script.src = '/eds/blocks/training-preview/dist/js/cptraining.min.js';
+      // script.src = 'https://mwpw-181343-tp--da-dx-partners--adobecom.aem.page/eds/blocks/training-preview/dist/js/cptraining.min.js'; // adjust path
       script.type = 'text/javascript';
       script.async = true;
       document.body.appendChild(script); // Append to body, not shadowRoot
