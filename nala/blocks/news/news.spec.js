@@ -13,7 +13,7 @@ export default {
         numberOfMatchingDescCards: 7,
         numberOfMatchingTitleCards: 1,
       },
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
     },
     {
       tcid: '2',
@@ -27,13 +27,13 @@ export default {
         numberOfCardsWithTitle: 8,
         numberOfPublicCards: 9,
       },
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
     },
     {
       tcid: '3',
       name: '@desc-regression-news-page-pagination',
       path: '/solutionpartners/drafts/automation/regression/partner-news-paginated',
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
       data: {
         searchCards: 'Automation regression news card SPP',
         firstPageResult: '1 - 3 of 8 results',
@@ -49,7 +49,7 @@ export default {
       tcid: '4',
       name: '@desc-regression-news-page-filters',
       path: '/solutionpartners/drafts/automation/regression/partner-news',
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
       data: {
         filterApplication: 'Applications',
         filterCampaign: 'Campaign',
@@ -79,7 +79,7 @@ export default {
         expectedToSeeInURL: '/solutionpartners/drafts/automation/regression/caas-cards/automation-regression-card-no1',
         cardsWithTitle: 1,
       },
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
     },
     {
       tcid: '6',
@@ -95,13 +95,13 @@ export default {
         noCards: 0,
         oneCard: 1,
       },
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
     },
     {
       tcid: '7',
       name: '@login-news-page-platinum-user',
       path: '/solutionpartners/drafts/automation/regression/partner-news',
-      tags: '@dx-news @regression @anonymous @circleCi',
+      // tags: '@dx-news @regression @anonymous @circleCi',
       data: {
         platinumCard: 'Automation regression news card spp platinum no1',
         partnerLevel: 'Platinum',
@@ -118,7 +118,7 @@ export default {
       tcid: '8',
       name: '@login-news-page-gold-user',
       path: '/solutionpartners/drafts/automation/regression/partner-news',
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
       data: {
         partnerLevel: 'Gold',
         partnerPortal: 'SPP',
@@ -134,7 +134,7 @@ export default {
       tcid: '9',
       name: '@login-news-page-silver-user',
       path: '/solutionpartners/drafts/automation/regression/partner-news',
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
       data: {
         partnerLevel: 'Silver',
         partnerPortal: 'SPP',
@@ -150,7 +150,7 @@ export default {
       tcid: '10',
       name: '@login-news-page-bronze-user',
       path: '/solutionpartners/drafts/automation/regression/partner-news',
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
       data: {
         partnerLevel: 'Bronze',
         partnerPortal: 'SPP',
@@ -166,7 +166,7 @@ export default {
       tcid: '11',
       name: '@login-news-page-community-user',
       path: '/solutionpartners/drafts/automation/regression/partner-news',
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
       data: {
         partnerLevel: 'Community',
         partnerPortal: 'SPP',
@@ -182,7 +182,7 @@ export default {
       tcid: '12',
       name: '@login-news-page-non-member-of-spp-user',
       path: '/solutionpartners/drafts/automation/regression/partner-news',
-      tags: '@dx-news @regression @anonymous',
+      // tags: '@dx-news @regression @anonymous',
       baseURL: 'https://www.stage.adobe.com/partners.html',
       data: {
         partnerLevel: 'Platinum',

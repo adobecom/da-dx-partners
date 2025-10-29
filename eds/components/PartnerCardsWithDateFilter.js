@@ -51,7 +51,7 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
 
   get filters() {
     return html`
-      ${this.dateFilter}
+      ${this.blockData.showDateFilter === 'false' || this.blockData.showDateFilter === '' ? null : this.dateFilter}
       ${super.filters}
     `;
   }
@@ -67,14 +67,14 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
             <div class="filter-header-content-mobile">
               <h3 class="filter-header-name-mobile">${filter.value}</h3>
                ${this.selectedDateFilter.default
-                 ? ''
-                 : html`
+        ? ''
+        : html`
                    <div class="filter-header-selected-tags-mobile">
                      <span class="filter-header-selected-tags-text-mobile">${this.selectedDateFilter.value}</span>
                      <span class="filter-header-selected-tags-count-mobile">+ 1</span>
                    </div>
                  `
-               }
+      }
             </div>
             <sp-icon-chevron-down class="filter-header-chevron-icon" />
           </button>
@@ -102,7 +102,7 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
 
   get filtersMobile() {
     return html`
-      ${this.dateFilterMobile}
+      ${this.blockData.showDateFilter === 'false' || this.blockData.showDateFilter === '' ? null : this.dateFilterMobile}
       ${super.filtersMobile}
     `;
   }

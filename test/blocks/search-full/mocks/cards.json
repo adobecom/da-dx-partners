@@ -1,0 +1,272 @@
+[
+  {
+    "id": "search-card-1",
+    "showCard": {
+      "from": "",
+      "until": ""
+    },
+    "styles": {
+      "typeOverride": "default",
+      "backgroundImage": "https://example.com/search-image1.jpg",
+      "backgroundAltText": "Search result image 1",
+      "mnemonic": "",
+      "icon": "",
+      "iconAlt": ""
+    },
+    "overlays": {
+      "banner": {
+        "backgroundColor": "#EAEAEA",
+        "fontColor": "#323232",
+        "description": "",
+        "icon": ""
+      },
+      "logo": {
+        "src": ""
+      },
+      "label": {
+        "description": ""
+      },
+      "videoButton": {
+        "url": ""
+      }
+    },
+    "tags": [
+      {
+        "id": "caas:product/adobe-analytics"
+      },
+      {
+        "id": "caas:topic/certification-credentials"
+      }
+    ],
+    "contentArea": {
+      "detailText": "",
+      "title": "Analytics Certification Guide",
+      "url": "https://example.com/analytics-cert-guide.pdf",
+      "description": "Complete guide for Adobe Analytics certification including study materials and practice tests for partners.",
+      "type": "pdf",
+      "contentType": "pdf",
+      "size": "2.1 MB",
+      "dateDetailText": {
+        "type": "date-interval",
+        "startTime": "",
+        "endTime": ""
+      }
+    },
+    "footer": [
+      {
+        "divider": false,
+        "left": [],
+        "center": [],
+        "right": []
+      }
+    ],
+    "search": {
+      "id": "analytics-cert-guide-001",
+      "key": "product"
+    },
+    "cardDate": "2024-01-15T10:30:00.000Z",
+    "createdDate": "2024-01-15T10:30:00.000Z",
+    "modifiedDate": "2024-01-15T10:30:00.000Z",
+    "startDate": "",
+    "endDate": "",
+    "ctaLink": "https://example.com/analytics-cert-guide.pdf",
+    "arbitrary": [
+      {
+        "id": "analytics-cert-guide-001",
+        "version": "v1.0"
+      },
+      {
+        "key": "product",
+        "value": "adobe-analytics"
+      },
+      {
+        "key": "topic",
+        "value": "certification-credentials"
+      }
+    ],
+    "overlayLink": "https://example.com/analytics-cert-guide.pdf",
+    "lang": "en",
+    "country": "us",
+    "origin": "da-dx-partners"
+  },
+  {
+    "id": "search-card-2",
+    "showCard": {
+      "from": "",
+      "until": ""
+    },
+    "styles": {
+      "typeOverride": "default",
+      "backgroundImage": "https://example.com/search-image2.jpg",
+      "backgroundAltText": "Search result image 2",
+      "mnemonic": "",
+      "icon": "",
+      "iconAlt": ""
+    },
+    "overlays": {
+      "banner": {
+        "backgroundColor": "#EAEAEA",
+        "fontColor": "#323232",
+        "description": "",
+        "icon": ""
+      },
+      "logo": {
+        "src": ""
+      },
+      "label": {
+        "description": ""
+      },
+      "videoButton": {
+        "url": ""
+      }
+    },
+    "tags": [
+      {
+        "id": "caas:product/adobe-target"
+      },
+      {
+        "id": "caas:topic/solutions"
+      }
+    ],
+    "contentArea": {
+      "detailText": "",
+      "title": "Target Implementation Best Practices",
+      "url": "https://example.com/target-implementation.html",
+      "description": "Learn the best practices for implementing Adobe Target in your client projects with real-world examples.",
+      "type": "html",
+      "contentType": "html",
+      "size": "",
+      "dateDetailText": {
+        "type": "date-interval",
+        "startTime": "",
+        "endTime": ""
+      }
+    },
+    "footer": [
+      {
+        "divider": false,
+        "left": [],
+        "center": [],
+        "right": []
+      }
+    ],
+    "search": {
+      "id": "target-implementation-002",
+      "key": "product"
+    },
+    "cardDate": "2024-02-10T14:20:00.000Z",
+    "createdDate": "2024-02-10T14:20:00.000Z",
+    "modifiedDate": "2024-02-10T14:20:00.000Z",
+    "startDate": "",
+    "endDate": "",
+    "ctaLink": "https://example.com/target-implementation.html",
+    "arbitrary": [
+      {
+        "id": "target-implementation-002",
+        "version": "v2.1"
+      },
+      {
+        "key": "product",
+        "value": "adobe-target"
+      },
+      {
+        "key": "topic",
+        "value": "solutions"
+      }
+    ],
+    "overlayLink": "https://example.com/target-implementation.html",
+    "lang": "en",
+    "country": "us",
+    "origin": "da-dx-partners"
+  },
+  {
+    "id": "search-card-3",
+    "showCard": {
+      "from": "",
+      "until": ""
+    },
+    "styles": {
+      "typeOverride": "default",
+      "backgroundImage": "",
+      "backgroundAltText": "",
+      "mnemonic": "",
+      "icon": "",
+      "iconAlt": ""
+    },
+    "overlays": {
+      "banner": {
+        "backgroundColor": "#EAEAEA",
+        "fontColor": "#323232",
+        "description": "",
+        "icon": ""
+      },
+      "logo": {
+        "src": ""
+      },
+      "label": {
+        "description": ""
+      },
+      "videoButton": {
+        "url": ""
+      }
+    },
+    "tags": [
+      {
+        "id": "caas:product/adobe-sign"
+      },
+      {
+        "id": "caas:topic/program-guide"
+      }
+    ],
+    "contentArea": {
+      "detailText": "",
+      "title": "Partner Program Updates",
+      "url": "https://example.com/partner-updates",
+      "description": "Latest updates and announcements for the Adobe Partner Program including new benefits and requirements.",
+      "type": "announcement",
+      "contentType": "announcement",
+      "size": "",
+      "dateDetailText": {
+        "type": "date-interval",
+        "startTime": "",
+        "endTime": ""
+      }
+    },
+    "footer": [
+      {
+        "divider": false,
+        "left": [],
+        "center": [],
+        "right": []
+      }
+    ],
+    "search": {
+      "id": "partner-updates-003",
+      "key": "topic"
+    },
+    "cardDate": "2024-03-05T09:15:00.000Z",
+    "createdDate": "2024-03-05T09:15:00.000Z",
+    "modifiedDate": "2024-03-05T09:15:00.000Z",
+    "startDate": "",
+    "endDate": "",
+    "ctaLink": "https://example.com/partner-updates",
+    "arbitrary": [
+      {
+        "id": "partner-updates-003",
+        "version": "v1.2"
+      },
+      {
+        "key": "product",
+        "value": "adobe-sign"
+      },
+      {
+        "key": "topic",
+        "value": "program-guide"
+      }
+    ],
+    "overlayLink": "https://example.com/partner-updates",
+    "lang": "en",
+    "country": "us",
+    "origin": "da-dx-partners"
+  }
+]

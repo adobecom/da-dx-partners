@@ -16,7 +16,7 @@ import {
   preloadResources,
   redirectLoggedinPartner,
   updateNavigation,
-  updateFooter, updateIMSConfig, getRenewBanner, PARTNER_LOGIN_QUERY,
+  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY,
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
@@ -28,13 +28,17 @@ const STYLES = '/eds/styles/styles.css';
 // Use 'https://milo.adobe.com/libs' if you cannot map '/libs' to milo's origin.
 const LIBS = '/libs';
 
-const imsClientId = prodHosts.includes(window.location.host) ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE';
+const isProd = prodHosts.includes(window.location.host);
+// required for react-include component: react-app may need different ims client ids.
+let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 'ims_client_id_stage' }]`)?.content
+imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
 // Add any config options.
 const CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
   imsClientId,
+  clientEnv: isProd ? 'prod' : null,
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   locales: {
@@ -89,7 +93,7 @@ function setUpPage() {
   updateNavigation();
   updateFooter();
 }
-(async function loadPage() {
+async function loadPage() {
   applyPagePersonalization();
   setUpPage();
   redirectLoggedinPartner();
@@ -98,8 +102,14 @@ function setUpPage() {
   const { loadArea, setConfig, getConfig } = await import(`${miloLibs}/utils/utils.js`);
 
   setConfig({ ...CONFIG, miloLibs });
-  await getRenewBanner(getConfig);
   await loadArea();
   applyPagePersonalization();
   rewriteLinks(document);
+}
+loadPage();
+
+(async function loadDa() {
+  if (!new URL(window.location.href).searchParams.get('dapreview')) return;
+  // eslint-disable-next-line import/no-unresolved
+  import('https://da.live/scripts/dapreview.js').then(({ default: daPreview }) => daPreview(loadPage));
 }());

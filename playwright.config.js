@@ -39,26 +39,47 @@ const config = {
     actionTimeout: 60000,
 
     trace: 'on-first-retry',
-    baseURL: process.env.PR_BRANCH_LIVE_URL || (process.env.LOCAL_TEST_LIVE_URL || 'https://main--dx-partners--adobecom.aem.live'),
+    baseURL: process.env.PR_BRANCH_LIVE_URL || (process.env.LOCAL_TEST_LIVE_URL || 'https://main--da-dx-partners--adobecom.aem.live'),
 
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'dx-partners-live-chromium',
+      name: 'da-dx-partners-live-chromium',
       use: { ...devices['Desktop Chrome'] },
       bypassCSP: true,
       launchOptions: { args: ['--disable-web-security', '--disable-gpu'] },
     },
 
     {
-      name: 'dx-partners-live-firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: 'da-dx-partners-live-firefox',
+      use: { 
+        ...devices['Desktop Firefox'],
+        // Ensure each test gets a fresh context
+        contextOptions: {
+          // Clear all storage between tests
+          clearStorageState: true,
+        }
+      },
       bypassCSP: true,
+      retries: process.env.CI ? 2 : 1,
+      launchOptions: {
+        args: [
+          '--disable-web-security',
+          '--private', 
+          '--no-first-run',
+          '--no-default-browser-check',
+        ],
+        firefoxUserPrefs: {
+          'network.http.connection-timeout': 60,
+          'network.http.response-timeout': 60,
+          'dom.max_script_run_time': 60,
+        }
+      },
     },
 //     {
-//       name: 'dx-partners-live-webkit',
+//       name: 'da-dx-partners-live-webkit',
 //       use: {
 //         ...devices['Desktop Safari'],
 //         ignoreHTTPSErrors: true,

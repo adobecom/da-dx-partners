@@ -9,10 +9,10 @@ jest.mock('../../eds/blocks/utils/utils.js', () => ({ getConfig: jest.fn() }));
 jest.mock('../../eds/scripts/utils.js', () => ({
   partnerIsSignedIn: jest.fn(() => ({ 'partner name': { company: 'test' } })),
   prodHosts: [
-    'main--dx-partners--adobecom.hlx.page',
-    'main--dx-partners--adobecom.hlx.live',
-    'main--dx-partners--adobecom.aem.page',
-    'main--dx-partners--adobecom.aem.live',
+    'main--da-dx-partners--adobecom.hlx.page',
+    'main--da-dx-partners--adobecom.hlx.live',
+    'main--da-dx-partners--adobecom.aem.page',
+    'main--da-dx-partners--adobecom.aem.live',
     'partners.adobe.com',
   ],
 }));
@@ -29,7 +29,7 @@ document.body.innerHTML = `
 
 describe('Test rewrite links', () => {
   beforeEach(() => {
-    getConfig.mockReturnValue({ env: { name: 'stage' }, codeRoot: 'https://stage--dx-partners--adobecom.aem.page/edsdme' });
+    getConfig.mockReturnValue({ env: { name: 'stage' }, codeRoot: 'https://stage--da-dx-partners--adobecom.aem.page/edsdme' });
     partnerIsSignedIn.mockReturnValue({ 'partner name': { company: 'test' } });
     Object.defineProperty(window, 'location', {
       writable: true,
@@ -81,7 +81,7 @@ describe('Test rewrite links', () => {
   });
 
   test('should return prod link href unchanged in on aem.page', () => {
-    getConfig.mockReturnValue({ env: { name: 'stage' }, codeRoot: 'https://main--dx-partners--adobecom.aem.page/edsdme' });
+    getConfig.mockReturnValue({ env: { name: 'stage' }, codeRoot: 'https://main--da-dx-partners--adobecom.aem.page/edsdme' });
 
     const href = 'https://partners.adobe.com/';
     const result = getUpdatedHref(href);

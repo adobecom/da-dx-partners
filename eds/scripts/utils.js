@@ -9,6 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
+
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
 export const PARTNER_LOGIN_QUERY = 'partnerLogin';
@@ -23,7 +25,7 @@ export const [setLibs, getLibs] = (() => {
       libs = (() => {
         const { hostname, search, origin } = location || window.location;
         if (origin.endsWith('adobe.com')) {
-          return origin.replace('partners', 'www') + prodLibs;
+          return origin + prodLibs;
         }
         const partnerBranch = hostname.startsWith('main') ? 'main' : 'stage';
         const branch = new URLSearchParams(search).get('milolibs') || partnerBranch;
@@ -36,9 +38,10 @@ export const [setLibs, getLibs] = (() => {
 })();
 
 export const prodHosts = [
-  'main--dx-partners--adobecom.aem.page',
-  'main--dx-partners--adobecom.aem.live',
+  'main--da-dx-partners--adobecom.aem.page',
+  'main--da-dx-partners--adobecom.aem.live',
   'partners.adobe.com',
+  'partnerspreview.adobe.com',
 ];
 
 /*
@@ -109,8 +112,7 @@ function preloadLit(miloLibs) {
 
 export function getProgramType(path) {
   switch (true) {
-    case /solutionpartners/.test(path): return 'spp';
-    case /technologypartners/.test(path): return 'tpp';
+    case /\/(digitalexperience|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return DX_PROGRAM_TYPE;
     case /channelpartners/.test(path): return 'cpp';
     case /channelpartnerassets/.test(path): return 'cpp';
     default: return '';
@@ -118,14 +120,11 @@ export function getProgramType(path) {
 }
 
 export function getProgramHomePage(path) {
-  switch (true) {
-    case /solutionpartners/.test(path):
-      return '/solutionpartners/';
-    case /technologypartners/.test(path):
-      return '/technologypartners/';
-    case /channelpartners/.test(path):
-      return '/channelpartners/';
-    case /channelpartnerassets/.test(path):
+  const programType = getProgramType(path);
+  switch (programType) {
+    case DX_PROGRAM_TYPE:
+      return '/digitalexperience/';
+    case 'cpp':
       return '/channelpartners/';
     default:
       return '';
@@ -140,14 +139,15 @@ export function getCookieValue(key) {
   const cookie = cookies.find((el) => el.startsWith(`${key}=`));
   return cookie?.substring((`${key}=`).length);
 }
-export function getPartnerDataCookieValue(programType, key) {
+export function getPartnerDataCookieValue(key, programType = DX_PROGRAM_TYPE) {
   try {
+    if(!programType){
+      programType = getCurrentProgramType();
+    }
     const partnerDataCookie = getCookieValue('partner_data');
     if (!partnerDataCookie) return;
     const partnerDataObj = JSON.parse(decodeURIComponent(partnerDataCookie.toLowerCase()));
-    const portalData = partnerDataObj?.[programType];
-    // eslint-disable-next-line consistent-return
-    return portalData?.[key];
+    return partnerDataObj?.[programType]?.[key];
   } catch (error) {
     console.error('Error parsing partner data object:', error);
     // eslint-disable-next-line consistent-return
@@ -163,8 +163,10 @@ function extractTableCollectionTags(el) {
     const colsContent = cols.slice(1);
     if (rowTitle === 'collection-tags') {
       const [collectionTagsEl] = colsContent;
-      const collectionTags = Array.from(collectionTagsEl.querySelectorAll('li'), (li) => `"${li.textContent.trim().toLowerCase()}"`);
-      tableCollectionTags = [...tableCollectionTags, ...collectionTags];
+      const collectionTags = Array.from(collectionTagsEl.querySelectorAll('li'), (li) =>
+        li.textContent ? `"${li.textContent.trim().toLowerCase()}"` : ''
+      );
+      tableCollectionTags.push(collectionTags)
     }
   });
 
@@ -172,9 +174,21 @@ function extractTableCollectionTags(el) {
 }
 
 function getPartnerLevelParams(portal) {
-  const partnerLevel = getPartnerDataCookieValue(portal, 'level');
-  const partnerTagBase = `"caas:adobe-partners/${portal}/partner-level/`;
-  return partnerLevel ? `(${partnerTagBase}${partnerLevel}"+OR+${partnerTagBase}public")` : `(${partnerTagBase}public")`;
+  const partnerLevel = getPartnerDataCookieValue('level', portal);
+  const partnerTagBase = `caas:adobe-partners/px/partner-level/`;
+
+  const partnerLevels = ['gold', 'silver', 'platinum', 'community'];
+
+  // Build the NOT conditions for all partner levels (excluding the target one)
+  const notConditions = partnerLevels
+    .map(level => `NOT+"${partnerTagBase}${level}"`)
+    .join('+AND+');
+
+  if(partnerLevel){
+    return `("${partnerTagBase}${partnerLevel}"+OR+(${notConditions}))`
+  } else {
+    return `(${notConditions})`;
+  }
 }
 
 function checkForQaContent(el) {
@@ -194,29 +208,27 @@ function checkForQaContent(el) {
   return false;
 }
 
-function getComplexQueryParams(el, collectionTag) {
-  const portal = getCurrentProgramType();
-  if (!portal) return;
-
-  const portalCollectionTag = `"caas:adobe-partners/${portal}"`;
+function getComplexQueryParams(el) {
   const tableTags = extractTableCollectionTags(el);
-  const collectionTags = [collectionTag, portalCollectionTag, ...tableTags];
 
-  const partnerLevelParams = getPartnerLevelParams(portal);
+  const groupedTagExpressions = tableTags
+    .filter(group => group.length)
+    .map(group => `(${group.join('+AND+')})`);
+  let fullQuery = '';
+  if (groupedTagExpressions.length){
+    fullQuery  = `(${groupedTagExpressions.join('+OR+')})`;
+  }
 
-  if (!collectionTags.length) return;
-
-  const collectionTagsStr = collectionTags.filter((e) => e.length).join('+AND+');
-  let resulStr = `(${collectionTagsStr})`;
 
   const qaContentTag = '"caas:adobe-partners/qa-content"';
   if (!checkForQaContent(el)) {
-    resulStr += `+NOT+${qaContentTag}`;
+    fullQuery += `${fullQuery.length>0?'+AND+':''}(+NOT+${qaContentTag})`;
   }
 
-  if (partnerLevelParams) resulStr += `+AND+${partnerLevelParams}`;
-  // eslint-disable-next-line consistent-return
-  return resulStr;
+  const partnerLevelParams = getPartnerLevelParams(DX_PROGRAM_TYPE);
+  if (partnerLevelParams) fullQuery += `${fullQuery.length>0?'+AND+':''}${partnerLevelParams}`;
+
+  return fullQuery;
 }
 
 export function getPartnerDataCookieObject(programType) {
@@ -228,8 +240,7 @@ export function getPartnerDataCookieObject(programType) {
 }
 
 export function hasSalesCenterAccess() {
-  const { salesCenterAccess } = getPartnerDataCookieObject(getCurrentProgramType());
-  return !!salesCenterAccess;
+  return getPartnerDataCookieValue('salescenteraccess');
 }
 
 export function isAdminUser() {
@@ -237,44 +248,22 @@ export function isAdminUser() {
   return !!isAdmin;
 }
 
-export function isRenew() {
-  const programType = getCurrentProgramType();
+export function isPartnerNewlyRegistered() {
+  if (!isMember()) return false;
 
-  const primaryContact = getPartnerDataCookieValue(programType, 'primarycontact');
-  if (!primaryContact) return;
+  const createdDate = getPartnerDataCookieValue('createddate');
 
-  const partnerLevel = getPartnerDataCookieValue(programType, 'level');
-  if (partnerLevel !== 'gold' && partnerLevel !== 'registered' && partnerLevel !== 'certified') return;
-
-  const accountExpiration = getPartnerDataCookieValue(programType, 'accountanniversary');
-  if (!accountExpiration) return;
-
-  const expirationDate = new Date(accountExpiration);
+  const newestCreatedDate = new Date(createdDate);
   const now = new Date();
 
-  let accountStatus;
-  let daysNum;
-
-  const differenceInMilliseconds = expirationDate - now;
+  const differenceInMilliseconds = now - newestCreatedDate;
   const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
-  const differenceInDaysRounded = Math.floor(differenceInDays);
 
-  if (differenceInMilliseconds > 0 && differenceInDays < 31) {
-    accountStatus = 'expired';
-    daysNum = differenceInDaysRounded;
-  } else if (differenceInMilliseconds < 0 && differenceInDays <= 90) {
-    accountStatus = 'suspended';
-    daysNum = 90 - differenceInDaysRounded;
-  } else {
-    return;
-  }
-  // eslint-disable-next-line consistent-return
-  return { accountStatus, daysNum };
+  return differenceInMilliseconds > 0 && differenceInDays < 31;
 }
 
 export function isMember() {
-  const { status } = getPartnerDataCookieObject(getCurrentProgramType());
-  return status === 'MEMBER';
+  return getPartnerDataCookieObject(getCurrentProgramType())?.status === 'MEMBER';
 }
 
 export function partnerIsSignedIn() {
@@ -285,20 +274,15 @@ export function signedInNonMember() {
   return partnerIsSignedIn() && !isMember();
 }
 
-function getProgramTypeStatus() {
-  const isSPP = getPartnerDataCookieValue('spp', 'status') === 'member';
-  const isTPP = getPartnerDataCookieValue('tpp', 'status') === 'member';
-  return { isSPP, isTPP };
+function isDxpMember() {
+  return getPartnerDataCookieValue('status', 'dxp') === 'member';
 }
-
-const { isSPP, isTPP } = getProgramTypeStatus();
-
-export const isSPPOnly = () => isSPP && !isTPP;
-export const isTPPOnly = () => !isSPP && isTPP;
-export const isSPPandTPP = () => isSPP && isTPP;
 
 export function getNodesByXPath(query, context = document) {
   const nodes = [];
+  if (!context) {
+    return nodes;
+  }
   const xpathResult = document.evaluate(query, context, null, XPathResult.ANY_TYPE);
   let current = xpathResult?.iterateNext();
   while (current) {
@@ -379,17 +363,23 @@ function setApiParams(api, block) {
 }
 
 export function getCaasUrl(block) {
-  const useStageCaasEndpoint = block.name === 'knowledge-base-overview';
-  const domain = `${(useStageCaasEndpoint && !prodHosts.includes(window.location.host)) ? 'https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1' : 'https://www.adobe.com/chimera-api'}`;
-  const api = new URL(`${domain}/collection?originSelection=dx-partners&draft=false&flatFile=false&expanded=true`);
+  const domain = `${(!prodHosts.includes(window.location.host)) ? 'https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1' : 'https://www.adobe.com/chimera-api'}`;
+  let sources = 'da-dx-partners';
+  Array.from(block.el.children).forEach((row) => {
+    const cols = Array.from(row.children);
+    const rowTitle = cols[0].textContent.trim().toLowerCase().replace(/ /g, '-');
+    if (rowTitle === 'sources' && cols.length>1) {
+      sources = cols[1].textContent.trim()
+    }
+  });
+  const api = new URL(`${domain}/collection?originSelection=${sources}&draft=false&flatFile=false&expanded=true`);
   return setApiParams(api, block);
 }
 
 export async function preloadResources(locales, miloLibs) {
   const locale = getLocale(locales);
   const cardBlocks = {
-    'partner-news': '"caas:adobe-partners/collections/news"',
-    'knowledge-base-overview': '"caas:adobe-partners/collections/knowledge-base"',
+    'dx-card-collection': '',
   };
   // since we are going to add search-full later
   // adding this code update now to prevent being forgotten since in search
@@ -415,7 +405,6 @@ export async function preloadResources(locales, miloLibs) {
     const block = {
       el,
       name: key,
-      collectionTag: value,
       ietf: locale.ietf,
     };
     const caasUrl = getCaasUrl(block);
@@ -424,53 +413,12 @@ export async function preloadResources(locales, miloLibs) {
   });
 }
 
-export async function getRenewBanner(getConfig) {
-  const renew = isRenew();
-  if (!renew) return;
-  const { accountStatus, daysNum } = renew;
-  const bannerFragments = {
-    expired: 'banner-account-expires',
-    suspended: 'banner-account-suspended',
-  };
-  const metadataKey = bannerFragments[accountStatus];
-
-  const config = getConfig();
-  const { prefix } = config.locale;
-  const defaultPath = `${prefix}/edsdme/partners-shared/fragments/${metadataKey}`;
-  const path = getMetadataContent(metadataKey) ?? defaultPath;
-  const url = new URL(path, window.location.origin);
-
-  try {
-    const response = await fetch(`${url}.plain.html`);
-    if (!response.ok) throw new Error(`Network response was not ok ${response.statusText}`);
-
-    const data = await response.text();
-    const componentData = data.replace('$daysNum', daysNum);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(componentData, 'text/html');
-    const block = doc.querySelector('.notification');
-
-    const div = document.createElement('div');
-    div.appendChild(block);
-
-    const main = document.querySelector('main');
-    if (main) main.insertBefore(div, main.firstChild);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('There has been a problem with your fetch operation:', error);
-    // eslint-disable-next-line consistent-return
-    return null;
-  }
-}
-
 export function updateNavigation() {
   const gnavMeta = getMetadata('gnav-source');
   if (!gnavMeta) return;
-  // todo check do we need locales for spp (same for footer) and update if yes (check dme code)
   let { content } = gnavMeta;
-  if (isMember()) {
-    // todo update when we have default logged in gnav created (same for footer)
-    content = getMetadataContent('gnav-loggedin-source') ?? '/solutionpartners/spp-shared/gnav';
+  if (isDxpMember()) {
+    content = getMetadataContent('gnav-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-gnav';
   }
   gnavMeta.content = content;
 }
@@ -479,8 +427,8 @@ export function updateFooter() {
   const footerMeta = getMetadata('footer-source');
   if (!footerMeta) return;
   let { content } = footerMeta;
-  if (isMember()) {
-    content = getMetadataContent('footer-loggedin-source') ?? '/solutionpartners/spp-shared/footer';
+  if (isDxpMember()) {
+    content = getMetadataContent('footer-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-footer';
   }
   footerMeta.content = content;
 }

@@ -11,7 +11,7 @@ export default class SmokeTest {
     this.contactUsLinkAR = page.locator('a[href*="/en/apc-helpdesk"]');
     this.findPartnerLinkAR = page.locator('a[href*="/PartnerSearch?lang=en"]');
     this.learnMoreLinkAR = page.locator('a[href*="/na/channelpartners/program/"]');
-    this.visitAdobeExchangeLink = page.locator('a[href*="https://stage.exchange.adobe.com/"]');
+    this.visitAdobeExchangeLink = page.locator('a[href*="exchange.adobe.com/"]');
     this.joinNowLinkSP = page.locator('a[href*="/solution-partners/registration.html"]');
     this.joinNowLinkTP = page.locator('a[href*="/technologyprogram/experiencecloud/registration.html"]');
     this.joinNowLinkAR = page.locator('a[href*="/na/channelpartners/enrollment/"]');

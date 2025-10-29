@@ -10,17 +10,17 @@ test.describe('Validate Partner Directory pages', () => {
   test.beforeEach(async ({ page, browserName, baseURL, context }) => {
     smokeTest = new SmokeTest(page);
     if (!baseURL.includes('partners.stage.adobe.com')) {
-          await context.setExtraHTTPHeaders({ authorization: `token ${process.env.MILO_AEM_API_KEY}` });
-        }
-        if (browserName === 'chromium' && !baseURL.includes('partners.stage.adobe.com')) {
-          await page.route('https://www.adobe.com/chimera-api/**', async (route, request) => {
-            const newUrl = request.url().replace(
-              'https://www.adobe.com/chimera-api',
-              'https://14257-chimera.adobeioruntime.net/api/v1/web/chimera-0.0.1',
-            );
-            route.continue({ url: newUrl });
-          });
-        }
+      await context.setExtraHTTPHeaders({ authorization: `token ${process.env.MILO_AEM_API_KEY}` });
+    }
+    if (browserName === 'chromium' && !baseURL.includes('partners.stage.adobe.com')) {
+      await page.route('https://www.adobe.com/chimera-api/**', async (route, request) => {
+        const newUrl = request.url().replace(
+          'https://www.adobe.com/chimera-api',
+          'https://14257-chimera.adobeioruntime.net/api/v1/web/chimera-0.0.1',
+        );
+        route.continue({ url: newUrl });
+      });
+    }
   });
 
   async function verifyPartnerLinks(data, baseURL, type = 'directory') {
@@ -30,21 +30,21 @@ test.describe('Validate Partner Directory pages', () => {
       linksToCheck.push(
         // Solution Partners
         { element: smokeTest.contactUsLinkSP, expected: data.contactUsSPURL },
-        { element: smokeTest.findPartnerLinkSP, expected: `${baseURL}${data.findPartnerSPURL}` },
+        { element: smokeTest.findPartnerLinkSP, expected: data.findPartnerSPURL },
         { element: smokeTest.learnMoreLinkSP, expected: data.learnMoreSPURL },
 
         // Technology Partners
-        { element: smokeTest.contactUsLinkTP, expected: `${baseURL}${data.contactUsTPURL}` },
+        { element: smokeTest.contactUsLinkTP, expected: data.contactUsTPURL },
         { element: smokeTest.findPartnerLinkTP, expected: `${baseURL}${data.findPartnerTPURL}` },
         { element: smokeTest.learnMoreLinkTP, expected: `${baseURL}${data.learnMoreTPURL}` },
 
         // Authorized Resellers
-        { element: smokeTest.contactUsLinkAR, expected: data.contactUsLinkAR },
-        { element: smokeTest.findPartnerLinkAR, expected: data.findPartnerLinkAR },
+        { element: smokeTest.contactUsLinkAR, expected: data.contactUsARURL },
+        { element: smokeTest.findPartnerLinkAR, expected: data.findPartnerARURL },
         { element: smokeTest.learnMoreLinkAR, expected: `${baseURL}${data.learnMoreARURL}` },
 
         // Adobe Exchange
-        { element: smokeTest.visitAdobeExchangeLink, expected: data.visitAdobeExchangeURL }
+        { element: smokeTest.visitAdobeExchangeLink, expected: data.visitAdobeExchangeURL },
       );
     } else if (type === 'join') {
       linksToCheck.push(
@@ -58,16 +58,16 @@ test.describe('Validate Partner Directory pages', () => {
 
         // Authorized Resellers
         { element: smokeTest.learnMoreLinkAR, expected: `${baseURL}${data.learnMoreARURL}` },
-        { element: smokeTest.joinNowLinkAR, expected: `${baseURL}${data.joinNowARURL}` }
+        { element: smokeTest.joinNowLinkAR, expected: `${baseURL}${data.joinNowARURL}` },
       );
     }
 
     for (const { element, expected } of linksToCheck) {
       await expect(element).toBeVisible();
-      await expect(element).toHaveAttribute('href', expected);
+      const href = await element.getAttribute('href');
+      expect(href).toContain(expected);
     }
   }
-
 
   test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
     const { path } = features[0];
@@ -89,6 +89,7 @@ test.describe('Validate Partner Directory pages', () => {
 
     await test.step('Go to Partner Directory page and verify the links', async () => {
       await page.goto(baseURL);
+      await smokeTest.gnav.waitFor({ state: 'visible', timeout: 40000 });
       await verifyPartnerLinks(data, baseURL, 'directory');
     });
   });

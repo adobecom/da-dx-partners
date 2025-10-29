@@ -1,0 +1,30 @@
+
+name: DA-DX-Partners Nala Tests
+
+on:
+  pull_request:
+    types: [ labeled, opened, synchronize, reopened ]
+
+jobs:
+  action:
+    name: Running E2E & IT
+    if: contains(github.event.pull_request.labels.*.name, 'run-on-da-dx')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Run Nala
+        uses: adobecom/da-dx-partners@stage # Change if doing dev work
+        env:
+          labels: ${{ '@anonymous' }}
+          branch: ${{ github.event.pull_request.head.ref }}
+          repoName: ${{ github.repository }}
+          prUrl: ${{ github.event.pull_request.head.repo.html_url }}
+          prOrg: ${{ github.event.pull_request.head.repo.owner.login }}
+          prRepo: ${{ github.event.pull_request.head.repo.name }}
+          prBranch: ${{ github.event.pull_request.head.ref }}
+          prBaseBranch: ${{ github.event.pull_request.base.ref }}
+          IMS_EMAIL: ${{ secrets.IMS_EMAIL }}
+          IMS_PASS: ${{ secrets.IMS_PASS }}
+          MILO_AEM_API_KEY: ${{ secrets.MILO_AEM_API_KEY }}

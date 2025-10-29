@@ -27,7 +27,11 @@ export const partnerCardsStyles = css`
     grid-template-columns: 204px auto;
     gap: 32px;
   }
-  
+
+  .partner-cards.filters-disabled {
+    grid-template-columns: none;
+  }
+
   @media screen and (max-width: 1200px) {
     .partner-cards {
       grid-template-columns: unset;
@@ -346,6 +350,10 @@ export const partnerCardsStyles = css`
       align-items: center;
       justify-content: space-between;
     }
+
+    .partner-cards-header .partner-cards-sort-wrapper.filters-disabled {
+      justify-content: flex-end;
+    }
   }
   
   .partner-cards-header .partner-cards-sort-wrapper .filters-btn-mobile {
@@ -405,6 +413,9 @@ export const partnerCardsStyles = css`
     border-left: 1px solid ${borderColor};
     margin-left: 20px;
     padding-left: 20px;
+  }
+  .partner-cards-header .partner-cards-sort-wrapper .sort-wrapper.border-disabled {
+    border-left: none;
   }
   
   @media screen and (max-width: 1200px) {
@@ -507,12 +518,20 @@ export const partnerCardsStyles = css`
     grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
     gap: 32px;
   }
+
+  .partner-cards-collection.layout-4-up {
+    grid-template-columns: repeat(auto-fit, minmax(275px, max-content));
+  }
   
   .partner-cards-collection .card-wrapper {
     min-height: 380px;
     width: 378px;
     max-width: 100%;
     position: relative;
+  }
+
+  .partner-cards-collection .single-partner-card--half-height {
+    min-height: 208px;
   }
   
   .partner-cards-collection .no-results {
@@ -1039,7 +1058,8 @@ export const singlePartnerCardStyles = css`
     box-sizing: border-box;
   }
 
-  .single-partner-card {
+  .single-partner-card, 
+  .single-partner-card-half-height {
     display: flex;
     flex-direction: column;
     background-color: #fff;
@@ -1050,12 +1070,18 @@ export const singlePartnerCardStyles = css`
     height: 400px;
   }
 
+  .single-partner-card--half-height {
+    height: 208px;
+    text-decoration: none;
+  }
+
   .single-partner-card:hover {
     box-shadow: 0 3px 6px 0 rgba(0,0,0,.16);
     transition: box-shadow .3s ease-in-out;
   }
 
-  .single-partner-card .card-header {
+  .single-partner-card .card-header, 
+  .single-partner-card--half-height {
     min-height: 192px;
     max-height: 192px;
     background-color: #323232;
@@ -1065,6 +1091,25 @@ export const singlePartnerCardStyles = css`
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     position: relative;
+  }
+
+  .single-partner-card--half-height {
+    min-height: 208px;
+    max-height: 208px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .single-partner-card--half-height::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: transparent linear-gradient(180deg,rgba(0,0,0,.1) 10%,rgba(0,0,0,.8) 80%) 0 0 no-repeat;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;    
   }
 
   .single-partner-card:hover .card-header:after {
@@ -1094,7 +1139,8 @@ export const singlePartnerCardStyles = css`
     height: 100%;
   }
 
-  .single-partner-card .card-title {
+  .single-partner-card .card-title, 
+  .single-partner-card--half-height .card-title {
     color: #323232;
     font-size: 1.125rem;
     font-weight: 700;
@@ -1106,6 +1152,17 @@ export const singlePartnerCardStyles = css`
     -webkit-box-orient: vertical;
     overflow: hidden;
     -webkit-line-clamp: 2;
+  }
+
+  .single-partner-card--half-height .card-title {
+    color: #fff;
+    z-index: 1;
+  }
+
+  .single-partner-card--half-height .card-title-wrapper {
+    padding: 8px 24px 32px;
+    color: #fff;
+    z-index: 1;
   }
 
   .single-partner-card .card-description {

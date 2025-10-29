@@ -1,23 +1,24 @@
 import {
   isMember,
   getNodesByXPath,
-  isRenew,
+  getPartnerDataCookieObject, getCurrentProgramType
 } from './utils.js';
-import { getConfig } from '../blocks/utils/utils.js';
 import {
-  PAGE_PERSONALIZATION_PLACEHOLDERS,
-  GNAV_PERSONALIZATION_PLACEHOLDERS,
+  PERSONALIZATION_PLACEHOLDERS,
   PERSONALIZATION_MARKER,
   PROCESSED_MARKER,
-  PERSONALIZATION_HIDE,
   PERSONALIZATION_CONDITIONS,
-  MAIN_NAV_PERSONALIZATION_CONDITIONS,
-  PROFILE_PERSONALIZATION_ACTIONS, COOKIE_OBJECT, LEVEL_CONDITION,
+  PROFILE_PERSONALIZATION_ACTIONS, LEVEL_CONDITION,
 } from './personalizationConfigDX.js';
+import {
+  PERSONALIZATION_HIDE,
+} from './personalizationUtils.js';
+import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
-function personalizePlaceholders(placeholders, context = document) {
+function personalizePlaceholders(placeholders, context = document, programType) {
   Object.entries(placeholders).forEach(([key, value]) => {
-    const placeholderValue = COOKIE_OBJECT[key];
+    const programData = getPartnerDataCookieObject(programType);
+    const placeholderValue = programData[key];
     getNodesByXPath(value, context).forEach((el) => {
       if (!placeholderValue) {
         el.remove();
@@ -30,11 +31,21 @@ function personalizePlaceholders(placeholders, context = document) {
 }
 
 function shouldHide(conditions, conditionsConfig = PERSONALIZATION_CONDITIONS) {
-  return conditions.every((condition) => {
-    const conditionLevel = condition.startsWith(LEVEL_CONDITION) ? condition.split('-').pop() : '';
-    return conditionLevel
-      ? !conditionsConfig[LEVEL_CONDITION](conditionLevel) : !conditionsConfig[condition];
-  });
+  // eslint-disable-next-line max-len
+  const partnerLevelConditions = conditions.filter((condition) => condition.startsWith(LEVEL_CONDITION));
+
+  // eslint-disable-next-line max-len
+  const otherConditions = conditions.filter((condition) => !condition.startsWith(LEVEL_CONDITION) && Object.keys(PERSONALIZATION_CONDITIONS).includes(condition));
+
+  const matchesPartnerLevel = partnerLevelConditions.length === 0
+    || partnerLevelConditions.some((condition) => {
+      const level = condition.replace(`${LEVEL_CONDITION}-`, '');
+      return conditionsConfig[LEVEL_CONDITION]?.(level);
+    });
+
+  const matchesOtherConditions = otherConditions.every((condition) => conditionsConfig[condition]);
+
+  return !(matchesPartnerLevel && matchesOtherConditions);
 }
 
 // eslint-disable-next-line max-len
@@ -81,22 +92,8 @@ function personalizePage(page) {
 
 export function applyPagePersonalization() {
   const main = document.querySelector('main') ?? document;
-  personalizePlaceholders(PAGE_PERSONALIZATION_PLACEHOLDERS, main);
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, main, getCurrentProgramType());
   personalizePage(main);
-}
-
-function processRenew(profile) {
-  const { env } = getConfig();
-  const renew = isRenew();
-  const renewElements = Array.from(profile.querySelectorAll('.partner-renew'));
-  renewElements.forEach((el) => {
-    el.classList.add(PERSONALIZATION_HIDE);
-    if (!renew) return;
-    const { accountStatus } = renew;
-    if (el.classList.contains(`partner-${accountStatus}`)) {
-      el.classList.remove(PERSONALIZATION_HIDE);
-    }
-  });
 }
 
 function processGnavElements(elements) {
@@ -123,7 +120,7 @@ function personalizeDropdownElements(profile) {
   });
 }
 
-function personalizeMainNav(gnav) {
+export function personalizeMainNav(gnav) {
   const personalizationXPath = `//*[contains(text(), "${PERSONALIZATION_MARKER}") and not(ancestor::*[contains(@class, "profile")])]`;
   const elements = getNodesByXPath(personalizationXPath, gnav);
   const processedElements = processGnavElements(elements);
@@ -135,29 +132,35 @@ function personalizeMainNav(gnav) {
     if (el.tagName.toLowerCase() === separatorSelector) {
       // main nav dropdown menu group separators
       const { nextElementSibling } = el;
-      const hide = shouldHide(conditions, MAIN_NAV_PERSONALIZATION_CONDITIONS);
+      const hide = shouldHide(conditions, PERSONALIZATION_CONDITIONS);
       if (nextElementSibling?.tagName.toLowerCase() !== separatorSelector && hide) {
         nextElementSibling.remove();
       }
     }
 
     const wrapperEl = el.closest('h2, li');
-    hideElement(wrapperEl || el, conditions, MAIN_NAV_PERSONALIZATION_CONDITIONS, true);
+    hideElement(wrapperEl || el, conditions, PERSONALIZATION_CONDITIONS, true);
   });
 
   // link group blocks
   const linkGroups = gnav.querySelectorAll('.link-group.partner-personalization');
   Array.from(linkGroups).forEach((el) => {
     const conditions = Object.values(el.classList);
-    hideElement(el, conditions, MAIN_NAV_PERSONALIZATION_CONDITIONS, true);
+    hideElement(el, conditions, PERSONALIZATION_CONDITIONS, true);
   });
+}
+
+export function shouldHideLinkGroup(elem) {
+  if (elem.classList.contains(PERSONALIZATION_MARKER)) {
+    const conditions = Object.values(elem.classList);
+    return shouldHide(conditions, PERSONALIZATION_CONDITIONS);
+  }
 }
 
 function personalizeProfile(gnav) {
   const profile = gnav.querySelector('.profile');
-  personalizePlaceholders(GNAV_PERSONALIZATION_PLACEHOLDERS, profile);
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, profile, DX_PROGRAM_TYPE);
   personalizeDropdownElements(profile);
-  processRenew(profile);
 }
 
 export function applyGnavPersonalization(gnav) {

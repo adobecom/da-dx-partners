@@ -1,5 +1,7 @@
-// MWPW-159021
+// PARTNERS_NAVIGATION START
+// MWPW-159021 - Fix eslint errors
 /* eslint-disable */
+// PARTNERS_NAVIGATION END
 import {
   toFragment,
   isDesktop,
@@ -15,10 +17,13 @@ const miloLibs = getLibs();
 const { replaceKeyArray } = await import(`${miloLibs}/features/placeholders.js`);
 const { getConfig, getFedsPlaceholderConfig } = await import(`${miloLibs}/utils/utils.js`);
 const { debounce } = await import(`${miloLibs}/utils/action.js`);
-const { getFedsPlaceholderConfig } = await import (`${miloLibs}/utils/federated.js`);
 
 
 const CONFIG = {
+  suggestions: {
+    scope: 'adobecom',
+    apiKey: 'adobedotcom2',
+  },
   selectors: {
     hasResults: 'has-results',
     inputIsPopulated: 'feds-search-input--isPopulated',
@@ -27,6 +32,7 @@ const CONFIG = {
 const SUGGESTIONS_SIZE = 10;
 
 const { locale } = getConfig();
+const [, country = 'US'] = locale.ietf.split('-');
 
 class Search {
   constructor(config) {
@@ -37,7 +43,7 @@ class Search {
       this.clearSearchForm();
     });
     observer.observe(this.trigger, { attributeFilter: ['aria-expanded'] });
-    logErrorFor(this.init.bind(this), 'Search init has failed', 'errorType=error,module=gnav-search');
+    logErrorFor(this.init.bind(this), 'Search init has failed', 'errorType=e,module=gnav-search');
   }
 
   async init() {
@@ -49,8 +55,11 @@ class Search {
 
   async getLabels() {
     this.labels = {};
+    // PARTNERS_NAVIGATION START
+    // MWPW-154138 - Search icon - Restricted global navigation
     [this.labels.clearResults] = await replaceKeyArray(['clear-results'], getFedsPlaceholderConfig());
     [this.labels.search, this.labels.viewAllResults] = await replaceKeyArray(['search-topics-resources-files', 'view-all-results'], getConfig());
+    // PARTNERS_NAVIGATION END
   }
 
   decorate() {
@@ -101,8 +110,11 @@ class Search {
       }
 
       if (e.code === 'Enter') {
+        // PARTNERS_NAVIGATION START
+        // MWPW-154138 - Search icon - Restricted global navigation
         if (!this.input) return;
         window.location.href = Search.getSearchLink(this.input.value?.trim());
+        // PARTNERS_NAVIGATION END
       }
     });
 
@@ -126,6 +138,8 @@ class Search {
     });
   }
 
+  // PARTNERS_NAVIGATION START
+  // MWPW-154138 Search icon - Restricted global navigation
   getSuggestions(query = this.query) {
    return generateRequestForSearchAPI(
         {
@@ -138,6 +152,7 @@ class Search {
           // do nothing
         });
   }
+  // PARTNERS_NAVIGATION END
 
   onSearchInput = debounce(() => {
     const query = this.getQuery();
@@ -159,6 +174,8 @@ class Search {
       .then((data) => {
         const suggestions = data?.suggested_completions;
         this.resultsList.replaceChildren(this.getResultsTemplate(suggestions));
+        // PARTNERS_NAVIGATION START
+        // MWPW-154138 - Search icon - Restricted global navigation
         this.resultsList.appendChild(this.getViewAllResultsTemplate());
         if (this.parent instanceof HTMLElement) {
           this.parent.classList.add(CONFIG.selectors.hasResults);
@@ -169,6 +186,7 @@ class Search {
         if (this.parent instanceof HTMLElement) {
           this.parent.classList.remove(CONFIG.selectors.hasResults);
         }
+        // PARTNERS_NAVIGATION END
       });
   }, 150);
 
@@ -241,7 +259,7 @@ class Search {
       });
 
       const resultTemplate = toFragment`<li>
-          <a href="${Search.getSearchLink(resultLabel)}" class="feds-search-result" aria-label="${resultLabel}">
+          <a href="${Search.getHelpxLink(resultLabel)}" class="feds-search-result" aria-label="${resultLabel}">
             <span>${suggestionPrefix}</span>${suggestionWithoutPrefix}
           </a>
         </li>`;
@@ -252,11 +270,14 @@ class Search {
     return resultsTemplate;
   }
 
+  // PARTNERS_NAVIGATION START
+  // MWPW-154138 - Search icon - Restricted global navigation
   getViewAllResultsTemplate(query = this.query) {
     return toFragment`<li>
       <a href="${Search.getSearchLink(query)}" class="feds-search-view-all-results"><span>${this.labels.viewAllResults}</span></a>
     </li>`;
   }
+  // PARTNERS_NAVIGATION END
 
   focusInput() {
     if (isDesktop.matches) {
@@ -276,10 +297,13 @@ class Search {
     }
   }
 
+  // PARTNERS_NAVIGATION START
+  // MWPW-154138 - Search icon - Restricted global navigation
   static getSearchLink(query) {
     const queryString = query ? `?term=${encodeURIComponent((query || '').trim())}` : '';
     return `${locale?.prefix}/channelpartners/home/search/${queryString}`;
   }
+  // PARTNERS_NAVIGATION END
 }
 
 export default Search;
