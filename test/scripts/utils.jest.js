@@ -28,6 +28,17 @@ import {
   getCaasUrl,
   getNodesByXPath,
   setLibs,
+  getPrimaryBusiness,
+  getAccessType,
+  getDesignationType,
+  getComplianceStatus,
+  getAccountStatus,
+  getComplianceExpirationDate,
+  getDaysFromRegistration,
+  isReturningUser60d,
+  isReturningUser90d,
+  isComplianceExpirationInPast,
+  isComplianceExpirationInFuture,
 } from '../../eds/scripts/utils.js';
 import {DX_PROGRAM_TYPE} from "../../eds/blocks/utils/dxConstants.js";
 
@@ -324,5 +335,113 @@ describe('Test utils.js', () => {
     const cookieObject = { DXP: { firstName: 'test' , salesCenterAccess: false }};
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     expect(hasSalesCenterAccess()).toBe(false);
+  });
+
+  describe('New utility functions for segment conditions', () => {
+    it('Should get primary business from cookie', () => {
+      const cookieObject = { DXP: { primaryBusiness: 'solution' } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(getPrimaryBusiness()).toEqual('solution');
+    });
+
+    it('Should get access type from cookie', () => {
+      const cookieObject = { DXP: { accessType: 'Billing Admin' } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(getAccessType()).toEqual('billing admin');
+    });
+
+    it('Should get designation type from cookie', () => {
+      const cookieObject = { DXP: { designationType: 'Legal and Compliance' } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(getDesignationType()).toEqual('legal and compliance');
+    });
+
+    it('Should get compliance status from cookie', () => {
+      const cookieObject = { DXP: { complianceStatus: 'Not Completed' } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(getComplianceStatus()).toEqual('not completed');
+    });
+
+    it('Should get account status from cookie', () => {
+      const cookieObject = { DXP: { status: 'Locked' } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(getAccountStatus()).toEqual('locked');
+    });
+
+    it('Should get compliance expiration date from cookie', () => {
+      const expirationDate = '2024-12-31T00:00:00.000Z';
+      const cookieObject = { DXP: { complianceExpirationDate: expirationDate } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(getComplianceExpirationDate()).toEqual(expirationDate.toLowerCase());
+    });
+
+    it('Should calculate days from registration', () => {
+      const createdDate = new Date();
+      createdDate.setDate(createdDate.getDate() - 45);
+      const cookieObject = { DXP: { createdDate: createdDate.toISOString() } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      const days = getDaysFromRegistration();
+      expect(days).toBeGreaterThan(44);
+      expect(days).toBeLessThan(46);
+    });
+
+    it('Should return true for returning user within 60 days window', () => {
+      const createdDate = new Date();
+      createdDate.setDate(createdDate.getDate() - 45);
+      const cookieObject = { DXP: { createdDate: createdDate.toISOString() } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(isReturningUser60d()).toBe(true);
+    });
+
+    it('Should return false for returning user outside 60 days window', () => {
+      const createdDate = new Date();
+      createdDate.setDate(createdDate.getDate() - 15);
+      const cookieObject = { DXP: { createdDate: createdDate.toISOString() } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(isReturningUser60d()).toBe(false);
+    });
+
+    it('Should return true for returning user within 90 days window', () => {
+      const createdDate = new Date();
+      createdDate.setDate(createdDate.getDate() - 75);
+      const cookieObject = { DXP: { createdDate: createdDate.toISOString() } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(isReturningUser90d()).toBe(true);
+    });
+
+    it('Should return false for returning user outside 90 days window', () => {
+      const createdDate = new Date();
+      createdDate.setDate(createdDate.getDate() - 45);
+      const cookieObject = { DXP: { createdDate: createdDate.toISOString() } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(isReturningUser90d()).toBe(false);
+    });
+
+    it('Should return true if compliance expiration date is in the past', () => {
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - 10);
+      const cookieObject = { DXP: { complianceExpirationDate: pastDate.toISOString() } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(isComplianceExpirationInPast()).toBe(true);
+    });
+
+    it('Should return false if compliance expiration date is in the future', () => {
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 10);
+      const cookieObject = { DXP: { complianceExpirationDate: futureDate.toISOString() } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(isComplianceExpirationInFuture()).toBe(true);
+    });
+
+    it('Should return null for days from registration when not signed in', () => {
+      document.cookie = 'partner_data=';
+      expect(getDaysFromRegistration()).toBe(null);
+    });
+
+    it('Should return null for days from registration when createdDate is missing', () => {
+      const cookieObject = { DXP: { status: 'MEMBER' } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      expect(getDaysFromRegistration()).toBe(null);
+    });
   });
 });

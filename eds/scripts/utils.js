@@ -262,6 +262,77 @@ export function isPartnerNewlyRegistered() {
   return differenceInMilliseconds > 0 && differenceInDays < 31;
 }
 
+export function getPrimaryBusiness() {
+  return getPartnerDataCookieValue('primarybusiness');
+}
+
+export function getAccessType() {
+  return getPartnerDataCookieValue('accesstype');
+}
+
+export function getDesignationType() {
+  return getPartnerDataCookieValue('designationtype');
+}
+
+export function getComplianceStatus() {
+  return getPartnerDataCookieValue('compliancestatus');
+}
+
+export function getAccountStatus() {
+  return getPartnerDataCookieValue('status');
+}
+
+export function getComplianceExpirationDate() {
+  return getPartnerDataCookieValue('complianceexpirationdate');
+}
+
+export function getDaysFromRegistration() {
+  if (!partnerIsSignedIn()) return null;
+
+  const createdDate = getPartnerDataCookieValue('createddate');
+  if (!createdDate) return null;
+
+  const registrationDate = new Date(createdDate);
+  const now = new Date();
+
+  const differenceInMilliseconds = now - registrationDate;
+  if (differenceInMilliseconds < 0) return null;
+
+  return differenceInMilliseconds / (1000 * 60 * 60 * 24);
+}
+
+export function isReturningUser60d() {
+  const days = getDaysFromRegistration();
+  if (days === null) return false;
+  return days >= 31 && days < 61;
+}
+
+export function isReturningUser90d() {
+  const days = getDaysFromRegistration();
+  if (days === null) return false;
+  return days >= 61 && days < 91;
+}
+
+export function isComplianceExpirationInPast() {
+  const expirationDate = getComplianceExpirationDate();
+  if (!expirationDate) return false;
+
+  const expDate = new Date(expirationDate);
+  const now = new Date();
+
+  return expDate < now;
+}
+
+export function isComplianceExpirationInFuture() {
+  const expirationDate = getComplianceExpirationDate();
+  if (!expirationDate) return false;
+
+  const expDate = new Date(expirationDate);
+  const now = new Date();
+
+  return expDate >= now;
+}
+
 export function isMember() {
   return getPartnerDataCookieObject(getCurrentProgramType())?.status === 'MEMBER';
 }

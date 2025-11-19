@@ -366,4 +366,354 @@ describe('Test personalization.js', () => {
       });
     });
   });
+
+  describe('New Segment Tests', () => {
+    describe('Primary Business segments', () => {
+      it('Show content for partner-primary-business-solution', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              primaryBusiness: 'solution',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization partner-primary-business-solution">Solution content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.partner-primary-business-solution');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Show content for partner-primary-business-technology', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              primaryBusiness: 'technology',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization partner-primary-business-technology">Technology content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.partner-primary-business-technology');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Hide content for mismatched primary business', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              primaryBusiness: 'solution',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization partner-primary-business-technology">Technology content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.partner-primary-business-technology');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(true);
+        });
+      });
+    });
+
+    describe('Access Type segments', () => {
+      it('Show content for partner-billing-admin', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              accessType: 'Billing Admin',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization partner-billing-admin">Billing admin content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.partner-billing-admin');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Show content for partner-salescenter-admin', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              accessType: 'Sales Center Admin',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization partner-salescenter-admin">Sales Center admin content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.partner-salescenter-admin');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Show content for partner-user', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              accessType: '/',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization partner-user">Partner user content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.partner-user');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+    });
+
+    describe('Designation Type segments', () => {
+      it('Show content for designation-Legal', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              designationType: 'Legal and Compliance',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization designation-Legal">Legal content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.designation-Legal');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Show content for designation-Learning', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              designationType: 'Learning & Development',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization designation-Learning">Learning content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.designation-Learning');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+    });
+
+    describe('Time-based user segments', () => {
+      it('Show content for returning-user-60d (31-60 days)', () => {
+        jest.isolateModules(() => {
+          const createdDate = new Date();
+          createdDate.setDate(createdDate.getDate() - 45);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              createdDate: createdDate.toISOString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization returning-user-60d">Returning 60d content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.returning-user-60d');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Show content for returning-user-90d (61-90 days)', () => {
+        jest.isolateModules(() => {
+          const createdDate = new Date();
+          createdDate.setDate(createdDate.getDate() - 75);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              createdDate: createdDate.toISOString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization returning-user-90d">Returning 90d content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.returning-user-90d');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Hide returning-user-60d for new user', () => {
+        jest.isolateModules(() => {
+          const createdDate = new Date();
+          createdDate.setDate(createdDate.getDate() - 15);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              createdDate: createdDate.toISOString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization returning-user-60d">Returning 60d content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.returning-user-60d');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(true);
+        });
+      });
+    });
+
+    describe('Locked and Compliance status segments', () => {
+      it('Show content for Locked-compliance', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'Locked',
+              complianceStatus: 'Not Completed',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization Locked-compliance">Locked compliance content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.Locked-compliance');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Show content for Locked-payment', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'Locked',
+              complianceStatus: 'Completed',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization Locked-payment">Locked payment content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.Locked-payment');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Show content for Locked-compliance-past', () => {
+        jest.isolateModules(() => {
+          const pastDate = new Date();
+          pastDate.setDate(pastDate.getDate() - 10);
+          const cookieObject = {
+            DXP: {
+              status: 'Locked',
+              complianceExpirationDate: pastDate.toISOString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization Locked-compliance-past">Past compliance content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.Locked-compliance-past');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Show content for Locked-payment-future', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 10);
+          const cookieObject = {
+            DXP: {
+              status: 'Locked',
+              complianceExpirationDate: futureDate.toISOString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization Locked-payment-future">Future payment content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.Locked-payment-future');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Hide Locked-compliance when status is not Locked', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceStatus: 'Not Completed',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization Locked-compliance">Locked compliance content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.Locked-compliance');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(true);
+        });
+      });
+    });
+
+    describe('Submitted status segment', () => {
+      it('Show content for Submitted-in-review', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'Submitted in Review',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization Submitted-in-review">Submitted content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.Submitted-in-review');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+    });
+
+    describe('Combined segment logic', () => {
+      it('Show content when user matches primary business AND designation (AND logic)', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              primaryBusiness: 'solution',
+              designationType: 'Legal and Compliance',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization partner-primary-business-solution designation-Legal">Combined content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.partner-primary-business-solution.designation-Legal');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('Hide content when user does not match all exclusive segments', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              primaryBusiness: 'solution',
+              designationType: 'Learning & Development',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML = '<div class="partner-personalization partner-primary-business-solution designation-Legal">Combined content</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const block = document.querySelector('.partner-primary-business-solution.designation-Legal');
+          expect(block.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(true);
+        });
+      });
+    });
+  });
 });
