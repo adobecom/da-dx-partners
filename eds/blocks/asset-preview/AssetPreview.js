@@ -153,6 +153,7 @@ export default class AssetPreview extends LitElement {
     this.fileType = DOMPurify.sanitize(assetMetadata.fileType);
     this.url = DOMPurify.sanitize(assetMetadata.url);
     this.webinarPresentation = DOMPurify.sanitize(assetMetadata.webinarPresentation);
+    if (!this.getFileExtension(this.webinarPresentation)) this.webinarPresentation = null;
     this.previewImage = DOMPurify.sanitize(assetMetadata.previewImage || assetMetadata.thumbnailUrl);
     this.backButtonUrl = DOMPurify.sanitize(this.blockData.backButtonUrl);
     this.backButtonLabel = DOMPurify.sanitize(this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL);
@@ -350,15 +351,18 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   getLabelBasedOnFileExtension(url) {
+    return FILE_EXTENSION_TO_DOWNLOAD_LABEL[this.getFileExtension(url)] || 'Download';
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getFileExtension(url) {
     try {
       const { pathname } = new URL(url);
       const fileName = pathname.split('/').pop();
       const parts = fileName.split('.');
-      const extension = parts.length > 1 ? parts.pop() : '';
-
-      return FILE_EXTENSION_TO_DOWNLOAD_LABEL[extension] || 'Download';
+      return parts.length > 1 ? parts.pop() : '';
     } catch (error) {
-      return 'Download';
+      return '';
     }
   }
 }
