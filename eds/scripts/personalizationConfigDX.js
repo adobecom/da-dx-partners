@@ -1,14 +1,14 @@
 import { processPrimaryContact, processSalesAccess } from './personalizationUtils.js';
 import {
-  hasSalesCenterAccess,
-  isAdminUser,
-  isPartnerNewlyRegistered,
-  isMember,
-  partnerIsSignedIn,
-  signedInNonMember,
-  getPartnerDataCookieValue,
-  partnerDataCookieContainsValue,
-  isReturningUser, isAccountLocked
+    hasSalesCenterAccess,
+    isAdminUser,
+    isPartnerNewlyRegistered,
+    isMember,
+    partnerIsSignedIn,
+    signedInNonMember,
+    getPartnerDataCookieValue,
+    partnerDataCookieContainsValue,
+    isReturningUser, isAccountLocked, isBctqExpiring
 } from './utils.js';
 import {
   DX_ACCESS_TYPE,
@@ -24,7 +24,8 @@ export const PERSONALIZATION_PLACEHOLDERS = {
   'primaryJobRole': '//*[contains(text(), "$primaryJobRole")]',
   'accountName': '//*[contains(text(), "$accountName")]',
   'company': '//*[contains(text(), "$company")]',
-  'email': '//*[contains(text(), "$email")]'
+  'email': '//*[contains(text(), "$email")]',
+  'bctqExpirationDays': '//*[contains(text(), "$bctqExpirationDays")]',
 };
 
 export const LEVEL_CONDITION = 'partner-level';
@@ -57,6 +58,7 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-locked-compliance-past': getPartnerDataCookieValue('specialstate') === DX_SPECIAL_STATE.LOCKED_COMPLIANCE_PAST,
   'partner-locked-payment-future': getPartnerDataCookieValue('specialstate') === DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE,
   'partner-submitted-in-review': getPartnerDataCookieValue('specialstate') === DX_SPECIAL_STATE.SUBMITTED_IN_REVIEW,
+  'partner-bctq-expiring-90d': isBctqExpiring(90)
 };
 
 export const PROFILE_PERSONALIZATION_ACTIONS = {

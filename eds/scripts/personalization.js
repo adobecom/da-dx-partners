@@ -1,7 +1,7 @@
 import {
-  isMember,
-  getNodesByXPath,
-  getPartnerDataCookieObject, getCurrentProgramType
+    isMember,
+    getNodesByXPath,
+    getPartnerDataCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration
 } from './utils.js';
 import {
   PERSONALIZATION_PLACEHOLDERS,
@@ -18,7 +18,10 @@ import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 export function personalizePlaceholders(placeholders, context = document, programType) {
   Object.entries(placeholders).forEach(([key, value]) => {
     const programData = getPartnerDataCookieObject(programType);
-    const placeholderValue = programData[key];
+    let placeholderValue = programData[key];
+    if (key === 'bctqExpirationDays') {
+      placeholderValue = getDaysUntilComplianceExpiration();
+    }
     getNodesByXPath(value, context).forEach((el) => {
       if (!placeholderValue) {
         el.remove();

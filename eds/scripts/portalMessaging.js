@@ -70,3 +70,31 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
         },
     );
 }
+
+export async function bctqBanner(miloLibs) {
+    if (!isMember()) return;
+
+    let bannerType;
+    if (PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d']) {
+        bannerType = 'bctq-banner';
+    }
+    if (!bannerType) return;
+
+    const bannerFragmentPath = getMetadataContent(bannerType);
+    if (!bannerFragmentPath) {
+        console.warn(`${bannerType} should be displayed but popup fragment path is not found`);
+        return;
+    }
+
+    const bannerContent = await loadPopupFragment(bannerFragmentPath);
+    if (!bannerContent) {
+        console.warn(`Popup fragment for ${bannerFragmentPath} not found`);
+        return;
+    }
+
+    const documentMain = document.querySelector('main');
+
+    // mozda neka provera
+
+    documentMain.prepend(bannerContent);
+}
