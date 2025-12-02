@@ -1,7 +1,7 @@
 import {
   isMember,
   getNodesByXPath,
-  getPartnerDataCookieObject, getCurrentProgramType, getLibs
+  getPartnerDataCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration, getLibs
 } from './utils.js';
 import {
   PERSONALIZATION_PLACEHOLDERS,
@@ -156,7 +156,10 @@ export function personalizePlaceholders(placeholders, context = document, progra
     }
 
     const programData = getPartnerDataCookieObject(programType);
-    const placeholderValue = programData[key];
+    let placeholderValue = programData[key];
+    if (key === 'bctqExpirationDays') {
+      placeholderValue = getDaysUntilComplianceExpiration();
+    }
     elements.forEach((el) => {
       if (!placeholderValue) {
         el.remove();

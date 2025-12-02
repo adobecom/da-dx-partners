@@ -531,4 +531,359 @@ describe('Test personalization.js', () => {
       });
     });
   });
+
+  describe('BCTQ Compliance Expiration Tests', () => {
+    beforeEach(() => {
+      document.cookie = 'partner_data=';
+    });
+
+    describe('getDaysUntilComplianceExpiration', () => {
+      it('should return correct days remaining for future expiration date', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 45);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { getDaysUntilComplianceExpiration } = require('../../eds/scripts/utils.js');
+          const days = getDaysUntilComplianceExpiration();
+          expect(days).toBe(45);
+        });
+      });
+
+      it('should return null for past expiration dates', () => {
+        jest.isolateModules(() => {
+          const pastDate = new Date();
+          pastDate.setDate(pastDate.getDate() - 10);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: pastDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { getDaysUntilComplianceExpiration } = require('../../eds/scripts/utils.js');
+          const days = getDaysUntilComplianceExpiration();
+          expect(days).toBeNull();
+        });
+      });
+
+      it('should return null when complianceExpiryDate is not provided', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { getDaysUntilComplianceExpiration } = require('../../eds/scripts/utils.js');
+          const days = getDaysUntilComplianceExpiration();
+          expect(days).toBeNull();
+        });
+      });
+
+      it('should return null when user is not signed in', () => {
+        jest.isolateModules(() => {
+          document.cookie = 'partner_data=';
+          const { getDaysUntilComplianceExpiration } = require('../../eds/scripts/utils.js');
+          const days = getDaysUntilComplianceExpiration();
+          expect(days).toBeNull();
+        });
+      });
+
+      it('should round up partial days', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          // Set to 30.5 days in the future
+          futureDate.setTime(futureDate.getTime() + (30.5 * 24 * 60 * 60 * 1000));
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { getDaysUntilComplianceExpiration } = require('../../eds/scripts/utils.js');
+          const days = getDaysUntilComplianceExpiration();
+          expect(days).toBe(31);
+        });
+      });
+    });
+
+    describe('isBctqExpiring', () => {
+      it('should return true when compliance expires within 90 days and not locked', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 60);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { isBctqExpiring } = require('../../eds/scripts/utils.js');
+          const isExpiring = isBctqExpiring(90);
+          expect(isExpiring).toBe(true);
+        });
+      });
+
+      it('should return true when compliance expires exactly on 90 days', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 90);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { isBctqExpiring } = require('../../eds/scripts/utils.js');
+          const isExpiring = isBctqExpiring(90);
+          expect(isExpiring).toBe(true);
+        });
+      });
+
+      it('should return false when compliance expires in more than 90 days', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 120);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { isBctqExpiring } = require('../../eds/scripts/utils.js');
+          const isExpiring = isBctqExpiring(90);
+          expect(isExpiring).toBe(false);
+        });
+      });
+
+      it('should return false when status is locked', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 60);
+          const cookieObject = {
+            DXP: {
+              status: 'locked',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { isBctqExpiring } = require('../../eds/scripts/utils.js');
+          const isExpiring = isBctqExpiring(90);
+          expect(isExpiring).toBe(false);
+        });
+      });
+
+      it('should return false when complianceExpiryDate is not available', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { isBctqExpiring } = require('../../eds/scripts/utils.js');
+          const isExpiring = isBctqExpiring(90);
+          expect(isExpiring).toBe(false);
+        });
+      });
+
+      it('should work with different threshold values', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 25);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { isBctqExpiring } = require('../../eds/scripts/utils.js');
+          expect(isBctqExpiring(30)).toBe(true);
+          expect(isBctqExpiring(20)).toBe(false);
+        });
+      });
+    });
+
+    describe('partner-bctq-expiring-90d segment', () => {
+      it('should show BCTQ expiring banner when compliance expires within 90 days', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 45);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML += '<div class="partner-bctq-expiring-90d partner-personalization">BCTQ Expiring</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const bctqBlock = document.querySelector('.partner-bctq-expiring-90d');
+          expect(bctqBlock).not.toBeNull();
+          expect(bctqBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('should not show BCTQ banner when compliance expires in more than 90 days', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 120);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { isBctqExpiring } = require('../../eds/scripts/utils.js');
+          expect(isBctqExpiring(90)).toBe(false);
+        });
+      });
+
+      it('should not show BCTQ banner when user is locked', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 45);
+          const cookieObject = {
+            DXP: {
+              status: 'locked',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { isBctqExpiring } = require('../../eds/scripts/utils.js');
+          expect(isBctqExpiring(90)).toBe(false);
+        });
+      });
+    });
+
+    describe('bctqExpirationDays placeholder', () => {
+      it('should populate bctqExpirationDays placeholder with correct days', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 45);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML += '<div id="days-countdown">Your compliance expires in $bctqExpirationDays days</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const countdown = document.querySelector('#days-countdown');
+          expect(countdown.textContent).toContain('45');
+          expect(countdown.textContent).not.toContain('$bctqExpirationDays');
+          expect(countdown.textContent).toBe('Your compliance expires in 45 days');
+        });
+      });
+
+      it('should remove element if bctqExpirationDays is null', () => {
+        jest.isolateModules(() => {
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML += '<div id="days-countdown">Your compliance expires in $bctqExpirationDays days</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const countdown = document.querySelector('#days-countdown');
+          expect(countdown).toBeNull();
+        });
+      });
+
+      it('should add bctqexpirationdays-placeholder class to element', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 30);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML += '<div id="days-countdown">$bctqExpirationDays</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const countdown = document.querySelector('#days-countdown');
+          expect(countdown.classList.contains('bctqexpirationdays-placeholder')).toBe(true);
+        });
+      });
+    });
+
+    describe('Combined BCTQ segments', () => {
+      it('should show admin-specific BCTQ banner for admins', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 45);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+              accessType: [DX_ACCESS_TYPE.ADMIN],
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML += '<div class="partner-bctq-expiring-90d partner-admin partner-personalization">Admin BCTQ Banner</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const adminBanner = document.querySelector('.partner-bctq-expiring-90d.partner-admin');
+          expect(adminBanner.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('should show user-specific BCTQ banner for non-admins', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 45);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+              accessType: [],
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          document.body.innerHTML += '<div class="partner-bctq-expiring-90d partner-user partner-personalization">User BCTQ Banner</div>';
+          const { applyPagePersonalization } = importModules();
+          applyPagePersonalization();
+          const userBanner = document.querySelector('.partner-bctq-expiring-90d.partner-user');
+          expect(userBanner.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+        });
+      });
+
+      it('should correctly identify admin users vs regular users', () => {
+        jest.isolateModules(() => {
+          const futureDate = new Date();
+          futureDate.setDate(futureDate.getDate() + 45);
+          const cookieObject = {
+            DXP: {
+              status: 'MEMBER',
+              complianceExpiryDate: futureDate.getTime().toString(),
+              accessType: [DX_ACCESS_TYPE.ADMIN],
+            },
+          };
+          document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+          const { partnerDataCookieContainsValue } = require('../../eds/scripts/utils.js');
+          expect(partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN)).toBe(true);
+        });
+      });
+    });
+  });
 });

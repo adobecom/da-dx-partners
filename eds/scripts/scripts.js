@@ -21,7 +21,7 @@ import {
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
 import {partnerAgreement} from "./partnerAgreement.js";
-import {portalMessaging} from "./portalMessaging.js";
+import {bctqBanner, portalMessaging} from "./portalMessaging.js";
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -104,6 +104,7 @@ function setUpPage() {
   updateFooter();
 }
 async function loadPage() {
+  await bctqBanner(miloLibs);
   applyPagePersonalization();
   setUpPage();
   redirectLoggedinPartner();
