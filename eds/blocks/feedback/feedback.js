@@ -253,14 +253,6 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
 }
 
 export default async function init(el) {
-  const feedbackMeta = document.querySelector('meta[name="feedback"]');
-  if (feedbackMeta) {
-    const feedbackContent = feedbackMeta.getAttribute('content');
-    if (feedbackContent === 'NONE') {
-      el.remove();
-      return;
-    }
-  }
   const formDefinitionUrl = el.querySelector('a[href$="feedback-definition.json"]');
 
   const miloLibs = getLibs();

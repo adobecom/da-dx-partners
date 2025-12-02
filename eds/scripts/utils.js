@@ -487,7 +487,7 @@ export function updateFooter() {
 
 export async function setFeedback(getConfig) {
   const feedback = getMetadataContent('feedback');
-  if (!feedback || feedback === 'false') return;
+  if (!feedback || feedback.toUpperCase() === 'FALSE' || feedback.toUpperCase() === 'NONE') return;
   const config = getConfig();
 
   const { prefix } = config.locale;
