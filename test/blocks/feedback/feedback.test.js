@@ -424,5 +424,43 @@ describe('feedback block', () => {
 
       btoaStub.restore();
     });
+
+    it('should not render component when meta feedback is NONE', async () => {
+      const meta = document.createElement('meta');
+      meta.name = 'feedback';
+      meta.content = 'NONE';
+      document.head.appendChild(meta);
+
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      const removeSpy = sinon.spy(block, 'remove');
+      await init(block);
+
+      expect(removeSpy.calledOnce).to.be.true;
+      expect(document.querySelector('.sticky-feedback-button')).to.not.exist;
+    });
+
+    it('should render component when meta feedback is TRUE', async () => {
+      const meta = document.createElement('meta');
+      meta.name = 'feedback';
+      meta.content = 'TRUE';
+      document.head.appendChild(meta);
+
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      await init(block);
+
+      const stickyButton = document.querySelector('.sticky-feedback-button');
+      expect(stickyButton).to.exist;
+    });
+
+    it('should render component when meta feedback does not exist', async () => {
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      await init(block);
+
+      const stickyButton = document.querySelector('.sticky-feedback-button');
+      expect(stickyButton).to.exist;
+    });
   });
 });
