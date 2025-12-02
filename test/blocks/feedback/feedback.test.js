@@ -424,5 +424,29 @@ describe('feedback block', () => {
 
       btoaStub.restore();
     });
+
+
+    it('should render component when meta feedback is TRUE', async () => {
+      const meta = document.createElement('meta');
+      meta.name = 'feedback';
+      meta.content = 'TRUE';
+      document.head.appendChild(meta);
+
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      await init(block);
+
+      const stickyButton = document.querySelector('.sticky-feedback-button');
+      expect(stickyButton).to.exist;
+    });
+
+    it('should render component when meta feedback does not exist', async () => {
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      await init(block);
+
+      const stickyButton = document.querySelector('.sticky-feedback-button');
+      expect(stickyButton).to.exist;
+    });
   });
 });
