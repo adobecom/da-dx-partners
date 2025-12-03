@@ -23,6 +23,7 @@ class SinglePartnerCardHalfHeight extends LitElement {
         class="single-partner-card--half-height"
         href="${transformCardUrl(this.data.contentArea?.url)}"
         target="_blank" rel="nooopener noreferrer"
+        data-dll-cardid="${this.data.id}"
         style="background-image: url(${transformCardUrl(this.data.styles?.backgroundImage)}), url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})"
       >
         <div class="card-title-wrapper">
