@@ -103,20 +103,20 @@ async function loadMartech({
   postLCP = false,
 } = {}) {
   // eslint-disable-next-line no-underscore-dangle
-  if (window.marketingtech?.adobe?.launch && window._satellite) {
-    return true;
-  }
+  // // if (window.marketingtech?.adobe?.launch && window._satellite) {
+  // //   return true;
+  // // }
 
-  if (PAGE_URL.searchParams.get('martech') === 'off'
-    || PAGE_URL.searchParams.get('marketingtech') === 'off'
-    || getMetadata('martech') === 'off') {
-    return false;
-  }
+  // // if (PAGE_URL.searchParams.get('martech') === 'off'
+  // //   || PAGE_URL.searchParams.get('marketingtech') === 'off'
+  // //   || getMetadata('martech') === 'off') {
+  // //   return false;
+  // }
 
   window.targetGlobalSettings = { bodyHidingEnabled: false };
-  loadIms().catch(() => { });
+  //().catch(() => { });
 
-  const { default: initMartech } = await import('../libs/martech/martech.js');
+  const { default: initMartech } = await import('./martech/martech.js');
   await initMartech({ persEnabled, persManifests, postLCP });
   isMartechLoaded = true;
 
