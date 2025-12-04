@@ -51,7 +51,17 @@ const CONFIG = {
   prod: { },
 };
 
-let isMartechLoaded = false;
+if (!isProd) {
+  CONFIG = {
+    ...CONFIG,
+    env: {
+      consumer: {
+        marTechUrl:
+          'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-184d20637aa8-development.min.js',
+      },
+    },
+  };
+}
 
 (function removePartnerLoginQuery() {
   const url = new URL(window.location.href);
@@ -97,32 +107,6 @@ const miloLibs = setLibs(LIBS);
   });
 }());
 
-async function loadMartech({
-  persEnabled = false,
-  persManifests = [],
-  postLCP = false,
-} = {}) {
-  // eslint-disable-next-line no-underscore-dangle
-  // // if (window.marketingtech?.adobe?.launch && window._satellite) {
-  // //   return true;
-  // // }
-
-  // // if (PAGE_URL.searchParams.get('martech') === 'off'
-  // //   || PAGE_URL.searchParams.get('marketingtech') === 'off'
-  // //   || getMetadata('martech') === 'off') {
-  // //   return false;
-  // }
-
-  window.targetGlobalSettings = { bodyHidingEnabled: false };
-  //().catch(() => { });
-
-  const { default: initMartech } = await import('../../libs/martech/martech.js');
-  await initMartech({ persEnabled, persManifests, postLCP });
-  isMartechLoaded = true;
-
-  return true;
-}
-
 function setUpPage() {
   updateNavigation();
   updateFooter();
@@ -142,9 +126,8 @@ async function loadPage() {
   rewriteLinks(document);
   const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
   await portalMessaging(miloLibs, partnerAgreementDisplayed);
-
-  if (window.adobeIMS?.isSignedInUser() && !isMartechLoaded) loadMartech();
 }
+
 loadPage();
 
 (async function loadDa() {
