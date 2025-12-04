@@ -3,9 +3,9 @@ import { RT_SEARCH_ACTION_PATH } from './dxConstants.js';
 
 const miloLibs = setLibs('/libs');
 
-const { createTag, localizeLink, getConfig } = await import(`${miloLibs}/utils/utils.js`);
+const { createTag, localizeLinkAsync, getConfig } = await import(`${miloLibs}/utils/utils.js`);
 
-export { createTag, localizeLink, getConfig };
+export { createTag, localizeLinkAsync, getConfig };
 const { replaceText } = await import(`${miloLibs}/features/placeholders.js`);
 export { replaceText };
 
