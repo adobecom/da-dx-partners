@@ -36,7 +36,7 @@ let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
 // Add any config options.
-const CONFIG = {
+let CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
   imsClientId,
