@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
+import {DX_COMPLIANCE_STATUS, DX_PROGRAM_TYPE, DX_SPECIAL_STATE} from "../blocks/utils/dxConstants.js";
 
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
@@ -274,6 +274,42 @@ export function signedInNonMember() {
   return partnerIsSignedIn() && !isMember();
 }
 
+export function partnerDataCookieContainsValue(key, value) {
+  const cookieValue = getPartnerDataCookieValue(key);
+  if (!cookieValue) return false;
+  return cookieValue.includes(value.toLowerCase());
+}
+
+export function isAccountLocked() {
+  if (!partnerIsSignedIn()) return false;
+  return partnerDataCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED) ||
+    partnerDataCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_COMPLIANCE_PAST) ||
+    partnerDataCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE);
+}
+
+export function getDaysFromRegistration() {
+  if (!partnerIsSignedIn()) return null;
+
+  const createdDate = getPartnerDataCookieValue('createddate');
+  if (!createdDate) return null;
+
+  const registrationDate = new Date(createdDate);
+  const now = new Date();
+
+  const differenceInMilliseconds = now - registrationDate;
+  if (differenceInMilliseconds < 0) return null;
+
+  return differenceInMilliseconds / (1000 * 60 * 60 * 24);
+}
+
+export function isReturningUser(daysNumber) {
+  const days = getDaysFromRegistration();
+  if (days === null) return false;
+  const upperDaysLimit = daysNumber + 1;
+  const lowerDaysLimit = upperDaysLimit - 30;
+  return days >= lowerDaysLimit && days < upperDaysLimit;
+}
+
 function isDxpMember() {
   return getPartnerDataCookieValue('status', 'dxp') === 'member';
 }
@@ -362,17 +398,33 @@ function setApiParams(api, block) {
   return api.toString();
 }
 
+function getAuthoredList(col) {
+  let authoredList = col.querySelectorAll('li');
+  if(authoredList && authoredList.length){
+    return Array.from(authoredList).map(li => li.textContent.trim()).join(',');
+  }
+  return col.textContent.trim();
+}
+
 export function getCaasUrl(block) {
-  const domain = `${(!prodHosts.includes(window.location.host)) ? 'https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1' : 'https://www.adobe.com/chimera-api'}`;
+  let isNonProd = !prodHosts.includes(window.location.host);
+  const domain = `${isNonProd ? 'https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1' : 'https://www.adobe.com/chimera-api'}`;
   let sources = 'da-dx-partners';
+  let featuredQuery = '';
   Array.from(block.el.children).forEach((row) => {
     const cols = Array.from(row.children);
     const rowTitle = cols[0].textContent.trim().toLowerCase().replace(/ /g, '-');
     if (rowTitle === 'sources' && cols.length>1) {
-      sources = cols[1].textContent.trim()
+      sources = getAuthoredList(cols[1])
+    }
+    if(isNonProd && rowTitle === 'featured-cards-stage' && cols.length>1){
+      featuredQuery = `&featuredCards=${(getAuthoredList(cols[1]))}`;
+    }
+    if(!isNonProd && rowTitle === 'featured-cards' && cols.length>1){
+      featuredQuery = `&featuredCards=${(getAuthoredList(cols[1]))}`;
     }
   });
-  const api = new URL(`${domain}/collection?originSelection=${sources}&draft=false&flatFile=false&expanded=true`);
+  const api = new URL(`${domain}/collection?originSelection=${sources}${featuredQuery}&draft=false&flatFile=false&expanded=true`);
   return setApiParams(api, block);
 }
 
@@ -431,4 +483,33 @@ export function updateFooter() {
     content = getMetadataContent('footer-loggedin-source') ?? '/eds/partners-shared/dx-loggedin-footer';
   }
   footerMeta.content = content;
+}
+
+export async function setFeedback(getConfig) {
+  const feedback = getMetadataContent('feedback');
+  if (!feedback || feedback.toUpperCase() === 'FALSE' || feedback.toUpperCase() === 'NONE') return;
+  const config = getConfig();
+
+  const { prefix } = config.locale;
+  const fragmentPath = `${prefix}/eds/partners-shared/fragments/feedback`;
+  const url = new URL(fragmentPath, window.location.origin);
+
+  try {
+    const response = await fetch(`${url}.plain.html`);
+    if (!response.ok) throw new Error(`Response was not ok ${response.statusText}`);
+
+    const data = await response.text();
+    const parser = new DOMParser();
+    const page = parser.parseFromString(data, 'text/html');
+    const main = document.querySelector('main');
+    const block = page.querySelector('.feedback');
+    const div = document.createElement('div');
+    div.appendChild(block);
+    if (main) main.insertBefore(div, main.firstChild);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error fetching plain html of feedback fragment:', error);
+    // eslint-disable-next-line consistent-return
+    return null;
+  }
 }

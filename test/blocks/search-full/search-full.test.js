@@ -12,7 +12,8 @@ const mockSearchResponse = {
   count: {
     all: cards.length,
     assets: cards.filter(card => card.contentArea.type !== 'announcement').length,
-    pages: cards.filter(card => card.contentArea.type === 'html').length
+    pages: cards.filter(card => card.contentArea.type === 'html').length,
+    courses: cards.filter(card => card.contentArea.type === 'course').length
   }
 };
 
@@ -172,7 +173,7 @@ describe('search-full block', () => {
     expect(searchCardsWrapper.searchTerm).to.equal('analytics');
   });
 
-  it('should handle different content types (all, assets, pages)', async function () {
+  it('should handle different content types (all, assets, pages, courses)', async function () {
     const { searchCardsWrapper } = await setupAndCommonTest(1200);
 
     expect(searchCardsWrapper.contentType).to.equal('all');
@@ -192,7 +193,7 @@ describe('search-full block', () => {
       this.cards = [];
       this.paginatedCards = [];
       this.hasResponseData = true;
-      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0 };
+      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
       this.countAll = 0;
     });
 
@@ -201,7 +202,7 @@ describe('search-full block', () => {
       this.cards = [];
       this.paginatedCards = [];
       this.hasResponseData = true;
-      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0 };
+      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
       this.allTags = [];
       this.selectedSortOrder = { key: 'most-recent', value: 'Most Recent' };
     });
@@ -234,7 +235,7 @@ describe('search-full block', () => {
       this.cards = [];
       this.paginatedCards = [];
       this.hasResponseData = true;
-      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0 };
+      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
     });
 
     sinon.stub(Search.prototype, 'firstUpdated').callsFake(async function () {
@@ -242,7 +243,7 @@ describe('search-full block', () => {
       this.cards = [];
       this.paginatedCards = [];
       this.hasResponseData = true;
-      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0 };
+      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
       this.allTags = [];
       this.selectedSortOrder = { key: 'most-recent', value: 'Most Recent' };
     });
@@ -263,7 +264,7 @@ describe('search-full block', () => {
       this.cards = [];
       this.paginatedCards = [];
       this.hasResponseData = false;  // Set to false to show loading state
-      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0 };
+      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
       this.allTags = [];
       this.selectedSortOrder = { key: 'most-recent', value: 'Most Recent' };
     });
@@ -273,7 +274,7 @@ describe('search-full block', () => {
       this.cards = [];
       this.paginatedCards = [];
       this.hasResponseData = false;  // Keep as false to maintain loading state
-      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0 };
+      this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
     });
 
     const { searchCardsWrapper } = await setupAndCommonTest(1200);
@@ -434,7 +435,7 @@ describe('SearchCards Unit Tests', () => {
     searchComponent.paginationCounter = 1;
     searchComponent.selectedFilters = {};
     searchComponent.paginatedCards = [];
-    searchComponent.contentTypeCounter = { countAll: 10, countAssets: 5, countPages: 5 };
+    searchComponent.contentTypeCounter = { countAll: 15, countAssets: 5, countPages: 5, countCourses: 5 };
     searchComponent.urlSearchParams = new URLSearchParams();
   });
 
@@ -704,10 +705,16 @@ describe('SearchCards Unit Tests', () => {
       expect(result).to.equal(5);
     });
 
+    it('should return course count for course content type', () => {
+      searchComponent.contentType = 'course';
+      const result = searchComponent.getTotalResults();
+      expect(result).to.equal(5);
+    });
+
     it('should return all count for other content types', () => {
       searchComponent.contentType = 'all';
       const result = searchComponent.getTotalResults();
-      expect(result).to.equal(10);
+      expect(result).to.equal(15);
     });
   });
 
@@ -872,8 +879,8 @@ describe('SearchCards Unit Tests', () => {
       const mockResponse = {
         ok: true,
         json: sinon.stub().resolves({ 
-          cards: [{ id: 1 }, { id: 2 }],
-          count: { all: 2, assets: 1, pages: 1 }
+          cards: [{ id: 1 }, { id: 2 }, { id: 3 }],
+          count: { all: 3, assets: 1, pages: 1, courses: 1 }
         })
       };
       
@@ -885,8 +892,8 @@ describe('SearchCards Unit Tests', () => {
       
       expect(searchComponent.hasResponseData).to.be.true;
       expect(result).to.deep.equal({ 
-        cards: [{ id: 1 }, { id: 2 }],
-        count: { all: 2, assets: 1, pages: 1 }
+        cards: [{ id: 1 }, { id: 2 }, { id: 3 }],
+        count: { all: 3, assets: 1, pages: 1, courses: 1 }
       });
     });
 
@@ -997,7 +1004,7 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.additionalResetActions = sinon.spy();
       searchComponent.getCards = sinon.stub().resolves({
         cards: [{ id: 2 }, { id: 3 }],
-        count: { all: 10, assets: 5, pages: 5 }
+        count: { all: 15, assets: 5, pages: 5, courses: 5 }
       });
       
       await searchComponent.handleActions();
@@ -1006,11 +1013,12 @@ describe('SearchCards Unit Tests', () => {
       expect(searchComponent.additionalResetActions.called).to.be.true;
       expect(searchComponent.cards).to.deep.equal([{ id: 2 }, { id: 3 }]);
       expect(searchComponent.paginatedCards).to.deep.equal([{ id: 1 }, { id: 2 }, { id: 3 }]);
-      expect(searchComponent.countAll).to.equal(10);
+      expect(searchComponent.countAll).to.equal(15);
       expect(searchComponent.contentTypeCounter).to.deep.equal({
-        countAll: 10,
+        countAll: 15,
         countAssets: 5,
-        countPages: 5
+        countPages: 5,
+        countCourses: 5
       });
     });
 
@@ -1020,7 +1028,7 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.additionalResetActions = sinon.spy();
       searchComponent.getCards = sinon.stub().resolves({
         cards: [{ id: 2 }, { id: 3 }],
-        count: { all: 10, assets: 5, pages: 5 }
+        count: { all: 15, assets: 5, pages: 5, courses: 5 }
       });
       
       await searchComponent.handleActions();
@@ -1041,7 +1049,8 @@ describe('SearchCards Unit Tests', () => {
       expect(searchComponent.contentTypeCounter).to.deep.equal({
         countAll: 0,
         countAssets: 0,
-        countPages: 0
+        countPages: 0,
+        countCourses: 0
       });
     });
   });

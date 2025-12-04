@@ -16,10 +16,12 @@ import {
   preloadResources,
   redirectLoggedinPartner,
   updateNavigation,
-  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY,
+  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
+import {partnerAgreement} from "./partnerAgreement.js";
+import {portalMessaging} from "./portalMessaging.js";
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -43,9 +45,10 @@ const CONFIG = {
   // fallbackRouting: 'off',
   locales: {
     '': { ietf: 'en-US', tk: 'hah7vzn.css' },
-    de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
-    kr: { ietf: 'ko-KR', tk: 'zfo3ouc' },
   },
+  local: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
+  stage: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
+  prod: { },
 };
 
 (function removePartnerLoginQuery() {
@@ -54,6 +57,9 @@ const CONFIG = {
   if (searchParams.has(PARTNER_LOGIN_QUERY)) {
     searchParams.delete(PARTNER_LOGIN_QUERY);
     window.history.replaceState({}, '', url.toString());
+
+    // reset portal messaging popup after login
+    sessionStorage.removeItem('portal-messaging-popup-closed');
   }
 }());
 
@@ -102,9 +108,12 @@ async function loadPage() {
   const { loadArea, setConfig, getConfig } = await import(`${miloLibs}/utils/utils.js`);
 
   setConfig({ ...CONFIG, miloLibs });
+  await setFeedback(getConfig);
   await loadArea();
   applyPagePersonalization();
   rewriteLinks(document);
+  const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
+  await portalMessaging(miloLibs, partnerAgreementDisplayed);
 }
 loadPage();
 

@@ -25,7 +25,7 @@ export default class Search extends PartnerCards {
   constructor() {
     super();
     this.contentType = 'all';
-    this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0 };
+    this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
     this.typeaheadOptions = [];
     this.isTypeaheadOpen = false;
   }
@@ -219,7 +219,7 @@ export default class Search extends PartnerCards {
     this.hasResponseData = false;
     this.additionalResetActions();
     const cardsData = await this.getCards();
-    const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0 } };
+    const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0, courses: 0 } };
     this.cards = cards;
     if (this.blockData.pagination === 'load-more') {
       this.paginatedCards = this.paginatedCards.concat(cards);
@@ -231,6 +231,7 @@ export default class Search extends PartnerCards {
       countAll: count.all,
       countAssets: count.assets,
       countPages: count.pages,
+      countCourses: count.courses,
     };
     this.hasResponseData = true;
   }
@@ -270,6 +271,9 @@ export default class Search extends PartnerCards {
         break;
       case 'asset':
         countAll = this.contentTypeCounter.countAssets;
+        break;
+      case 'course':
+        countAll = this.contentTypeCounter.countCourses;
         break;
       default:
         countAll = this.contentTypeCounter.countAll;
@@ -376,6 +380,8 @@ export default class Search extends PartnerCards {
                   ${this.blockData.localizedText['{{assets}}']} (${this.contentTypeCounter.countAssets})</sp-button>
                 <sp-button variant="${this.contentType === 'page' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('page')}" aria-label="${this.blockData.localizedText['{{pages}}']}">
                   ${this.blockData.localizedText['{{pages}}']} (${this.contentTypeCounter.countPages})</sp-button>
+                   <sp-button variant="${this.contentType === 'course' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('course')}" aria-label="${this.blockData.localizedText['{{trainings}}']}">
+                  ${this.blockData.localizedText['{{trainings}}']} (${this.contentTypeCounter.countCourses})</sp-button>
               </sp-theme>
             </div>
             <div class="partner-cards-sort-wrapper">

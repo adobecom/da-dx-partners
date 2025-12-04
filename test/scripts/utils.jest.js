@@ -28,6 +28,9 @@ import {
   getCaasUrl,
   getNodesByXPath,
   setLibs,
+  partnerDataCookieContainsValue,
+  getDaysFromRegistration,
+  isReturningUser,
 } from '../../eds/scripts/utils.js';
 import {DX_PROGRAM_TYPE} from "../../eds/blocks/utils/dxConstants.js";
 
@@ -264,7 +267,30 @@ describe('Test utils.js', () => {
       ietf: locale.ietf,
     };
     const caasUrl = getCaasUrl(block);
-    expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
+    expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&featuredCards=c2608c6f-1727-5d62-8094-a225bdc701stage%2Cc2608c6f-1727-5d62-8094-a225bdc701stage&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
+  });
+  it('Get caas url prod', () => {
+    document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"company":"Yugo DXP Stage Platinum Spain"%2C"firstName":"DXP Stage"%2C"lastName":"Spain Platinum"%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}}';
+    const locales = {
+      '': { ietf: 'en-US', tk: 'hah7vzn.css' },
+      de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
+    };
+    const locale = getLocale(locales);
+    document.body.innerHTML = fs.readFileSync(
+      path.resolve(__dirname, './mocks/dx-card-collection.html'),
+      'utf8',
+    );
+    const el = document.querySelector('.dx-card-collection');
+    window.location.host = 'partners.adobe.com';
+
+    const block = {
+      el,
+      name: 'dx-card-collection',
+      // collectionTag: '"caas:adobe-partners/collections/news"',
+      ietf: locale.ietf,
+    };
+    const caasUrl = getCaasUrl(block);
+    expect(caasUrl).toEqual('https://www.adobe.com/chimera-api/collection?originSelection=da-dx-partners&featuredCards=c2608c6f-1727-5d62-8094-a225bdc701c3%2Cc2608c6f-1727-5d62-8094-a225bdc701c5&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
   });
   it('Preload resources', async () => {
     const locales = {
@@ -301,5 +327,68 @@ describe('Test utils.js', () => {
     const cookieObject = { DXP: { firstName: 'test' , salesCenterAccess: false }};
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     expect(hasSalesCenterAccess()).toBe(false);
+  });
+  it('partnerDataCookieContainsValue returns true when accessType value matches', () => {
+    const cookieObject = { DXP: { accessType: 'Billing Admin' } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    expect(partnerDataCookieContainsValue('accesstype', 'billing admin')).toBe(true);
+  });
+  it('partnerDataCookieContainsValue returns false when key missing or cookie absent', () => {
+    document.cookie = 'partner_data=';
+    expect(partnerDataCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
+    const cookieObject = { DXP: { other: 'value' } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    expect(partnerDataCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
+  });
+  it('getDaysFromRegistration returns null when not signed in or missing createddate', () => {
+    document.cookie = 'partner_data=';
+    expect(getDaysFromRegistration()).toBeNull();
+    const cookieObject = { DXP: { status: 'MEMBER' } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    expect(getDaysFromRegistration()).toBeNull();
+  });
+  it('getDaysFromRegistration returns null for future registration date', () => {
+    const future = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
+    const cookieObject = { DXP: { status: 'MEMBER', createddate: future } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    expect(getDaysFromRegistration()).toBeNull();
+  });
+  it('getDaysFromRegistration returns days since registration (approximate)', () => {
+    const tenDaysMs = 10 * 24 * 60 * 60 * 1000;
+    const past = new Date(Date.now() - tenDaysMs).toISOString();
+    const cookieObject = { DXP: { status: 'MEMBER', createddate: past } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    const days = getDaysFromRegistration();
+    expect(days).toBeGreaterThanOrEqual(9);
+    expect(days).toBeLessThan(11);
+  });
+  it('isReturningUser returns false when not signed in or no createddate', () => {
+    document.cookie = 'partner_data=';
+    expect(isReturningUser(30)).toBe(false);
+    const cookieObject = { DXP: { status: 'MEMBER' } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    expect(isReturningUser(30)).toBe(false);
+  });
+  it('isReturningUser true if days within (daysNumber+1)-30 window', () => {
+    // For daysNumber = 30: window is [1, 31)
+    const fiveDaysMs = 5 * 24 * 60 * 60 * 1000;
+    const past = new Date(Date.now() - fiveDaysMs).toISOString();
+    const cookieObject = { DXP: { status: 'MEMBER', createddate: past } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    expect(isReturningUser(30)).toBe(true);
+  });
+  it('isReturningUser false if below lower bound (< 1 day)', () => {
+    const halfDayMs = 12 * 60 * 60 * 1000;
+    const past = new Date(Date.now() - halfDayMs).toISOString();
+    const cookieObject = { DXP: { status: 'MEMBER', createddate: past } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    expect(isReturningUser(30)).toBe(false);
+  });
+  it('isReturningUser false if at or above upper bound (>= daysNumber+1)', () => {
+    const thirtyOneDaysMs = 31 * 24 * 60 * 60 * 1000;
+    const past = new Date(Date.now() - thirtyOneDaysMs).toISOString();
+    const cookieObject = { DXP: { status: 'MEMBER', createddate: past } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    expect(isReturningUser(30)).toBe(false);
   });
 });

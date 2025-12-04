@@ -58,7 +58,7 @@ export const assetPreviewStyles = css`
     width: 100%;
     background-repeat: no-repeat;
     background-position: 50% 50%;
-    background-size: 100% auto;
+    background-size: contain;
     aspect-ratio: 16/9;
     max-width: 600px;
   }
@@ -142,6 +142,7 @@ export const assetPreviewStyles = css`
     width: 100%;
     height: 100%;
     object-fit: contain;
+    background-color: ${black};
   }
 
   .asset-preview-block-video .video-container.video-holder .pause-play-wrapper {
