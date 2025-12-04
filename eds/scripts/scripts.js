@@ -51,6 +51,8 @@ const CONFIG = {
   prod: { },
 };
 
+let isMartechLoaded = false;
+
 (function removePartnerLoginQuery() {
   const url = new URL(window.location.href);
   const { searchParams } = url;
@@ -95,6 +97,32 @@ const miloLibs = setLibs(LIBS);
   });
 }());
 
+async function loadMartech({
+  persEnabled = false,
+  persManifests = [],
+  postLCP = false,
+} = {}) {
+  // eslint-disable-next-line no-underscore-dangle
+  if (window.marketingtech?.adobe?.launch && window._satellite) {
+    return true;
+  }
+
+  if (PAGE_URL.searchParams.get('martech') === 'off'
+    || PAGE_URL.searchParams.get('marketingtech') === 'off'
+    || getMetadata('martech') === 'off') {
+    return false;
+  }
+
+  window.targetGlobalSettings = { bodyHidingEnabled: false };
+  loadIms().catch(() => { });
+
+  const { default: initMartech } = await import('../libs/martech/martech.js');
+  await initMartech({ persEnabled, persManifests, postLCP });
+  isMartechLoaded = true;
+
+  return true;
+}
+
 function setUpPage() {
   updateNavigation();
   updateFooter();
@@ -114,6 +142,8 @@ async function loadPage() {
   rewriteLinks(document);
   const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
   await portalMessaging(miloLibs, partnerAgreementDisplayed);
+
+  if (window.adobeIMS?.isSignedInUser() && !isMartechLoaded) loadMartech();
 }
 loadPage();
 
