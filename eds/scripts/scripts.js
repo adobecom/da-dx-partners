@@ -36,7 +36,7 @@ let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
 // Add any config options.
-const CONFIG = {
+let CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
   imsClientId,
@@ -50,6 +50,18 @@ const CONFIG = {
   stage: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
   prod: { },
 };
+
+if (!isProd) {
+  CONFIG = {
+    ...CONFIG,
+    env: {
+      consumer: {
+        marTechUrl:
+          'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-184d20637aa8-development.min.js',
+      },
+    },
+  };
+}
 
 (function removePartnerLoginQuery() {
   const url = new URL(window.location.href);
@@ -115,6 +127,7 @@ async function loadPage() {
   const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
   await portalMessaging(miloLibs, partnerAgreementDisplayed);
 }
+
 loadPage();
 
 (async function loadDa() {
