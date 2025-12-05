@@ -49,10 +49,8 @@ let CONFIG = {
   local: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
   stage: {
     edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e',
-    consumer: {
-      marTechUrl:
-        'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-184d20637aa8-development.min.js',
-    },
+    marTechUrl:
+      'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-184d20637aa8-development.min.js',
   },
   prod: { },
 };
