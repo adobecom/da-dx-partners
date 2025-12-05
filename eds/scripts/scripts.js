@@ -22,6 +22,7 @@ import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
 import {partnerAgreement} from "./partnerAgreement.js";
 import {portalMessaging} from "./portalMessaging.js";
+import { initBrickProfilePicture } from './brickProfilePicture.js';
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -114,6 +115,7 @@ async function loadPage() {
   rewriteLinks(document);
   const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
   await portalMessaging(miloLibs, partnerAgreementDisplayed);
+  initBrickProfilePicture();
 }
 loadPage();
 
