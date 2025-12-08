@@ -46,8 +46,10 @@ export default async function init(el) {
   declareAssetPreview();
   const app = document.createElement('partnership-progress');
   app.className = 'partnership-progress-block';
-  if (el.classList.length > 0) {
-    app.classList.add(...el.classList);
+  const blockClasses = el.classList;
+  if (blockClasses.length > 1) {
+    blockClasses.remove('partnership-progress');
+    app.classList.add(...blockClasses);
   }
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
