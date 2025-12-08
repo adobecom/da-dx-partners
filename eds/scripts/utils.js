@@ -377,6 +377,7 @@ export function updateIMSConfig() {
     }
 
     window.adobeIMS.adobeIdData.redirect_uri = targetUrl.toString();
+    window.dispatchEvent(new Event('dxp:imsReady'));
   }, 500);
 }
 
