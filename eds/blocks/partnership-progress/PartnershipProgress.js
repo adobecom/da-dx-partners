@@ -70,7 +70,6 @@ export default class PartnershipProgress extends LitElement {
       }
 
       const res = await fetch(url, {
-        credentials: 'include',
         headers: {
           Authorization: `Bearer ${token}`,
           'X-Api-Key': token,
