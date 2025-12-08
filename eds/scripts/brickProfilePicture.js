@@ -30,36 +30,33 @@ async function replaceBrickProfilePictures() {
     const bricks = document.querySelectorAll('.brick');
 
     bricks.forEach((brick) => {
-      const walker = document.createTreeWalker(
-        brick,
-        NodeFilter.SHOW_TEXT,
-        null,
-        false
+      const xpath = './/*[text()="$profileImage"]';
+      const result = document.evaluate(xpath, brick, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      const element = result.singleNodeValue;
+      
+      if (!element) return;
+
+      const textNode = Array.from(element.childNodes).find(
+        node => node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '$profileImage'
       );
       
-      let textNode;
-      while (textNode = walker.nextNode()) {
-        const text = textNode.textContent.trim();
-        if (text === '$profileImage') {
-          const img = document.createElement('img');
-          img.src = userAvatar;
-          img.alt = '';
-          img.dataset.userProfile = 'true';
-          img.width = 96;
-          img.height = 96;
-          
-          const picture = document.createElement('picture');
-          picture.appendChild(img);
-          
-          const parent = textNode.parentNode;
-          if (parent && parent.tagName === 'P') {
-            parent.classList.add('icon-area');
-          }
-          
-          textNode.parentNode.replaceChild(picture, textNode);
-          break;
-        }
+      if (!textNode) return;
+
+      const img = document.createElement('img');
+      img.src = userAvatar;
+      img.alt = '';
+      img.dataset.userProfile = 'true';
+      img.width = 96;
+      img.height = 96;
+      
+      const picture = document.createElement('picture');
+      picture.appendChild(img);
+      
+      if (element.tagName === 'P') {
+        element.classList.add('icon-area');
       }
+      
+      element.replaceChild(picture, textNode);
     });
   } catch (error) {
     console.warn('Failed to replace profile pictures in brick components:', error);
