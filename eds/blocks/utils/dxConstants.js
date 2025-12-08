@@ -76,3 +76,10 @@ export const DX_DESIGNATION_TYPE = {
     LEGAL_AND_COMPLIANCE: 'Legal and Compliance',
     LEARNING_AND_DEVELOPMENT: 'Learning & Development'
 }
+
+export const DX_PARTNER_LEVEL = {
+    COMMUNITY: 'Community',
+    SILVER: 'Silver',
+    GOLD: 'Gold',
+    PLATINUM: 'Platinum'
+}
