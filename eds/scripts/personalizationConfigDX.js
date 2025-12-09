@@ -24,7 +24,9 @@ export const PERSONALIZATION_PLACEHOLDERS = {
   'primaryJobRole': '//*[contains(text(), "$primaryJobRole")]',
   'accountName': '//*[contains(text(), "$accountName")]',
   'company': '//*[contains(text(), "$company")]',
-  'email': '//*[contains(text(), "$email")]'
+  'email': '//*[contains(text(), "$email")]',
+  'profileImage': '//*[contains(text(), "$profileImage")]',
+  'companyLogo': '//*[contains(text(), "$companyLogo")]'
 };
 
 export const LEVEL_CONDITION = 'partner-level';
