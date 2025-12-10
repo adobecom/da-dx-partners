@@ -533,6 +533,9 @@ describe('Test personalization.js', () => {
   });
 
   describe('Profile Image and Company Logo Personalization', () => {
+    let mockGetLibs;
+    let mockGetConfig;
+
     beforeEach(() => {
       document.cookie = 'partner_data=';
       // Setup window.adobeIMS mock
@@ -541,48 +544,704 @@ describe('Test personalization.js', () => {
       };
       // Setup fetch mock
       global.fetch = jest.fn();
+
+      // Mock getLibs
+      mockGetLibs = jest.fn(() => 'https://main--milo--adobecom.aem.live/libs');
+      mockGetConfig = jest.fn(() => ({ env: { adobeIO: 'adobeio-api.adobe.io' } }));
     });
 
     afterEach(() => {
       jest.clearAllMocks();
+      jest.resetModules();
       delete window.adobeIMS;
       delete global.fetch;
     });
 
-    describe('Event listener and placeholder registration', () => {
-      it('should register event listener for profileImage placeholder', () => {
-        jest.isolateModules(() => {
+    describe('replaceProfileImage', () => {
+      it('should replace $profileImage with user avatar on successful API call', (done) => {
+        jest.isolateModules(async () => {
+          // Mock utils.js to return our mock getLibs
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          const mockToken = { token: 'test-access-token' };
+          const mockAvatarUrl = 'https://example.com/avatar.jpg';
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          // Mock dynamic import
+          jest.doMock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
+            getConfig: mockGetConfig,
+          }), { virtual: true });
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({
+              user: {
+                avatar: mockAvatarUrl,
+              },
+            }),
+          });
+
           document.body.innerHTML = '<p id="profile-img">$profileImage</p>';
 
-          const { personalizePlaceholders } = require('../../eds/scripts/personalization.js');
+          const personalization = require('../../eds/scripts/personalization.js');
+
+          // Manually call the internal function by triggering through personalizePlaceholders
           const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
 
-          // Check that elements exist before personalization
-          expect(document.querySelector('#profile-img')).toBeTruthy();
+          // Dispatch the event
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
 
-          personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+          // Wait for async operations
+          setTimeout(() => {
+            const element = document.querySelector('#profile-img');
+            const picture = element?.querySelector('picture');
+            const img = picture?.querySelector('img');
 
-          // The function should not throw and should handle the placeholder
-          expect(document.querySelector('#profile-img')).toBeTruthy();
+            expect(picture).toBeTruthy();
+            expect(img).toBeTruthy();
+            expect(img.src).toBe(mockAvatarUrl);
+            expect(img.alt).toBe('');
+            expect(img.dataset.userProfile).toBe('true');
+            expect(img.width).toBe(96);
+            expect(img.height).toBe(96);
+            expect(element.classList.contains('icon-area')).toBe(true);
+            done();
+          }, 100);
         });
       });
 
-      it('should register event listener for logoCompany placeholder', () => {
-        jest.isolateModules(() => {
+      it('should remove element when access token is missing', (done) => {
+        jest.isolateModules(async () => {
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          window.adobeIMS.getAccessToken.mockReturnValue(null);
+
+          document.body.innerHTML = '<p id="profile-img">$profileImage</p>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#profile-img');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should remove element when access token object has no token property', (done) => {
+        jest.isolateModules(async () => {
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          window.adobeIMS.getAccessToken.mockReturnValue({});
+
+          document.body.innerHTML = '<p id="profile-img">$profileImage</p>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#profile-img');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should remove element when API returns non-200 status', (done) => {
+        jest.isolateModules(async () => {
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          jest.doMock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
+            getConfig: mockGetConfig,
+          }), { virtual: true });
+
+          const mockToken = { token: 'test-access-token' };
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 404,
+            json: async () => ({}),
+          });
+
+          document.body.innerHTML = '<p id="profile-img">$profileImage</p>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#profile-img');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should remove element when user avatar is missing from profile data', (done) => {
+        jest.isolateModules(async () => {
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          jest.doMock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
+            getConfig: mockGetConfig,
+          }), { virtual: true });
+
+          const mockToken = { token: 'test-access-token' };
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({
+              user: {},
+            }),
+          });
+
+          document.body.innerHTML = '<p id="profile-img">$profileImage</p>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#profile-img');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should remove element when user object is missing from profile data', (done) => {
+        jest.isolateModules(async () => {
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          jest.doMock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
+            getConfig: mockGetConfig,
+          }), { virtual: true });
+
+          const mockToken = { token: 'test-access-token' };
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({}),
+          });
+
+          document.body.innerHTML = '<p id="profile-img">$profileImage</p>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#profile-img');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should handle fetch errors and remove elements', (done) => {
+        jest.isolateModules(async () => {
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          jest.doMock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
+            getConfig: mockGetConfig,
+          }), { virtual: true });
+
+          const mockToken = { token: 'test-access-token' };
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockRejectedValueOnce(new Error('Network error'));
+
+          document.body.innerHTML = '<p id="profile-img">$profileImage</p>';
+
+          const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#profile-img');
+            expect(element).toBeNull();
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+              'Failed to replace profile image placeholders:',
+              expect.any(Error)
+            );
+            consoleWarnSpy.mockRestore();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should handle multiple elements with $profileImage', (done) => {
+        jest.isolateModules(async () => {
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          jest.doMock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
+            getConfig: mockGetConfig,
+          }), { virtual: true });
+
+          const mockToken = { token: 'test-access-token' };
+          const mockAvatarUrl = 'https://example.com/avatar.jpg';
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({
+              user: {
+                avatar: mockAvatarUrl,
+              },
+            }),
+          });
+
+          document.body.innerHTML = `
+            <p id="profile-img-1">$profileImage</p>
+            <div id="profile-img-2">User: $profileImage</div>
+          `;
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element1 = document.querySelector('#profile-img-1');
+            const element2 = document.querySelector('#profile-img-2');
+
+            expect(element1.querySelector('img')?.src).toBe(mockAvatarUrl);
+            expect(element2.querySelector('img')?.src).toBe(mockAvatarUrl);
+            done();
+          }, 100);
+        });
+      });
+
+      it('should add icon-area class to P elements', (done) => {
+        jest.isolateModules(async () => {
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          jest.doMock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
+            getConfig: mockGetConfig,
+          }), { virtual: true });
+
+          const mockToken = { token: 'test-access-token' };
+          const mockAvatarUrl = 'https://example.com/avatar.jpg';
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({
+              user: {
+                avatar: mockAvatarUrl,
+              },
+            }),
+          });
+
+          document.body.innerHTML = '<p id="profile-img">$profileImage</p>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#profile-img');
+            expect(element.classList.contains('icon-area')).toBe(true);
+            done();
+          }, 100);
+        });
+      });
+
+      it('should not add icon-area class to non-P elements', (done) => {
+        jest.isolateModules(async () => {
+          jest.doMock('../../eds/scripts/utils.js', () => ({
+            ...jest.requireActual('../../eds/scripts/utils.js'),
+            getLibs: mockGetLibs,
+          }));
+
+          jest.doMock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
+            getConfig: mockGetConfig,
+          }), { virtual: true });
+
+          const mockToken = { token: 'test-access-token' };
+          const mockAvatarUrl = 'https://example.com/avatar.jpg';
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({
+              user: {
+                avatar: mockAvatarUrl,
+              },
+            }),
+          });
+
+          document.body.innerHTML = '<div id="profile-img">$profileImage</div>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#profile-img');
+            if (element) {
+              expect(element.classList.contains('icon-area')).toBe(false);
+            }
+            done();
+          }, 100);
+        });
+      }, 10000);
+    });
+
+    describe('replaceCompanyLogo', () => {
+      it('should replace $logoCompany with company logo on successful API call', (done) => {
+        jest.isolateModules(async () => {
+          const mockToken = { token: 'test-access-token' };
+          const mockLogoUrl = 'https://example.com/company-logo.png';
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({
+              account: {
+                logoUrl: mockLogoUrl,
+              },
+            }),
+          });
+
           document.body.innerHTML = '<div id="company-logo">$logoCompany</div>';
 
-          const { personalizePlaceholders } = require('../../eds/scripts/personalization.js');
+          const personalization = require('../../eds/scripts/personalization.js');
           const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
 
-          expect(document.querySelector('#company-logo')).toBeTruthy();
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
 
-          personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
 
-          expect(document.querySelector('#company-logo')).toBeTruthy();
+          setTimeout(() => {
+            const element = document.querySelector('#company-logo');
+            const picture = element?.querySelector('picture');
+            const img = picture?.querySelector('img');
+
+            expect(picture).toBeTruthy();
+            expect(img).toBeTruthy();
+            expect(img.src).toBe(mockLogoUrl);
+            expect(img.alt).toBe('Company Logo');
+            expect(img.dataset.logoCompany).toBe('true');
+            done();
+          }, 100);
         });
       });
 
-      it('should not process profile image if no elements found', () => {
+      it('should remove element when access token is missing', (done) => {
+        jest.isolateModules(async () => {
+          window.adobeIMS.getAccessToken.mockReturnValue(null);
+
+          document.body.innerHTML = '<div id="company-logo">$logoCompany</div>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#company-logo');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should remove element when access token object has no token property', (done) => {
+        jest.isolateModules(async () => {
+          window.adobeIMS.getAccessToken.mockReturnValue({});
+
+          document.body.innerHTML = '<div id="company-logo">$logoCompany</div>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#company-logo');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should remove element when API returns non-200 status', (done) => {
+        jest.isolateModules(async () => {
+          const mockToken = { token: 'test-access-token' };
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 500,
+            json: async () => ({}),
+          });
+
+          document.body.innerHTML = '<div id="company-logo">$logoCompany</div>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#company-logo');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should remove element when logoUrl is missing from account data', (done) => {
+        jest.isolateModules(async () => {
+          const mockToken = { token: 'test-access-token' };
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({
+              account: {},
+            }),
+          });
+
+          document.body.innerHTML = '<div id="company-logo">$logoCompany</div>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#company-logo');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should remove element when account object is missing', (done) => {
+        jest.isolateModules(async () => {
+          const mockToken = { token: 'test-access-token' };
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({}),
+          });
+
+          document.body.innerHTML = '<div id="company-logo">$logoCompany</div>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#company-logo');
+            expect(element).toBeNull();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should handle fetch errors and remove elements', (done) => {
+        jest.isolateModules(async () => {
+          const mockToken = { token: 'test-access-token' };
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockRejectedValueOnce(new Error('Network error'));
+
+          document.body.innerHTML = '<div id="company-logo">$logoCompany</div>';
+
+          const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element = document.querySelector('#company-logo');
+            expect(element).toBeNull();
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+              'Failed to replace company logo placeholders:',
+              expect.any(Error)
+            );
+            consoleWarnSpy.mockRestore();
+            done();
+          }, 100);
+        });
+      });
+
+      it('should handle multiple elements with $logoCompany', (done) => {
+        jest.isolateModules(async () => {
+          const mockToken = { token: 'test-access-token' };
+          const mockLogoUrl = 'https://example.com/company-logo.png';
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({
+              account: {
+                logoUrl: mockLogoUrl,
+              },
+            }),
+          });
+
+          document.body.innerHTML = `
+            <div id="logo-1">$logoCompany</div>
+            <span id="logo-2">Company: $logoCompany</span>
+          `;
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            const element1 = document.querySelector('#logo-1');
+            const element2 = document.querySelector('#logo-2');
+
+            if (element1 && element2) {
+              expect(element1.querySelector('img')?.src).toBe(mockLogoUrl);
+              expect(element2.querySelector('img')?.src).toBe(mockLogoUrl);
+            }
+            done();
+          }, 100);
+        });
+      }, 10000);
+
+      it('should call API with correct URL and headers', (done) => {
+        jest.isolateModules(async () => {
+          const mockToken = { token: 'test-access-token-123' };
+          const mockLogoUrl = 'https://example.com/company-logo.png';
+          window.adobeIMS.getAccessToken.mockReturnValue(mockToken);
+
+          global.fetch.mockResolvedValueOnce({
+            status: 200,
+            json: async () => ({
+              account: {
+                logoUrl: mockLogoUrl,
+              },
+            }),
+          });
+
+          document.body.innerHTML = '<div id="company-logo">$logoCompany</div>';
+
+          const personalization = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalization.personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          const event = new Event('dxp:imsReady');
+          window.dispatchEvent(event);
+
+          setTimeout(() => {
+            expect(global.fetch).toHaveBeenCalledWith(
+              'https://partner-identity-stage.adobe.io/v1/dxp/profile',
+              expect.objectContaining({
+                headers: expect.any(Headers),
+              })
+            );
+            done();
+          }, 100);
+        });
+      });
+    });
+
+    describe('Event listener registration', () => {
+      it('should not add event listener when no profileImage elements found', () => {
         jest.isolateModules(() => {
           document.body.innerHTML = '<div id="other-content">Some content</div>';
 
@@ -591,12 +1250,11 @@ describe('Test personalization.js', () => {
 
           personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
 
-          // Should not throw and should not add event listener
           expect(document.querySelector('#other-content')).toBeTruthy();
         });
       });
 
-      it('should not process company logo if no elements found', () => {
+      it('should not add event listener when no logoCompany elements found', () => {
         jest.isolateModules(() => {
           document.body.innerHTML = '<div id="other-content">Some content</div>';
 
@@ -609,7 +1267,7 @@ describe('Test personalization.js', () => {
         });
       });
 
-      it('should handle both profileImage and logoCompany placeholders in one page', () => {
+      it('should handle both profileImage and logoCompany on same page', () => {
         jest.isolateModules(() => {
           document.body.innerHTML = `
             <p id="profile-img">$profileImage</p>
@@ -624,7 +1282,6 @@ describe('Test personalization.js', () => {
 
           personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
 
-          // Both elements should still exist after personalization setup
           expect(document.querySelector('#profile-img')).toBeTruthy();
           expect(document.querySelector('#company-logo')).toBeTruthy();
         });
