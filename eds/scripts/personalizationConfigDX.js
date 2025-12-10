@@ -26,7 +26,7 @@ export const PERSONALIZATION_PLACEHOLDERS = {
   'company': '//*[contains(text(), "$company")]',
   'email': '//*[contains(text(), "$email")]',
   'profileImage': '//*[contains(text(), "$profileImage")]',
-  'companyLogo': '//*[contains(text(), "$companyLogo")]'
+  'logoCompany': '//*[contains(text(), "$logoCompany")]'
 };
 
 export const LEVEL_CONDITION = 'partner-level';

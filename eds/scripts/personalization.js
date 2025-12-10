@@ -81,12 +81,77 @@ function personalizeProfileImage(elements) {
   });
 }
 
+async function replaceCompanyLogo(elements) {
+  try {
+    const accessToken = window.adobeIMS.getAccessToken();
+    if (!accessToken?.token) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+
+    const apiUrl = 'https://partner-identity-stage.adobe.io/v1/dxp/profile';
+    
+    const headers = new Headers({
+      'Authorization': `Bearer ${accessToken.token}`,
+      'x-api-key': 'APP_Gravity_local'
+    });
+
+    const profileResponse = await fetch(apiUrl, { headers });
+
+    if (profileResponse.status !== 200) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+    
+    const profileData = await profileResponse.json();
+    const companyLogo = profileData?.account?.logoUrl;
+
+    if (!companyLogo) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+
+    elements.forEach((el) => {
+      const textNode = Array.from(el.childNodes).find(
+        node => node.nodeType === Node.TEXT_NODE && node.textContent.includes('$logoCompany')
+      );
+      
+      if (!textNode) return;
+
+      const img = document.createElement('img');
+      img.src = companyLogo;
+      img.alt = 'Company Logo';
+      img.dataset.logoCompany = 'true';
+      
+      const picture = document.createElement('picture');
+      picture.appendChild(img);
+      
+      el.replaceChild(picture, textNode);
+    });
+  } catch (error) {
+    console.warn('Failed to replace company logo placeholders:', error);
+    elements.forEach(el => el.remove());
+  }
+}
+
+function personalizeCompanyLogo(elements) {
+  if (!elements.length) return;
+  window.addEventListener('dxp:imsReady',  () => {
+     replaceCompanyLogo(elements);
+  });
+}
+
 export function personalizePlaceholders(placeholders, context = document, programType) {
   Object.entries(placeholders).forEach(([key, value]) => {
     const elements = getNodesByXPath(value, context);
     
     if (key === 'profileImage' && elements.length > 0) {
       personalizeProfileImage(elements);
+      return;
+    }
+
+    if (key === 'logoCompany' && elements.length > 0) {
+      personalizeCompanyLogo(elements);
       return;
     }
 
