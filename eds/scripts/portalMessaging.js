@@ -18,8 +18,6 @@ async function loadPopupFragment(popupFragment) {
     if (!body) return null;
 
     const main = body.querySelector('main');
-    personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, main, getCurrentProgramType());
-    personalizePage(main);
     return main.firstElementChild;
 }
 
@@ -58,7 +56,7 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
     }
 
     const {getModal} = await import(`${miloLibs}/blocks/modal/modal.js`);
-    getModal(
+    const modal = await getModal(
         null,
         {
             id: 'portal-messaging-modal',
@@ -69,6 +67,12 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
             }
         },
     );
+    if (!modal) return;
+
+    const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
+    await loadArea(modal);
+    personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
+    personalizePage(modal);
 }
 
 export async function bctqBanner(miloLibs) {
