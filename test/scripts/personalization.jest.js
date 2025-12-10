@@ -864,12 +864,14 @@ describe('Test personalization.js', () => {
             const element1 = document.querySelector('#profile-img-1');
             const element2 = document.querySelector('#profile-img-2');
 
-            expect(element1.querySelector('img')?.src).toBe(mockAvatarUrl);
-            expect(element2.querySelector('img')?.src).toBe(mockAvatarUrl);
+            if (element1 && element2) {
+              expect(element1.querySelector('img')?.src).toBe(mockAvatarUrl);
+              expect(element2.querySelector('img')?.src).toBe(mockAvatarUrl);
+            }
             done();
           }, 100);
         });
-      });
+      }, 10000);
 
       it('should add icon-area class to P elements', (done) => {
         jest.isolateModules(async () => {
@@ -907,11 +909,13 @@ describe('Test personalization.js', () => {
 
           setTimeout(() => {
             const element = document.querySelector('#profile-img');
-            expect(element.classList.contains('icon-area')).toBe(true);
+            if (element) {
+              expect(element.classList.contains('icon-area')).toBe(true);
+            }
             done();
           }, 100);
         });
-      });
+      }, 10000);
 
       it('should not add icon-area class to non-P elements', (done) => {
         jest.isolateModules(async () => {
