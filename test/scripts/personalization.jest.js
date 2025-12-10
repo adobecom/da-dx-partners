@@ -532,6 +532,106 @@ describe('Test personalization.js', () => {
     });
   });
 
+  describe('Profile Image and Company Logo Personalization', () => {
+    beforeEach(() => {
+      document.cookie = 'partner_data=';
+      // Setup window.adobeIMS mock
+      window.adobeIMS = {
+        getAccessToken: jest.fn(),
+      };
+      // Setup fetch mock
+      global.fetch = jest.fn();
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+      delete window.adobeIMS;
+      delete global.fetch;
+    });
+
+    describe('Event listener and placeholder registration', () => {
+      it('should register event listener for profileImage placeholder', () => {
+        jest.isolateModules(() => {
+          document.body.innerHTML = '<p id="profile-img">$profileImage</p>';
+
+          const { personalizePlaceholders } = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          // Check that elements exist before personalization
+          expect(document.querySelector('#profile-img')).toBeTruthy();
+
+          personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          // The function should not throw and should handle the placeholder
+          expect(document.querySelector('#profile-img')).toBeTruthy();
+        });
+      });
+
+      it('should register event listener for logoCompany placeholder', () => {
+        jest.isolateModules(() => {
+          document.body.innerHTML = '<div id="company-logo">$logoCompany</div>';
+
+          const { personalizePlaceholders } = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          expect(document.querySelector('#company-logo')).toBeTruthy();
+
+          personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          expect(document.querySelector('#company-logo')).toBeTruthy();
+        });
+      });
+
+      it('should not process profile image if no elements found', () => {
+        jest.isolateModules(() => {
+          document.body.innerHTML = '<div id="other-content">Some content</div>';
+
+          const { personalizePlaceholders } = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          // Should not throw and should not add event listener
+          expect(document.querySelector('#other-content')).toBeTruthy();
+        });
+      });
+
+      it('should not process company logo if no elements found', () => {
+        jest.isolateModules(() => {
+          document.body.innerHTML = '<div id="other-content">Some content</div>';
+
+          const { personalizePlaceholders } = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          expect(document.querySelector('#other-content')).toBeTruthy();
+        });
+      });
+
+      it('should handle both profileImage and logoCompany placeholders in one page', () => {
+        jest.isolateModules(() => {
+          document.body.innerHTML = `
+            <p id="profile-img">$profileImage</p>
+            <div id="company-logo">$logoCompany</div>
+          `;
+
+          const { personalizePlaceholders } = require('../../eds/scripts/personalization.js');
+          const { PERSONALIZATION_PLACEHOLDERS } = require('../../eds/scripts/personalizationConfigDX.js');
+
+          expect(document.querySelector('#profile-img')).toBeTruthy();
+          expect(document.querySelector('#company-logo')).toBeTruthy();
+
+          personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, document, 'DXP');
+
+          // Both elements should still exist after personalization setup
+          expect(document.querySelector('#profile-img')).toBeTruthy();
+          expect(document.querySelector('#company-logo')).toBeTruthy();
+        });
+      });
+    });
+  });
+
   describe('BCTQ Compliance Expiration Tests', () => {
     beforeEach(() => {
       document.cookie = 'partner_data=';

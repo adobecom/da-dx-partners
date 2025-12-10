@@ -1,7 +1,7 @@
 import {
   isMember,
   getNodesByXPath,
-  getPartnerDataCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration
+  getPartnerDataCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration, getLibs
 } from './utils.js';
 import {
   PERSONALIZATION_PLACEHOLDERS,
@@ -15,14 +15,152 @@ import {
 } from './personalizationUtils.js';
 import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
+async function replaceProfileImage(elements) {
+  try {
+    const accessToken = window.adobeIMS.getAccessToken();
+    if (!accessToken?.token) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+
+    const miloLibs = getLibs();
+    const { getConfig } = await import(`${miloLibs}/utils/utils.js`);
+
+    const { env } = getConfig();
+    const headers = new Headers({ Authorization: `Bearer ${accessToken.token}` });
+    const profileResponse = await fetch(`https://${env.adobeIO}/profile`, { headers });
+
+    if (profileResponse.status !== 200) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+
+    const profileData = await profileResponse.json();
+
+    if (!profileData?.user?.avatar) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+
+    const userAvatar = profileData.user.avatar;
+
+    elements.forEach((el) => {
+      const textNode = Array.from(el.childNodes).find(
+        node => node.nodeType === Node.TEXT_NODE && node.textContent.includes('$profileImage')
+      );
+
+      if (!textNode) return;
+
+      const img = document.createElement('img');
+      img.src = userAvatar;
+      img.alt = '';
+      img.dataset.userProfile = 'true';
+      img.width = 96;
+      img.height = 96;
+
+      const picture = document.createElement('picture');
+      picture.appendChild(img);
+
+      if (el.tagName === 'P') {
+        el.classList.add('icon-area');
+      }
+
+      el.replaceChild(picture, textNode);
+    });
+  } catch (error) {
+    console.warn('Failed to replace profile image placeholders:', error);
+    elements.forEach(el => el.remove());
+  }
+}
+
+function personalizeProfileImage(elements) {
+  if (!elements.length) return;
+
+  window.addEventListener('dxp:imsReady',  () => {
+     replaceProfileImage(elements);
+  });
+}
+
+async function replaceCompanyLogo(elements) {
+  try {
+    const accessToken = window.adobeIMS.getAccessToken();
+    if (!accessToken?.token) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+
+    const apiUrl = 'https://partner-identity-stage.adobe.io/v1/dxp/profile';
+
+    const headers = new Headers({
+      'Authorization': `Bearer ${accessToken.token}`,
+      'x-api-key': 'APP_Gravity_local'
+    });
+
+    const profileResponse = await fetch(apiUrl, { headers });
+
+    if (profileResponse.status !== 200) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+
+    const profileData = await profileResponse.json();
+    const companyLogo = profileData?.account?.logoUrl;
+
+    if (!companyLogo) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+
+    elements.forEach((el) => {
+      const textNode = Array.from(el.childNodes).find(
+        node => node.nodeType === Node.TEXT_NODE && node.textContent.includes('$logoCompany')
+      );
+
+      if (!textNode) return;
+
+      const img = document.createElement('img');
+      img.src = companyLogo;
+      img.alt = 'Company Logo';
+      img.dataset.logoCompany = 'true';
+
+      const picture = document.createElement('picture');
+      picture.appendChild(img);
+
+      el.replaceChild(picture, textNode);
+    });
+  } catch (error) {
+    console.warn('Failed to replace company logo placeholders:', error);
+    elements.forEach(el => el.remove());
+  }
+}
+
+function personalizeCompanyLogo(elements) {
+  if (!elements.length) return;
+  window.addEventListener('dxp:imsReady',  () => {
+     replaceCompanyLogo(elements);
+  });
+}
+
 export function personalizePlaceholders(placeholders, context = document, programType) {
   Object.entries(placeholders).forEach(([key, value]) => {
+    const elements = getNodesByXPath(value, context);
     const programData = getPartnerDataCookieObject(programType);
     let placeholderValue = programData[key];
+
+    if (key === 'profileImage' && elements.length > 0) {
+      personalizeProfileImage(elements);
+      return;
+    }
+
+    if (key === 'logoCompany' && elements.length > 0) {
+      personalizeCompanyLogo(elements);
+      return;
+    }
+    
     if (key === 'bctqExpirationDays') {
       placeholderValue = getDaysUntilComplianceExpiration();
     }
-    getNodesByXPath(value, context).forEach((el) => {
+    elements.forEach((el) => {
       if (!placeholderValue) {
         el.remove();
         return;
