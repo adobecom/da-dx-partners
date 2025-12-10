@@ -26,6 +26,10 @@ jest.mock('../../eds/scripts/personalization.js', () => ({
   personalizePlaceholders: jest.fn(() => {}),
 }));
 
+jest.mock('../../eds/scripts/rewriteLinks.js', () => ({
+  rewriteLinks: jest.fn(() => {}),
+}));
+
 jest.mock('../../eds/scripts/utils.js', () => ({
   getCurrentProgramType: jest.fn(() => 'dxp'),
   getMetadataContent: jest.fn(),
