@@ -6,6 +6,7 @@ import {
 } from "./utils.js";
 import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./personalizationConfigDX.js";
 import {personalizePage, personalizePlaceholders} from "./personalization.js";
+import {rewriteLinks} from "./rewriteLinks.js";
 
 async function loadPopupFragment(popupFragment) {
     const response = await fetch(popupFragment);
@@ -73,6 +74,7 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
     await loadArea(modal);
     personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
     personalizePage(modal);
+    rewriteLinks(modal);
 }
 
 export async function bctqBanner(miloLibs) {
