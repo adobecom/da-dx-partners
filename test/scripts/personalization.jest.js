@@ -557,9 +557,10 @@ describe('Test personalization.js', () => {
       delete window.adobeIMS;
       delete global.fetch;
       document.body.innerHTML = '';
+      jest.restoreAllMocks();
     });
 
-    it('should handle profileImage placeholder and trigger event', (done) => {
+    it('should handle profileImage placeholder with successful API response', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<p>$profileImage</p>';
       document.body.appendChild(main);
@@ -582,17 +583,17 @@ describe('Test personalization.js', () => {
 
       applyPagePersonalization();
 
-      // Dispatch the dxp:imsReady event to trigger the async function
+      // Dispatch the event and wait for it to process
       const event = new Event('dxp:imsReady');
       window.dispatchEvent(event);
 
-      // Wait for async operations to complete
-      setTimeout(() => {
-        done();
-      }, 200);
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
     });
 
-    it('should handle logoCompany placeholder and trigger event', (done) => {
+    it('should handle logoCompany placeholder with successful API response', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<div>$logoCompany</div>';
       document.body.appendChild(main);
@@ -615,16 +616,16 @@ describe('Test personalization.js', () => {
 
       applyPagePersonalization();
 
-      // Dispatch the dxp:imsReady event
+      // Dispatch the event and wait
       const event = new Event('dxp:imsReady');
       window.dispatchEvent(event);
 
-      setTimeout(() => {
-        done();
-      }, 200);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
     });
 
-    it('should handle missing access token for profileImage', (done) => {
+    it('should handle missing access token for profileImage', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<p>$profileImage</p>';
       document.body.appendChild(main);
@@ -643,12 +644,12 @@ describe('Test personalization.js', () => {
       const event = new Event('dxp:imsReady');
       window.dispatchEvent(event);
 
-      setTimeout(() => {
-        done();
-      }, 200);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('should handle missing access token for logoCompany', (done) => {
+    it('should handle missing access token for logoCompany', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<div>$logoCompany</div>';
       document.body.appendChild(main);
@@ -667,12 +668,12 @@ describe('Test personalization.js', () => {
       const event = new Event('dxp:imsReady');
       window.dispatchEvent(event);
 
-      setTimeout(() => {
-        done();
-      }, 200);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('should handle API error for profileImage', (done) => {
+    it('should handle API error for profileImage', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<p>$profileImage</p>';
       document.body.appendChild(main);
@@ -694,12 +695,12 @@ describe('Test personalization.js', () => {
       const event = new Event('dxp:imsReady');
       window.dispatchEvent(event);
 
-      setTimeout(() => {
-        done();
-      }, 200);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
     });
 
-    it('should handle API error for logoCompany', (done) => {
+    it('should handle API error for logoCompany', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<div>$logoCompany</div>';
       document.body.appendChild(main);
@@ -721,12 +722,12 @@ describe('Test personalization.js', () => {
       const event = new Event('dxp:imsReady');
       window.dispatchEvent(event);
 
-      setTimeout(() => {
-        done();
-      }, 200);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
     });
 
-    it('should handle fetch errors for profileImage', (done) => {
+    it('should handle fetch errors for profileImage', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<p>$profileImage</p>';
       document.body.appendChild(main);
@@ -745,12 +746,12 @@ describe('Test personalization.js', () => {
       const event = new Event('dxp:imsReady');
       window.dispatchEvent(event);
 
-      setTimeout(() => {
-        done();
-      }, 200);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
     });
 
-    it('should handle fetch errors for logoCompany', (done) => {
+    it('should handle fetch errors for logoCompany', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<div>$logoCompany</div>';
       document.body.appendChild(main);
@@ -769,9 +770,121 @@ describe('Test personalization.js', () => {
       const event = new Event('dxp:imsReady');
       window.dispatchEvent(event);
 
-      setTimeout(() => {
-        done();
-      }, 200);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
+    });
+    
+    it('should handle missing avatar in profile data', async () => {
+      const main = document.createElement('main');
+      main.innerHTML = '<p>$profileImage</p>';
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+
+      global.fetch.mockResolvedValueOnce({
+        status: 200,
+        json: async () => ({
+          user: {}
+        }),
+      });
+
+      applyPagePersonalization();
+
+      const event = new Event('dxp:imsReady');
+      window.dispatchEvent(event);
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
+    });
+    
+    it('should handle missing logoUrl in account data', async () => {
+      const main = document.createElement('main');
+      main.innerHTML = '<div>$logoCompany</div>';
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+
+      global.fetch.mockResolvedValueOnce({
+        status: 200,
+        json: async () => ({
+          account: {}
+        }),
+      });
+
+      applyPagePersonalization();
+
+      const event = new Event('dxp:imsReady');
+      window.dispatchEvent(event);
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
+    });
+    
+    it('should handle non-200 response with successful json for profileImage', async () => {
+      const main = document.createElement('main');
+      main.innerHTML = '<p>$profileImage</p>';
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+
+      global.fetch.mockResolvedValueOnce({
+        status: 401,
+        json: async () => ({ error: 'Unauthorized' }),
+      });
+
+      applyPagePersonalization();
+
+      const event = new Event('dxp:imsReady');
+      window.dispatchEvent(event);
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
+    });
+    
+    it('should handle missing user object in profile data', async () => {
+      const main = document.createElement('main');
+      main.innerHTML = '<p>$profileImage</p>';
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+
+      global.fetch.mockResolvedValueOnce({
+        status: 200,
+        json: async () => ({}),
+      });
+
+      applyPagePersonalization();
+
+      const event = new Event('dxp:imsReady');
+      window.dispatchEvent(event);
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      expect(global.fetch).toHaveBeenCalled();
     });
   });
 
