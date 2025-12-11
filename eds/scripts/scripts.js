@@ -21,7 +21,7 @@ import {
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
 import {partnerAgreement} from "./partnerAgreement.js";
-import {portalMessaging} from "./portalMessaging.js";
+import {bctqBanner, portalMessaging} from "./portalMessaging.js";
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -36,7 +36,7 @@ let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
 // Add any config options.
-const CONFIG = {
+let CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
   imsClientId,
@@ -47,7 +47,11 @@ const CONFIG = {
     '': { ietf: 'en-US', tk: 'hah7vzn.css' },
   },
   local: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
-  stage: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
+  stage: {
+    edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e',
+    marTechUrl:
+      'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-184d20637aa8-development.min.js',
+  },
   prod: { },
 };
 
@@ -100,6 +104,7 @@ function setUpPage() {
   updateFooter();
 }
 async function loadPage() {
+  await bctqBanner(miloLibs);
   applyPagePersonalization();
   setUpPage();
   redirectLoggedinPartner();
@@ -115,6 +120,7 @@ async function loadPage() {
   const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
   await portalMessaging(miloLibs, partnerAgreementDisplayed);
 }
+
 loadPage();
 
 (async function loadDa() {

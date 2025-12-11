@@ -6,6 +6,7 @@ import {
 } from "./utils.js";
 import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./personalizationConfigDX.js";
 import {personalizePage, personalizePlaceholders} from "./personalization.js";
+import {rewriteLinks} from "./rewriteLinks.js";
 
 async function loadPopupFragment(popupFragment) {
     const response = await fetch(popupFragment);
@@ -18,8 +19,6 @@ async function loadPopupFragment(popupFragment) {
     if (!body) return null;
 
     const main = body.querySelector('main');
-    personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, main, getCurrentProgramType());
-    personalizePage(main);
     return main.firstElementChild;
 }
 
@@ -58,7 +57,7 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
     }
 
     const {getModal} = await import(`${miloLibs}/blocks/modal/modal.js`);
-    getModal(
+    const modal = await getModal(
         null,
         {
             id: 'portal-messaging-modal',
@@ -69,4 +68,38 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
             }
         },
     );
+    if (!modal) return;
+
+    const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
+    await loadArea(modal);
+    personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
+    personalizePage(modal);
+    rewriteLinks(modal);
+}
+
+export async function bctqBanner(miloLibs) {
+    if (!isMember()) return;
+
+    let bannerType;
+    if (PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d']) {
+        bannerType = 'bctq-banner';
+    }
+    if (!bannerType) return;
+
+    const bannerFragmentPath = getMetadataContent(bannerType);
+    if (!bannerFragmentPath) {
+        console.warn(`${bannerType} should be displayed but popup fragment path is not found`);
+        return;
+    }
+
+    const bannerContent = await loadPopupFragment(bannerFragmentPath);
+    if (!bannerContent) {
+        console.warn(`Popup fragment for ${bannerFragmentPath} not found`);
+        return;
+    }
+
+    const documentMain = document.querySelector('main');
+    if (!documentMain) return;
+
+    documentMain.prepend(bannerContent);
 }
