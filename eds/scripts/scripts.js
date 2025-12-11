@@ -46,6 +46,11 @@ let CONFIG = {
   locales: {
     '': { ietf: 'en-US', tk: 'hah7vzn.css' },
   },
+  jarvis: {
+    id: 'spp_default',
+    version: '1.0',
+    onDemand: false,
+  },
   local: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
   stage: {
     edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e',
