@@ -17,32 +17,19 @@ import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
 async function replaceProfileImage(elements) {
   try {
-    const accessToken = window.adobeIMS.getAccessToken();
-    if (!accessToken?.token) {
-      elements.forEach(el => el.remove());
+    const isSignedIn = typeof window.adobeIMS?.isSignedInUser === 'function' && window.adobeIMS.isSignedInUser();
+    if (!isSignedIn) {
+      elements.forEach((el) => el.remove());
       return;
     }
 
-    const miloLibs = getLibs();
-    const { getConfig } = await import(`${miloLibs}/utils/utils.js`);
-
-    const { env } = getConfig();
-    const headers = new Headers({ Authorization: `Bearer ${accessToken.token}` });
-    const profileResponse = await fetch(`https://${env.adobeIO}/profile`, { headers });
-
-    if (profileResponse.status !== 200) {
-      elements.forEach(el => el.remove());
+    const existingAvatarImg = document.querySelector('img.feds-profile-img');
+    if (!existingAvatarImg?.src) {
+      elements.forEach((el) => el.remove());
       return;
     }
 
-    const profileData = await profileResponse.json();
-
-    if (!profileData?.user?.avatar) {
-      elements.forEach(el => el.remove());
-      return;
-    }
-
-    const userAvatar = profileData.user.avatar;
+    const userAvatar = existingAvatarImg.src;
 
     elements.forEach((el) => {
       const textNode = Array.from(el.childNodes).find(
@@ -76,8 +63,8 @@ async function replaceProfileImage(elements) {
 function personalizeProfileImage(elements) {
   if (!elements.length) return;
 
-  window.addEventListener('dxp:imsReady',  () => {
-     replaceProfileImage(elements);
+  window.addEventListener('feds:profileImageRendered', () => {
+    replaceProfileImage(elements);
   });
 }
 

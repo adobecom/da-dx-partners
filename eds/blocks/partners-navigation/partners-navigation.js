@@ -868,6 +868,8 @@ class Gnav {
 
     this.blocks.profile.buttonElem = await decorateProfileTrigger({ avatar });
     decoratedElem.append(this.blocks.profile.buttonElem);
+    
+    window.dispatchEvent(new CustomEvent('feds:profileImageRendered'));
 
     // Decorate the profile dropdown
     // after user interacts with button or after 3s have passed
