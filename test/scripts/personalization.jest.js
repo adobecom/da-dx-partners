@@ -560,7 +560,7 @@ describe('Test personalization.js', () => {
       jest.restoreAllMocks();
     });
 
-    it('should handle profileImage placeholder with successful API response', async () => {
+    it('should handle profileImage placeholder with existing DOM image', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<p>$profileImage</p>';
       document.body.appendChild(main);
@@ -572,25 +572,25 @@ describe('Test personalization.js', () => {
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
 
-      global.fetch.mockResolvedValueOnce({
-        status: 200,
-        json: async () => ({
-          user: {
-            avatar: 'https://example.com/avatar.jpg',
-          },
-        }),
-      });
+      const mockImg = document.createElement('img');
+      mockImg.className = 'feds-profile-img';
+      mockImg.src = 'https://example.com/avatar.jpg';
+      document.body.appendChild(mockImg);
+
+      window.adobeIMS.isSignedInUser = jest.fn(() => true);
 
       applyPagePersonalization();
 
-      // Dispatch the event and wait for it to process
-      const event = new Event('dxp:imsReady');
+      const event = new CustomEvent('feds:profileImageRendered');
       window.dispatchEvent(event);
 
-      // Wait for async operations
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      expect(global.fetch).toHaveBeenCalled();
+      expect(global.fetch).not.toHaveBeenCalled();
+      
+      const picture = main.querySelector('picture');
+      expect(picture).not.toBeNull();
+      expect(picture.querySelector('img')?.src).toBe('https://example.com/avatar.jpg');
     });
 
     it('should handle logoCompany placeholder with successful API response', async () => {
@@ -625,12 +625,14 @@ describe('Test personalization.js', () => {
       expect(global.fetch).toHaveBeenCalled();
     });
 
-    it('should handle missing access token for profileImage', async () => {
+    it('should handle missing signed in user for profileImage', async () => {
       const main = document.createElement('main');
-      main.innerHTML = '<p>$profileImage</p>';
+      const placeholder = document.createElement('p');
+      placeholder.textContent = '$profileImage';
+      main.appendChild(placeholder);
       document.body.appendChild(main);
 
-      window.adobeIMS.getAccessToken.mockReturnValue(null);
+      window.adobeIMS.isSignedInUser = jest.fn(() => false);
 
       const cookieObject = {
         DXP: {
@@ -641,12 +643,13 @@ describe('Test personalization.js', () => {
 
       applyPagePersonalization();
 
-      const event = new Event('dxp:imsReady');
+      const event = new CustomEvent('feds:profileImageRendered');
       window.dispatchEvent(event);
 
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       expect(global.fetch).not.toHaveBeenCalled();
+      expect(main.querySelector('p')).toBeNull();
     });
 
     it('should handle missing access token for logoCompany', async () => {
@@ -673,9 +676,11 @@ describe('Test personalization.js', () => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('should handle API error for profileImage', async () => {
+    it('should handle missing avatar image in DOM for profileImage', async () => {
       const main = document.createElement('main');
-      main.innerHTML = '<p>$profileImage</p>';
+      const placeholder = document.createElement('p');
+      placeholder.textContent = '$profileImage';
+      main.appendChild(placeholder);
       document.body.appendChild(main);
 
       const cookieObject = {
@@ -685,19 +690,17 @@ describe('Test personalization.js', () => {
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
 
-      global.fetch.mockResolvedValueOnce({
-        status: 404,
-        json: async () => ({}),
-      });
+      window.adobeIMS.isSignedInUser = jest.fn(() => true);
 
       applyPagePersonalization();
 
-      const event = new Event('dxp:imsReady');
+      const event = new CustomEvent('feds:profileImageRendered');
       window.dispatchEvent(event);
 
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      expect(global.fetch).toHaveBeenCalled();
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(main.querySelector('p')).toBeNull();
     });
 
     it('should handle API error for logoCompany', async () => {
@@ -727,9 +730,11 @@ describe('Test personalization.js', () => {
       expect(global.fetch).toHaveBeenCalled();
     });
 
-    it('should handle fetch errors for profileImage', async () => {
+    it('should handle empty avatar src in DOM for profileImage', async () => {
       const main = document.createElement('main');
-      main.innerHTML = '<p>$profileImage</p>';
+      const placeholder = document.createElement('p');
+      placeholder.textContent = '$profileImage';
+      main.appendChild(placeholder);
       document.body.appendChild(main);
 
       const cookieObject = {
@@ -739,16 +744,21 @@ describe('Test personalization.js', () => {
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
 
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
+      const mockImg = document.createElement('img');
+      mockImg.className = 'feds-profile-img';
+      document.body.appendChild(mockImg);
+
+      window.adobeIMS.isSignedInUser = jest.fn(() => true);
 
       applyPagePersonalization();
 
-      const event = new Event('dxp:imsReady');
+      const event = new CustomEvent('feds:profileImageRendered');
       window.dispatchEvent(event);
 
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      expect(global.fetch).toHaveBeenCalled();
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(main.querySelector('p')).toBeNull();
     });
 
     it('should handle fetch errors for logoCompany', async () => {
@@ -775,34 +785,6 @@ describe('Test personalization.js', () => {
       expect(global.fetch).toHaveBeenCalled();
     });
     
-    it('should handle missing avatar in profile data', async () => {
-      const main = document.createElement('main');
-      main.innerHTML = '<p>$profileImage</p>';
-      document.body.appendChild(main);
-
-      const cookieObject = {
-        DXP: {
-          status: 'MEMBER',
-        },
-      };
-      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-
-      global.fetch.mockResolvedValueOnce({
-        status: 200,
-        json: async () => ({
-          user: {}
-        }),
-      });
-
-      applyPagePersonalization();
-
-      const event = new Event('dxp:imsReady');
-      window.dispatchEvent(event);
-
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      expect(global.fetch).toHaveBeenCalled();
-    });
     
     it('should handle missing logoUrl in account data', async () => {
       const main = document.createElement('main');
@@ -833,59 +815,6 @@ describe('Test personalization.js', () => {
       expect(global.fetch).toHaveBeenCalled();
     });
     
-    it('should handle non-200 response with successful json for profileImage', async () => {
-      const main = document.createElement('main');
-      main.innerHTML = '<p>$profileImage</p>';
-      document.body.appendChild(main);
-
-      const cookieObject = {
-        DXP: {
-          status: 'MEMBER',
-        },
-      };
-      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-
-      global.fetch.mockResolvedValueOnce({
-        status: 401,
-        json: async () => ({ error: 'Unauthorized' }),
-      });
-
-      applyPagePersonalization();
-
-      const event = new Event('dxp:imsReady');
-      window.dispatchEvent(event);
-
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      expect(global.fetch).toHaveBeenCalled();
-    });
-    
-    it('should handle missing user object in profile data', async () => {
-      const main = document.createElement('main');
-      main.innerHTML = '<p>$profileImage</p>';
-      document.body.appendChild(main);
-
-      const cookieObject = {
-        DXP: {
-          status: 'MEMBER',
-        },
-      };
-      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-
-      global.fetch.mockResolvedValueOnce({
-        status: 200,
-        json: async () => ({}),
-      });
-
-      applyPagePersonalization();
-
-      const event = new Event('dxp:imsReady');
-      window.dispatchEvent(event);
-
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      expect(global.fetch).toHaveBeenCalled();
-    });
   });
 
   describe('BCTQ Compliance Expiration Tests', () => {
