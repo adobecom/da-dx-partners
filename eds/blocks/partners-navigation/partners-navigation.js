@@ -1499,14 +1499,6 @@ class Gnav {
               updatePopupPosition: this.updatePopupPosition,
             });
             if (popup.closest('section.feds-dropdown--active')) makeTabActive(popup);
-          } catch (e) {
-            const errorDiv = await createErrorPopup();
-            const loadingElement = template.querySelector('.feds-popup');
-            const topBar = loadingElement.querySelector('.top-bar');
-            const closeIcon = document.querySelector('.feds-popup .close-icon');
-            if (loadingElement) loadingElement.replaceWith(errorDiv);
-            if (closeIcon) errorDiv.append(closeIcon);
-            if (topBar) errorDiv.prepend(topBar);
           } finally {
             if (this.isLocalNav()) {
               decorateLocalNavItems(item, template);
@@ -1533,10 +1525,6 @@ class Gnav {
             enableMobileScroll();
             if (isDesktop.matches) {
               newPopup.innerHTML = desktopMegaMenuHTML ?? loadingDesktopMegaMenuHTML;
-              if (newPopup.classList.contains('error')) {
-                const errorDiv = await createErrorPopup();
-                if (newPopup) newPopup.replaceWith(errorDiv);
-              }
               this.block.classList.remove('new-nav');
               disableAriaHidden();
               removeA11YMobileDropdowns();
