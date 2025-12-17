@@ -287,6 +287,27 @@ export function isAccountLocked() {
     partnerDataCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE);
 }
 
+export function isBctqExpiring(renewalNoticeDays) {
+  const daysRemaining = getDaysUntilComplianceExpiration();
+  const status = getPartnerDataCookieValue('status');
+  return daysRemaining !== null && daysRemaining <= renewalNoticeDays && status !== 'locked';
+}
+
+export function getDaysUntilComplianceExpiration() {
+    if (!partnerIsSignedIn()) return null;
+
+    const expirationTimestamp = getPartnerDataCookieValue('complianceexpirydate');
+    if (!expirationTimestamp) return null;
+
+    const expirationDate = new Date(Number(expirationTimestamp));
+    const now = new Date();
+
+    const differenceInMilliseconds = expirationDate - now;
+    if (differenceInMilliseconds < 0) return null;
+
+    return Math.ceil(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+}
+
 export function getDaysFromRegistration() {
   if (!partnerIsSignedIn()) return null;
 
@@ -377,6 +398,7 @@ export function updateIMSConfig() {
     }
 
     window.adobeIMS.adobeIdData.redirect_uri = targetUrl.toString();
+    window.dispatchEvent(new Event('dxp:imsReady'));
   }, 500);
 }
 

@@ -3,21 +3,31 @@
  */
 
 const mockGetModal = jest.fn();
+const mockLoadArea = jest.fn();
+
 jest.mock('https://test-milo-libs.com/blocks/modal/modal.js', () => ({
   getModal: (...args) => mockGetModal(...args),
+}), { virtual: true });
+
+jest.mock('https://test-milo-libs.com/utils/utils.js', () => ({
+  loadArea: (...args) => mockLoadArea(...args),
 }), { virtual: true });
 
 jest.mock('../../eds/scripts/personalizationConfigDX.js', () => ({
   PERSONALIZATION_PLACEHOLDERS: {},
   PERSONALIZATION_CONDITIONS: {
-    'partner-submitted-in-review': () => true,
-    'partner-locked-compliance-past': () => true,
-    'partner-locked-payment-future': () => true,
+    'partner-submitted-in-review': false,
+    'partner-locked-compliance-past': false,
+    'partner-locked-payment-future': false,
   },
 }));
 jest.mock('../../eds/scripts/personalization.js', () => ({
   personalizePage: jest.fn(() => {}),
   personalizePlaceholders: jest.fn(() => {}),
+}));
+
+jest.mock('../../eds/scripts/rewriteLinks.js', () => ({
+  rewriteLinks: jest.fn(() => {}),
 }));
 
 jest.mock('../../eds/scripts/utils.js', () => ({
@@ -70,6 +80,8 @@ describe('Test portalMessaging.js', () => {
       document.body.appendChild(modal);
       return Promise.resolve(modal);
     });
+
+    mockLoadArea.mockResolvedValue();
   });
 
   afterEach(() => {
@@ -112,6 +124,12 @@ describe('Test portalMessaging.js', () => {
     // ensure condition resolves and flow advances
     getPartnerDataCookieValue.mockReturnValue('submitted-in-review');
     getMetadataContent.mockReturnValue(null);
+
+    const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+    PERSONALIZATION_CONDITIONS['partner-submitted-in-review'] = true;
+    PERSONALIZATION_CONDITIONS['partner-locked-compliance-past'] = false;
+    PERSONALIZATION_CONDITIONS['partner-locked-payment-future'] = false;
+
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
     await portalMessaging(miloLibs, false);
@@ -124,6 +142,12 @@ describe('Test portalMessaging.js', () => {
     getPartnerDataCookieValue.mockReturnValue('submitted-in-review');
     getMetadataContent.mockReturnValue('/fragments/test-popup');
     global.fetch.mockResolvedValueOnce({ ok: false, status: 500, text: () => Promise.resolve('') });
+
+    const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+    PERSONALIZATION_CONDITIONS['partner-submitted-in-review'] = true;
+    PERSONALIZATION_CONDITIONS['partner-locked-compliance-past'] = false;
+    PERSONALIZATION_CONDITIONS['partner-locked-payment-future'] = false;
+
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
@@ -138,6 +162,11 @@ describe('Test portalMessaging.js', () => {
   it('renders submitted-in-review popup', async () => {
     getPartnerDataCookieValue.mockReturnValue('submitted-in-review');
     getMetadataContent.mockReturnValue('/fragments/submitted-in-review-popup');
+
+    const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+    PERSONALIZATION_CONDITIONS['partner-submitted-in-review'] = true;
+    PERSONALIZATION_CONDITIONS['partner-locked-compliance-past'] = false;
+    PERSONALIZATION_CONDITIONS['partner-locked-payment-future'] = false;
 
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
     await portalMessaging(miloLibs, false);
@@ -156,6 +185,11 @@ describe('Test portalMessaging.js', () => {
     getPartnerDataCookieValue.mockReturnValue('locked-compliance-past');
     getMetadataContent.mockReturnValue('/fragments/locked-compliance-popup');
 
+    const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+    PERSONALIZATION_CONDITIONS['partner-submitted-in-review'] = false;
+    PERSONALIZATION_CONDITIONS['partner-locked-compliance-past'] = true;
+    PERSONALIZATION_CONDITIONS['partner-locked-payment-future'] = false;
+
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
     await portalMessaging(miloLibs, false);
     expect(mockGetModal).toHaveBeenCalled();
@@ -164,6 +198,11 @@ describe('Test portalMessaging.js', () => {
   it('renders locked-payment popup when applicable', async () => {
     getPartnerDataCookieValue.mockReturnValue('locked-payment-future');
     getMetadataContent.mockReturnValue('/fragments/locked-payment-popup');
+
+    const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+    PERSONALIZATION_CONDITIONS['partner-submitted-in-review'] = false;
+    PERSONALIZATION_CONDITIONS['partner-locked-compliance-past'] = false;
+    PERSONALIZATION_CONDITIONS['partner-locked-payment-future'] = true;
 
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
     await portalMessaging(miloLibs, false);

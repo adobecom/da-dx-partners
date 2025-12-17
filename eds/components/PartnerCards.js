@@ -581,7 +581,7 @@ export default class PartnerCards extends LitElement {
       (tag) => tag.key,
       (tag) => html`
         <button class="sidebar-chosen-filter-btn" @click="${() => this.handleRemoveTag(tag)}" aria-label="${tag.value}">
-          ${tag.value}
+          ${unsafeHTML(tag.value)}
         </button>`,
     )}`;
 
