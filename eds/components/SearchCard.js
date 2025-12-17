@@ -60,7 +60,7 @@ class SearchCard extends LitElement {
           </div>
           <div class="card-icons">
             <sp-theme theme="spectrum" color="light" scale="medium">
-              <sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}"><sp-icon-open-in /></sp-action-button>
+              <sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}" daa-ll="${this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : ''}"><sp-icon-open-in /></sp-action-button>
             </sp-theme>
           </div>
         </div>

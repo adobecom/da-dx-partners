@@ -1,8 +1,9 @@
 import { singlePartnerCardStyles } from './PartnerCardsStyles.js';
-import { formatDate, getLibs, prodHosts } from '../scripts/utils.js';
-import { transformCardUrl } from '../blocks/utils/utils.js';
+import { getLibs, processTrackingLabels } from '../scripts/utils.js';
+import { getConfig, transformCardUrl } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
+
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 
@@ -25,6 +26,7 @@ class SinglePartnerCardHalfHeight extends LitElement {
         target="_blank" rel="nooopener noreferrer"
         data-dll-cardid="${this.data.id}"
         style="background-image: url(${transformCardUrl(this.data.styles?.backgroundImage)}), url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})"
+        daa-ll="${processTrackingLabels(unsafeHTML(DOMPurify.sanitize(this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : '')), getConfig(), 20)}"
       >
         <div class="card-title-wrapper">
           <p class="card-title">

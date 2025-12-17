@@ -30,7 +30,7 @@ class SinglePartnerCard extends LitElement {
           </div>
           <div class="card-footer">
             <span class="card-date">${formatDate(this.data.cardDate, this.ietf)}</span>
-            <a class="card-btn" href="${transformCardUrl(this.data.contentArea?.url)}" target="_blank" rel="nooopener noreferrer" >${this.data.footer[0]?.right[0]?.text}</a>
+            <a class="card-btn" daa-ll="${this.data.footer[0]?.right[0]?.text}" href="${transformCardUrl(this.data.contentArea?.url)}" target="_blank" rel="nooopener noreferrer">${this.data.footer[0]?.right[0]?.text}</a>
           </div>
         </div>
       </div>

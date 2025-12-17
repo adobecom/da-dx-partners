@@ -161,7 +161,7 @@ export default class Search extends PartnerCards {
       return html`${repeat(
         this.paginatedCards,
         (card) => card.id,
-        (card) => html`<search-card class="card-wrapper" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf}></search-card>`,
+        (card, index) => html`<search-card class="card-wrapper" daa-lh="Search Card ${index + 1} | ${card.contentArea?.title}" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf}></search-card>`,
       )}`;
     }
     return html`<div class="no-results">
@@ -325,7 +325,7 @@ export default class Search extends PartnerCards {
   /* eslint-disable indent */
   render() {
     return html`
-      <div @click="${this.handleClickOutside}" class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}">
+      <div @click="${this.handleClickOutside}" class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}" daa-lh="b1 | Search Box">
         <div class="search-box content">
           <h3 class="partner-cards-title">
             ${this.searchTerm && !this.isTypeaheadOpen
@@ -348,7 +348,9 @@ export default class Search extends PartnerCards {
         </div>
 
       </div>
-      <div @click="${this.handleClickOutside}" class="content">
+      <div @click="${this.handleClickOutside}" class="content"
+        daa-lh="b2 | Search Cards Content | Filters: ${Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters'} | Search Query: ${this.searchTerm.trim() ? this.searchTerm : 'None'}"
+      >
         <div class="partner-cards">
         <div class="partner-cards-sidebar-wrapper">
           <div class="partner-cards-sidebar">

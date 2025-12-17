@@ -107,6 +107,7 @@ export default async function init(el) {
   app.className = 'content dx-card-collection-wrapper';
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
+  app.setAttribute('daa-ll', 'Card Collection');
   el.replaceWith(app);
 
   await deps;
