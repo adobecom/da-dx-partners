@@ -27,7 +27,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[0];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[0].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await cardCollectionPage.searchField.click();
       await cardCollectionPage.searchField.type(data.keyword);
       await cardCollectionPage.cardTitleByText(data.cardTitle1);
@@ -59,7 +59,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[1];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[1].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await cardCollectionPage.cardTitleByText(data.cardTitle1);
       await cardCollectionPage.cardTitleByText(data.cardTitle2);
       expect(cardCollectionPage.sideFilter).toBeVisible();
@@ -73,7 +73,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[2];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[2].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await cardCollectionPage.cardTitleByText(data.cardTitle1);
       await cardCollectionPage.cardTitleByText(data.cardTitle2);
     });
@@ -96,7 +96,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[3];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[3].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await cardCollectionPage.cardTitleByText(data.cardTitle1);
       await cardCollectionPage.nextButton.click();
       await cardCollectionPage.cardTitleByText(data.cardTitle2);
@@ -108,7 +108,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[4];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[4].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await cardCollectionPage.cardTitleByText(data.cardTitle1);
       await cardCollectionPage.cardTitleByText(data.cardTitle2);
       await cardCollectionPage.page2Button.click();
@@ -122,7 +122,7 @@ test.describe('Validate card collection block', () => {
   test(`${features[5].name},${features[5].tags}`, async ({ page }) => {
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[5].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await expect(cardCollectionPage.noResults).toBeVisible();
     });
   });
@@ -131,7 +131,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[6];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[6].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await cardCollectionPage.mainCollection.isVisible();
       await cardCollectionPage.additionalCollection.isVisible();
     });
@@ -167,7 +167,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[7];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[7].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Search and Filter Collection', async () => {
       await cardCollectionPage.searchField.click();
@@ -190,7 +190,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[8];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[8].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Search and Filter Collection', async () => {
       await cardCollectionPage.productFilter.click();
@@ -207,7 +207,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[9];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[9].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Search and Filter Collection', async () => {
       await cardCollectionPage.productFilter.click();
@@ -226,7 +226,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[10];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[10].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Search and Filter Collection', async () => {
       await cardCollectionPage.productFilter.click();
@@ -245,7 +245,7 @@ test.describe('Validate card collection block', () => {
     const { data } = features[11];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[11].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Search and Filter Collection', async () => {
       await cardCollectionPage.filterCheckbox(data.buttonRole, data.topicFilter).click();
