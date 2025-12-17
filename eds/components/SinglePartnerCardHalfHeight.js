@@ -1,6 +1,6 @@
 import { singlePartnerCardStyles } from './PartnerCardsStyles.js';
-import { getLibs, processTrackingLabels } from '../scripts/utils.js';
-import { getConfig, transformCardUrl } from '../blocks/utils/utils.js';
+import { getLibs } from '../scripts/utils.js';
+import { transformCardUrl } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
 
