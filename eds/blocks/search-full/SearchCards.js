@@ -326,7 +326,7 @@ export default class Search extends PartnerCards {
   /* eslint-disable indent */
   render() {
     return html`
-      <div @click="${this.handleClickOutside}" class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}" daa-lh="b1 | Search Box">
+      <div @click="${this.handleClickOutside}" class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}" daa-lh="Search Box">
         <div class="search-box content">
           <h3 class="partner-cards-title">
             ${this.searchTerm && !this.isTypeaheadOpen
@@ -350,7 +350,7 @@ export default class Search extends PartnerCards {
 
       </div>
       <div @click="${this.handleClickOutside}" class="content"
-        daa-lh="b2 | Search Cards Content | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
+        daa-lh="Search Cards Content | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
       >
         <div class="partner-cards">
         <div class="partner-cards-sidebar-wrapper">
