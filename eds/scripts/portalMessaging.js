@@ -8,7 +8,7 @@ import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./person
 import {personalizePage, personalizePlaceholders} from "./personalization.js";
 import {rewriteLinks} from "./rewriteLinks.js";
 
-async function loadPopupFragment(popupFragment) {
+export async function loadPopupFragment(popupFragment) {
     const response = await fetch(popupFragment);
     if (!response.ok) {
         console.error(`Fetching partner agreement metadata failed, status ${response.status}`);
@@ -23,14 +23,15 @@ async function loadPopupFragment(popupFragment) {
 }
 
 export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
-    if (partnerAgreementDisplayed) return;
-    if (!isMember()) return;
+    if (partnerAgreementDisplayed) return false;
+    if (!isMember()) return false;
 
     const modalClosed = sessionStorage.getItem('portal-messaging-popup-closed')
-    if (modalClosed === 'true') return;
+    if (modalClosed === 'true') return false;
 
     const specialStateCookie = getPartnerDataCookieValue('specialstate');
-    if (!specialStateCookie) return;
+    // todo is this true or false in sence - portal messaging is done and we can proceed to next modal?
+    if (!specialStateCookie) return false;
 
     let popupType;
     if (PERSONALIZATION_CONDITIONS['partner-submitted-in-review']) {
@@ -42,18 +43,19 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
     if (PERSONALIZATION_CONDITIONS['partner-locked-payment-future']) {
         popupType = 'locked-payment-future-modal';
     }
-    if (!popupType) return;
+    // todo check is this ok, if something goes wrong with it, consider it is done with processing and go to next  modal
+    if (!popupType) return false;
 
     const popupFragmentPath = getMetadataContent(popupType);
     if (!popupFragmentPath) {
         console.warn(`${popupType} should be displayed but popup fragment path is not found`);
-        return;
+        return false;
     }
 
     const popupContent = await loadPopupFragment(popupFragmentPath);
     if (!popupContent) {
         console.warn(`Popup fragment for ${popupFragmentPath} not found`);
-        return;
+        return false;
     }
 
     const {getModal} = await import(`${miloLibs}/blocks/modal/modal.js`);
@@ -68,13 +70,14 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
             }
         },
     );
-    if (!modal) return;
+    if (!modal) return false;
 
     const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
     await loadArea(modal);
     personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
     personalizePage(modal);
     rewriteLinks(modal);
+    return true;
 }
 
 export async function bctqBanner(miloLibs) {
