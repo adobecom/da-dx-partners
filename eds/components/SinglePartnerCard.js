@@ -1,11 +1,12 @@
 import { singlePartnerCardStyles } from './PartnerCardsStyles.js';
-import { formatDate, getLibs, prodHosts } from '../scripts/utils.js';
-import { transformCardUrl } from '../blocks/utils/utils.js';
+import { formatDate, getLibs } from '../scripts/utils.js';
+import { getConfig, transformCardUrl } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 const DEFAULT_BACKGROUND_IMAGE_PATH = '/content/dam/solution/en/images/card-collection/sample_default.png';
 
@@ -30,7 +31,7 @@ class SinglePartnerCard extends LitElement {
           </div>
           <div class="card-footer">
             <span class="card-date">${formatDate(this.data.cardDate, this.ietf)}</span>
-            <a class="card-btn" daa-ll="${this.data.footer[0]?.right[0]?.text}" href="${transformCardUrl(this.data.contentArea?.url)}" target="_blank" rel="nooopener noreferrer">${this.data.footer[0]?.right[0]?.text}</a>
+            <a class="card-btn" daa-ll="${processTrackingLabels(this.data.footer[0]?.right[0]?.text, getConfig(), 30)}" href="${transformCardUrl(this.data.contentArea?.url)}" target="_blank" rel="nooopener noreferrer">${this.data.footer[0]?.right[0]?.text}</a>
           </div>
         </div>
       </div>
