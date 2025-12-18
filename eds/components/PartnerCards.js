@@ -380,14 +380,14 @@ export default class PartnerCards extends LitElement {
       return html`${repeat(
         this.paginatedCards,
         (card) => card.id,
-        (card, index) => html`<single-partner-card-half-height daa-lh="Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title)} +" |"} ${card.id}" class="card-wrapper ${this.blockData.cardDesign}" .data=${card} .design=${this.blockData.cardDesign}></single-partner-card-half-height>`,
+        (card, index) => html`<single-partner-card-half-height daa-lh="Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title)} | ${card.id}" class="card-wrapper ${this.blockData.cardDesign}" .data=${card} .design=${this.blockData.cardDesign}></single-partner-card-half-height>`,
       )}`;
     }
     return html`${repeat(
       this.paginatedCards,
       (card) => card.id,
       (card, index) => html`<single-partner-card
-                              daa-lh="Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title)} +" |"} ${card.id}"
+                              daa-lh="Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title)} | ${card.id}"
                               class="card-wrapper"
                               .data=${card}
                               .ietf=${this.blockData.ietf}
