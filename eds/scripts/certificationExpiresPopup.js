@@ -10,11 +10,44 @@ const partnerDirectoryStage = 'https://partner-directory-stage.adobe.io/v1/dxp/c
 const partnerDirectoryProd = 'https://partner-directory.adobe.io/v1/dxp/contact/credentials';
 const partnerDirectoryUrl = isProd() ? partnerDirectoryProd : partnerDirectoryStage;
 
+// Convert date to YYYY-MM-DD string in local timezone
 function dateToLocalString(date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
+// Normalize date to local midnight (removes time component)
 function normalizeDate(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+// Parse date string to local midnight
+// Handles "DD/MM/YYYY", "YYYY-MM-DD", or any date format
+function parseLocalDate(dateString) {
+  if (!dateString) return null;
+
+  // Check if it's DD/MM/YYYY format (from API)
+  const slashFormat = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  const match = dateString.match(slashFormat);
+
+  if (match) {
+    // DD/MM/YYYY format - parse as local date
+    const [, day, month, year] = match;
+    return new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+  }
+
+  // Check if it's YYYY-MM-DD format (from storage)
+  const dashFormat = /^(\d{4})-(\d{2})-(\d{2})$/;
+  const dashMatch = dateString.match(dashFormat);
+
+  if (dashMatch) {
+    // YYYY-MM-DD format - parse as local date
+    const [, year, month, day] = dashMatch;
+    return new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+  }
+
+  // For other formats, parse and normalize to local midnight
+  const parsedDate = new Date(dateString);
+  if (Number.isNaN(parsedDate.getTime())) return null; // Invalid date
+
+  return normalizeDate(parsedDate);
 }
 function getLastMilestone(certificationExpiresDate) {
   const milestones = [
@@ -38,7 +71,8 @@ function getLastMilestone(certificationExpiresDate) {
 }
 function isMilestoneReached(certification, lastCertificationPopupShown) {
   const currentDate = normalizeDate(new Date());
-  const certificationExpiresDate = normalizeDate(new Date(certification.expirationDate));
+  const certificationExpiresDate = parseLocalDate(certification.expirationDate);
+  if (!certificationExpiresDate) return false;
   const certificationExpiresInDays = Math.round(
     (certificationExpiresDate - currentDate) / (24 * 60 * 60 * 1000),
   );
@@ -56,8 +90,12 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
   if (partnerAgreementDisplayed) return;
   if (portalMessagingOpen) return;
   if (!isMember()) return;
-  const lastCertificationPopupShown = new Date(sessionStorage.getItem(LAST_DATE_SHOWN));
-  if (new Date().getTime() - lastCertificationPopupShown.getTime() < 24 * 60 * 60 * 1000) {
+  const lastCertificationPopupShown = parseLocalDate(
+    sessionStorage.getItem(LAST_DATE_SHOWN),
+  ) || new Date(1970, 0, 1); // Jan 1, 1970 at midnight local time
+  const today = normalizeDate(new Date());
+  // Check if popup was already shown today (compare local calendar days, not time difference)
+  if (lastCertificationPopupShown.getTime() >= today.getTime()) {
     return;
   }
 
@@ -76,7 +114,7 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
     }
 
     const result = await response.json();
-    const { credentials } = result.credentials;
+    const { credentials } = result;
     shoulDisplayCertificationModal = credentials.some(
       (c) => isMilestoneReached(c, lastCertificationPopupShown),
     );
@@ -93,7 +131,7 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
   }
 
   const certificationFragmentPath = certificationModalFragmentMeta || '/digitalexperience/fragments/modals/certification-modal';
-  const popupContent = await loadPopupFragment(certificationFragmentPath);
+  const popupContent = await loadPopupFragment(certificationFragmentPath, 'certification modal');
   if (!popupContent) {
     console.warn(`Popup fragment for ${certificationModalFragmentMeta} not found`);
     return;
@@ -103,7 +141,7 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
   const modal = await getModal(
     null,
     {
-      id: 'portal-messaging-modal',
+      id: 'certification-popup-modal',
       class: 's-size',
       content: popupContent,
       closeCallback: () => {

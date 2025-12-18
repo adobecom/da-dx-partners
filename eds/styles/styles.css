@@ -28,3 +28,14 @@
 #portal-messaging-modal {
   padding: var(--spacing-m);
 }
+
+#certification-popup-modal {
+  padding: var(--spacing-m);
+}
+
+@media screen and (max-width: 600px) {
+  #certification-popup-modal {
+    padding: var(--spacing-xxs);
+  }
+}
+

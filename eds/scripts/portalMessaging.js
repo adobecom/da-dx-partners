@@ -8,10 +8,10 @@ import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./person
 import {personalizePage, personalizePlaceholders} from "./personalization.js";
 import {rewriteLinks} from "./rewriteLinks.js";
 
-export async function loadPopupFragment(popupFragment) {
+export async function loadPopupFragment(popupFragment, modal = 'partner agreement') {
     const response = await fetch(popupFragment);
     if (!response.ok) {
-        console.error(`Fetching partner agreement metadata failed, status ${response.status}`);
+        console.error(`Fetching ${modal} metadata failed, status ${response.status}`);
         return null;
     }
     const text = await response.text();
