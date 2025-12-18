@@ -162,7 +162,7 @@ export default class Search extends PartnerCards {
       return html`${repeat(
         this.paginatedCards,
         (card) => card.id,
-        (card, index) => html`<search-card class="card-wrapper" daa-lh="${processTrackingLabels(`Search Card ${index + 1} | ${card.contentArea?.title ?? ''}`)}" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf}></search-card>`,
+        (card, index) => html`<search-card class="card-wrapper" daa-lh="Search Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title ?? '')}" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf}></search-card>`,
       )}`;
     }
     return html`<div class="no-results">
@@ -350,7 +350,7 @@ export default class Search extends PartnerCards {
 
       </div>
       <div @click="${this.handleClickOutside}" class="content"
-        daa-lh="${processTrackingLabels(`b2 | Search Cards Content | Filters: ${Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters'} | Search Query: ${this.searchTerm.trim() ? this.searchTerm : 'None'}`)}"
+        daa-lh="b2 | Search Cards Content | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
       >
         <div class="partner-cards">
         <div class="partner-cards-sidebar-wrapper">

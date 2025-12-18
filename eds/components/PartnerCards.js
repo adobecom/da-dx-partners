@@ -380,14 +380,14 @@ export default class PartnerCards extends LitElement {
       return html`${repeat(
         this.paginatedCards,
         (card) => card.id,
-        (card, index) => html`<single-partner-card-half-height daa-lh="${processTrackingLabels(`Card ${index + 1} | ${card.contentArea?.title +" |"} ${card.id}`)}" class="card-wrapper ${this.blockData.cardDesign}" .data=${card} .design=${this.blockData.cardDesign}></single-partner-card-half-height>`,
+        (card, index) => html`<single-partner-card-half-height daa-lh="Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title)} +" |"} ${card.id}" class="card-wrapper ${this.blockData.cardDesign}" .data=${card} .design=${this.blockData.cardDesign}></single-partner-card-half-height>`,
       )}`;
     }
     return html`${repeat(
       this.paginatedCards,
       (card) => card.id,
       (card, index) => html`<single-partner-card
-                              daa-lh="${processTrackingLabels(`Card ${index + 1} | ${card.contentArea?.title +" |"} ${card.id}`)}"
+                              daa-lh="Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title)} +" |"} ${card.id}"
                               class="card-wrapper"
                               .data=${card}
                               .ietf=${this.blockData.ietf}
@@ -908,7 +908,7 @@ export default class PartnerCards extends LitElement {
       ${this.fetchedData
         ? html`
           <div class="partner-cards ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled': ''}"
-            daa-lh="${processTrackingLabels(`Card Collection | Filters: ${Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters'} | Search Query: ${this.searchTerm.trim() ? this.searchTerm : 'None'}`)}"
+            daa-lh="Card Collection | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
           >
           ${this.blockData.filtersPanel === 'disable'
             ? ''
