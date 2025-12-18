@@ -55,7 +55,7 @@ function isMilestoneReached(certification, lastCertificationPopupShown) {
 export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
   if (partnerAgreementDisplayed) return;
   if (portalMessagingOpen) return;
-  // if (!isMember()) return;
+  if (!isMember()) return;
   const lastCertificationPopupShown = new Date(sessionStorage.getItem(LAST_DATE_SHOWN));
   if (new Date().getTime() - lastCertificationPopupShown.getTime() < 24 * 60 * 60 * 1000) {
     return;
