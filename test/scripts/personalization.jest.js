@@ -44,14 +44,15 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test user',
         },
       };
+      const partnerInfo = { firstName: 'Test user' };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify(partnerInfo)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const placeholderElementAfter = document.querySelector('#welcome-firstname');
-      expect(placeholderElementAfter.textContent.includes(cookieObject.DXP.firstName)).toBe(true);
+      expect(placeholderElementAfter.textContent.includes(partnerInfo.firstName)).toBe(true);
     });
   });
   it('Remove placeholder if user is not a member', () => {
@@ -59,9 +60,9 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         CPP: {
           status: 'MEMBER',
-          firstName: 'Test use',
         },
       };
+      document.cookie = 'partner_info=; Max-Age=0;';
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
@@ -97,11 +98,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           level: 'Gold',
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const allLevelsBlock = document.querySelector('.partner-member');
@@ -113,11 +114,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           level: 'Gold'
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const goldBlock = document.querySelector('.partner-level-gold');
@@ -130,11 +131,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           primaryBusiness: [DX_PRIMARY_BUSINESS.SOLUTION]
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const businessSolutionBlock = document.querySelector('.partner-primary-business-solution');
@@ -146,11 +147,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           primaryBusiness: [DX_PRIMARY_BUSINESS.TECHNOLOGY]
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const businessTechnologyBlock = document.querySelector('.partner-primary-business-technology');
@@ -162,11 +163,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           accessType: [DX_ACCESS_TYPE.BILLING_ADMIN, DX_ACCESS_TYPE.SALES_CENTER_ADMIN, DX_ACCESS_TYPE.ADMIN]
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const billingAdminBlock = document.querySelector('.partner-billing-admin');
@@ -593,7 +594,7 @@ describe('Test personalization.js', () => {
       expect(picture.querySelector('img')?.src).toBe('https://example.com/avatar.jpg');
     });
 
-    it('should handle logoCompany placeholder with successful API response', async () => {
+    it('should handle logoCompany placeholder with companyLogoUrl in cookie', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<div>$logoCompany</div>';
       document.body.appendChild(main);
@@ -603,26 +604,19 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
         },
       };
+      const partnerInfo = {
+        companyLogoUrl: 'https://example.com/logo.png',
+      };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-
-      global.fetch.mockResolvedValueOnce({
-        status: 200,
-        json: async () => ({
-          account: {
-            logoUrl: 'https://example.com/logo.png',
-          },
-        }),
-      });
+      document.cookie = `partner_info=${JSON.stringify(partnerInfo)}`;
 
       applyPagePersonalization();
 
-      // Dispatch the event and wait
-      const event = new Event('dxp:imsReady');
-      window.dispatchEvent(event);
-
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      expect(global.fetch).toHaveBeenCalled();
+      const img = main.querySelector('img[data-logo-company]');
+      expect(img).not.toBeNull();
+      expect(img.src).toBe('https://example.com/logo.png');
     });
 
     it('should handle missing signed in user for profileImage', async () => {
@@ -652,12 +646,10 @@ describe('Test personalization.js', () => {
       expect(main.querySelector('p')).toBeNull();
     });
 
-    it('should handle missing access token for logoCompany', async () => {
+    it('should handle missing companyLogoUrl for logoCompany', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<div>$logoCompany</div>';
       document.body.appendChild(main);
-
-      window.adobeIMS.getAccessToken.mockReturnValue(null);
 
       const cookieObject = {
         DXP: {
@@ -665,15 +657,13 @@ describe('Test personalization.js', () => {
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({})}`;
 
       applyPagePersonalization();
 
-      const event = new Event('dxp:imsReady');
-      window.dispatchEvent(event);
-
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      expect(global.fetch).not.toHaveBeenCalled();
+      expect(main.querySelector('div')).toBeNull();
     });
 
     it('should handle missing avatar image in DOM for profileImage', async () => {
@@ -703,7 +693,7 @@ describe('Test personalization.js', () => {
       expect(main.querySelector('p')).toBeNull();
     });
 
-    it('should handle API error for logoCompany', async () => {
+    it('should remove logoCompany element when companyLogoUrl is missing', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<div>$logoCompany</div>';
       document.body.appendChild(main);
@@ -714,20 +704,13 @@ describe('Test personalization.js', () => {
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-
-      global.fetch.mockResolvedValueOnce({
-        status: 500,
-        json: async () => ({}),
-      });
+      document.cookie = `partner_info=${JSON.stringify({})}`;
 
       applyPagePersonalization();
 
-      const event = new Event('dxp:imsReady');
-      window.dispatchEvent(event);
-
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      expect(global.fetch).toHaveBeenCalled();
+      expect(main.querySelector('div')).toBeNull();
     });
 
     it('should handle empty avatar src in DOM for profileImage', async () => {
@@ -761,7 +744,7 @@ describe('Test personalization.js', () => {
       expect(main.querySelector('p')).toBeNull();
     });
 
-    it('should handle fetch errors for logoCompany', async () => {
+    it('should handle missing partner_info cookie for logoCompany', async () => {
       const main = document.createElement('main');
       main.innerHTML = '<div>$logoCompany</div>';
       document.body.appendChild(main);
@@ -772,23 +755,21 @@ describe('Test personalization.js', () => {
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
+      // No partner_info cookie set
 
       applyPagePersonalization();
 
-      const event = new Event('dxp:imsReady');
-      window.dispatchEvent(event);
-
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      expect(global.fetch).toHaveBeenCalled();
+      expect(main.querySelector('div')).toBeNull();
     });
     
     
-    it('should handle missing logoUrl in account data', async () => {
+    it('should replace logoCompany placeholder with image when companyLogoUrl exists', async () => {
       const main = document.createElement('main');
-      main.innerHTML = '<div>$logoCompany</div>';
+      const div = document.createElement('div');
+      div.textContent = '$logoCompany';
+      main.appendChild(div);
       document.body.appendChild(main);
 
       const cookieObject = {
@@ -796,23 +777,22 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
         },
       };
+      const partnerInfo = {
+        companyLogoUrl: 'https://example.com/company-logo.png',
+      };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-
-      global.fetch.mockResolvedValueOnce({
-        status: 200,
-        json: async () => ({
-          account: {}
-        }),
-      });
+      document.cookie = `partner_info=${JSON.stringify(partnerInfo)}`;
 
       applyPagePersonalization();
 
-      const event = new Event('dxp:imsReady');
-      window.dispatchEvent(event);
-
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      expect(global.fetch).toHaveBeenCalled();
+      const picture = main.querySelector('picture');
+      const img = main.querySelector('img[data-logo-company]');
+      expect(picture).not.toBeNull();
+      expect(img).not.toBeNull();
+      expect(img.src).toBe('https://example.com/company-logo.png');
+      expect(img.alt).toBe('Company Logo');
     });
     
   });

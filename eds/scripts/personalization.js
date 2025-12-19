@@ -70,28 +70,8 @@ function personalizeProfileImage(elements) {
 
 async function replaceCompanyLogo(elements) {
   try {
-    const accessToken = window.adobeIMS.getAccessToken();
-    if (!accessToken?.token) {
-      elements.forEach(el => el.remove());
-      return;
-    }
-
-    const apiUrl = 'https://partner-identity-stage.adobe.io/v1/dxp/profile';
-
-    const headers = new Headers({
-      'Authorization': `Bearer ${accessToken.token}`,
-      'x-api-key': 'APP_Gravity_local'
-    });
-
-    const profileResponse = await fetch(apiUrl, { headers });
-
-    if (profileResponse.status !== 200) {
-      elements.forEach(el => el.remove());
-      return;
-    }
-
-    const profileData = await profileResponse.json();
-    const companyLogo = profileData?.account?.logoUrl;
+    const programData = getPartnerDataCookieObject(getCurrentProgramType());
+    const companyLogo = programData?.companyLogoUrl;
 
     if (!companyLogo) {
       elements.forEach(el => el.remove());
@@ -123,9 +103,7 @@ async function replaceCompanyLogo(elements) {
 
 function personalizeCompanyLogo(elements) {
   if (!elements.length) return;
-  window.addEventListener('dxp:imsReady',  () => {
-     replaceCompanyLogo(elements);
-  });
+  replaceCompanyLogo(elements);
 }
 
 export function personalizePlaceholders(placeholders, context = document, programType) {

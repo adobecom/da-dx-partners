@@ -20,6 +20,7 @@ import {
 
 export const PERSONALIZATION_PLACEHOLDERS = {
   'firstName': '//*[contains(text(), "$firstName")]',
+  'lastName': '//*[contains(text(), "$lastName")]',
   'level': '//*[contains(text(), "$level")]',
   'primaryJobRole': '//*[contains(text(), "$primaryJobRole")]',
   'accountName': '//*[contains(text(), "$accountName")]',

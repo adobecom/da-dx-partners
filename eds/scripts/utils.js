@@ -146,8 +146,18 @@ export function getPartnerDataCookieValue(key, programType = DX_PROGRAM_TYPE) {
     }
     const partnerDataCookie = getCookieValue('partner_data');
     if (!partnerDataCookie) return;
+    const partnerInfoCookie = getCookieValue('partner_info');
+    if (!partnerInfoCookie) return '';
+
     const partnerDataObj = JSON.parse(decodeURIComponent(partnerDataCookie.toLowerCase()));
-    return partnerDataObj?.[programType]?.[key];
+    const partnerInfoObj = JSON.parse(decodeURIComponent(partnerInfoCookie.toLowerCase()));
+    
+    const portalData = {
+      ...(partnerDataObj?.[programType] ?? {}),
+      ...partnerInfoObj
+    };
+    
+    return portalData?.[key] || '';
   } catch (error) {
     console.error('Error parsing partner data object:', error);
     // eslint-disable-next-line consistent-return
@@ -234,8 +244,19 @@ function getComplexQueryParams(el) {
 export function getPartnerDataCookieObject(programType) {
   const partnerDataCookie = getCookieValue('partner_data');
   if (!partnerDataCookie) return {};
+
+  const partnerInfoCookie = getCookieValue('partner_info');
+  if (!partnerInfoCookie) return {};
+
   const partnerDataObj = JSON.parse(decodeURIComponent(partnerDataCookie));
-  const portalData = partnerDataObj?.[programType.toUpperCase()] ?? {};
+  const partnerInfoObj = JSON.parse(decodeURIComponent(partnerInfoCookie));
+  
+  const programKey = programType.toUpperCase();
+  const portalData = {
+    ...(partnerDataObj?.[programKey] ?? {}),
+    ...partnerInfoObj
+  };
+  
   return portalData;
 }
 

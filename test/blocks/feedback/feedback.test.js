@@ -329,13 +329,16 @@ describe('feedback block', () => {
     it('should include user profile data when partner is signed in', async () => {
       const partnerData = {
         DXP: {
-          firstName: 'John',
-          lastName: 'Doe',
           email: 'john.doe@example.com',
           status: 'MEMBER',
         },
       };
+      const partnerInfo = {
+        firstName: 'John',
+        lastName: 'Doe',
+      };
       document.cookie = `partner_data=${encodeURIComponent(JSON.stringify(partnerData))}`;
+      document.cookie = `partner_info=${encodeURIComponent(JSON.stringify(partnerInfo))}`;
 
       const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
       const block = document.querySelector('.feedback');
