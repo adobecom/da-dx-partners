@@ -92,7 +92,7 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
   if (!isMember()) return;
   const lastCertificationPopupShown = parseLocalDate(
     sessionStorage.getItem(LAST_DATE_SHOWN),
-  ) || new Date(1970, 0, 1); // Jan 1, 1970 at midnight local time
+  ) || new Date(0); // Jan 1, 1970 at midnight local time
   const today = normalizeDate(new Date());
   // Check if popup was already shown today (compare local calendar days, not time difference)
   if (lastCertificationPopupShown.getTime() >= today.getTime()) {
@@ -109,15 +109,13 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
         'x-api-key': imsClientId,
       },
     });
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
+    if (response.ok) {
+      const result = await response.json();
+      const { credentials } = result;
+      shoulDisplayCertificationModal = credentials.some(
+        (c) => isMilestoneReached(c, lastCertificationPopupShown),
+      );
     }
-
-    const result = await response.json();
-    const { credentials } = result;
-    shoulDisplayCertificationModal = credentials.some(
-      (c) => isMilestoneReached(c, lastCertificationPopupShown),
-    );
   } catch (error) {
     console.error(error.message);
   }

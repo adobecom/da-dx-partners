@@ -238,13 +238,9 @@ describe('Test certificationExpiresPopup.js', () => {
         status: 500,
       });
 
-      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
       await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Response status: 500'));
       expect(mockGetModal).not.toHaveBeenCalled();
-      errorSpy.mockRestore();
     });
 
     it('should handle fetch exception gracefully', async () => {
