@@ -160,6 +160,7 @@ describe('dx-card-collection block', () => {
     expect(infoBox.innerHTML).to.include('<strong>Test</strong>');
   });
 
+  it('should contain card collection analytics attributes', async function () {
     const block = document.querySelector('.dx-card-collection');
     expect(block).to.exist;
 
@@ -185,7 +186,7 @@ describe('dx-card-collection block', () => {
     expect(singlePartnerCardBtn.getAttribute('daa-ll')).to.equal(singlePartnerCardBtn.textContent);
   });
 
-    it('should contain card collection analytics attributes with filtering and search', async function () {
+  it('should contain card collection analytics attributes with filtering and search', async function () {
     const block = document.querySelector('.dx-card-collection');
     expect(block).to.exist;
     PartnerCards.prototype.firstUpdated.restore();
