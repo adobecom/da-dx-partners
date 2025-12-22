@@ -124,16 +124,15 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
   if (!shoulDisplayCertificationModal) return;
 
   const CERTIFICATION_META = 'certification-modal';
-  const certificationModalFragmentMeta = getMetadataContent(CERTIFICATION_META);
-  if (!certificationModalFragmentMeta) {
+  const certificationFragmentPath = getMetadataContent(CERTIFICATION_META);
+  if (!certificationFragmentPath) {
     console.warn(`${CERTIFICATION_META} should be displayed but popup fragment path is not found`);
     return;
   }
 
-  const certificationFragmentPath = certificationModalFragmentMeta || '/digitalexperience/fragments/modals/certification-modal';
   const popupContent = await loadPopupFragment(certificationFragmentPath, 'certification modal');
   if (!popupContent) {
-    console.warn(`Popup fragment for ${certificationModalFragmentMeta} not found`);
+    console.warn(`Popup fragment for ${certificationFragmentPath} not found`);
     return;
   }
 
