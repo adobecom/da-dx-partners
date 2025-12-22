@@ -28,7 +28,7 @@ export const PERSONALIZATION_PLACEHOLDERS = {
   'email': '//*[contains(text(), "$email")]',
   'bctqExpirationDays': '//*[contains(text(), "$bctqExpirationDays")]',
   'profileImage': '//*[contains(text(), "$profileImage")]',
-  'logoCompany': '//*[contains(text(), "$logoCompany")]'
+  'companyLogoUrl': '//*[contains(text(), "$companyLogoUrl")]'
 };
 
 export const LEVEL_CONDITION = 'partner-level';

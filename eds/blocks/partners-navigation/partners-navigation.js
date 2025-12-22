@@ -868,8 +868,10 @@ class Gnav {
 
     this.blocks.profile.buttonElem = await decorateProfileTrigger({ avatar });
     decoratedElem.append(this.blocks.profile.buttonElem);
-    
+    // PARTNERS_NAVIGATION START
+    // MWPW-182655 - Manage profile and company Landing page
     window.dispatchEvent(new CustomEvent('feds:profileImageRendered'));
+    // PARTNERS_NAVIGATION END
 
     // Decorate the profile dropdown
     // after user interacts with button or after 3s have passed

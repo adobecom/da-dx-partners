@@ -32,11 +32,7 @@ async function replaceProfileImage(elements) {
     const userAvatar = existingAvatarImg.src;
 
     elements.forEach((el) => {
-      const textNode = Array.from(el.childNodes).find(
-        node => node.nodeType === Node.TEXT_NODE && node.textContent.includes('$profileImage')
-      );
-
-      if (!textNode) return;
+      if (!el.textContent.includes('$profileImage')) return;
 
       const img = document.createElement('img');
       img.src = userAvatar;
@@ -52,7 +48,8 @@ async function replaceProfileImage(elements) {
         el.classList.add('icon-area');
       }
 
-      el.replaceChild(picture, textNode);
+      el.textContent = '';
+      el.appendChild(picture);
     });
   } catch (error) {
     console.warn('Failed to replace profile image placeholders:', error);
@@ -62,38 +59,42 @@ async function replaceProfileImage(elements) {
 
 function personalizeProfileImage(elements) {
   if (!elements.length) return;
-
-  window.addEventListener('feds:profileImageRendered', () => {
+  
+  const existingAvatarImg = document.querySelector('img.feds-profile-img');
+  if (existingAvatarImg?.src) {
     replaceProfileImage(elements);
-  });
+  } else {
+    window.addEventListener('feds:profileImageRendered', () => {
+      replaceProfileImage(elements);
+    });
+  }
 }
 
 async function replaceCompanyLogo(elements) {
   try {
     const programData = getPartnerDataCookieObject(getCurrentProgramType());
-    const companyLogo = programData?.companyLogoUrl;
+    const companyLogoUrl = programData?.companyLogoUrl;
 
-    if (!companyLogo) {
+    if (!companyLogoUrl) {
       elements.forEach(el => el.remove());
       return;
     }
 
     elements.forEach((el) => {
-      const textNode = Array.from(el.childNodes).find(
-        node => node.nodeType === Node.TEXT_NODE && node.textContent.includes('$logoCompany')
-      );
-
-      if (!textNode) return;
+      if (!el.textContent.includes('$companyLogoUrl')) return;
 
       const img = document.createElement('img');
-      img.src = companyLogo;
-      img.alt = 'Company Logo';
-      img.dataset.logoCompany = 'true';
+      img.src = companyLogoUrl;
+      img.alt = 'Company Logo URL';
+      img.dataset.companyLogoUrl = 'true';
+      img.width = 96;
+      img.height = 96;
 
       const picture = document.createElement('picture');
       picture.appendChild(img);
 
-      el.replaceChild(picture, textNode);
+      el.textContent = '';
+      el.appendChild(picture);
     });
   } catch (error) {
     console.warn('Failed to replace company logo placeholders:', error);
@@ -101,13 +102,9 @@ async function replaceCompanyLogo(elements) {
   }
 }
 
-function personalizeCompanyLogo(elements) {
-  if (!elements.length) return;
-  replaceCompanyLogo(elements);
-}
-
 export function personalizePlaceholders(placeholders, context = document, programType) {
-  Object.entries(placeholders).forEach(([key, value]) => {
+  const sortedEntries = Object.entries(placeholders).sort((a, b) => b[0].length - a[0].length);
+  sortedEntries.forEach(([key, value]) => {
     const elements = getNodesByXPath(value, context);
     const programData = getPartnerDataCookieObject(programType);
     let placeholderValue = programData[key];
@@ -117,8 +114,8 @@ export function personalizePlaceholders(placeholders, context = document, progra
       return;
     }
 
-    if (key === 'logoCompany' && elements.length > 0) {
-      personalizeCompanyLogo(elements);
+    if (key === 'companyLogoUrl' && elements.length > 0) {
+      replaceCompanyLogo(elements);
       return;
     }
     

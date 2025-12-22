@@ -594,9 +594,9 @@ describe('Test personalization.js', () => {
       expect(picture.querySelector('img')?.src).toBe('https://example.com/avatar.jpg');
     });
 
-    it('should handle logoCompany placeholder with companyLogoUrl in cookie', async () => {
+    it('should handle companyLogoUrl placeholder with companyLogoUrl in cookie', async () => {
       const main = document.createElement('main');
-      main.innerHTML = '<div>$logoCompany</div>';
+      main.innerHTML = '<div>$companyLogoUrl</div>';
       document.body.appendChild(main);
 
       const cookieObject = {
@@ -614,7 +614,7 @@ describe('Test personalization.js', () => {
 
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const img = main.querySelector('img[data-logo-company]');
+      const img = main.querySelector('img[data-company-logo-url]');
       expect(img).not.toBeNull();
       expect(img.src).toBe('https://example.com/logo.png');
     });
@@ -646,9 +646,9 @@ describe('Test personalization.js', () => {
       expect(main.querySelector('p')).toBeNull();
     });
 
-    it('should handle missing companyLogoUrl for logoCompany', async () => {
+    it('should handle missing companyLogoUrl for companyLogoUrl', async () => {
       const main = document.createElement('main');
-      main.innerHTML = '<div>$logoCompany</div>';
+      main.innerHTML = '<div>$companyLogoUrl</div>';
       document.body.appendChild(main);
 
       const cookieObject = {
@@ -693,9 +693,9 @@ describe('Test personalization.js', () => {
       expect(main.querySelector('p')).toBeNull();
     });
 
-    it('should remove logoCompany element when companyLogoUrl is missing', async () => {
+    it('should remove companyLogoUrl element when companyLogoUrl is missing', async () => {
       const main = document.createElement('main');
-      main.innerHTML = '<div>$logoCompany</div>';
+      main.innerHTML = '<div>$companyLogoUrl</div>';
       document.body.appendChild(main);
 
       const cookieObject = {
@@ -744,9 +744,9 @@ describe('Test personalization.js', () => {
       expect(main.querySelector('p')).toBeNull();
     });
 
-    it('should handle missing partner_info cookie for logoCompany', async () => {
+    it('should handle missing partner_info cookie for companyLogoUrl', async () => {
       const main = document.createElement('main');
-      main.innerHTML = '<div>$logoCompany</div>';
+      main.innerHTML = '<div>$companyLogoUrl</div>';
       document.body.appendChild(main);
 
       const cookieObject = {
@@ -765,10 +765,10 @@ describe('Test personalization.js', () => {
     });
     
     
-    it('should replace logoCompany placeholder with image when companyLogoUrl exists', async () => {
+    it('should replace companyLogoUrl placeholder with image when companyLogoUrl exists', async () => {
       const main = document.createElement('main');
       const div = document.createElement('div');
-      div.textContent = '$logoCompany';
+      div.textContent = '$companyLogoUrl';
       main.appendChild(div);
       document.body.appendChild(main);
 
@@ -788,11 +788,11 @@ describe('Test personalization.js', () => {
       await new Promise(resolve => setTimeout(resolve, 100));
       
       const picture = main.querySelector('picture');
-      const img = main.querySelector('img[data-logo-company]');
+      const img = main.querySelector('img[data-company-logo-url]');
       expect(picture).not.toBeNull();
       expect(img).not.toBeNull();
       expect(img.src).toBe('https://example.com/company-logo.png');
-      expect(img.alt).toBe('Company Logo');
+      expect(img.alt).toBe('Company Logo URL');
     });
     
   });
