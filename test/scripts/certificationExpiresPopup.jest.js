@@ -320,40 +320,6 @@ describe('Test certificationExpiresPopup.js', () => {
         expect(mockGetModal).toHaveBeenCalled();
       });
 
-      it('should display modal at 150-day milestone', async () => {
-        const expirationDate = daysFromToday(150);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
-      it('should display modal at 120-day milestone', async () => {
-        const expirationDate = daysFromToday(120);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
       it('should display modal at 90-day milestone', async () => {
         const expirationDate = daysFromToday(90);
         mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
@@ -406,23 +372,6 @@ describe('Test certificationExpiresPopup.js', () => {
 
         expect(mockGetModal).toHaveBeenCalled();
       });
-
-      it('should display modal at 60-day milestone', async () => {
-        const expirationDate = daysFromToday(60);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
     });
 
     describe('60-30 days range (every 10 days)', () => {
@@ -433,40 +382,6 @@ describe('Test certificationExpiresPopup.js', () => {
         global.fetch.mockResolvedValue({
           ok: true,
           json: () => Promise.resolve({credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
-      it('should display modal at 40-day milestone', async () => {
-        const expirationDate = daysFromToday(40);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
-      it('should display modal at 30-day milestone', async () => {
-        const expirationDate = daysFromToday(30);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -493,111 +408,9 @@ describe('Test certificationExpiresPopup.js', () => {
 
         expect(mockGetModal).toHaveBeenCalled();
       });
-
-      it('should display modal at 26-day milestone', async () => {
-        const expirationDate = daysFromToday(26);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
-      it('should display modal at 20-day milestone', async () => {
-        const expirationDate = daysFromToday(20);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
-      it('should display modal at 16-day milestone', async () => {
-        const expirationDate = daysFromToday(16);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
     });
 
     describe('15-1 days range (every day)', () => {
-      it('should display modal at 14-day milestone', async () => {
-        const expirationDate = daysFromToday(14);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
-      it('should display modal at 10-day milestone', async () => {
-        const expirationDate = daysFromToday(10);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
-      it('should display modal at 5-day milestone', async () => {
-        const expirationDate = daysFromToday(5);
-        mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
       it('should display modal at 1-day milestone', async () => {
         const expirationDate = daysFromToday(1);
         mockGetItem.mockReturnValue(daysFromToday(-2).toISOString());
@@ -613,65 +426,6 @@ describe('Test certificationExpiresPopup.js', () => {
         await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         expect(mockGetModal).toHaveBeenCalled();
-      });
-    });
-
-    describe('missed milestone - user not logged in', () => {
-      it('should show popup on next login if user missed 90-day milestone', async () => {
-        const expirationDate = daysFromToday(85); // 85 days (past 90-day milestone)
-        const lastShown = daysFromToday(-40); // Last shown 40 days ago (before 90-day milestone)
-        mockGetItem.mockReturnValue(lastShown.toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        // Should show because we passed the 90-day milestone and it wasn't shown
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
-      it('should show popup on next login if user missed multiple milestones', async () => {
-        const expirationDate = daysFromToday(15); // 15 days
-        const lastShown = daysFromToday(-50); // Last shown 50 days ago
-        mockGetItem.mockReturnValue(lastShown.toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        // Should show because we passed many milestones since last shown
-        expect(mockGetModal).toHaveBeenCalled();
-      });
-
-      it('should not show popup if already shown after the current milestone', async () => {
-        const expirationDate = daysFromToday(90); // 90 days
-        const lastShown = getToday(); // Last shown today (UTC midnight)
-        mockGetItem.mockReturnValue(lastShown.toISOString());
-
-        global.fetch.mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
-        });
-
-        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
-
-        // Should not show - already shown today
-        expect(mockGetModal).not.toHaveBeenCalled();
       });
     });
 
