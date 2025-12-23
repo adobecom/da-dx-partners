@@ -534,7 +534,6 @@ describe('Test personalization.js', () => {
   });
 
   describe('Profile Image and Company Logo Personalization', () => {
-    const utils = require('../../eds/scripts/utils.js');
     const { applyPagePersonalization } = require('../../eds/scripts/personalization.js');
 
     beforeEach(() => {
@@ -544,14 +543,6 @@ describe('Test personalization.js', () => {
         getAccessToken: jest.fn(() => ({ token: 'mock-token' })),
       };
       global.fetch = jest.fn();
-      
-      // Mock getLibs
-      jest.spyOn(utils, 'getLibs').mockReturnValue('https://main--milo--adobecom.aem.live/libs');
-      
-      // Mock the dynamic import
-      jest.mock('https://main--milo--adobecom.aem.live/libs/utils/utils.js', () => ({
-        getConfig: () => ({ env: { adobeIO: 'adobeio-api.adobe.io' } }),
-      }), { virtual: true });
     });
 
     afterEach(() => {
