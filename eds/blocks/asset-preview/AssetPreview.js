@@ -6,14 +6,13 @@ import {
   transformCardUrl,
 } from '../utils/utils.js';
 import {
-  DIGITALEXPERIENCE_ASSETS_PATH,
-  DIGITALEXPERIENCE_PREVIEW_PATH,
+  DIGITALEXPERIENCE_PREVIEW_PATH, FILE_EXTENSION_TO_DOWNLOAD_LABEL,
   PARTNER_LEVEL, PX_ASSETS_PREVIEW_PATH,
 } from '../utils/dxConstants.js';
 
 const DEFAULT_BACKGROUND_IMAGE_PATH = '/content/dam/solution/en/images/card-collection/sample_default.png';
 
-const { default: DOMPurify } = await import('/node_modules/dompurify/dist/purify.es.mjs');
+import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -147,21 +146,21 @@ export default class AssetPreview extends LitElement {
   }
 
   async setData(assetMetadata) {
-    this.title = assetMetadata.title;
-    document.title = assetMetadata.title;
-    this.summary = assetMetadata.summary;
-    this.description = assetMetadata.description;
-    this.fileType = assetMetadata.fileType;
-    this.url = assetMetadata.url;
-    this.previewImage = assetMetadata.previewImage || assetMetadata.thumbnailUrl;
-    this.backButtonUrl = this.blockData.backButtonUrl;
-    this.backButtonLabel = this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL;
+    this.title = DOMPurify.sanitize(assetMetadata.title);
+    document.title = DOMPurify.sanitize(assetMetadata.title);
+    this.summary = DOMPurify.sanitize(assetMetadata.summary) || DOMPurify.sanitize(assetMetadata.description);
+    this.fileType = DOMPurify.sanitize(assetMetadata.fileType);
+    this.url = DOMPurify.sanitize(assetMetadata.url);
+    this.webinarPresentation = DOMPurify.sanitize(assetMetadata.webinarPresentation);
+    this.previewImage = DOMPurify.sanitize(assetMetadata.previewImage || assetMetadata.thumbnailUrl);
+    this.backButtonUrl = DOMPurify.sanitize(this.blockData.backButtonUrl);
+    this.backButtonLabel = DOMPurify.sanitize(this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL);
     this.tags = assetMetadata.tags
       ? this.getTagsDisplayValues(this.allCaaSTags, assetMetadata.tags) : [];
     this.allAssetTags = assetMetadata.tags;
-    this.ctaText = assetMetadata.ctaText;
-    this.size = this.getSizeInMb(assetMetadata.size);
-    this.assetPartnerLevel = assetMetadata.partnerLevel?.map((level) => level.toLowerCase());
+    this.ctaText = DOMPurify.sanitize(assetMetadata.ctaText);
+    this.size = DOMPurify.sanitize(this.getSizeInMb(assetMetadata.size));
+    this.assetPartnerLevel = assetMetadata.partnerLevel?.map((level) => DOMPurify.sanitize(level.toLowerCase()));
     this.createdDate = (() => {
       if (!assetMetadata.createdDate) return '';
 
@@ -180,7 +179,7 @@ export default class AssetPreview extends LitElement {
     } else {
       this.assetHasData = true;
     }
-    this.aemPath = assetMetadata.aemPath;
+    this.aemPath = DOMPurify.sanitize(assetMetadata.aemPath);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -200,15 +199,15 @@ export default class AssetPreview extends LitElement {
   render() {
     return html`<div class="asset-preview-block-container">
       ${this.assetHasData && !this.isLoading ? html`
-          <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${unsafeHTML(DOMPurify.sanitize(this.title))}  ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}</p></div>
+          <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${unsafeHTML(this.title)}  ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}</p></div>
           <div class="asset-preview-block-details ">
             <div class="asset-preview-block-details-left">
               ${this.createdDate ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Date}}']}: </span>${this.createdDate}</p>` : ''}
-              ${this.getTagsTitlesString(this.audienceTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Audience}}']}: </span>${unsafeHTML(DOMPurify.sanitize(this.getTagsTitlesString(this.audienceTags)))}</p>` : ''}
-              ${(this.isVideo ? this.description : this.summary || this.description) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Summary}}']}: </span>${this.isVideo ? unsafeHTML(DOMPurify.sanitize(this.description)) : unsafeHTML(DOMPurify.sanitize(this.summary)) || unsafeHTML(DOMPurify.sanitize(this.description))}</p>` : ''}
-              ${this.getTagsTitlesString(this.fileFormatTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Type}}']}: </span>${unsafeHTML(DOMPurify.sanitize(this.getTagsTitlesString(this.fileFormatTags)))}</p>` : ''}
-              ${this.getTagsTitlesString(this.tags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Tags}}']}: </span>${unsafeHTML(DOMPurify.sanitize(this.getTagsTitlesString(this.tags)))}</p>` : ''}
-              ${this.size ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span class="bold">${this.size}</p>` : ''}
+              ${this.getTagsTitlesString(this.audienceTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Audience}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.audienceTags))}</p>` : ''}
+              ${this.summary ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Summary}}']}: </span>${unsafeHTML(this.summary)}</p>` : ''}
+              ${this.getTagsTitlesString(this.fileFormatTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Type}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.fileFormatTags))}</p>` : ''}
+              ${this.getTagsTitlesString(this.tags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Tags}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.tags))}</p>` : ''}
+              ${this.size ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span class="bold">${unsafeHTML(this.size)}</p>` : ''}
             </div>
             <div class="asset-preview-block-details-right"
                  style="background-image:
@@ -223,7 +222,11 @@ export default class AssetPreview extends LitElement {
               <div class="asset-preview-block-actions">
               ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button 
                 class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}"> View </a></button>` : ''}
-                <button class="filled"><a  download="${this.title}" href="${this.getDownloadUrl()}">${this.blockData.localizedText['{{Download}}']}</a></button>
+                <button class="filled"><a  download="${this.title}" href="${this.getDownloadUrl()}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>
+                ${this.webinarPresentation ? html`
+                  <button class="filled"><a  download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
+                ` : ''}
+                
               ${this.backButtonUrl ? html`<a 
                 class="link" href="${this.backButtonUrl}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
               </div>` : ''}
@@ -310,7 +313,7 @@ export default class AssetPreview extends LitElement {
     filteredTags.forEach((tag) => {
       const tagObject = this.findTagByPath(this.allCaaSTags.namespaces.caas.tags, tag)
         || { tagId: tag, title: tag };
-      tagsArray.push({ tagId: tag, title: tagObject.title });
+      tagsArray.push({ tagId: DOMPurify.sanitize(tag), title: DOMPurify.sanitize(tagObject.title) });
     });
     return tagsArray;
   }
@@ -325,7 +328,7 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   getTagsTitlesString(tags) {
-    return tags?.map((tag) => tag.title).join(', ');
+    return tags?.map((tag) => DOMPurify.sanitize(tag.title)).join(', ');
   }
 
   getDownloadUrl() {
@@ -333,9 +336,28 @@ export default class AssetPreview extends LitElement {
     return this.url;
   }
 
+  getWebinarPresentationDownloadUrl() {
+    if (!this.webinarPresentation) return '#';
+    return this.webinarPresentation;
+  }
+
   isRestrictedAssetForUser() {
     return !(!this.assetPartnerLevel.length
       || this.assetPartnerLevel.includes('public')
       || this.assetPartnerLevel.includes(PARTNER_LEVEL));
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getLabelBasedOnFileExtension(url) {
+    try {
+      const { pathname } = new URL(url);
+      const fileName = pathname.split('/').pop();
+      const parts = fileName.split('.');
+      const extension = parts.length > 1 ? parts.pop() : '';
+
+      return FILE_EXTENSION_TO_DOWNLOAD_LABEL[extension] || 'Download';
+    } catch (error) {
+      return 'Download';
+    }
   }
 }

@@ -16,10 +16,12 @@ import {
   preloadResources,
   redirectLoggedinPartner,
   updateNavigation,
-  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY,
+  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
+import {partnerAgreement} from "./partnerAgreement.js";
+import {bctqBanner, portalMessaging} from "./portalMessaging.js";
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -34,7 +36,7 @@ let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
 // Add any config options.
-const CONFIG = {
+let CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
   imsClientId,
@@ -43,9 +45,19 @@ const CONFIG = {
   // fallbackRouting: 'off',
   locales: {
     '': { ietf: 'en-US', tk: 'hah7vzn.css' },
-    de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
-    kr: { ietf: 'ko-KR', tk: 'zfo3ouc' },
   },
+  jarvis: {
+    id: 'spp_default',
+    version: '1.0',
+    onDemand: false,
+  },
+  local: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
+  stage: {
+    edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e',
+    marTechUrl:
+      'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-184d20637aa8-development.min.js',
+  },
+  prod: { },
 };
 
 (function removePartnerLoginQuery() {
@@ -54,6 +66,9 @@ const CONFIG = {
   if (searchParams.has(PARTNER_LOGIN_QUERY)) {
     searchParams.delete(PARTNER_LOGIN_QUERY);
     window.history.replaceState({}, '', url.toString());
+
+    // reset portal messaging popup after login
+    sessionStorage.removeItem('portal-messaging-popup-closed');
   }
 }());
 
@@ -94,6 +109,7 @@ function setUpPage() {
   updateFooter();
 }
 async function loadPage() {
+  await bctqBanner(miloLibs);
   applyPagePersonalization();
   setUpPage();
   redirectLoggedinPartner();
@@ -102,10 +118,14 @@ async function loadPage() {
   const { loadArea, setConfig, getConfig } = await import(`${miloLibs}/utils/utils.js`);
 
   setConfig({ ...CONFIG, miloLibs });
+  await setFeedback(getConfig);
   await loadArea();
   applyPagePersonalization();
   rewriteLinks(document);
+  const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
+  await portalMessaging(miloLibs, partnerAgreementDisplayed);
 }
+
 loadPage();
 
 (async function loadDa() {

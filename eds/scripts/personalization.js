@@ -1,24 +1,27 @@
 import {
   isMember,
   getNodesByXPath,
-  getPartnerDataCookieObject, getCurrentProgramType
+  getPartnerDataCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration
 } from './utils.js';
 import {
   PERSONALIZATION_PLACEHOLDERS,
   PERSONALIZATION_MARKER,
   PROCESSED_MARKER,
   PERSONALIZATION_CONDITIONS,
-  PROFILE_PERSONALIZATION_ACTIONS, LEVEL_CONDITION,
+  PROFILE_PERSONALIZATION_ACTIONS, LEVEL_CONDITION, NEGATION_PREFIX,
 } from './personalizationConfigDX.js';
 import {
   PERSONALIZATION_HIDE,
 } from './personalizationUtils.js';
 import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
-function personalizePlaceholders(placeholders, context = document, programType) {
+export function personalizePlaceholders(placeholders, context = document, programType) {
   Object.entries(placeholders).forEach(([key, value]) => {
     const programData = getPartnerDataCookieObject(programType);
-    const placeholderValue = programData[key];
+    let placeholderValue = programData[key];
+    if (key === 'bctqExpirationDays') {
+      placeholderValue = getDaysUntilComplianceExpiration();
+    }
     getNodesByXPath(value, context).forEach((el) => {
       if (!placeholderValue) {
         el.remove();
@@ -30,12 +33,24 @@ function personalizePlaceholders(placeholders, context = document, programType) 
   });
 }
 
+function isNegatedCondition(condition) {
+  return condition.startsWith(NEGATION_PREFIX);
+}
+
+function getBaseConditionName(condition) {
+  if (!isNegatedCondition(condition)) return condition;
+  return condition.replace(NEGATION_PREFIX, 'partner-');
+}
+
 function shouldHide(conditions, conditionsConfig = PERSONALIZATION_CONDITIONS) {
   // eslint-disable-next-line max-len
   const partnerLevelConditions = conditions.filter((condition) => condition.startsWith(LEVEL_CONDITION));
 
-  // eslint-disable-next-line max-len
-  const otherConditions = conditions.filter((condition) => !condition.startsWith(LEVEL_CONDITION) && Object.keys(PERSONALIZATION_CONDITIONS).includes(condition));
+  const otherConditions = conditions.filter((condition) => {
+    if (condition.startsWith(LEVEL_CONDITION)) return false;
+    const baseCondition = getBaseConditionName(condition);
+    return Object.prototype.hasOwnProperty.call(conditionsConfig, baseCondition);
+  });
 
   const matchesPartnerLevel = partnerLevelConditions.length === 0
     || partnerLevelConditions.some((condition) => {
@@ -43,7 +58,11 @@ function shouldHide(conditions, conditionsConfig = PERSONALIZATION_CONDITIONS) {
       return conditionsConfig[LEVEL_CONDITION]?.(level);
     });
 
-  const matchesOtherConditions = otherConditions.every((condition) => conditionsConfig[condition]);
+  const matchesOtherConditions = otherConditions.every((condition) => {
+    const baseCondition = getBaseConditionName(condition);
+    let value = conditionsConfig[baseCondition];
+    return isNegatedCondition(condition) ? !value : value;
+  });
 
   return !(matchesPartnerLevel && matchesOtherConditions);
 }
@@ -79,7 +98,7 @@ function hideSections(page) {
   });
 }
 
-function personalizePage(page) {
+export function personalizePage(page) {
   const blocks = Array.from(page.getElementsByClassName(PERSONALIZATION_MARKER));
   blocks.forEach((el) => {
     const conditions = Object.values(el.classList);

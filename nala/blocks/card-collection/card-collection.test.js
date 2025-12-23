@@ -194,9 +194,9 @@ test.describe('Validate card collection block', () => {
     });
     await test.step('Search and Filter Collection', async () => {
       await cardCollectionPage.productFilter.click();
-      await cardCollectionPage.inproductfilter.click();
+      await cardCollectionPage.filterCheckbox(data.btnRoleInDesign, data.checkBoxInDesign).click();
       await cardCollectionPage.expectResultsNumber(data.numberOfFilteredCards);
-      await cardCollectionPage.premiereRush.click();
+      await cardCollectionPage.filterCheckbox(data.btnRolePremiereRush, data.checkBoxPremiereRush).click();
       await cardCollectionPage.expectResultsNumber(data.topicPremiereResults);
       await cardCollectionPage.filterCheckbox(data.buttonRole, data.checkBoxAfterEffects).click();
       await cardCollectionPage.expectResultsNumber(data.afterEffectsResults);
@@ -214,7 +214,7 @@ test.describe('Validate card collection block', () => {
       await cardCollectionPage.filterCheckbox(data.btnRoleXd, data.checkBoxXdFilter).click();
       await cardCollectionPage.expectResultsNumber(data.numberOfFilteredCards);
       await cardCollectionPage.filterCheckbox(data.buttonRole, data.topicFilter).click();
-      await cardCollectionPage.workFromAnywhere.click();
+      await cardCollectionPage.filterCheckbox(data.btnRoleWorkFromAnywhere, data.workFromAnywhereFilter).click();
       await cardCollectionPage.expectResultsNumber(data.topicWorkFromAnywhere);
       await cardCollectionPage.filterCheckbox(data.btnRoleWorkFromAnywhere, data.workFromAnywhereFilter).click();
       await page.reload({ waitUntil: 'networkidle' });

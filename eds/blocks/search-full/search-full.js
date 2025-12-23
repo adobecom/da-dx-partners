@@ -46,6 +46,7 @@ export default async function init(el) {
     '{{view-all-results}}': 'View all results',
     '{{show-more}}': 'Show more',
     '{{show-less}}': 'Show less',
+    '{{trainings}}': 'Trainings',
   };
 
   populateLocalizedTextFromListItems(el, localizedText);
@@ -75,6 +76,7 @@ export default async function init(el) {
   app.className = 'search-cards-wrapper';
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
+  app.setAttribute('daa-lh', 'Search Cards Section')
   el.replaceWith(app);
 
   await deps;

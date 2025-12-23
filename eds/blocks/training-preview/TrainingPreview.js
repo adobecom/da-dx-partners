@@ -1,7 +1,9 @@
 import { getLibs } from '../../scripts/utils.js';
 import { trainingPreviewStyles } from './TrainingPreviewStyles.js';
+
 const miloLibs = getLibs();
 const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
+
 export default class TrainingPreview extends LitElement {
   static styles = [
     trainingPreviewStyles,
@@ -26,14 +28,20 @@ export default class TrainingPreview extends LitElement {
       return;
     }
 
-    // Inject the CSS file (once)
-    if (!document.querySelector('link[href="/eds/blocks/training-preview/dist/css/cptraining.min.css"]')) {
-      const cssLink = document.createElement('link');
-      cssLink.rel = 'stylesheet';
-      cssLink.href = '/eds/blocks/training-preview/dist/css/cptraining.min.css';
-      document.head.appendChild(cssLink);
-
+    function addStyle(name) {
+      if (!document.querySelector(`link[href="${name}"]`)) {
+        const linkElement = document.createElement('link');
+        linkElement.rel = 'stylesheet';
+        linkElement.href = name;
+        document.head.appendChild(linkElement);
+      }
     }
+
+    addStyle('/eds/blocks/training-preview/dist/css/gravitycommon.min.css');
+    addStyle('/eds/blocks/training-preview/dist/css/gravitypublish.min.css');
+    addStyle('/eds/blocks/training-preview/dist/css/cptraining.min.css');
+    addStyle('/eds/blocks/training-preview/dist/css/dexterbasepublish.min.css');
+    addStyle('/eds/blocks/training-preview/dist/css/dexterthemethree.min.css');
 
     // Inject the React bundle (once)
     if (!document.querySelector('script[src="/eds/blocks/training-preview/dist/js/cptraining.min.js"]')) {

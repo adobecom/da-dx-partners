@@ -24,3 +24,7 @@
     font-weight: unset;
   }
 }
+
+#portal-messaging-modal {
+  padding: var(--spacing-m);
+}

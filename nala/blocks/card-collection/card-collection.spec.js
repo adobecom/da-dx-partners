@@ -112,6 +112,10 @@ export default {
         afterEffectsResults: 3,
         checkBoxAfterEffects: 'After Effects',
         buttonRole: 'checkbox',
+        checkBoxInDesign: 'InDesign',
+        btnRoleInDesign: 'checkbox',
+        checkBoxPremiereRush: 'Premiere Rush',
+        btnRolePremiereRush: 'checkbox',
       },
     },
     {

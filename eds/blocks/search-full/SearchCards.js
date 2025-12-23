@@ -6,6 +6,7 @@ import { generateRequestForSearchAPI } from '../utils/utils.js';
 
 const miloLibs = getLibs();
 const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 const SEE_ALL = 'SEE_ALL';
 
 export default class Search extends PartnerCards {
@@ -25,7 +26,7 @@ export default class Search extends PartnerCards {
   constructor() {
     super();
     this.contentType = 'all';
-    this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0 };
+    this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
     this.typeaheadOptions = [];
     this.isTypeaheadOpen = false;
   }
@@ -161,7 +162,7 @@ export default class Search extends PartnerCards {
       return html`${repeat(
         this.paginatedCards,
         (card) => card.id,
-        (card) => html`<search-card class="card-wrapper" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf}></search-card>`,
+        (card, index) => html`<search-card class="card-wrapper" daa-lh="Search Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title ?? '')}" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf}></search-card>`,
       )}`;
     }
     return html`<div class="no-results">
@@ -219,7 +220,7 @@ export default class Search extends PartnerCards {
     this.hasResponseData = false;
     this.additionalResetActions();
     const cardsData = await this.getCards();
-    const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0 } };
+    const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0, courses: 0 } };
     this.cards = cards;
     if (this.blockData.pagination === 'load-more') {
       this.paginatedCards = this.paginatedCards.concat(cards);
@@ -231,6 +232,7 @@ export default class Search extends PartnerCards {
       countAll: count.all,
       countAssets: count.assets,
       countPages: count.pages,
+      countCourses: count.courses,
     };
     this.hasResponseData = true;
   }
@@ -270,6 +272,9 @@ export default class Search extends PartnerCards {
         break;
       case 'asset':
         countAll = this.contentTypeCounter.countAssets;
+        break;
+      case 'course':
+        countAll = this.contentTypeCounter.countCourses;
         break;
       default:
         countAll = this.contentTypeCounter.countAll;
@@ -321,7 +326,7 @@ export default class Search extends PartnerCards {
   /* eslint-disable indent */
   render() {
     return html`
-      <div @click="${this.handleClickOutside}" class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}">
+      <div @click="${this.handleClickOutside}" class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}" daa-lh="Search Box">
         <div class="search-box content">
           <h3 class="partner-cards-title">
             ${this.searchTerm && !this.isTypeaheadOpen
@@ -344,7 +349,9 @@ export default class Search extends PartnerCards {
         </div>
 
       </div>
-      <div @click="${this.handleClickOutside}" class="content">
+      <div @click="${this.handleClickOutside}" class="content"
+        daa-lh="Search Cards Content | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
+      >
         <div class="partner-cards">
         <div class="partner-cards-sidebar-wrapper">
           <div class="partner-cards-sidebar">
@@ -376,6 +383,8 @@ export default class Search extends PartnerCards {
                   ${this.blockData.localizedText['{{assets}}']} (${this.contentTypeCounter.countAssets})</sp-button>
                 <sp-button variant="${this.contentType === 'page' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('page')}" aria-label="${this.blockData.localizedText['{{pages}}']}">
                   ${this.blockData.localizedText['{{pages}}']} (${this.contentTypeCounter.countPages})</sp-button>
+                   <sp-button variant="${this.contentType === 'course' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('course')}" aria-label="${this.blockData.localizedText['{{trainings}}']}">
+                  ${this.blockData.localizedText['{{trainings}}']} (${this.contentTypeCounter.countCourses})</sp-button>
               </sp-theme>
             </div>
             <div class="partner-cards-sort-wrapper">

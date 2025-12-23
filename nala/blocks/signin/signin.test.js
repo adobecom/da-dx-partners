@@ -265,4 +265,27 @@ test.describe('MAPP sign in flow', () => {
       });
     });
   });
+  // @double-access-protected=page-with-non-member-user
+  test(`${features[17].name},${features[17].tags}`, async ({ page }) => {
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${features[17].path}`);
+      await page.waitForLoadState('networkidle');
+    });
+
+    await test.step('Sign in', async () => {
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${features[17].data.partnerLevel}`);
+      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      });
+
+    await test.step('Verify error message', async () => {
+      await page.waitForLoadState('networkidle');
+      const pages = await page.context().pages();
+      await expect(pages[0].url())
+        .toContain(`${features[17].data.expectedToContactNotFoundInURL}`);
+      await page.goto(`${features[17].data.secondaccess404Url}`);
+      await expect(signInPage.notFound).toBeVisible();
+    });
+  });
 });

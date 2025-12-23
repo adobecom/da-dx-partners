@@ -8,9 +8,9 @@ import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
 
-const { default: DOMPurify } = await import('/node_modules/dompurify/dist/purify.es.mjs');
 const miloLibs = getLibs();
 const { html, LitElement, css, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 export default class PartnerCards extends LitElement {
   static designMap = {
@@ -126,7 +126,7 @@ export default class PartnerCards extends LitElement {
         if (!filterKey || !filterTagsKeys.length) return;
 
         const isCaasTag = filterTagsKeys[0]?.includes('caas:');
-        const getTagValue = (tagKey) => 
+        const getTagValue = (tagKey) =>
           isCaasTag
             ? this.allTagsFlatMap?.get(tagKey)?.title
             : this.blockData.localizedText[`{{${tagKey}}}`];
@@ -137,7 +137,7 @@ export default class PartnerCards extends LitElement {
           tags: filterTagsKeys.map(tagKey => ({
             key: tagKey,
             parentKey: filterKey,
-            value: unsafeHTML(DOMPurify.sanitize(getTagValue(tagKey))),
+            value: getTagValue(tagKey),
             checked: false,
           })),
         };
@@ -380,13 +380,19 @@ export default class PartnerCards extends LitElement {
       return html`${repeat(
         this.paginatedCards,
         (card) => card.id,
-        (card) => html`<single-partner-card-half-height class="card-wrapper ${this.blockData.cardDesign}" .data=${card} .design=${this.blockData.cardDesign}></single-partner-card-half-height>`,
+        (card, index) => html`<single-partner-card-half-height daa-lh="Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title)} | ${card.id}" class="card-wrapper ${this.blockData.cardDesign}" .data=${card} .design=${this.blockData.cardDesign}></single-partner-card-half-height>`,
       )}`;
     }
     return html`${repeat(
       this.paginatedCards,
       (card) => card.id,
-      (card) => html`<single-partner-card class="card-wrapper" .data=${card} .ietf=${this.blockData.ietf} .design=${this.blockData.cardDesign}></single-partner-card>`,
+      (card, index) => html`<single-partner-card
+                              daa-lh="Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title)} | ${card.id}"
+                              class="card-wrapper"
+                              .data=${card}
+                              .ietf=${this.blockData.ietf}
+                              .design=${this.blockData.cardDesign}>
+                            </single-partner-card>`,
     )}`;
   }
 
@@ -576,7 +582,7 @@ export default class PartnerCards extends LitElement {
       (tag) => tag.key,
       (tag) => html`
         <button class="sidebar-chosen-filter-btn" @click="${() => this.handleRemoveTag(tag)}" aria-label="${tag.value}">
-          ${tag.value}
+          ${unsafeHTML(tag.value)}
         </button>`,
     )}`;
 
@@ -602,7 +608,7 @@ export default class PartnerCards extends LitElement {
 
   getTagsByFilter(filter) {
     const { tags } = filter;
-    
+
     return html`${repeat(
       tags,
       (tag) => tag.key,
@@ -611,7 +617,7 @@ export default class PartnerCards extends LitElement {
         ?checked=${tag.checked}
         @change=${(event) => this.handleTag(event, tag, filter.key)}
       >
-        ${tag.value}
+        ${unsafeHTML(tag.value)}
       </sp-checkbox></li>`,
     )}`;
   }
@@ -901,7 +907,9 @@ export default class PartnerCards extends LitElement {
     return html`
       ${this.fetchedData
         ? html`
-          <div class="partner-cards ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled': ''}">
+          <div class="partner-cards ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled': ''}"
+            daa-lh="Card Collection | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
+          >
           ${this.blockData.filtersPanel === 'disable'
             ? ''
             : html`
@@ -929,10 +937,10 @@ export default class PartnerCards extends LitElement {
                           <div class="sidebar-filters-wrapper">
                             ${this.filters}
                           </div>
-                          ${this.blockData.filterInfoBox.title ? html` 
+                          ${this.blockData.filterInfoBox.title ? html`
                             <div class="sidebar-info-box">
-                              <div class="title">${this.blockData.filterInfoBox.title}</div>
-                              ${unsafeHTML(DOMPurify.sanitize(this.blockData.filterInfoBox.description))}
+                              <div class="title">${unsafeHTML(this.blockData.filterInfoBox.title)}</div>
+                              ${unsafeHTML(this.blockData.filterInfoBox.description)}
                             </div>` : ''
                           }
                         `
@@ -1013,7 +1021,7 @@ export default class PartnerCards extends LitElement {
             class="partner-cards-cards-results"><strong>${this.cards?.length}</strong> ${this.blockData.localizedText['{{results}}']}</span>`
             : ''
           }
-          
+
         </div>
         <div class="partner-cards-sort-wrapper ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled' : ''}">
           ${this.mobileView && this.blockData.filtersPanel !== 'disable'
