@@ -144,20 +144,11 @@ export function getPartnerCookieValue(key, programType = DX_PROGRAM_TYPE) {
     if(!programType){
       programType = getCurrentProgramType();
     }
-    const partnerDataCookie = getCookieValue('partner_data');
-    if (!partnerDataCookie) return;
-    const partnerInfoCookie = getCookieValue('partner_info');
-    if (!partnerInfoCookie) return '';
-
-    const partnerDataObj = JSON.parse(decodeURIComponent(partnerDataCookie.toLowerCase()));
-    const partnerInfoObj = JSON.parse(decodeURIComponent(partnerInfoCookie.toLowerCase()));
-    
-    const portalData = {
-      ...(partnerDataObj?.[programType] ?? {}),
-      ...partnerInfoObj
-    };
-    
-    return portalData?.[key] || '';
+    const portalData = getPartnerCookieObject(programType);
+    const lowercasedPortalData = JSON.parse(
+      JSON.stringify(portalData).toLowerCase()
+    );
+    return lowercasedPortalData?.[key] || '';
   } catch (error) {
     console.error('Error parsing partner data object:', error);
     // eslint-disable-next-line consistent-return
@@ -243,13 +234,10 @@ function getComplexQueryParams(el) {
 
 export function getPartnerCookieObject(programType) {
   const partnerDataCookie = getCookieValue('partner_data');
-  if (!partnerDataCookie) return {};
-
   const partnerInfoCookie = getCookieValue('partner_info');
-  if (!partnerInfoCookie) return {};
 
-  const partnerDataObj = JSON.parse(decodeURIComponent(partnerDataCookie));
-  const partnerInfoObj = JSON.parse(decodeURIComponent(partnerInfoCookie));
+  const partnerDataObj = partnerDataCookie ? JSON.parse(decodeURIComponent(partnerDataCookie)) : {};
+  const partnerInfoObj = partnerInfoCookie ? JSON.parse(decodeURIComponent(partnerInfoCookie)) : {};
   
   const programKey = programType.toUpperCase();
   const portalData = {
