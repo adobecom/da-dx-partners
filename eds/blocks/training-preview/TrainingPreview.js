@@ -28,14 +28,6 @@ export default class TrainingPreview extends LitElement {
       return;
     }
 
-    // Inject the CSS file (once)
-    if (!document.querySelector('link[href="/eds/blocks/training-preview/dist/css/cptraining.min.css"]')) {
-      const cssLink = document.createElement('link');
-      cssLink.rel = 'stylesheet';
-      cssLink.href = '/eds/blocks/training-preview/dist/css/cptraining.min.css';
-      document.head.appendChild(cssLink);
-    }
-
     function addStyle(name) {
       if (!document.querySelector(`link[href="${name}"]`)) {
         const linkElement = document.createElement('link');

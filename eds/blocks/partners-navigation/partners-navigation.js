@@ -1478,7 +1478,7 @@ class Gnav {
         clearTimeout(decorationTimeout);
 
         const loadingDesktopMegaMenuHTML = template.querySelector('.feds-popup.loading')?.innerHTML;
-        await (async () => {
+        (async () => {
           try {
             const menuLogic = await loadDecorateMenu();
 

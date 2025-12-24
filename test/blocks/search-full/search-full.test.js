@@ -1677,5 +1677,28 @@ describe('SearchCard Unit Tests', () => {
       // Clean up
       document.body.removeChild(searchCard);
     });
+
+    it('should contain search cards analytics attributes', async function () {
+      const searchCardsWrapper = document.querySelector('.search-cards-wrapper');
+      expect(searchCardsWrapper.shadowRoot).to.exist;
+
+      const component = await init(searchCardsWrapper);
+      await component.updateComplete;
+      expect(component).to.exist;
+
+      expect(searchCardsWrapper.getAttribute('daa-lh')).to.equal('Search Cards Section');
+
+      const searchBoxWrapper = searchCardsWrapper.shadowRoot.querySelector('.search-box-wrapper');
+      expect(searchBoxWrapper.getAttribute('daa-lh')).to.equal('Search Box');
+
+      const searchCardsContent = searchCardsWrapper.shadowRoot.querySelectorAll('.content')[1];
+      expect(searchCardsContent.getAttribute('daa-lh')).to.equal('Search Cards Content | Filters: Analytics Target Retail | Search Query: None');
+
+      const firstCard = searchCardsWrapper.shadowRoot.querySelector('search-card');
+      expect(firstCard.getAttribute('daa-lh')).to.equal(`Search Card 1 | ${cards[0].contentArea.title}`);
+
+      const singlePartnerCardBtn = firstCard.shadowRoot.querySelector('sp-action-button');
+      expect(singlePartnerCardBtn.getAttribute('daa-ll')).to.equal(cards[0].contentArea.title);
+    });
   });
 });

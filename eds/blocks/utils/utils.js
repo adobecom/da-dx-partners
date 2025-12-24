@@ -124,3 +124,6 @@ export function transformCardUrl(url) {
   }
   return newUrl;
 }
+export function isProd() {
+  return prodHosts.includes(window.location.host);
+}

@@ -56,7 +56,7 @@ export default async function init(el) {
   app.setAttribute('data-idx', sectionIndex);
   keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'training-not-available-fragment');
   keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'enroll-alert-text');
-  keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'training-static-info-fragment');
+  keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'training-warning-text');
   el.replaceWith(app);
 
   await deps;
