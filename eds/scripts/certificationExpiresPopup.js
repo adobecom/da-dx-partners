@@ -91,7 +91,7 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
   if (portalMessagingOpen) return;
   if (!isMember()) return;
   const lastCertificationPopupShown = parseLocalDate(
-    sessionStorage.getItem(LAST_DATE_SHOWN),
+    localStorage.getItem(LAST_DATE_SHOWN),
   ) || new Date(0); // Jan 1, 1970 at midnight local time
   const today = normalizeDate(new Date());
   // Check if popup was already shown today (compare local calendar days, not time difference)
@@ -142,7 +142,7 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
       class: 's-size',
       content: popupContent,
       closeCallback: () => {
-        sessionStorage.setItem(LAST_DATE_SHOWN, dateToLocalString(normalizeDate(new Date())));
+        localStorage.setItem(LAST_DATE_SHOWN, dateToLocalString(normalizeDate(new Date())));
       },
     },
   );
