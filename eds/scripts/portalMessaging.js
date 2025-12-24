@@ -1,7 +1,7 @@
 import {
     getCurrentProgramType,
     getMetadataContent,
-    getPartnerDataCookieValue,
+    getPartnerCookieValue,
     isMember
 } from "./utils.js";
 import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./personalizationConfigDX.js";
@@ -29,7 +29,7 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
     const modalClosed = sessionStorage.getItem('portal-messaging-popup-closed')
     if (modalClosed === 'true') return;
 
-    const specialStateCookie = getPartnerDataCookieValue('specialstate');
+    const specialStateCookie = getPartnerCookieValue('specialstate');
     if (!specialStateCookie) return;
 
     let popupType;

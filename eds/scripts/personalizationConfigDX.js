@@ -6,7 +6,7 @@ import {
   isMember,
   partnerIsSignedIn,
   signedInNonMember,
-  getPartnerDataCookieValue,
+  getPartnerCookieValue,
   partnerDataCookieContainsValue,
   isReturningUser, isAccountLocked, isBctqExpiring
 } from './utils.js';
@@ -41,7 +41,7 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-member': isMember(),
   'partner-sales-access': hasSalesCenterAccess(),
   'partner-level': (level) => PARTNER_LEVEL === level,
-  'partner-primary': getPartnerDataCookieValue('primarycontact'),
+  'partner-primary': getPartnerCookieValue('primarycontact'),
   'partner-primary-business-solution': partnerDataCookieContainsValue('primarybusiness', DX_PRIMARY_BUSINESS.SOLUTION),
   'partner-primary-business-technology': partnerDataCookieContainsValue('primarybusiness', DX_PRIMARY_BUSINESS.TECHNOLOGY),
   'partner-new-user-segment': isPartnerNewlyRegistered(),
@@ -55,11 +55,11 @@ export const PERSONALIZATION_CONDITIONS = {
       partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.SALES_CENTER_ADMIN)),
   'partner-designation-legal': partnerDataCookieContainsValue('designationtype', DX_DESIGNATION_TYPE.LEGAL_AND_COMPLIANCE),
   'partner-designation-learning': partnerDataCookieContainsValue('designationtype', DX_DESIGNATION_TYPE.LEARNING_AND_DEVELOPMENT),
-  'partner-locked-compliance': isAccountLocked() && getPartnerDataCookieValue('compliancestatus') === DX_COMPLIANCE_STATUS.NOT_COMPLETED.toLowerCase(),
-  'partner-locked-payment': isAccountLocked() && getPartnerDataCookieValue('compliancestatus') === DX_COMPLIANCE_STATUS.COMPLETED.toLowerCase(),
-  'partner-locked-compliance-past': getPartnerDataCookieValue('specialstate') === DX_SPECIAL_STATE.LOCKED_COMPLIANCE_PAST,
-  'partner-locked-payment-future': getPartnerDataCookieValue('specialstate') === DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE,
-  'partner-submitted-in-review': getPartnerDataCookieValue('specialstate') === DX_SPECIAL_STATE.SUBMITTED_IN_REVIEW,
+  'partner-locked-compliance': isAccountLocked() && getPartnerCookieValue('compliancestatus') === DX_COMPLIANCE_STATUS.NOT_COMPLETED.toLowerCase(),
+  'partner-locked-payment': isAccountLocked() && getPartnerCookieValue('compliancestatus') === DX_COMPLIANCE_STATUS.COMPLETED.toLowerCase(),
+  'partner-locked-compliance-past': getPartnerCookieValue('specialstate') === DX_SPECIAL_STATE.LOCKED_COMPLIANCE_PAST,
+  'partner-locked-payment-future': getPartnerCookieValue('specialstate') === DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE,
+  'partner-submitted-in-review': getPartnerCookieValue('specialstate') === DX_SPECIAL_STATE.SUBMITTED_IN_REVIEW,
   'partner-bctq-expiring-90d': isBctqExpiring(90),
 };
 

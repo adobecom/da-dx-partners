@@ -1,7 +1,7 @@
 import {
   isMember,
   getNodesByXPath,
-  getPartnerDataCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration, getLibs
+  getPartnerCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration, getLibs
 } from './utils.js';
 import {
   PERSONALIZATION_PLACEHOLDERS,
@@ -15,6 +15,8 @@ import {
 } from './personalizationUtils.js';
 import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
+const imgSelector = 'img.feds-profile-img';
+
 async function replaceProfileImage(elements) {
   try {
     const isSignedIn = typeof window.adobeIMS?.isSignedInUser === 'function' && window.adobeIMS.isSignedInUser();
@@ -23,7 +25,7 @@ async function replaceProfileImage(elements) {
       return;
     }
 
-    const existingAvatarImg = document.querySelector('img.feds-profile-img');
+    const existingAvatarImg = document.querySelector(imgSelector);
     if (!existingAvatarImg?.src) {
       elements.forEach((el) => el.remove());
       return;
@@ -60,7 +62,7 @@ async function replaceProfileImage(elements) {
 function personalizeProfileImage(elements) {
   if (!elements.length) return;
   
-  const existingAvatarImg = document.querySelector('img.feds-profile-img');
+  const existingAvatarImg = document.querySelector(imgSelector);
   if (existingAvatarImg?.src) {
     replaceProfileImage(elements);
   } else {
@@ -72,7 +74,7 @@ function personalizeProfileImage(elements) {
 
 async function replaceCompanyLogo(elements) {
   try {
-    const programData = getPartnerDataCookieObject(getCurrentProgramType());
+    const programData = getPartnerCookieObject(getCurrentProgramType());
     const companyLogoUrl = programData?.companyLogoUrl;
 
     if (!companyLogoUrl) {
@@ -106,7 +108,7 @@ export function personalizePlaceholders(placeholders, context = document, progra
   const sortedEntries = Object.entries(placeholders).sort((a, b) => b[0].length - a[0].length);
   sortedEntries.forEach(([key, value]) => {
     const elements = getNodesByXPath(value, context);
-    const programData = getPartnerDataCookieObject(programType);
+    const programData = getPartnerCookieObject(programType);
     let placeholderValue = programData[key];
 
     if (key === 'profileImage' && elements.length > 0) {

@@ -139,7 +139,7 @@ export function getCookieValue(key) {
   const cookie = cookies.find((el) => el.startsWith(`${key}=`));
   return cookie?.substring((`${key}=`).length);
 }
-export function getPartnerDataCookieValue(key, programType = DX_PROGRAM_TYPE) {
+export function getPartnerCookieValue(key, programType = DX_PROGRAM_TYPE) {
   try {
     if(!programType){
       programType = getCurrentProgramType();
@@ -184,7 +184,7 @@ function extractTableCollectionTags(el) {
 }
 
 function getPartnerLevelParams(portal) {
-  const partnerLevel = getPartnerDataCookieValue('level', portal);
+  const partnerLevel = getPartnerCookieValue('level', portal);
   const partnerTagBase = `caas:adobe-partners/px/partner-level/`;
 
   const partnerLevels = ['gold', 'silver', 'platinum', 'community'];
@@ -241,7 +241,7 @@ function getComplexQueryParams(el) {
   return fullQuery;
 }
 
-export function getPartnerDataCookieObject(programType) {
+export function getPartnerCookieObject(programType) {
   const partnerDataCookie = getCookieValue('partner_data');
   if (!partnerDataCookie) return {};
 
@@ -261,18 +261,18 @@ export function getPartnerDataCookieObject(programType) {
 }
 
 export function hasSalesCenterAccess() {
-  return getPartnerDataCookieValue('salescenteraccess');
+  return getPartnerCookieValue('salescenteraccess');
 }
 
 export function isAdminUser() {
-  const { isAdmin } = getPartnerDataCookieObject(getCurrentProgramType());
+  const { isAdmin } = getPartnerCookieObject(getCurrentProgramType());
   return !!isAdmin;
 }
 
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
 
-  const createdDate = getPartnerDataCookieValue('createddate');
+  const createdDate = getPartnerCookieValue('createddate');
 
   const newestCreatedDate = new Date(createdDate);
   const now = new Date();
@@ -284,7 +284,7 @@ export function isPartnerNewlyRegistered() {
 }
 
 export function isMember() {
-  return getPartnerDataCookieObject(getCurrentProgramType())?.status === 'MEMBER';
+  return getPartnerCookieObject(getCurrentProgramType())?.status === 'MEMBER';
 }
 
 export function partnerIsSignedIn() {
@@ -296,7 +296,7 @@ export function signedInNonMember() {
 }
 
 export function partnerDataCookieContainsValue(key, value) {
-  const cookieValue = getPartnerDataCookieValue(key);
+  const cookieValue = getPartnerCookieValue(key);
   if (!cookieValue) return false;
   return cookieValue.includes(value.toLowerCase());
 }
@@ -310,14 +310,14 @@ export function isAccountLocked() {
 
 export function isBctqExpiring(renewalNoticeDays) {
   const daysRemaining = getDaysUntilComplianceExpiration();
-  const status = getPartnerDataCookieValue('status');
+  const status = getPartnerCookieValue('status');
   return daysRemaining !== null && daysRemaining <= renewalNoticeDays && status !== 'locked';
 }
 
 export function getDaysUntilComplianceExpiration() {
     if (!partnerIsSignedIn()) return null;
 
-    const expirationTimestamp = getPartnerDataCookieValue('complianceexpirydate');
+    const expirationTimestamp = getPartnerCookieValue('complianceexpirydate');
     if (!expirationTimestamp) return null;
 
     const expirationDate = new Date(Number(expirationTimestamp));
@@ -332,7 +332,7 @@ export function getDaysUntilComplianceExpiration() {
 export function getDaysFromRegistration() {
   if (!partnerIsSignedIn()) return null;
 
-  const createdDate = getPartnerDataCookieValue('createddate');
+  const createdDate = getPartnerCookieValue('createddate');
   if (!createdDate) return null;
 
   const registrationDate = new Date(createdDate);
@@ -353,7 +353,7 @@ export function isReturningUser(daysNumber) {
 }
 
 function isDxpMember() {
-  return getPartnerDataCookieValue('status', 'dxp') === 'member';
+  return getPartnerCookieValue('status', 'dxp') === 'member';
 }
 
 export function getNodesByXPath(query, context = document) {
