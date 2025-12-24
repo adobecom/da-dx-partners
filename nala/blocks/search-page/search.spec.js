@@ -1,9 +1,10 @@
 export default {
   features: [
     {
+      tcid: '1',
       name: '@search-page-platinum-user-validation',
       path: '/digitalexperience/drafts/automation/regression/search-page',
-      tags: '@da-dx-search-page@regression @circleCi',
+      tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
         searchKeyword: 'dxRegressionTest25',
@@ -16,5 +17,78 @@ export default {
         trainingLink:'https://learningmanager.adobe.com/'
       },
     },
+    {
+      tcid: '2',
+      name: '@search-page-silver-user-validation',
+      path: '/digitalexperience/drafts/automation/regression/search-page',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-silver:',
+        searchKeyword: 'dxRegressionTest25',
+        assetTitle1: 'Asset preview Public PDF Regular',
+        assetTitle2: 'Asset preview Community JPG Regular',
+        assetTitle3: 'Asset preview Silver PPTX Regular',
+        assetTitle4: 'Asset preview Public ZIP Netstorage',
+        silverAsset: 'Silver only page for testing search Automation',
+      },
+    }, 
+    {
+      tcid: '3',
+      name: '@asset-preview-public-non-logged-in-user-validation',
+      path: '/digitalexperience/preview/qatest/asset-preview/Asset%20preview%20Public%20PDF%20Regular.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        assetTitle: 'Asset detail: Asset preview Public PDF Regular  (PDF)',
+        assetDate: 'Date: ',
+        assetDateValue: '12/4/2025',
+        assetSummary: 'Summary: ',
+        assetType: 'Type: ',
+        assetTypeValue: 'PDF',
+        assetTags: 'Tags: ',
+        assetTagsValue: ['Public', 'PX', 'Adobe Partners', 'Explore', 'Networking', 'Data Activation', 'Content Velocity', 'Bacom', 'Resource', 'PDF'],
+        assetSize: 'Size: ',
+        assetSizeValue: '451.7 KB',
+        assetUrl: '/digitalexperience-assets/qatest/asset-preview/Asset%20preview%20Public%20PDF%20Regular.pdf',
+      }
+    },
+    {
+      tcid: '4',
+      name: '@asset-preview-community-logged-in-user-validation',
+      path: '/digitalexperience/preview/qatest/asset-preview/Asset%20preview%20Community%20JPG%20Regular.jpg.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-community:',
+        assetTitle: 'Asset detail: Asset preview Community JPG Regular  (Image)',
+        assetDate: 'Date: ',
+        assetDateValue: '12/4/2025',
+        assetSummary: 'Summary: ',
+        assetSummaryValue: 'Asset preview Community JPG Regular Description',
+        assetType: 'Type: ',
+        assetTypeValue: 'Image',
+        assetTags: 'Tags: ',
+        assetTagsValue: ['Community', 'Silver', 'Gold', 'Platinum', 'PX', 'Adobe Partners', 'Discover', 'Try This at Home', 'Analysis & Insights', 'Solutions+', 'Gravity', 'Resource', 'Image'],
+        assetSize: 'Size: ',
+        assetSizeValue: '2.6 MB',
+        assetUrl: '/digitalexperience-assets/qatest/asset-preview/Asset%20preview%20Public%20PDF%20Regular.pdf',
+        searchAllAssetsPath: 'https://partners.stage.adobe.com/digitalexperience/home/search/',
+        goldAssetLink: '/digitalexperience/preview/netstorage-assets/spp/gold/as/asset_preview_goldmp4netstorage.mp4.html',
+        asssetPreviewTitle: 'Asset detail: Asset preview Gold MP4 Netstorage  (Video)',
+      }
+    },
+    {
+      tcid: '5',
+      name: '@asset-preview-gold-user-validation',
+      path: '/digitalexperience/drafts/automation/regression/search-page',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-silver:',
+        searchKeyword: 'dxRegressionTest25',
+        assetTitle1: 'Asset preview Public PDF Regular',
+        assetTitle2: 'Asset preview Community JPG Regular',
+        assetTitle3: 'Asset preview Silver PPTX Regular',
+        assetTitle4: 'Asset preview Public ZIP Netstorage',
+        silverAsset: 'Silver only page for testing search Automation',
+      },
+    }, 
   ],
 };

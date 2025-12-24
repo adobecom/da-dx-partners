@@ -13,6 +13,24 @@ export default class SearchPage {
     this.clearSearch = page.getByRole('button', { name: 'Reset' });
     this.trainingButton = page.getByRole('button', { name: 'Trainings' });
     this.trainingPreviewButton = page.locator('.card-icons').nth(0);
+    this.journeyPhaseFilter = page.getByRole('button', { name: 'Journey Phase' });
+    this.exploreCheckBox = page.getByRole('checkbox', { name: 'Explore' });
+    this.discoverCheckBox = page.getByRole('checkbox', { name: 'Discover' });
+    this.functionalityFilter = page.getByRole('button', { name: 'Functionality' });
+    this.analysisInsgightCheckBox = page.getByRole('checkbox', { name: 'Analysis & Insights' });
+    this.businessSolutionFilter= page.getByRole('button', { name: 'Business Solutions' });
+    this.b2bCheckBox = page.getByRole('checkbox', { name: 'B2B Orchestration' });
+    this.crossFunctionalCheckBox = page.getByRole('checkbox', { name: 'Cross-functional Collaboration' });
+    this.assetTitlePreview = page.locator('.asset-preview-block-header');
+    this.assetDate = page.locator('p').filter({ hasText: 'Date:' });
+    this.assetSummary = page.locator('p').filter({ hasText: 'Summary:' });
+    this.assetType = page.locator('p').filter({ hasText: 'Type:' });
+    this.assetTags = page.locator('p').filter({ hasText: 'Tags:' });
+    this.assetSize = page.locator('p').filter({ hasText: 'Size:' });
+    this.viewAssetButton = page.getByRole('button', { name: 'View' });
+    this.downloadAssetButton = page.getByRole('button', { name: 'Download PDF' });
+    this.downloadImageButton = page.getByRole('button', { name: 'Download Image' });
+    this.searchAllAssetsButton = page.getByRole('link', { name: 'Search All Assets' });
   }
 
   async getCardTitle() {
