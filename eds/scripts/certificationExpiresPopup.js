@@ -76,7 +76,7 @@ function isMilestoneReached(certification, lastCertificationPopupShown) {
   const certificationExpiresInDays = Math.round(
     (certificationExpiresDate - currentDate) / (24 * 60 * 60 * 1000),
   );
-  if (certificationExpiresInDays < 0) {
+  if (certificationExpiresInDays <= 0) {
     return false;
   }
   if (certificationExpiresInDays > 180) return false;
