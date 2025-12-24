@@ -295,7 +295,7 @@ export function signedInNonMember() {
   return partnerIsSignedIn() && !isMember();
 }
 
-export function partnerDataCookieContainsValue(key, value) {
+export function partnerCookieContainsValue(key, value) {
   const cookieValue = getPartnerCookieValue(key);
   if (!cookieValue) return false;
   return cookieValue.includes(value.toLowerCase());
@@ -303,9 +303,9 @@ export function partnerDataCookieContainsValue(key, value) {
 
 export function isAccountLocked() {
   if (!partnerIsSignedIn()) return false;
-  return partnerDataCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED) ||
-    partnerDataCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_COMPLIANCE_PAST) ||
-    partnerDataCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE);
+  return partnerCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED) ||
+    partnerCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_COMPLIANCE_PAST) ||
+    partnerCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE);
 }
 
 export function isBctqExpiring(renewalNoticeDays) {

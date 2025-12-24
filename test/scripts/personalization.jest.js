@@ -1136,8 +1136,8 @@ describe('Test personalization.js', () => {
             },
           };
           document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-          const { partnerDataCookieContainsValue } = require('../../eds/scripts/utils.js');
-          expect(partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN)).toBe(true);
+          const { partnerCookieContainsValue } = require('../../eds/scripts/utils.js');
+          expect(partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN)).toBe(true);
         });
       });
     });

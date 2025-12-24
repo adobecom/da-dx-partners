@@ -28,7 +28,7 @@ import {
   getCaasUrl,
   getNodesByXPath,
   setLibs,
-  partnerDataCookieContainsValue,
+  partnerCookieContainsValue,
   getDaysFromRegistration,
   isReturningUser,
 } from '../../eds/scripts/utils.js';
@@ -341,19 +341,19 @@ describe('Test utils.js', () => {
     document.cookie = `partner_info=${JSON.stringify({ firstName: 'test' })}`;
     expect(hasSalesCenterAccess()).toBeFalsy();
   });
-  it('partnerDataCookieContainsValue returns true when accessType value matches', () => {
+  it('partnerCookieContainsValue returns true when accessType value matches', () => {
     const cookieObject = { DXP: { accessType: 'Billing Admin' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     document.cookie = `partner_info=${JSON.stringify({})}`;
-    expect(partnerDataCookieContainsValue('accesstype', 'billing admin')).toBe(true);
+    expect(partnerCookieContainsValue('accesstype', 'billing admin')).toBe(true);
   });
-  it('partnerDataCookieContainsValue returns false when key missing or cookie absent', () => {
+  it('partnerCookieContainsValue returns false when key missing or cookie absent', () => {
     document.cookie = 'partner_data=';
-    expect(partnerDataCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
+    expect(partnerCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
     const cookieObject = { DXP: { other: 'value' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     document.cookie = `partner_info=${JSON.stringify({})}`;
-    expect(partnerDataCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
+    expect(partnerCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
   });
   it('getDaysFromRegistration returns null when not signed in or missing createddate', () => {
     document.cookie = 'partner_data=';

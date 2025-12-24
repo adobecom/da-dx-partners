@@ -7,7 +7,7 @@ import {
   partnerIsSignedIn,
   signedInNonMember,
   getPartnerCookieValue,
-  partnerDataCookieContainsValue,
+  partnerCookieContainsValue,
   isReturningUser, isAccountLocked, isBctqExpiring
 } from './utils.js';
 import {
@@ -42,19 +42,19 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-sales-access': hasSalesCenterAccess(),
   'partner-level': (level) => PARTNER_LEVEL === level,
   'partner-primary': getPartnerCookieValue('primarycontact'),
-  'partner-primary-business-solution': partnerDataCookieContainsValue('primarybusiness', DX_PRIMARY_BUSINESS.SOLUTION),
-  'partner-primary-business-technology': partnerDataCookieContainsValue('primarybusiness', DX_PRIMARY_BUSINESS.TECHNOLOGY),
+  'partner-primary-business-solution': partnerCookieContainsValue('primarybusiness', DX_PRIMARY_BUSINESS.SOLUTION),
+  'partner-primary-business-technology': partnerCookieContainsValue('primarybusiness', DX_PRIMARY_BUSINESS.TECHNOLOGY),
   'partner-new-user-segment': isPartnerNewlyRegistered(),
   'partner-returning-user-60d': isReturningUser(60),
   'partner-returning-user-90d': isReturningUser(90),
-  'partner-billing-admin': partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.BILLING_ADMIN),
-  'partner-salescenter-admin': partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.SALES_CENTER_ADMIN),
-  'partner-admin': partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN),
-  'partner-user': !(partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN) ||
-      partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.BILLING_ADMIN) ||
-      partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.SALES_CENTER_ADMIN)),
-  'partner-designation-legal': partnerDataCookieContainsValue('designationtype', DX_DESIGNATION_TYPE.LEGAL_AND_COMPLIANCE),
-  'partner-designation-learning': partnerDataCookieContainsValue('designationtype', DX_DESIGNATION_TYPE.LEARNING_AND_DEVELOPMENT),
+  'partner-billing-admin': partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.BILLING_ADMIN),
+  'partner-salescenter-admin': partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.SALES_CENTER_ADMIN),
+  'partner-admin': partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN),
+  'partner-user': !(partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN) ||
+      partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.BILLING_ADMIN) ||
+      partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.SALES_CENTER_ADMIN)),
+  'partner-designation-legal': partnerCookieContainsValue('designationtype', DX_DESIGNATION_TYPE.LEGAL_AND_COMPLIANCE),
+  'partner-designation-learning': partnerCookieContainsValue('designationtype', DX_DESIGNATION_TYPE.LEARNING_AND_DEVELOPMENT),
   'partner-locked-compliance': isAccountLocked() && getPartnerCookieValue('compliancestatus') === DX_COMPLIANCE_STATUS.NOT_COMPLETED.toLowerCase(),
   'partner-locked-payment': isAccountLocked() && getPartnerCookieValue('compliancestatus') === DX_COMPLIANCE_STATUS.COMPLETED.toLowerCase(),
   'partner-locked-compliance-past': getPartnerCookieValue('specialstate') === DX_SPECIAL_STATE.LOCKED_COMPLIANCE_PAST,
