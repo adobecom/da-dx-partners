@@ -45,7 +45,9 @@ class SearchCard extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   getFileType(type) {
-    const supportedFileTypes = ['excel', 'pdf', 'powerpoint', 'video', 'word', 'zip', 'html', 'announcement'];
+    if (type === 'course') return 'course';
+
+    const supportedFileTypes = ['excel', 'pdf', 'powerpoint', 'video', 'word', 'zip', 'html'];
     return supportedFileTypes.includes(type) ? type : 'default';
   }
 
@@ -73,13 +75,13 @@ class SearchCard extends LitElement {
           }
           <div class="card-text">
             <span class="card-date">${this.localizedText['{{last-modified}}']}: ${formatDate(this.data.cardDate, this.ietf)}
-          ${this.data.contentArea?.type !== 'html' && this.data.contentArea?.type !== 'announcement'
+          ${this.data.contentArea?.type !== 'html' && this.data.contentArea?.contentType !== 'course'
         ? html`<span class="card-size">${this.localizedText['{{size}}']}: ${this.data.contentArea?.size}</span>`
         : ''
       }
             </span>
             <p class="card-description">${unsafeHTML(DOMPurify.sanitize(this.data.contentArea?.description))}</p>
-            <div class="card-tags-wrapper">${this.cardTags}</div>
+            ${ this.data.contentArea?.contentType !== 'course' ? html`<div class="card-tags-wrapper">${this.cardTags}</div>` : '' }
           </div>
         </div>
       </div>
