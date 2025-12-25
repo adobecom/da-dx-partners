@@ -234,6 +234,7 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
           firstName: 'Test use',
           specialState: 'locked',
+          purchasedPartnerLevel: 'Silver',
           complianceStatus: DX_COMPLIANCE_STATUS.NOT_COMPLETED
         },
       };
@@ -242,6 +243,8 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
       const lockedComplianceNotCompletedBlock = document.querySelector('.partner-locked-compliance');
       expect(lockedComplianceNotCompletedBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+      const placeholderElementAfter = document.querySelector('.purchasedPartnerLevelHolder');
+      expect(placeholderElementAfter.textContent.includes(cookieObject.DXP.purchasedPartnerLevel)).toBe(true);
     });
   });
   it('Show Locked Compliance Not Completed block', () => {
@@ -251,6 +254,7 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
           firstName: 'Test use',
           specialState: 'locked',
+          purchasedPartnerLevel: 'Silver',
           complianceStatus: DX_COMPLIANCE_STATUS.COMPLETED
         },
       };
@@ -259,6 +263,8 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
       const lockedComplianceCompletedBlock = document.querySelector('.partner-locked-payment');
       expect(lockedComplianceCompletedBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+      const placeholderElementAfter = document.querySelector('.purchasedPartnerLevelHolderCoplianceCompleted');
+      expect(placeholderElementAfter.textContent.includes(cookieObject.DXP.purchasedPartnerLevel)).toBe(true);
     });
   });
   it('Show Locked Compliance Expiry date in the past block', () => {
@@ -267,7 +273,8 @@ describe('Test personalization.js', () => {
         DXP: {
           status: 'MEMBER',
           firstName: 'Test use',
-          specialState: 'locked-compliance-past'
+          specialState: 'locked-compliance-past',
+          purchasedPartnerLevel: 'Silver',
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
@@ -284,6 +291,7 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
           firstName: 'Test use',
           specialState: 'locked-payment-future',
+          purchasedPartnerLevel: 'Silver',
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
@@ -300,6 +308,7 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
           firstName: 'Test use',
           specialState: 'submitted-in-review',
+          purchasedPartnerLevel: 'Silver',
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
