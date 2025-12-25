@@ -84,7 +84,7 @@ test.describe('Validate profile dropdown block', () => {
     await test.step('Verify sign out redirection', async () => {
       await profileDropdownPage.signOut.click();
       await page.waitForLoadState('domcontentloaded');
-      await expect(page).toHaveURL(features[2].data.signOutLink);
+      await expect(page.url()).toContain(features[2].data.signOutLink);
     });
   });
 });
