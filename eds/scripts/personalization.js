@@ -27,7 +27,7 @@ export function personalizePlaceholders(placeholders, context = document, progra
         el.remove();
         return;
       }
-      el.textContent = el.textContent.replace(`$${key}`, placeholderValue);
+      el.innerHTML = el.innerHTML.replace(`$${key}`, placeholderValue);
       el.classList.add(`${key.toLowerCase()}-placeholder`);
     });
   });

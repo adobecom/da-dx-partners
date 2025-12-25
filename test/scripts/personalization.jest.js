@@ -52,6 +52,7 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
       const placeholderElementAfter = document.querySelector('#welcome-firstname');
       expect(placeholderElementAfter.textContent.includes(cookieObject.DXP.firstName)).toBe(true);
+      expect(placeholderElementAfter.querySelector('a')).toBeTruthy();
     });
   });
   it('Remove placeholder if user is not a member', () => {
