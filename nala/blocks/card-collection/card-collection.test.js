@@ -134,6 +134,7 @@ test.describe('Validate card collection block', () => {
       await page.waitForLoadState('domcontentloaded');
       await cardCollectionPage.mainCollection.isVisible();
       await cardCollectionPage.additionalCollection.isVisible();
+      await page.waitForTimeout(5000);
     });
     await test.step('Filter main collection', async () => {
       const firstResults = await cardCollectionPage.cardsResults.first().textContent();
