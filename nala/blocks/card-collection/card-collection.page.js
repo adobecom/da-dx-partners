@@ -25,6 +25,7 @@ export default class CardCollectionPage {
     this.inproductfilter = page.getByRole('checkbox', { name: 'InDesign' });
     this.premiereRush = page.getByRole('checkbox', { name: 'Premiere Rush' });
     this.workFromAnywhere = page.getByRole('checkbox', { name: 'Work from anywhere' });
+    this.productFilterPanel = page.getByRole('list').filter({ hasText: 'After Effects Bridge InDesign' });
   }
 
   filterCheckbox(role, name) {
