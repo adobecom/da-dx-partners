@@ -1,9 +1,9 @@
-import { getPartnerDataCookieValue, hasSalesCenterAccess } from './utils.js';
+import { getPartnerCookieValue, hasSalesCenterAccess } from './utils.js';
 
 export const PERSONALIZATION_HIDE = 'personalization-hide';
 
 export function processPrimaryContact(el) {
-  const isPrimary = getPartnerDataCookieValue('primarycontact');
+  const isPrimary = getPartnerCookieValue('primarycontact');
   el.classList.add(PERSONALIZATION_HIDE);
   if (!isPrimary) return;
   const primaryContactWrapper = document.createElement('div');
