@@ -72,6 +72,5 @@ export default class CardCollectionPage {
     const option = this.page.locator(`button.sort-item[value="${value}"]`);
     await option.waitFor({ state: 'visible' }); // ensure it's visible
     await option.click();
-    await this.page.waitForLoadState('networkidle');
   }
 }
