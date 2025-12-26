@@ -129,36 +129,63 @@ test.describe('Validate card collection block', () => {
   // @multiple-card-collections-on-one-page
   test(`${features[6].name},${features[6].tags}`, async ({ page }) => {
     const { data } = features[6];
+
+    const extractNumber = (s) => {
+      const m = (s ?? '').match(/\d+/);
+      return m ? Number(m[0]) : 0;
+    };
+
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[6].path}`);
       await page.waitForLoadState('domcontentloaded');
-      await cardCollectionPage.mainCollection.isVisible();
-      await cardCollectionPage.additionalCollection.isVisible();
-      await page.waitForTimeout(5000);
+      await expect(cardCollectionPage.mainCollection).toBeVisible();
+      await expect(cardCollectionPage.additionalCollection).toBeVisible();
+      await expect(cardCollectionPage.cardsResults.first()).toHaveText(/\d+/);
+      await expect(cardCollectionPage.cardsResults.nth(1)).toHaveText(/\d+/);
     });
     await test.step('Filter main collection', async () => {
-      const firstResults = await cardCollectionPage.cardsResults.first().textContent();
-      const secondResults = await cardCollectionPage.cardsResults.nth(1).textContent();
 
-      const mainCollectionResults = await parseInt(firstResults.match(/\d+/)[0], 10);
-      const assitionalCollectionresults = await parseInt(secondResults.match(/\d+/)[0], 10);
+      const firstText = await cardCollectionPage.cardsResults.first().innerText();
+      const secondText = await cardCollectionPage.cardsResults.nth(1).innerText();
+
+      const mainCollectionResults = extractNumber(firstText);
+      const assitionalCollectionresults = extractNumber(secondText);
+
       await expect(mainCollectionResults).toBeGreaterThanOrEqual(assitionalCollectionresults);
+
       await cardCollectionPage.productFilter.click();
-      await cardCollectionPage.filterCheckbox(data.btnRole, data.checkBoxAfterEffects).click();
-      await page.waitForTimeout(5000);
-      const firstResultsFiltered = await cardCollectionPage.cardsResults.first().textContent();
-      const secondResultsFiltered = await cardCollectionPage.cardsResults.nth(1).textContent();
-      const mainCollectionResultsFiltered = await parseInt(firstResultsFiltered.match(/\d+/)[0], 10);
-      const assitionalCollectionresultsFiltered = await parseInt(secondResultsFiltered.match(/\d+/)[0], 10);
-      await expect(mainCollectionResultsFiltered).toBeLessThan(assitionalCollectionresultsFiltered);
+      await expect(cardCollectionPage.productFilterPanel).toBeVisible();
+      const checkBox = cardCollectionPage.filterCheckbox(data.btnRole, data.checkBoxAfterEffects);
+      await expect(checkBox).toBeVisible();
+      await expect(checkBox).toBeEnabled();
+
+      const firstLocator = cardCollectionPage.cardsResults.first();
+      await Promise.all([
+        expect(firstLocator).not.toHaveText(firstText),
+        checkBox.click(),
+      ]);
+      const firstTextAfter = await firstLocator.innerText();
+      const secondTextAfter = await cardCollectionPage.cardsResults.nth(1).innerText();
+  
+      const mainAfter = extractNumber(firstTextAfter);
+      const additionalAfter = extractNumber(secondTextAfter);
+  
+      await expect(mainAfter).toBeLessThanOrEqual(additionalAfter);
     });
     await test.step('Sort main collection', async () => {
       await cardCollectionPage.clearAll.click();
       const mainCardTitleBefore = await cardCollectionPage.getFirstCardMainCollection();
       const additionalCardTitleBefore = await cardCollectionPage.getFirstCardAdditionalCollection();
+
       await cardCollectionPage.selectDateSort(data.oldestSort);
+
+      await expect
+        .poll(async () => await cardCollectionPage.getFirstCardMainCollection())
+        .not.toBe(mainCardTitleBefore);
+
       const mainCardTitleAfter = await cardCollectionPage.getFirstCardMainCollection();
       const additionalCardTitleAfter = await cardCollectionPage.getFirstCardAdditionalCollection();
+
       await expect(mainCardTitleBefore).not.toBe(mainCardTitleAfter);
       await expect(additionalCardTitleBefore).toBe(additionalCardTitleAfter);
     });
