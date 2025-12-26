@@ -144,7 +144,7 @@ test.describe('Validate card collection block', () => {
       await expect(mainCollectionResults).toBeGreaterThanOrEqual(assitionalCollectionresults);
       await cardCollectionPage.productFilter.click();
       await cardCollectionPage.filterCheckbox(data.btnRole, data.checkBoxAfterEffects).click();
-      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(5000);
       const firstResultsFiltered = await cardCollectionPage.cardsResults.first().textContent();
       const secondResultsFiltered = await cardCollectionPage.cardsResults.nth(1).textContent();
       const mainCollectionResultsFiltered = await parseInt(firstResultsFiltered.match(/\d+/)[0], 10);
