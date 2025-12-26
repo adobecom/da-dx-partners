@@ -9,7 +9,12 @@ import {
   DX_DESIGNATION_TYPE,
   DX_PRIMARY_BUSINESS
 } from "../../eds/blocks/utils/dxConstants.js";
-
+jest.mock('./../../eds/libs/deps/purify-wrapper.js', () => ({
+  __esModule: true,
+  default: {
+    sanitize: jest.fn(v => v),
+  }
+}));
 const PERSONALIZATION_HIDE_CLASS = 'personalization-hide';
 
 function importModules() {
