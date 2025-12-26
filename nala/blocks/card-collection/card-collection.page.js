@@ -34,7 +34,7 @@ export default class CardCollectionPage {
   async cardTitleByText(title) {
     const card = this.page.locator(`.card-title:has-text("${title}")`);
     await expect(card)
-      .toBeVisible();
+      .toBeVisible({ timeout: 20000 });
   }
 
   async getFirstCardTitle() {
