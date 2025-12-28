@@ -140,8 +140,9 @@ test.describe('Validate card collection block', () => {
       await page.waitForLoadState('domcontentloaded');
       await expect(cardCollectionPage.mainCollection).toBeVisible();
       await expect(cardCollectionPage.additionalCollection).toBeVisible();
-      await expect(cardCollectionPage.cardsResults.first()).toHaveText(/\d+/);
-      await expect(cardCollectionPage.cardsResults.nth(1)).toHaveText(/\d+/);
+      await expect(cardCollectionPage.cardsResults).toHaveCount(2, { timeout: 20000 });
+      await expect(cardCollectionPage.cardsResults.first()).toContainText(/\d+/);
+      await expect(cardCollectionPage.cardsResults.nth(1)).toContainText(/\d+/);
     });
     await test.step('Filter main collection', async () => {
 
@@ -160,17 +161,23 @@ test.describe('Validate card collection block', () => {
       await expect(checkBox).toBeEnabled();
 
       const firstLocator = cardCollectionPage.cardsResults.first();
-      await Promise.all([
-        expect(firstLocator).not.toHaveText(firstText),
-        checkBox.click(),
-      ]);
+      await checkBox.click();
+      await expect(checkBox).toBeChecked();
+      await expect(firstLocator).not.toHaveText(firstText);
+
       const firstTextAfter = await firstLocator.innerText();
+      await cardCollectionPage.cardsResults.nth(1).scrollIntoViewIfNeeded();
+      await page.locator('.progress-circle-wrapper').waitFor({ state: 'hidden' });
+      
       const secondTextAfter = await cardCollectionPage.cardsResults.nth(1).innerText();
   
       const mainAfter = extractNumber(firstTextAfter);
       const additionalAfter = extractNumber(secondTextAfter);
+      
+      console.log('Main collection results after filter:', mainAfter);
+      console.log('Additional collection results after filter:', additionalAfter);
   
-      await expect(mainAfter).toBeLessThanOrEqual(additionalAfter);
+      await expect(mainAfter).toBeLessThan(additionalAfter);
     });
     await test.step('Sort main collection', async () => {
       await cardCollectionPage.clearAll.click();
