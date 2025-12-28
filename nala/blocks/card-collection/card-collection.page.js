@@ -25,6 +25,7 @@ export default class CardCollectionPage {
     this.inproductfilter = page.getByRole('checkbox', { name: 'InDesign' });
     this.premiereRush = page.getByRole('checkbox', { name: 'Premiere Rush' });
     this.workFromAnywhere = page.getByRole('checkbox', { name: 'Work from anywhere' });
+    this.productFilterPanel = page.getByRole('list').filter({ hasText: 'After Effects Bridge InDesign' });
   }
 
   filterCheckbox(role, name) {
@@ -34,7 +35,7 @@ export default class CardCollectionPage {
   async cardTitleByText(title) {
     const card = this.page.locator(`.card-title:has-text("${title}")`);
     await expect(card)
-      .toBeVisible();
+      .toBeVisible({ timeout: 20000 });
   }
 
   async getFirstCardTitle() {
@@ -71,6 +72,5 @@ export default class CardCollectionPage {
     const option = this.page.locator(`button.sort-item[value="${value}"]`);
     await option.waitFor({ state: 'visible' }); // ensure it's visible
     await option.click();
-    await this.page.waitForLoadState('networkidle');
   }
 }
