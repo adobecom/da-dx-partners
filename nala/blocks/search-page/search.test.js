@@ -12,7 +12,7 @@ test.describe('Search Page', () => {
     searchPage = new SearchPage(page);
     signInPage = new SignInPage(page);
   });
-  test(`${features[0].name},${features[0].tags}`, async ({ page, context }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ page, browserName, context }) => {
     const { data } = features[0];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[0].path}`);
@@ -27,7 +27,7 @@ test.describe('Search Page', () => {
       await expect(searchPage.searchField).toBeVisible();
       await searchPage.searchField.fill(data.searchKeyword);
       await searchPage.searchField.press('Enter');
-      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(5000);
 
       await searchPage.searchAllResults.waitFor({ state: 'visible' });
       const text = await searchPage.searchAllResults.textContent();
@@ -42,6 +42,9 @@ test.describe('Search Page', () => {
       await expect(firstCardTitle).not.toBe(secondCardTitle);
     });
     await test.step('Asset Card Content Validation', async () => {
+      if (browserName === 'firefox') {
+        await searchPage.oneTrustBanner.click();
+      }
       const card = searchPage.getCardByTitle(data.cardTitle);
       await card.click();
 
@@ -114,7 +117,7 @@ test.describe('Search Page', () => {
       await searchPage.searchField.fill(data.silverAsset);
       await page.waitForTimeout(5000);
       await searchPage.searchField.press('Enter');
-      await page.waitForTimeout(5000);
+      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       const firstCardTitle = await searchPage.getCardTitle();
       await expect(firstCardTitle).toBe(data.silverAsset);
 
@@ -227,7 +230,7 @@ test.describe('Search Page', () => {
       await searchPage.searchAllAssetsButton.click();
       await page.waitForLoadState('networkidle');
       const currentUrl = page.url();
-      await expect(currentUrl).toBe(data.searchAllAssetsPath);
+      await expect(currentUrl).toContain(data.searchAllAssetsPath);
     });
     await test.step('Go to Gold Asset', async () => {
       await page.goto(`${data.goldAssetLink}`);

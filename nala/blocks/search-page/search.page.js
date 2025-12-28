@@ -36,6 +36,7 @@ export default class SearchPage {
     this.training = page.locator("//p[@id='titletext' and contains(text(),'Adobe Digital Experience Partner Training')]");
     this.loader = page.locator('.progress-circle-wrapper');
     this.clearAll = page.getByRole('button', { name: 'Clear all' });
+    this.oneTrustBanner = page.getByRole('button', { name: 'Enable all' });
   }
 
   async getCardTitle() {

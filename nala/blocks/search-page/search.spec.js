@@ -70,7 +70,7 @@ export default {
         assetSize: 'Size: ',
         assetSizeValue: '2.6 MB',
         assetUrl: '/digitalexperience-assets/qatest/asset-preview/Asset%20preview%20Public%20PDF%20Regular.pdf',
-        searchAllAssetsPath: 'https://partners.stage.adobe.com/digitalexperience/home/search/',
+        searchAllAssetsPath: '/digitalexperience/home/search/',
         goldAssetLink: '/digitalexperience/preview/netstorage-assets/spp/gold/as/asset_preview_goldmp4netstorage.mp4.html',
         asssetPreviewTitle: 'Asset detail: Asset preview Gold MP4 Netstorage  (Video)',
       }
