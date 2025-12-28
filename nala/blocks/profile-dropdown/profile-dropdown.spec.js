@@ -9,7 +9,7 @@ export default {
         partnerLevel: 'dxp-platinum:',
         profileName: 'DONOT USE Yugo DX Stage Platinum New',
         profileEmail: 'yugo-test+dx…@adobetest.com',
-        profileJob: 'Product Engineering',
+        profileJob: 'Product Management',
         accountName: 'DONOT USE Yugo DX Stage Platinum New',
         partnerLevelDropdown: 'Platinum',
       },
