@@ -44,11 +44,9 @@ class SearchCard extends LitElement {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  getFileType(type) {
-    if (type === 'course') return 'course';
-
-    const supportedFileTypes = ['excel', 'pdf', 'powerpoint', 'video', 'word', 'zip', 'html'];
-    return supportedFileTypes.includes(type) ? type : 'default';
+  getIconNameForContentType(contentType) {
+    const supportedFileTypes = ['excel', 'pdf', 'powerpoint', 'video', 'word', 'zip', 'html', 'course'];
+    return supportedFileTypes.includes(contentType) ? contentType : 'default';
   }
 
   /* eslint-disable indent */
@@ -58,7 +56,7 @@ class SearchCard extends LitElement {
         <div class="card-header">
           <div class="card-title-wrapper">
             <span class="card-chevron-icon"></span>
-            <div class="file-icon" style="background-image: url('/eds/img/icons/${this.getFileType(this.data.contentArea?.type ?? this.data.contentArea?.contentType)}.svg')"></div>
+            <div class="file-icon" style="background-image: url('/eds/img/icons/${this.getIconNameForContentType(this.data.contentArea?.type ?? this.data.contentArea?.contentType)}.svg')"></div>
             <span class="card-title">${this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : ''}</span>
           </div>
           <div class="card-icons">
