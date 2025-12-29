@@ -129,8 +129,35 @@ export function personalizePlaceholders(placeholders, context = document, progra
         el.remove();
         return;
       }
-      el.textContent = el.textContent.replace(`$${key}`, placeholderValue);
-      el.classList.add(`${key.toLowerCase()}-placeholder`);
+
+      const regex = new RegExp(`\\$${key}`, 'g');
+
+      // Handle text nodes directly
+      if (el.nodeType === Node.TEXT_NODE) {
+        if (el.nodeValue) {
+          el.nodeValue = el.nodeValue.replace(regex, placeholderValue);
+        }
+        return;
+      }
+
+      // Handle element nodes: walk through child text nodes
+      if (el.nodeType === Node.ELEMENT_NODE) {
+        const walker = document.createTreeWalker(
+          el,
+          NodeFilter.SHOW_TEXT,
+          null,
+          false
+        );
+
+        let textNode;
+        while ((textNode = walker.nextNode())) {
+          if (textNode.nodeValue) {
+            textNode.nodeValue = textNode.nodeValue.replace(regex, placeholderValue);
+          }
+        }
+
+        el.classList.add(`${key.toLowerCase()}-placeholder`);
+      }
     });
   });
 }

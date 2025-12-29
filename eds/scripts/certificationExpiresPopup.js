@@ -147,8 +147,6 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
     },
   );
   if (!modal) return;
-  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
-  personalizePage(modal);
   const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
   await loadArea(modal);
   personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
