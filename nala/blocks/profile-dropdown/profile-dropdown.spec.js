@@ -1,19 +1,21 @@
 export default {
   features: [
     {
+      tcid: '1',
       name: '@dxp-user-profile-dropdown',
       path: '/digitalexperience/',
       tags: '@da-dx-profile-dropdown @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
-        profileName: 'Yugo DX Stage Platinum',
-        profileEmail: 'yugo-test-dx…@adobetest.com',
-        profileJob: 'Product Engineering',
-        accountName: 'DONOT USE Yugo DX Stage Platinum',
+        profileName: 'DONOT USE Yugo DX Stage Platinum New',
+        profileEmail: 'yugo-test+dx…@adobetest.com',
+        profileJob: 'Product Management',
+        accountName: 'DONOT USE Yugo DX Stage Platinum New',
         partnerLevelDropdown: 'Platinum',
       },
     },
     {
+      tcid: '2',
       name: '@dxp-user-profile-dropdown-and-open-links',
       path: '/digitalexperience/',
       tags: '@da-dx-profile-dropdown @regression @circleCi',
@@ -24,6 +26,7 @@ export default {
       },
     },
     {
+      tcid: '3',
       name: '@dxp-non-user-profile-dropdown-validation',
       path: '/digitalexperience/',
       tags: '@da-dx-profile-dropdown @regression @circleCi',
