@@ -14,6 +14,7 @@ import {
   PERSONALIZATION_HIDE,
 } from './personalizationUtils.js';
 import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
+import DOMPurify from '../libs/deps/purify-wrapper.js';
 
 const imgSelector = 'img.feds-profile-img';
 
@@ -129,7 +130,7 @@ export function personalizePlaceholders(placeholders, context = document, progra
         el.remove();
         return;
       }
-      el.textContent = el.textContent.replace(`$${key}`, placeholderValue);
+      el.innerHTML = DOMPurify.sanitize(el.innerHTML.replace(`$${key}`, placeholderValue));
       el.classList.add(`${key.toLowerCase()}-placeholder`);
     });
   });

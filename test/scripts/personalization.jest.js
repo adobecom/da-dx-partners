@@ -9,7 +9,12 @@ import {
   DX_DESIGNATION_TYPE,
   DX_PRIMARY_BUSINESS
 } from "../../eds/blocks/utils/dxConstants.js";
-
+jest.mock('./../../eds/libs/deps/purify-wrapper.js', () => ({
+  __esModule: true,
+  default: {
+    sanitize: jest.fn(v => v),
+  }
+}));
 const PERSONALIZATION_HIDE_CLASS = 'personalization-hide';
 
 function importModules() {
@@ -586,9 +591,9 @@ describe('Test personalization.js', () => {
       window.dispatchEvent(event);
 
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       expect(global.fetch).not.toHaveBeenCalled();
-      
+
       const picture = main.querySelector('picture');
       expect(picture).not.toBeNull();
       expect(picture.querySelector('img')?.src).toBe('https://example.com/avatar.jpg');
@@ -613,7 +618,7 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
 
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       const img = main.querySelector('img[data-company-logo-url]');
       expect(img).not.toBeNull();
       expect(img.src).toBe('https://example.com/logo.png');
@@ -641,7 +646,7 @@ describe('Test personalization.js', () => {
       window.dispatchEvent(event);
 
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       expect(global.fetch).not.toHaveBeenCalled();
       expect(main.querySelector('p')).toBeNull();
     });
@@ -662,7 +667,7 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
 
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       expect(main.querySelector('div')).toBeNull();
     });
 
@@ -688,7 +693,7 @@ describe('Test personalization.js', () => {
       window.dispatchEvent(event);
 
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       expect(global.fetch).not.toHaveBeenCalled();
       expect(main.querySelector('p')).toBeNull();
     });
@@ -709,7 +714,7 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
 
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       expect(main.querySelector('div')).toBeNull();
     });
 
@@ -739,7 +744,7 @@ describe('Test personalization.js', () => {
       window.dispatchEvent(event);
 
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       expect(global.fetch).not.toHaveBeenCalled();
       expect(main.querySelector('p')).toBeNull();
     });
@@ -760,11 +765,11 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
 
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       expect(main.querySelector('div')).toBeNull();
     });
-    
-    
+
+
     it('should replace companyLogoUrl placeholder with image when companyLogoUrl exists', async () => {
       const main = document.createElement('main');
       const div = document.createElement('div');
@@ -786,7 +791,7 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
 
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       const picture = main.querySelector('picture');
       const img = main.querySelector('img[data-company-logo-url]');
       expect(picture).not.toBeNull();
@@ -794,7 +799,7 @@ describe('Test personalization.js', () => {
       expect(img.src).toBe('https://example.com/company-logo.png');
       expect(img.alt).toBe('Company Logo URL');
     });
-    
+
   });
 
   describe('BCTQ Compliance Expiration Tests', () => {
