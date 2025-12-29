@@ -9,7 +9,12 @@ import {
   DX_DESIGNATION_TYPE,
   DX_PRIMARY_BUSINESS
 } from "../../eds/blocks/utils/dxConstants.js";
-
+jest.mock('./../../eds/libs/deps/purify-wrapper.js', () => ({
+  __esModule: true,
+  default: {
+    sanitize: jest.fn(v => v),
+  }
+}));
 const PERSONALIZATION_HIDE_CLASS = 'personalization-hide';
 
 function importModules() {
@@ -44,14 +49,15 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test user',
         },
       };
+      const partnerInfo = { firstName: 'Test user' };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify(partnerInfo)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const placeholderElementAfter = document.querySelector('#welcome-firstname');
-      expect(placeholderElementAfter.textContent.includes(cookieObject.DXP.firstName)).toBe(true);
+      expect(placeholderElementAfter.textContent.includes(partnerInfo.firstName)).toBe(true);
     });
   });
   it('Remove placeholder if user is not a member', () => {
@@ -59,9 +65,9 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         CPP: {
           status: 'MEMBER',
-          firstName: 'Test use',
         },
       };
+      document.cookie = 'partner_info=; Max-Age=0;';
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
@@ -97,11 +103,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           level: 'Gold',
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const allLevelsBlock = document.querySelector('.partner-member');
@@ -113,11 +119,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           level: 'Gold'
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const goldBlock = document.querySelector('.partner-level-gold');
@@ -130,11 +136,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           primaryBusiness: [DX_PRIMARY_BUSINESS.SOLUTION]
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const businessSolutionBlock = document.querySelector('.partner-primary-business-solution');
@@ -146,11 +152,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           primaryBusiness: [DX_PRIMARY_BUSINESS.TECHNOLOGY]
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const businessTechnologyBlock = document.querySelector('.partner-primary-business-technology');
@@ -162,11 +168,11 @@ describe('Test personalization.js', () => {
       const cookieObject = {
         DXP: {
           status: 'MEMBER',
-          firstName: 'Test use',
           accessType: [DX_ACCESS_TYPE.BILLING_ADMIN, DX_ACCESS_TYPE.SALES_CENTER_ADMIN, DX_ACCESS_TYPE.ADMIN]
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({ firstName: 'Test use' })}`;
       const { applyPagePersonalization } = importModules();
       applyPagePersonalization();
       const billingAdminBlock = document.querySelector('.partner-billing-admin');
@@ -234,6 +240,7 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
           firstName: 'Test use',
           specialState: 'locked',
+          purchasedPartnerLevel: 'Silver',
           complianceStatus: DX_COMPLIANCE_STATUS.NOT_COMPLETED
         },
       };
@@ -242,6 +249,8 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
       const lockedComplianceNotCompletedBlock = document.querySelector('.partner-locked-compliance');
       expect(lockedComplianceNotCompletedBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+      const placeholderElementAfter = document.querySelector('.purchasedPartnerLevelHolder');
+      expect(placeholderElementAfter.textContent.includes(cookieObject.DXP.purchasedPartnerLevel)).toBe(true);
     });
   });
   it('Show Locked Compliance Not Completed block', () => {
@@ -251,6 +260,7 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
           firstName: 'Test use',
           specialState: 'locked',
+          purchasedPartnerLevel: 'Silver',
           complianceStatus: DX_COMPLIANCE_STATUS.COMPLETED
         },
       };
@@ -259,6 +269,8 @@ describe('Test personalization.js', () => {
       applyPagePersonalization();
       const lockedComplianceCompletedBlock = document.querySelector('.partner-locked-payment');
       expect(lockedComplianceCompletedBlock.classList.contains(PERSONALIZATION_HIDE_CLASS)).toBe(false);
+      const placeholderElementAfter = document.querySelector('.purchasedPartnerLevelHolderCoplianceCompleted');
+      expect(placeholderElementAfter.textContent.includes(cookieObject.DXP.purchasedPartnerLevel)).toBe(true);
     });
   });
   it('Show Locked Compliance Expiry date in the past block', () => {
@@ -267,7 +279,8 @@ describe('Test personalization.js', () => {
         DXP: {
           status: 'MEMBER',
           firstName: 'Test use',
-          specialState: 'locked-compliance-past'
+          specialState: 'locked-compliance-past',
+          purchasedPartnerLevel: 'Silver',
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
@@ -284,6 +297,7 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
           firstName: 'Test use',
           specialState: 'locked-payment-future',
+          purchasedPartnerLevel: 'Silver',
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
@@ -300,6 +314,7 @@ describe('Test personalization.js', () => {
           status: 'MEMBER',
           firstName: 'Test use',
           specialState: 'submitted-in-review',
+          purchasedPartnerLevel: 'Silver',
         },
       };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
@@ -530,6 +545,261 @@ describe('Test personalization.js', () => {
         expect(heading).not.toBeNull();
       });
     });
+  });
+
+  describe('Profile Image and Company Logo Personalization', () => {
+    const { applyPagePersonalization } = require('../../eds/scripts/personalization.js');
+
+    beforeEach(() => {
+      document.cookie = 'partner_data=';
+      document.body.innerHTML = '';
+      window.adobeIMS = {
+        getAccessToken: jest.fn(() => ({ token: 'mock-token' })),
+      };
+      global.fetch = jest.fn();
+    });
+
+    afterEach(() => {
+      delete window.adobeIMS;
+      delete global.fetch;
+      document.body.innerHTML = '';
+      jest.restoreAllMocks();
+    });
+
+    it('should handle profileImage placeholder with existing DOM image', async () => {
+      const main = document.createElement('main');
+      main.innerHTML = '<p>$profileImage</p>';
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+
+      const mockImg = document.createElement('img');
+      mockImg.className = 'feds-profile-img';
+      mockImg.src = 'https://example.com/avatar.jpg';
+      document.body.appendChild(mockImg);
+
+      window.adobeIMS.isSignedInUser = jest.fn(() => true);
+
+      applyPagePersonalization();
+
+      const event = new CustomEvent('feds:profileImageRendered');
+      window.dispatchEvent(event);
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      expect(global.fetch).not.toHaveBeenCalled();
+
+      const picture = main.querySelector('picture');
+      expect(picture).not.toBeNull();
+      expect(picture.querySelector('img')?.src).toBe('https://example.com/avatar.jpg');
+    });
+
+    it('should handle companyLogoUrl placeholder with companyLogoUrl in cookie', async () => {
+      const main = document.createElement('main');
+      main.innerHTML = '<div>$companyLogoUrl</div>';
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      const partnerInfo = {
+        companyLogoUrl: 'https://example.com/logo.png',
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify(partnerInfo)}`;
+
+      applyPagePersonalization();
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const img = main.querySelector('img[data-company-logo-url]');
+      expect(img).not.toBeNull();
+      expect(img.src).toBe('https://example.com/logo.png');
+    });
+
+    it('should handle missing signed in user for profileImage', async () => {
+      const main = document.createElement('main');
+      const placeholder = document.createElement('p');
+      placeholder.textContent = '$profileImage';
+      main.appendChild(placeholder);
+      document.body.appendChild(main);
+
+      window.adobeIMS.isSignedInUser = jest.fn(() => false);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+
+      applyPagePersonalization();
+
+      const event = new CustomEvent('feds:profileImageRendered');
+      window.dispatchEvent(event);
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(main.querySelector('p')).toBeNull();
+    });
+
+    it('should handle missing companyLogoUrl for companyLogoUrl', async () => {
+      const main = document.createElement('main');
+      main.innerHTML = '<div>$companyLogoUrl</div>';
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({})}`;
+
+      applyPagePersonalization();
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      expect(main.querySelector('div')).toBeNull();
+    });
+
+    it('should handle missing avatar image in DOM for profileImage', async () => {
+      const main = document.createElement('main');
+      const placeholder = document.createElement('p');
+      placeholder.textContent = '$profileImage';
+      main.appendChild(placeholder);
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+
+      window.adobeIMS.isSignedInUser = jest.fn(() => true);
+
+      applyPagePersonalization();
+
+      const event = new CustomEvent('feds:profileImageRendered');
+      window.dispatchEvent(event);
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(main.querySelector('p')).toBeNull();
+    });
+
+    it('should remove companyLogoUrl element when companyLogoUrl is missing', async () => {
+      const main = document.createElement('main');
+      main.innerHTML = '<div>$companyLogoUrl</div>';
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({})}`;
+
+      applyPagePersonalization();
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      expect(main.querySelector('div')).toBeNull();
+    });
+
+    it('should handle empty avatar src in DOM for profileImage', async () => {
+      const main = document.createElement('main');
+      const placeholder = document.createElement('p');
+      placeholder.textContent = '$profileImage';
+      main.appendChild(placeholder);
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+
+      const mockImg = document.createElement('img');
+      mockImg.className = 'feds-profile-img';
+      document.body.appendChild(mockImg);
+
+      window.adobeIMS.isSignedInUser = jest.fn(() => true);
+
+      applyPagePersonalization();
+
+      const event = new CustomEvent('feds:profileImageRendered');
+      window.dispatchEvent(event);
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(main.querySelector('p')).toBeNull();
+    });
+
+    it('should handle missing partner_info cookie for companyLogoUrl', async () => {
+      const main = document.createElement('main');
+      main.innerHTML = '<div>$companyLogoUrl</div>';
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      // No partner_info cookie set
+
+      applyPagePersonalization();
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      expect(main.querySelector('div')).toBeNull();
+    });
+
+
+    it('should replace companyLogoUrl placeholder with image when companyLogoUrl exists', async () => {
+      const main = document.createElement('main');
+      const div = document.createElement('div');
+      div.textContent = '$companyLogoUrl';
+      main.appendChild(div);
+      document.body.appendChild(main);
+
+      const cookieObject = {
+        DXP: {
+          status: 'MEMBER',
+        },
+      };
+      const partnerInfo = {
+        companyLogoUrl: 'https://example.com/company-logo.png',
+      };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify(partnerInfo)}`;
+
+      applyPagePersonalization();
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const picture = main.querySelector('picture');
+      const img = main.querySelector('img[data-company-logo-url]');
+      expect(picture).not.toBeNull();
+      expect(img).not.toBeNull();
+      expect(img.src).toBe('https://example.com/company-logo.png');
+      expect(img.alt).toBe('Company Logo URL');
+    });
+
   });
 
   describe('BCTQ Compliance Expiration Tests', () => {
@@ -880,8 +1150,8 @@ describe('Test personalization.js', () => {
             },
           };
           document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-          const { partnerDataCookieContainsValue } = require('../../eds/scripts/utils.js');
-          expect(partnerDataCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN)).toBe(true);
+          const { partnerCookieContainsValue } = require('../../eds/scripts/utils.js');
+          expect(partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN)).toBe(true);
         });
       });
     });

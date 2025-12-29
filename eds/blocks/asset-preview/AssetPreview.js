@@ -197,7 +197,7 @@ export default class AssetPreview extends LitElement {
   }
 
   render() {
-    return html`<div class="asset-preview-block-container">
+    return html`<div class="asset-preview-block-container" daa-lh="Asset preview container | ${this.title}">
       ${this.assetHasData && !this.isLoading ? html`
           <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${unsafeHTML(this.title)}  ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}</p></div>
           <div class="asset-preview-block-details ">
@@ -219,16 +219,16 @@ export default class AssetPreview extends LitElement {
          
          
           ${!this.isRestrictedAssetForUser() ? html`
-              <div class="asset-preview-block-actions">
-              ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button 
-                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}"> View </a></button>` : ''}
-                <button class="filled"><a  download="${this.title}" href="${this.getDownloadUrl()}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>
+              <div class="asset-preview-block-actions" daa-lh="Asset preview block actions">
+              ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button
+                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}" daa-ll="View"> View </a></button>` : ''}
+                <button class="filled"><a download="${this.title}" href="${this.getDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>
                 ${this.webinarPresentation ? html`
-                  <button class="filled"><a  download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
+                  <button class="filled"><a  download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
                 ` : ''}
-                
-              ${this.backButtonUrl ? html`<a 
-                class="link" href="${this.backButtonUrl}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
+
+              ${this.backButtonUrl ? html`<a
+                class="link" href="${this.backButtonUrl}" daa-ll="${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
               </div>` : ''}
   
         ${this.isVideo && !this.isRestrictedAssetForUser() ? html`

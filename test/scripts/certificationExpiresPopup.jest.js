@@ -33,10 +33,10 @@ jest.mock('../../eds/scripts/personalizationConfigDX.js', () => ({ PERSONALIZATI
 // Global mocks
 global.fetch = jest.fn();
 
-// Mock sessionStorage
+// Mock localStorage
 const mockGetItem = jest.fn();
 const mockSetItem = jest.fn();
-Object.defineProperty(global, 'sessionStorage', {
+Object.defineProperty(global, 'localStorage', {
   value: {
     getItem: mockGetItem,
     setItem: mockSetItem,

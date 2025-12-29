@@ -60,6 +60,7 @@ export default async function init(el) {
   app.className = 'asset-preview-block';
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
+  app.setAttribute('daa-lh', 'Asset Preview Block')
   el.replaceWith(app);
 
   await deps;

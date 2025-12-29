@@ -32,7 +32,7 @@ jest.mock('../../eds/scripts/utils.js', () => ({
   getCookieValue: jest.fn(),
   getCurrentProgramType: jest.fn(() => 'dxp'),
   getMetadataContent: jest.fn(),
-  getPartnerDataCookieValue: jest.fn(),
+  getPartnerCookieValue: jest.fn(),
   isMember: jest.fn(),
 }));
 
@@ -43,7 +43,7 @@ describe('Test partnerAgreement.js', () => {
   let getCookieValue;
   let getCurrentProgramType;
   let getMetadataContent;
-  let getPartnerDataCookieValue;
+  let getPartnerCookieValue;
   let isMember;
   let getConfig;
   let getRuntimeActionUrl;
@@ -118,7 +118,7 @@ describe('Test partnerAgreement.js', () => {
     getCookieValue = utilsModule.getCookieValue;
     getCurrentProgramType = utilsModule.getCurrentProgramType;
     getMetadataContent = utilsModule.getMetadataContent;
-    getPartnerDataCookieValue = utilsModule.getPartnerDataCookieValue;
+    getPartnerCookieValue = utilsModule.getPartnerCookieValue;
     isMember = utilsModule.isMember;
 
     const blockUtilsModule = require('../../eds/blocks/utils/utils.js');
@@ -135,7 +135,7 @@ describe('Test partnerAgreement.js', () => {
   describe('early exits and metadata', () => {
     it('does nothing when member and latest agreement accepted', async () => {
       isMember.mockReturnValue(true);
-      getPartnerDataCookieValue.mockReturnValue('true');
+      getPartnerCookieValue.mockReturnValue('true');
 
       const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
       await partnerAgreement('https://test-milo-libs.com');
@@ -145,7 +145,7 @@ describe('Test partnerAgreement.js', () => {
 
     it('warns when partner agreement meta path is missing', async () => {
       isMember.mockReturnValue(false);
-      getPartnerDataCookieValue.mockReturnValue(null);
+      getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue(null);
 
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
@@ -158,7 +158,7 @@ describe('Test partnerAgreement.js', () => {
 
     it('logs error if metadata fetch fails', async () => {
       isMember.mockReturnValue(false);
-      getPartnerDataCookieValue.mockReturnValue(null);
+      getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/path/to/meta.html');
 
       global.fetch.mockResolvedValueOnce({ ok: false, status: 404, text: () => Promise.resolve('') });
@@ -187,7 +187,7 @@ describe('Test partnerAgreement.js', () => {
 
     it('logs when response is empty and stops before creating modal', async () => {
       isMember.mockReturnValue(false);
-      getPartnerDataCookieValue.mockReturnValue(null);
+      getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/path/meta.html');
 
       global.fetch.mockImplementation((url) => {
@@ -208,7 +208,7 @@ describe('Test partnerAgreement.js', () => {
 
     it('logs error when fetch response is not ok', async () => {
       isMember.mockReturnValue(false);
-      getPartnerDataCookieValue.mockReturnValue(null);
+      getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/path/meta.html');
 
       global.fetch.mockImplementation((url) => {
@@ -228,7 +228,7 @@ describe('Test partnerAgreement.js', () => {
 
     it('uses getRuntimeActionUrl with correct path', async () => {
       isMember.mockReturnValue(false);
-      getPartnerDataCookieValue.mockReturnValue(null);
+      getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/digitalexperience/fragments/partner-agreement-meta');
 
       global.fetch.mockImplementation((url) => {
@@ -248,7 +248,7 @@ describe('Test partnerAgreement.js', () => {
   describe('modal creation and UI', () => {
     it('creates modal with expected UI structure', async () => {
       isMember.mockReturnValue(false);
-      getPartnerDataCookieValue.mockReturnValue(null);
+      getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/digitalexperience/fragments/partner-agreement-meta');
 
       const metaHtml = `
@@ -305,7 +305,7 @@ describe('Test partnerAgreement.js', () => {
     it('accept success closes modal and sets regenerate cookie', async () => {
       jest.useFakeTimers();
       isMember.mockReturnValue(false);
-      getPartnerDataCookieValue.mockReturnValue(null);
+      getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/digitalexperience/fragments/partner-agreement-meta');
       getCurrentProgramType.mockReturnValue('dxp');
       getCookieValue.mockReturnValue(JSON.stringify({ DXP: { status: 'MEMBER' } }));
@@ -345,7 +345,7 @@ describe('Test partnerAgreement.js', () => {
 
     it('accept error logs and does not close modal', async () => {
       isMember.mockReturnValue(false);
-      getPartnerDataCookieValue.mockReturnValue(null);
+      getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/path/meta.html');
       getCookieValue.mockReturnValue(JSON.stringify({ DXP: { status: 'MEMBER' } }));
 
@@ -373,7 +373,7 @@ describe('Test partnerAgreement.js', () => {
   describe('prevent modal close behavior', () => {
     it('removes Milo close button and keeps modal open on escape/click outside', async () => {
       isMember.mockReturnValue(false);
-      getPartnerDataCookieValue.mockReturnValue(null);
+      getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/digitalexperience/fragments/partner-agreement-meta');
 
       const metaHtml = `<html><head><meta name="agreementtitle" content="T" /></head></html>`;

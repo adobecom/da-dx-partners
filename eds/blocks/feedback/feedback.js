@@ -1,4 +1,4 @@
-import { getCurrentProgramType, getPartnerDataCookieObject, partnerIsSignedIn, getLibs, prodHosts } from '../../scripts/utils.js';
+import { getCurrentProgramType, getPartnerCookieObject, partnerIsSignedIn, getLibs, prodHosts } from '../../scripts/utils.js';
 import { getConfig } from '../utils/utils.js';
 
 function showToast(success, onTryAgain, config) {
@@ -197,7 +197,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     let userEmail = '';
     if (partnerIsSignedIn()) {
       try {
-        const profileData = getPartnerDataCookieObject(getCurrentProgramType());
+        const profileData = getPartnerCookieObject(getCurrentProgramType());
         userName = `${profileData.firstName} ${profileData.lastName}`;
         userEmail = profileData.email;
       } catch (error) {
