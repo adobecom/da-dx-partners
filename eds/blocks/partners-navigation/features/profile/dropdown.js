@@ -40,6 +40,14 @@ const decorateProfileLink = (service, path = '') => {
   return `${serviceUrl}${path}`;
 };
 
+const decorateUpdateProfileLink = () => {
+  const { env } = getConfig();
+  if (env.name === 'prod') {
+    return 'https://partners.adobe.com/digitalexperience/home/manage-user';
+  }
+  return 'https://partners.stage.adobe.com/digitalexperience/home/manage-user';
+};
+
 const decorateAction = (label, path) => toFragment`<li><a class="feds-profile-action" href="${decorateProfileLink('adminconsole', path)}">${label}</a></li>`;
 
 class ProfileDropdown {
@@ -115,6 +123,7 @@ class ProfileDropdown {
   decorateDropdown() {
     const { locale } = getConfig();
     const lang = getLanguage(locale.ietf);
+    const updateYourProfile = 'Update your profile';
 
     // TODO: the account name and email might need a bit of adaptive behavior;
     // historically we shrunk the font size and displayed the account name on two lines;
@@ -122,6 +131,7 @@ class ProfileDropdown {
     // for MVP, we took a simpler approach ("Some very long name, very l...")
     // PARTNERS_NAVIGATION START
     // MWPW-157753 - only Edit user profile link should be clickable
+    // MWPW-185175 - Investigate Profile dropdown view account
     this.avatarElem = toFragment`<img
       data-cs-mask
       class="feds-profile-img"
@@ -136,7 +146,14 @@ class ProfileDropdown {
           <div class="feds-profile-details">
             <p data-cs-mask class="feds-profile-name">${this.profileData.displayName}</p>
             <p data-cs-mask class="feds-profile-email">${this.decorateEmail(this.profileData.email)}</p>
-            <p class="feds-profile-account">${this.placeholders.viewAccount}</p>
+
+            <a
+              href="${decorateUpdateProfileLink()}"
+              daa-ll="${updateYourProfile}"
+              aria-label="${updateYourProfile}"
+            >
+              <p class="feds-profile-account">${updateYourProfile}</p>
+            </a>
           </div>
         </div>
         ${this.localMenu ? this.decorateLocalMenu() : ''}
