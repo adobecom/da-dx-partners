@@ -99,6 +99,12 @@ class ProfileDropdown {
         this.placeholders.editProfile,
       ],
       // PARTNERS_NAVIGATION END
+      // PARTNERS_NAVIGATION START
+      // MWPW-185175 - Investigate Profile dropdown view account
+      [
+        this.placeholders.updateYourProfile,
+      ],
+      // PARTNERS_NAVIGATION END
       { displayName: this.profileData.displayName, email: this.profileData.email },
     ] = await Promise.all([
       replaceKeyArray(
@@ -109,6 +115,13 @@ class ProfileDropdown {
       // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
       replaceKeyArray(
         ['edit-profile'],
+        getConfig(),
+      ),
+      // PARTNERS_NAVIGATION END
+      // PARTNERS_NAVIGATION START
+      // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
+      replaceKeyArray(
+        ['update-your-profile'],
         getConfig(),
       ),
       // PARTNERS_NAVIGATION END
@@ -123,7 +136,6 @@ class ProfileDropdown {
   decorateDropdown() {
     const { locale } = getConfig();
     const lang = getLanguage(locale.ietf);
-    const updateYourProfile = 'Update your profile';
 
     // TODO: the account name and email might need a bit of adaptive behavior;
     // historically we shrunk the font size and displayed the account name on two lines;
@@ -146,13 +158,12 @@ class ProfileDropdown {
           <div class="feds-profile-details">
             <p data-cs-mask class="feds-profile-name">${this.profileData.displayName}</p>
             <p data-cs-mask class="feds-profile-email">${this.decorateEmail(this.profileData.email)}</p>
-
             <a
               href="${decorateUpdateProfileLink()}"
-              daa-ll="${updateYourProfile}"
-              aria-label="${updateYourProfile}"
+              daa-ll="${this.placeholders.updateYourProfile}"
+              aria-label="${this.placeholders.updateYourProfile}"
             >
-              <p class="feds-profile-account">${updateYourProfile}</p>
+              <p class="feds-profile-account">${this.placeholders.updateYourProfile}</p>
             </a>
           </div>
         </div>
