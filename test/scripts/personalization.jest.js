@@ -1077,7 +1077,7 @@ describe('Test personalization.js', () => {
         });
       });
 
-      it('should add bctqexpirationdays-placeholder class to element', () => {
+      it('should not add key-placeholder class to element', () => {
         jest.isolateModules(() => {
           const futureDate = new Date();
           futureDate.setDate(futureDate.getDate() + 30);
@@ -1092,7 +1092,7 @@ describe('Test personalization.js', () => {
           const { applyPagePersonalization } = importModules();
           applyPagePersonalization();
           const countdown = document.querySelector('#days-countdown');
-          expect(countdown.classList.contains('bctqexpirationdays-placeholder')).toBe(true);
+          expect(countdown.classList.contains('bctqexpirationdays-placeholder')).toBe(false);
         });
       });
     });
