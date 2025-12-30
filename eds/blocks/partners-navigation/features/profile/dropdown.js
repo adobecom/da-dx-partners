@@ -40,6 +40,8 @@ const decorateProfileLink = (service, path = '') => {
   return `${serviceUrl}${path}`;
 };
 
+// PARTNERS_NAVIGATION START
+// MWPW-185175 - Investigate Profile dropdown view account
 const decorateUpdateProfileLink = () => {
   const { env } = getConfig();
   if (env.name === 'prod') {
@@ -47,6 +49,7 @@ const decorateUpdateProfileLink = () => {
   }
   return 'https://partners.stage.adobe.com/digitalexperience/home/manage-user';
 };
+// PARTNERS_NAVIGATION END
 
 const decorateAction = (label, path) => toFragment`<li><a class="feds-profile-action" href="${decorateProfileLink('adminconsole', path)}">${label}</a></li>`;
 
@@ -119,7 +122,7 @@ class ProfileDropdown {
       ),
       // PARTNERS_NAVIGATION END
       // PARTNERS_NAVIGATION START
-      // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
+      // MWPW-185175 - Investigate Profile dropdown view account
       replaceKeyArray(
         ['update-your-profile'],
         getConfig(),
