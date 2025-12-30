@@ -3,7 +3,7 @@ export default {
     {
       tcid: '1',
       name: '@search-page-platinum-user-validation',
-      path: '/digitalexperience/drafts/automation/regression/search-page',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
@@ -20,7 +20,7 @@ export default {
     {
       tcid: '2',
       name: '@search-page-silver-user-validation',
-      path: '/digitalexperience/drafts/automation/regression/search-page',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-silver:',
@@ -137,7 +137,7 @@ export default {
     {
       tcid: '9',
       name: '@search-page-training-validation',
-      path: '/digitalexperience/drafts/automation/regression/search-page',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
@@ -147,7 +147,7 @@ export default {
     {
       tcid: '10',
       name: '@search-page-uncheck-filters-flow-validation',
-      path: '/digitalexperience/drafts/automation/regression/search-page',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-silver:',
