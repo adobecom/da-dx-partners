@@ -48,8 +48,10 @@ const config = {
   projects: [
     {
       name: 'da-dx-partners-live-chromium',
-      use: { ...devices['Desktop Chrome'] },
-      bypassCSP: true,
+      use: { 
+        ...devices['Desktop Chrome'],
+        bypassCSP: true,
+      },
       launchOptions: { args: ['--disable-web-security', '--disable-gpu'] },
     },
 
@@ -57,13 +59,13 @@ const config = {
       name: 'da-dx-partners-live-firefox',
       use: { 
         ...devices['Desktop Firefox'],
+        bypassCSP: true,
         // Ensure each test gets a fresh context
         contextOptions: {
           // Clear all storage between tests
           clearStorageState: true,
         }
       },
-      bypassCSP: true,
       retries: process.env.CI ? 2 : 1,
       launchOptions: {
         args: [

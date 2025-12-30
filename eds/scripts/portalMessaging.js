@@ -1,7 +1,7 @@
 import {
     getCurrentProgramType,
     getMetadataContent,
-    getPartnerDataCookieValue,
+    getPartnerCookieValue,
     isMember
 } from "./utils.js";
 import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./personalizationConfigDX.js";
@@ -29,9 +29,8 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
     const modalClosed = sessionStorage.getItem('portal-messaging-popup-closed')
     if (modalClosed === 'true') return false;
 
-    const specialStateCookie = getPartnerDataCookieValue('specialstate');
-    // todo is this true or false in sence - portal messaging is done and we can proceed to next modal?
-    if (!specialStateCookie) return false;
+    const specialStateCookie = getPartnerCookieValue('specialstate');
+    if (!specialStateCookie) return;
 
     let popupType;
     if (PERSONALIZATION_CONDITIONS['partner-submitted-in-review']) {
