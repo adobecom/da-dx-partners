@@ -177,9 +177,6 @@ describe('dx-card-collection block', () => {
     expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: No Filters | Search Query: None');
 
     const firstCard = partnerCards.querySelector('.card-wrapper');
-    const singlePartnerCard = firstCard.shadowRoot.querySelector('.single-partner-card');
-
-    expect(singlePartnerCard.getAttribute('data-dll-cardid')).to.equal(cards[0].id);
     expect(firstCard.getAttribute('daa-lh')).to.equal(`Card 1 | ${cards[0].contentArea.title} | ${cards[0].id}`);
 
     const singlePartnerCardBtn = firstCard.shadowRoot.querySelector('.card-btn');

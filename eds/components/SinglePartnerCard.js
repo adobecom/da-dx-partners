@@ -21,7 +21,7 @@ class SinglePartnerCard extends LitElement {
 
   render() {
     return html`
-      <div class="single-partner-card" data-dll-cardid="${this.data.id}">
+      <div class="single-partner-card">
         <div class="card-header" style="background-image: url(${transformCardUrl(this.data.styles?.backgroundImage)}), url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})">
         </div>
         <div class="card-content">
