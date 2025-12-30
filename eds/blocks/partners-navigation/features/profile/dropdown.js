@@ -100,13 +100,10 @@ class ProfileDropdown {
       // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
       [
         this.placeholders.editProfile,
-      ],
-      // PARTNERS_NAVIGATION END
-      // PARTNERS_NAVIGATION START
-      // MWPW-185175 - Investigate Profile dropdown view account
-      [
+        // MWPW-185175 - Investigate Profile dropdown view account
         this.placeholders.updateYourProfile,
       ],
+
       // PARTNERS_NAVIGATION END
       { displayName: this.profileData.displayName, email: this.profileData.email },
     ] = await Promise.all([
@@ -117,14 +114,11 @@ class ProfileDropdown {
       // PARTNERS_NAVIGATION START
       // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
       replaceKeyArray(
-        ['edit-profile'],
-        getConfig(),
-      ),
-      // PARTNERS_NAVIGATION END
-      // PARTNERS_NAVIGATION START
-      // MWPW-185175 - Investigate Profile dropdown view account
-      replaceKeyArray(
-        ['update-your-profile'],
+        [
+          'edit-profile',
+          // MWPW-185175 - Investigate Profile dropdown view account
+          'update-your-profile',
+        ],
         getConfig(),
       ),
       // PARTNERS_NAVIGATION END
