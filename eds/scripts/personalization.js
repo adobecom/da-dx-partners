@@ -105,7 +105,7 @@ async function replaceCompanyLogo(elements) {
   }
 }
 
-export function personalizePlaceholders(placeholders, context = document, programType) {
+export function personalizePlaceholders(placeholders, context = document, programType, addClass = false) {
   const sortedEntries = Object.entries(placeholders).sort((a, b) => b[0].length - a[0].length);
   sortedEntries.forEach(([key, value]) => {
     const elements = getNodesByXPath(value, context);
@@ -131,7 +131,9 @@ export function personalizePlaceholders(placeholders, context = document, progra
         return;
       }
       el.innerHTML = DOMPurify.sanitize(el.innerHTML.replace(`$${key}`, placeholderValue));
-      el.classList.add(`${key.toLowerCase()}-placeholder`);
+      if (addClass) {
+        el.classList.add(`${key.toLowerCase()}-placeholder`);
+      }
     });
   });
 }
@@ -281,7 +283,7 @@ export function shouldHideLinkGroup(elem) {
 
 function personalizeProfile(gnav) {
   const profile = gnav.querySelector('.profile');
-  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, profile, DX_PROGRAM_TYPE);
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, profile, DX_PROGRAM_TYPE, true);
   personalizeDropdownElements(profile);
 }
 
