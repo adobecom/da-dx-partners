@@ -42,7 +42,10 @@ export default class PartnershipProgress extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    window.addEventListener('dxp:imsReady', this._onImsReady);
+    if (window.dxpImsReady) {
+      this._onImsReady();
+    }
+    window.addEventListener('dxpImsReady', this._onImsReady);
   }
 
   disconnectedCallback() {
