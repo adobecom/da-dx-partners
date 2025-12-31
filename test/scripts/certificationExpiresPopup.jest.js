@@ -15,6 +15,7 @@ jest.mock('../../eds/scripts/utils.js', () => ({
   getCurrentProgramType: jest.fn(() => 'dxp'),
   getMetadataContent: jest.fn(),
   isMember: jest.fn(),
+  invokeAfterImsIsReady: jest.fn(async (callback) => await callback()), // Immediately invoke callback and await result
 }));
 
 jest.mock('../../eds/scripts/portalMessaging.js', () => ({ loadPopupFragment: jest.fn() }));
@@ -32,6 +33,7 @@ jest.mock('../../eds/scripts/personalizationConfigDX.js', () => ({ PERSONALIZATI
 
 // Global mocks
 global.fetch = jest.fn();
+window.dxpImsReady = 'eventhappend';
 
 // Mock localStorage
 const mockGetItem = jest.fn();
@@ -51,6 +53,7 @@ describe('Test certificationExpiresPopup.js', () => {
   let getCurrentProgramType;
   let getMetadataContent;
   let isMember;
+  let invokeAfterImsIsReady;
   let loadPopupFragment;
   let isProd;
   let rewriteLinks;
@@ -108,6 +111,7 @@ describe('Test certificationExpiresPopup.js', () => {
     getCurrentProgramType = utilsModule.getCurrentProgramType;
     getMetadataContent = utilsModule.getMetadataContent;
     isMember = utilsModule.isMember;
+    invokeAfterImsIsReady = utilsModule.invokeAfterImsIsReady;
 
     const portalMessagingModule = require('../../eds/scripts/portalMessaging.js');
     loadPopupFragment = portalMessagingModule.loadPopupFragment;
@@ -136,7 +140,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
   describe('early exits', () => {
     it('should exit if partner agreement is displayed', async () => {
-      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+      const {certificationExpiresPopup} = require('../../eds/scripts/certificationExpiresPopup.js');
 
       await certificationExpiresPopup('https://test-milo-libs.com', false, true, 'test-client-id');
 
