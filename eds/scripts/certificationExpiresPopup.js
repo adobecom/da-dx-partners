@@ -87,6 +87,7 @@ function isMilestoneReached(certification, lastCertificationPopupShown) {
 
 // eslint-disable-next-line import/prefer-default-export,max-len
 async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
+  window.removeEventListener('dxpImsReady', this);
   if (partnerAgreementDisplayed) return;
   if (portalMessagingOpen) return;
   if (!isMember()) return;

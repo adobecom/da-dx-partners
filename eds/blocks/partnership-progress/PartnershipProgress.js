@@ -51,6 +51,7 @@ export default class PartnershipProgress extends LitElement {
 
   _onImsReady() {
     this.fetchData();
+    window.removeEventListener('dxpImsReady', this._onImsReady);
   }
 
   async fetchData() {
