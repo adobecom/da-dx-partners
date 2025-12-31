@@ -3,7 +3,10 @@ import { toFragment, trigger, closeAllDropdowns, logErrorFor } from '../../utili
 import { getLibs } from '../../../../scripts/utils.js';
 
 const miloLibs = getLibs();
+// PARTNERS_NAVIGATION START
+// MWPW-185175 - Investigate Profile dropdown view account
 const { replaceKey, replaceKeyArray } = await import(`${miloLibs}/features/placeholders.js`);
+// PARTNERS_NAVIGATION END
 
 const { getConfig, getFedsPlaceholderConfig } = await import(`${miloLibs}/utils/utils.js`);
 
