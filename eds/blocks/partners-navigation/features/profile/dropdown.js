@@ -3,7 +3,7 @@ import { toFragment, trigger, closeAllDropdowns, logErrorFor } from '../../utili
 import { getLibs } from '../../../../scripts/utils.js';
 
 const miloLibs = getLibs();
-const { replaceKeyArray } = await import(`${miloLibs}/features/placeholders.js`);
+const { replaceKey, replaceKeyArray } = await import(`${miloLibs}/features/placeholders.js`);
 
 const { getConfig, getFedsPlaceholderConfig } = await import(`${miloLibs}/utils/utils.js`);
 
@@ -96,34 +96,19 @@ class ProfileDropdown {
         this.placeholders.manageEnterprise,
         this.placeholders.profileAvatar,
       ],
-      // PARTNERS_NAVIGATION START
-      // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
-      [
-        this.placeholders.editProfile,
-        // MWPW-185175 - Investigate Profile dropdown view account
-        this.placeholders.updateYourProfile,
-      ],
-
-      // PARTNERS_NAVIGATION END
       { displayName: this.profileData.displayName, email: this.profileData.email },
     ] = await Promise.all([
       replaceKeyArray(
         ['profile-button', 'sign-out', 'view-account', 'manage-teams', 'manage-enterprise', 'profile-avatar'],
         getFedsPlaceholderConfig(),
       ),
-      // PARTNERS_NAVIGATION START
-      // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
-      replaceKeyArray(
-        [
-          'edit-profile',
-          // MWPW-185175 - Investigate Profile dropdown view account
-          'update-your-profile',
-        ],
-        getConfig(),
-      ),
-      // PARTNERS_NAVIGATION END
       window.adobeIMS.getProfile(),
     ]);
+
+    // PARTNERS_NAVIGATION START
+    // MWPW-185175 - Investigate Profile dropdown view account
+    this.placeholders.updateProfile = await replaceKey('update-profile', getConfig());
+    // PARTNERS_NAVIGATION END
   }
 
   setButtonLabel() {
@@ -157,10 +142,10 @@ class ProfileDropdown {
             <p data-cs-mask class="feds-profile-email">${this.decorateEmail(this.profileData.email)}</p>
             <a
               href="${decorateUpdateProfileLink()}"
-              daa-ll="${this.placeholders.updateYourProfile}"
-              aria-label="${this.placeholders.updateYourProfile}"
+              daa-ll="${this.placeholders.updateProfile}"
+              aria-label="${this.placeholders.updateProfile}"
             >
-              <p class="feds-profile-account">${this.placeholders.updateYourProfile}</p>
+              <p class="feds-profile-account">${this.placeholders.updateProfile}</p>
             </a>
           </div>
         </div>

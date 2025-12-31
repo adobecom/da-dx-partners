@@ -89,10 +89,6 @@
   font-size: 14px;
   text-decoration: underline;
   /* PARTNERS_NAVIGATION START */
-  /* MWPW-185175 - Investigate Profile dropdown view account */
-  text-transform: capitalize;
-  /* PARTNERS_NAVIGATION END */
-  /* PARTNERS_NAVIGATION START */
   /* MWPW-157753 - Make profile picture, firstName, lastName and email unclickable */
   color: var(--link-color);
   /* PARTNERS_NAVIGATION END */
