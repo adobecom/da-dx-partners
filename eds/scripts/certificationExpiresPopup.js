@@ -165,9 +165,7 @@ export function certificationExpiresPopup(
   partnerAgreementDisplayed,
   imsClientId,
 ) {
-  // Create callback with reference to itself for removal
-  const callback = async () => {
-    await showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId, callback);
-  };
-  return invokeAfterImsIsReady(callback);
+    return invokeAfterImsIsReady(async () => {
+    await showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
+  });
 }

@@ -548,8 +548,12 @@ export async function setFeedback(getConfig) {
 }
 export async function invokeAfterImsIsReady(callback) {
   if (window.dxpImsReady) {
-      await callback();
-  } else {
-    window.addEventListener('dxpImsReady', callback);
+    await callback();
+    return;
   }
+  const handler = () => {
+    callback();
+    window.removeEventListener('dxpImsReady', handler);
+  };
+  window.addEventListener('dxpImsReady', handler);
 }
