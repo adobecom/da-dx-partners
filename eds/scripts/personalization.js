@@ -103,7 +103,13 @@ async function replaceCompanyLogo(elements) {
     elements.forEach(el => el.remove());
   }
 }
-
+function replaceDirectText(node, search, replace) {
+  node.childNodes.forEach((child) => {
+    if (child.nodeType === Node.TEXT_NODE) {
+      child.nodeValue = child.nodeValue.replaceAll(search, replace);
+    }
+  });
+}
 export function personalizePlaceholders(placeholders, context = document, programType, addClass = false) {
   const sortedEntries = Object.entries(placeholders).sort((a, b) => b[0].length - a[0].length);
   sortedEntries.forEach(([key, value]) => {
@@ -120,7 +126,7 @@ export function personalizePlaceholders(placeholders, context = document, progra
       replaceCompanyLogo(elements);
       return;
     }
-    
+
     if (key === 'bctqExpirationDays') {
       placeholderValue = getDaysUntilComplianceExpiration();
     }
@@ -130,38 +136,10 @@ export function personalizePlaceholders(placeholders, context = document, progra
         return;
       }
 
-      const regex = new RegExp(`\\$${key}`, 'g');
+      replaceDirectText(el, `$${key}`, placeholderValue);
 
-      // Handle text nodes directly
-      if (el.nodeType === Node.TEXT_NODE) {
-        if (el.nodeValue) {
-          el.nodeValue = el.nodeValue.replace(regex, placeholderValue);
-        }
-        if (addClass) {
-          el.classList.add(`${key.toLowerCase()}-placeholder`);
-        }
-        return;
-      }
-
-      // Handle element nodes: walk through child text nodes
-      if (el.nodeType === Node.ELEMENT_NODE) {
-        const walker = document.createTreeWalker(
-          el,
-          NodeFilter.SHOW_TEXT,
-          null,
-          false
-        );
-
-        let textNode;
-        while ((textNode = walker.nextNode())) {
-          if (textNode.nodeValue) {
-            textNode.nodeValue = textNode.nodeValue.replace(regex, placeholderValue);
-          }
-        }
-
-        if (addClass) {
-          el.classList.add(`${key.toLowerCase()}-placeholder`);
-        }
+      if (addClass) {
+        el.classList.add(`${key.toLowerCase()}-placeholder`);
       }
     });
   });

@@ -19,15 +19,15 @@ import {
 } from '../blocks/utils/dxConstants.js';
 
 export const PERSONALIZATION_PLACEHOLDERS = {
-  'firstName': '//*[contains(., "$firstName") and not(.//*[contains(., "$firstName")])]',
-  'lastName': '//*[contains(., "$lastName") and not(.//*[contains(., "$lastName")])]',
-  'purchasedPartnerLevel': '//*[contains(., "$purchasedPartnerLevel") and not(.//*[contains(., "$purchasedPartnerLevel")])]',
-  'level': '//*[contains(., "$level") and not(.//*[contains(., "$level")])]',
-  'primaryJobRole': '//*[contains(., "$primaryJobRole") and not(.//*[contains(., "$primaryJobRole")])]',
-  'accountName': '//*[contains(., "$accountName") and not(.//*[contains(., "$accountName")])]',
-  'company': '//*[contains(., "$company") and not(.//*[contains(., "$company")])]',
-  'email': '//*[contains(., "$email") and not(.//*[contains(., "$email")])]',
-  'bctqExpirationDays': '//*[contains(., "$bctqExpirationDays") and not(.//*[contains(., "$bctqExpirationDays")])]',
+  'firstName': '//*[text()[contains(., "$firstName")]]',
+  'lastName': '//*[text()[contains(., "$lastName")]]',
+  'purchasedPartnerLevel': '//*[text()[contains(., "$purchasedPartnerLevel")]]',
+  'level': '//*[text()[contains(., "$level")]]',
+  'primaryJobRole': '//*[text()[contains(., "$primaryJobRole")]]',
+  'accountName': '//*[text()[contains(., "$accountName")]]',
+  'company': '//*[text()[contains(., "$company")]]',
+  'email': '//*[text()[contains(., "$email")]]',
+  'bctqExpirationDays': '//*[text()[contains(., "$bctqExpirationDays")]]',
   // Special handlers that replace entire element - use text() to avoid matching parent elements
   'profileImage': '//*[contains(text(), "$profileImage")]',
   'companyLogoUrl': '//*[contains(text(), "$companyLogoUrl")]'
