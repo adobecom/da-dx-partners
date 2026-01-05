@@ -1,4 +1,4 @@
-import { getCurrentProgramType, getPartnerCookieObject, partnerIsSignedIn, aemPublish, getLibs } from '../../scripts/utils.js';
+import { getCurrentProgramType, getPartnerCookieObject, partnerIsSignedIn, prodHosts, getLibs } from '../../scripts/utils.js';
 import { parseMarkdown, extractAuthoredConfigs } from './utils.js';
 
 const miloLibs = getLibs();
@@ -211,7 +211,7 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
   try {
     const tags = [level].filter((tag) => tag && tag !== '').join(',');
 
-    const origin = aemPublish;
+    const origin = prodHosts.includes(window.location.host) ? 'https://partners.adobe.com' : 'https://partners.stage.adobe.com';
     const url = new URL(`${origin}/services/gravity/yukonAIAssistant`);
     url.searchParams.append('question', encodeURIComponent(question));
     if (configs.yukonProfile !== 'dxpKbArticles') {
