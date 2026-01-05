@@ -28,7 +28,8 @@ test.describe('Validate card collection block', () => {
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[0].path}`);
       await page.waitForLoadState('domcontentloaded');
-      await cardCollectionPage.searchField.click();
+      await cardCollectionPage.searchField.waitFor({ state: 'visible', timeout: 10000 });
+      await cardCollectionPage.searchField.click({ force: true });
       await cardCollectionPage.searchField.type(data.keyword);
       await cardCollectionPage.cardTitleByText(data.cardTitle1);
       await cardCollectionPage.cardTitleByText(data.cardTitle2);
@@ -199,9 +200,10 @@ test.describe('Validate card collection block', () => {
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[7].path}`);
       await page.waitForLoadState('domcontentloaded');
+      await cardCollectionPage.searchField.waitFor({ state: 'visible', timeout: 10000 });
     });
     await test.step('Search and Filter Collection', async () => {
-      await cardCollectionPage.searchField.click();
+      await cardCollectionPage.searchField.click({ force: true });
       await cardCollectionPage.searchField.type(data.keyword);
       await cardCollectionPage.expectResultsNumber(data.numberOfFilteredCards);
       await cardCollectionPage.filterCheckbox(data.buttonRole, data.topicFilter).click();
