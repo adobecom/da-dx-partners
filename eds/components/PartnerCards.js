@@ -676,8 +676,8 @@ export default class PartnerCards extends LitElement {
 
   handleSearchAction() {
     // eslint-disable-next-line max-len
-    this.cards = this.allCards.filter((card) => card.contentArea?.title.toLowerCase().includes(this.searchTerm)
-      || card.contentArea?.description.toLowerCase().includes(this.searchTerm));
+    this.cards = this.allCards.filter((card) => card.contentArea?.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      || card.contentArea?.description.toLowerCase().includes(this.searchTerm.toLowerCase()));
   }
 
   handleSearch(event) {
