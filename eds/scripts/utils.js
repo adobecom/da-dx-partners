@@ -44,6 +44,8 @@ export const prodHosts = [
   'partnerspreview.adobe.com',
 ];
 
+export const aemPublish = prodHosts.includes(window.location.host) ? 'https://partners.adobe.com' : 'https://partners.stage.adobe.com';
+
 /*
  * ------------------------------------------------------------
  * Edit above at your own risk.
