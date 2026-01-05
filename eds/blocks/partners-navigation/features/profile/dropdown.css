@@ -110,7 +110,10 @@
 }
 
 .feds-local-menu p {
-  margin: 0;
+  /* PARTNERS_NAVIGATION START */
+  /* MWPW-185175 - Investigate Profile dropdown view account */
+  margin: 0px 0px 16px;
+  /* PARTNERS_NAVIGATION END */
 }
 
 .feds-local-menu a,
@@ -204,7 +207,10 @@
 .partners-navigation .feds-local-menu a {
   text-transform: none;
   font-size: 14px;
-  padding: 16px 0;
+  /* PARTNERS_NAVIGATION START */
+  /* MWPW-185175 - Investigate Profile dropdown view account */
+  padding: 0px;
+  /* PARTNERS_NAVIGATION END */
   color: #2680EB; /* MWPW-172075 different link colors */
   font-style: normal;
   line-height: 1;

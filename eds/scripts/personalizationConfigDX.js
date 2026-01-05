@@ -19,15 +19,16 @@ import {
 } from '../blocks/utils/dxConstants.js';
 
 export const PERSONALIZATION_PLACEHOLDERS = {
-  'firstName': '//*[contains(text(), "$firstName")]',
-  'lastName': '//*[contains(text(), "$lastName")]',
-  'purchasedPartnerLevel': '//*[contains(text(), "$purchasedPartnerLevel")]',
-  'level': '//*[contains(text(), "$level")]',
-  'primaryJobRole': '//*[contains(text(), "$primaryJobRole")]',
-  'accountName': '//*[contains(text(), "$accountName")]',
-  'company': '//*[contains(text(), "$company")]',
-  'email': '//*[contains(text(), "$email")]',
-  'bctqExpirationDays': '//*[contains(text(), "$bctqExpirationDays")]',
+  'firstName': '//*[text()[contains(., "$firstName")]]',
+  'lastName': '//*[text()[contains(., "$lastName")]]',
+  'purchasedPartnerLevel': '//*[text()[contains(., "$purchasedPartnerLevel")]]',
+  'level': '//*[text()[contains(., "$level")]]',
+  'primaryJobRole': '//*[text()[contains(., "$primaryJobRole")]]',
+  'accountName': '//*[text()[contains(., "$accountName")]]',
+  'company': '//*[text()[contains(., "$company")]]',
+  'email': '//*[text()[contains(., "$email")]]',
+  'bctqExpirationDays': '//*[text()[contains(., "$bctqExpirationDays")]]',
+  // Special handlers that replace entire element - use text() to avoid matching parent elements
   'profileImage': '//*[contains(text(), "$profileImage")]',
   'companyLogoUrl': '//*[contains(text(), "$companyLogoUrl")]'
 };
