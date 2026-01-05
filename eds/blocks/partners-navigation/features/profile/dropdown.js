@@ -3,7 +3,10 @@ import { toFragment, trigger, closeAllDropdowns, logErrorFor } from '../../utili
 import { getLibs } from '../../../../scripts/utils.js';
 
 const miloLibs = getLibs();
-const { replaceKeyArray } = await import(`${miloLibs}/features/placeholders.js`);
+// PARTNERS_NAVIGATION START
+// MWPW-185175 - Investigate Profile dropdown view account
+const { replaceKey, replaceKeyArray } = await import(`${miloLibs}/features/placeholders.js`);
+// PARTNERS_NAVIGATION END
 
 const { getConfig, getFedsPlaceholderConfig } = await import(`${miloLibs}/utils/utils.js`);
 
@@ -39,6 +42,17 @@ const decorateProfileLink = (service, path = '') => {
 
   return `${serviceUrl}${path}`;
 };
+
+// PARTNERS_NAVIGATION START
+// MWPW-185175 - Investigate Profile dropdown view account
+const decorateUpdateProfileLink = () => {
+  const { env } = getConfig();
+  if (env.name === 'prod') {
+    return 'https://partners.adobe.com/digitalexperience/home/manage-user';
+  }
+  return 'https://partners.stage.adobe.com/digitalexperience/home/manage-user';
+};
+// PARTNERS_NAVIGATION END
 
 const decorateAction = (label, path) => toFragment`<li><a class="feds-profile-action" href="${decorateProfileLink('adminconsole', path)}">${label}</a></li>`;
 
@@ -85,27 +99,19 @@ class ProfileDropdown {
         this.placeholders.manageEnterprise,
         this.placeholders.profileAvatar,
       ],
-      // PARTNERS_NAVIGATION START
-      // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
-      [
-        this.placeholders.editProfile,
-      ],
-      // PARTNERS_NAVIGATION END
       { displayName: this.profileData.displayName, email: this.profileData.email },
     ] = await Promise.all([
       replaceKeyArray(
         ['profile-button', 'sign-out', 'view-account', 'manage-teams', 'manage-enterprise', 'profile-avatar'],
         getFedsPlaceholderConfig(),
       ),
-      // PARTNERS_NAVIGATION START
-      // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
-      replaceKeyArray(
-        ['edit-profile'],
-        getConfig(),
-      ),
-      // PARTNERS_NAVIGATION END
       window.adobeIMS.getProfile(),
     ]);
+
+    // PARTNERS_NAVIGATION START
+    // MWPW-185175 - Investigate Profile dropdown view account
+    this.placeholders.updateProfile = await replaceKey('update-profile', getConfig());
+    // PARTNERS_NAVIGATION END
   }
 
   setButtonLabel() {
@@ -122,6 +128,7 @@ class ProfileDropdown {
     // for MVP, we took a simpler approach ("Some very long name, very l...")
     // PARTNERS_NAVIGATION START
     // MWPW-157753 - only Edit user profile link should be clickable
+    // MWPW-185175 - Investigate Profile dropdown view account
     this.avatarElem = toFragment`<img
       data-cs-mask
       class="feds-profile-img"
@@ -136,7 +143,13 @@ class ProfileDropdown {
           <div class="feds-profile-details">
             <p data-cs-mask class="feds-profile-name">${this.profileData.displayName}</p>
             <p data-cs-mask class="feds-profile-email">${this.decorateEmail(this.profileData.email)}</p>
-            <p class="feds-profile-account">${this.placeholders.viewAccount}</p>
+            <a
+              href="${decorateUpdateProfileLink()}"
+              daa-ll="${this.placeholders.updateProfile}"
+              aria-label="${this.placeholders.updateProfile}"
+            >
+              <p class="feds-profile-account">${this.placeholders.updateProfile}</p>
+            </a>
           </div>
         </div>
         ${this.localMenu ? this.decorateLocalMenu() : ''}
