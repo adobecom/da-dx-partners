@@ -86,10 +86,7 @@ function isMilestoneReached(certification, lastCertificationPopupShown) {
 }
 
 // eslint-disable-next-line import/prefer-default-export,max-len
-async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
-  if (partnerAgreementDisplayed) return;
-  if (portalMessagingOpen) return;
-  if (!isMember()) return;
+async function showPopup(miloLibs, imsClientId) {
   const lastCertificationPopupShown = parseLocalDate(
     localStorage.getItem(LAST_DATE_SHOWN),
   ) || new Date(0); // Jan 1, 1970 at midnight local time
@@ -157,11 +154,9 @@ async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplaye
 
 export function certificationExpiresPopup(
   miloLibs,
-  portalMessagingOpen,
-  partnerAgreementDisplayed,
   imsClientId,
 ) {
   return invokeAfterImsIsReady(async () => {
-    await showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
+    await showPopup(miloLibs, imsClientId);
   });
 }

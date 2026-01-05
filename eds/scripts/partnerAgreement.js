@@ -4,9 +4,9 @@ import {
     getCurrentProgramType,
     getMetadataContent,
     getPartnerCookieValue,
-    isMember
 } from "./utils.js";
 
+export const AGREEMENT_POPUP_DONE = 'dxp:AgreementDone';
 const RT_PARTNER_AGREEMENT_PATH = '/api/v1/web/dx-partners-runtime/partner-agreement';
 
 const SPINNER_ANIMATION = `<sp-theme system="light" color="light" scale="medium" dir="ltr" class="agreement-progress-wrapper">
@@ -21,7 +21,10 @@ async function acceptAgreement(agreementTextContainer, successMessage, errorMess
     if (success) {
         spinner.innerHTML = successMessage;
         addRegeneratePropToCookie();
-        setTimeout(() => closeModalCallback(agreementModal), 2000);
+      setTimeout(() => {
+        closeModalCallback(agreementModal);
+        window.dispatchEvent(new Event(AGREEMENT_POPUP_DONE));
+      }, 2000);
     } else {
         spinner.innerHTML = errorMessage;
     }
@@ -154,19 +157,29 @@ async function loadAgreementMeta(metadataUrl) {
 
 export async function partnerAgreement(miloLibs) {
     const latestAgreementAccepted = getPartnerCookieValue('latestagreementaccepted');
-    if (isMember() && latestAgreementAccepted) return false;
+    if (latestAgreementAccepted) {
+      window.dispatchEvent(new Event(AGREEMENT_POPUP_DONE));
+      return;
+    }
 
     const partnerAgreementMetaPath = getMetadataContent('partner-agreement-meta');
     if (!partnerAgreementMetaPath) {
         console.warn('Partner agreement should be displayed but partner agreement meta path is not authored');
-        return false;
+      window.dispatchEvent(new Event(AGREEMENT_POPUP_DONE));
+      return;
     }
 
     const agreementMeta = await loadAgreementMeta(partnerAgreementMetaPath);
-    if (!agreementMeta) return false;
+  if (!agreementMeta) {
+    window.dispatchEvent(new Event(AGREEMENT_POPUP_DONE));
+    return;
+  }
 
     const agreementContent = await handleAgreement('fetch');
-    if (!agreementContent) return false;
+  if (!agreementContent) {
+    window.dispatchEvent(new Event(AGREEMENT_POPUP_DONE));
+    return;
+  }
 
     const content = await createContent(miloLibs, agreementMeta, agreementContent);
 

@@ -8,6 +8,7 @@ import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./person
 import {personalizePage, personalizePlaceholders} from "./personalization.js";
 import {rewriteLinks} from "./rewriteLinks.js";
 
+export const PORTAL_MESSAGING_DONE = 'dxp:portalMessagingDone';
 export async function loadPopupFragment(popupFragment, modal = 'partner agreement') {
     const response = await fetch(popupFragment);
     if (!response.ok) {
@@ -22,15 +23,18 @@ export async function loadPopupFragment(popupFragment, modal = 'partner agreemen
     return main.firstElementChild;
 }
 
-export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
-    if (partnerAgreementDisplayed) return false;
-    if (!isMember()) return false;
-
+export async function portalMessaging(miloLibs) {
     const modalClosed = sessionStorage.getItem('portal-messaging-popup-closed')
-    if (modalClosed === 'true') return false;
+  if (modalClosed === 'true') {
+    window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
+    return;
+  }
 
     const specialStateCookie = getPartnerCookieValue('specialstate');
-    if (!specialStateCookie) return;
+    if (!specialStateCookie) {
+      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
+      return;
+    }
 
     let popupType;
     if (PERSONALIZATION_CONDITIONS['partner-submitted-in-review']) {
@@ -43,18 +47,23 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
         popupType = 'locked-payment-future-modal';
     }
     // todo check is this ok, if something goes wrong with it, consider it is done with processing and go to next  modal
-    if (!popupType) return false;
+    if (!popupType) {
+      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
+      return;
+    }
 
     const popupFragmentPath = getMetadataContent(popupType);
     if (!popupFragmentPath) {
         console.warn(`${popupType} should be displayed but popup fragment path is not found`);
-        return false;
+      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
+      return;
     }
 
     const popupContent = await loadPopupFragment(popupFragmentPath);
     if (!popupContent) {
         console.warn(`Popup fragment for ${popupFragmentPath} not found`);
-        return false;
+      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
+      return;
     }
 
     const {getModal} = await import(`${miloLibs}/blocks/modal/modal.js`);
@@ -66,16 +75,19 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
             content: popupContent,
             closeCallback: () => {
                 sessionStorage.setItem("portal-messaging-popup-closed", "true");
+              window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
             }
         },
     );
-    if (!modal) return false;
+    if (!modal) {
+      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
+      return;
+    };
     const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
     await loadArea(modal);
     personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
     personalizePage(modal);
     rewriteLinks(modal);
-    return true;
 }
 
 export async function bctqBanner(miloLibs) {

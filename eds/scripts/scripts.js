@@ -20,9 +20,8 @@ import {
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
-import {partnerAgreement} from "./partnerAgreement.js";
-import {bctqBanner, portalMessaging} from "./portalMessaging.js";
-import { certificationExpiresPopup } from "./certificationExpiresPopup.js";
+import { bctqBanner } from './portalMessaging.js';
+import { setPopups } from './setPopups.js';
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -123,9 +122,7 @@ async function loadPage() {
   await loadArea();
   applyPagePersonalization();
   rewriteLinks(document);
-  const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
-  const portalMessagingOpen = await portalMessaging(miloLibs, partnerAgreementDisplayed);
-  await certificationExpiresPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
+  await setPopups(miloLibs, imsClientId);
 }
 
 loadPage();
