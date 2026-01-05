@@ -382,6 +382,7 @@ export function redirectLoggedinPartner() {
   window.location.assign(target);
 }
 export function updateIMSConfig() {
+  window.dxpImsReady = null;
   const isSignedIn = partnerIsSignedIn();
   const imsReady = setInterval(() => {
     if (!window.adobeIMS) return;
@@ -407,7 +408,8 @@ export function updateIMSConfig() {
     }
 
     window.adobeIMS.adobeIdData.redirect_uri = targetUrl.toString();
-    window.dispatchEvent(new Event('dxp:imsReady'));
+    window.dxpImsReady = new Event('dxpImsReady');
+    window.dispatchEvent(new Event('dxpImsReady'));
   }, 500);
 }
 
@@ -543,4 +545,15 @@ export async function setFeedback(getConfig) {
     // eslint-disable-next-line consistent-return
     return null;
   }
+}
+export async function invokeAfterImsIsReady(callback) {
+  if (window.dxpImsReady) {
+    await callback();
+    return;
+  }
+  const handler = async () => {
+    await callback();
+    window.removeEventListener('dxpImsReady', handler);
+  };
+  window.addEventListener('dxpImsReady', handler);
 }

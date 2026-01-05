@@ -1,4 +1,4 @@
-import {getLibs, getPartnerCookieValue} from '../../scripts/utils.js';
+import {getLibs, getPartnerCookieValue, invokeAfterImsIsReady} from '../../scripts/utils.js';
 import { partnershipProgressStyles } from './PartnershipProgressStyles.js';
 import { getConfig } from '../utils/utils.js';
 import {DX_PARTNER_LEVEL, DX_PRIMARY_BUSINESS} from "../utils/dxConstants.js";
@@ -42,12 +42,11 @@ export default class PartnershipProgress extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    window.addEventListener('dxp:imsReady', this._onImsReady);
+    invokeAfterImsIsReady(this._onImsReady);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    window.removeEventListener('dxp:imsReady', this._onImsReady);
   }
 
   _onImsReady() {

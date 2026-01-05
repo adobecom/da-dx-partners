@@ -42,9 +42,7 @@ test.describe('Search Page', () => {
       await expect(firstCardTitle).not.toBe(secondCardTitle);
     });
     await test.step('Asset Card Content Validation', async () => {
-      if (browserName === 'firefox') {
-        await searchPage.oneTrustBanner.click();
-      }
+
       const card = searchPage.getCardByTitle(data.cardTitle);
       await card.click();
 
@@ -85,7 +83,7 @@ test.describe('Search Page', () => {
     await test.step('Search for asset', async () => {
       await searchPage.searchField.fill(data.searchKeyword);
       await searchPage.searchField.press('Enter');
-      await page.waitForLoadState('networkidle');
+      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       const text = await searchPage.searchAllResults.textContent();
       const match = text.match(/\((\d+)\)/);
       const numberResults = Number(match[1]);
@@ -472,10 +470,7 @@ test.describe('Search Page', () => {
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       await searchPage.analysisInsgightCheckBox.click();
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
-      if (browserName === 'firefox') {
-        const enableAllButton = page.getByRole('button', { name: 'Enable all' });
-        await enableAllButton.click();
-      }
+
       await searchPage.businessSolutionFilter.click();
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       await searchPage.b2bCheckBox.click();
