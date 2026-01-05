@@ -86,11 +86,7 @@ function isMilestoneReached(certification, lastCertificationPopupShown) {
 }
 
 // eslint-disable-next-line import/prefer-default-export,max-len
-async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId, callbackRef) {
-  // Remove event listener using the callback reference
-  if (callbackRef) {
-    window.removeEventListener('dxpImsReady', callbackRef);
-  }
+async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
   if (partnerAgreementDisplayed) return;
   if (portalMessagingOpen) return;
   if (!isMember()) return;
@@ -165,7 +161,7 @@ export function certificationExpiresPopup(
   partnerAgreementDisplayed,
   imsClientId,
 ) {
-    return invokeAfterImsIsReady(async () => {
+  return invokeAfterImsIsReady(async () => {
     await showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
   });
 }
