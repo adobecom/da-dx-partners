@@ -1,4 +1,4 @@
-import { getCurrentProgramType, getMetadataContent, isMember } from './utils.js';
+import {getCurrentProgramType, getMetadataContent, invokeAfterImsIsReady, isMember} from './utils.js';
 import { loadPopupFragment } from './portalMessaging.js';
 import { isProd } from '../blocks/utils/utils.js';
 import { rewriteLinks } from './rewriteLinks.js';
@@ -86,7 +86,7 @@ function isMilestoneReached(certification, lastCertificationPopupShown) {
 }
 
 // eslint-disable-next-line import/prefer-default-export,max-len
-export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
+async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
   if (partnerAgreementDisplayed) return;
   if (portalMessagingOpen) return;
   if (!isMember()) return;
@@ -99,7 +99,7 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
     return;
   }
 
-  const imsToken = window.adobeIMS.getAccessToken().token;
+  const imsToken = window.adobeIMS?.getAccessToken?.()?.token;
   let shoulDisplayCertificationModal = false;
 
   try {
@@ -118,6 +118,7 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
     }
   } catch (error) {
     console.error(error.message);
+    console.warn('certification popup skipped');
   }
   if (!shoulDisplayCertificationModal) return;
 
@@ -152,4 +153,15 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
   personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
   personalizePage(modal);
   rewriteLinks(modal);
+}
+
+export function certificationExpiresPopup(
+  miloLibs,
+  portalMessagingOpen,
+  partnerAgreementDisplayed,
+  imsClientId,
+) {
+  return invokeAfterImsIsReady(async () => {
+    await showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
+  });
 }
