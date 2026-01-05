@@ -551,8 +551,8 @@ export async function invokeAfterImsIsReady(callback) {
     await callback();
     return;
   }
-  const handler = () => {
-    callback();
+  const handler = async () => {
+    await callback();
     window.removeEventListener('dxpImsReady', handler);
   };
   window.addEventListener('dxpImsReady', handler);
