@@ -429,20 +429,28 @@ describe('Test personalization.js', () => {
             status: 'MEMBER',
             firstName: 'Test Name',
             level: 'Platinum',
-            accountName: 'Test Company',
+            accountName: 'Test account name',
+            company: 'Test Company name',
           },
         };
         document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+        const accountPlaceholder = gnav.querySelector('#test-account-placeholder');
         const companyPlaceholder = gnav.querySelector('#test-company-placeholder');
         const levelPlaceholder = gnav.querySelector('#test-level-placeholder');
-        expect(companyPlaceholder.textContent).toEqual('$accountName');
+        expect(companyPlaceholder.textContent).toEqual('$company');
+        expect(accountPlaceholder.textContent).toEqual('$accountName');
         expect(levelPlaceholder.textContent).toEqual('$level');
         const { applyGnavPersonalization } = importModules();
         const personalizedGnav = applyGnavPersonalization(gnav);
         const companyPlaceholderUpdated = personalizedGnav.querySelector('#test-company-placeholder');
+        const accountPlaceholderUpdated = personalizedGnav.querySelector('#test-account-placeholder');
         const levelPlaceholderUpdated = personalizedGnav.querySelector('#test-level-placeholder');
-        expect(companyPlaceholderUpdated.textContent).toEqual('Test Company');
+        expect(companyPlaceholderUpdated.textContent).toEqual('Test Company name');
+        expect(accountPlaceholderUpdated.textContent).toEqual('Test account name');
         expect(levelPlaceholderUpdated.textContent).toEqual('Platinum');
+        expect(levelPlaceholderUpdated.classList.contains('level-placeholder')).toBe(true);
+        expect(accountPlaceholderUpdated.classList.contains('accountname-placeholder')).toBe(true);
+        expect(companyPlaceholderUpdated.classList.contains('company-placeholder')).toBe(true);
       });
     });
     it('Show primary contact', () => {
