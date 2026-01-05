@@ -14,7 +14,6 @@ import {
   PERSONALIZATION_HIDE,
 } from './personalizationUtils.js';
 import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
-import DOMPurify from '../libs/deps/purify-wrapper.js';
 
 const imgSelector = 'img.feds-profile-img';
 
@@ -104,8 +103,14 @@ async function replaceCompanyLogo(elements) {
     elements.forEach(el => el.remove());
   }
 }
-
-export function personalizePlaceholders(placeholders, context = document, programType) {
+function replaceDirectText(node, search, replace) {
+  node.childNodes.forEach((child) => {
+    if (child.nodeType === Node.TEXT_NODE) {
+      child.nodeValue = child.nodeValue.replaceAll(search, replace);
+    }
+  });
+}
+export function personalizePlaceholders(placeholders, context = document, programType, addClass = false) {
   const sortedEntries = Object.entries(placeholders).sort((a, b) => b[0].length - a[0].length);
   sortedEntries.forEach(([key, value]) => {
     const elements = getNodesByXPath(value, context);
@@ -121,7 +126,7 @@ export function personalizePlaceholders(placeholders, context = document, progra
       replaceCompanyLogo(elements);
       return;
     }
-    
+
     if (key === 'bctqExpirationDays') {
       placeholderValue = getDaysUntilComplianceExpiration();
     }
@@ -130,8 +135,12 @@ export function personalizePlaceholders(placeholders, context = document, progra
         el.remove();
         return;
       }
-      el.innerHTML = DOMPurify.sanitize(el.innerHTML.replace(`$${key}`, placeholderValue));
-      el.classList.add(`${key.toLowerCase()}-placeholder`);
+
+      replaceDirectText(el, `$${key}`, placeholderValue);
+
+      if (addClass) {
+        el.classList.add(`${key.toLowerCase()}-placeholder`);
+      }
     });
   });
 }
@@ -281,7 +290,7 @@ export function shouldHideLinkGroup(elem) {
 
 function personalizeProfile(gnav) {
   const profile = gnav.querySelector('.profile');
-  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, profile, DX_PROGRAM_TYPE);
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, profile, DX_PROGRAM_TYPE, true);
   personalizeDropdownElements(profile);
 }
 

@@ -70,7 +70,6 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
         },
     );
     if (!modal) return false;
-
     const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
     await loadArea(modal);
     personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
