@@ -675,6 +675,9 @@ export default class PartnerCards extends LitElement {
   additionalResetActions() {}
 
   handleSearchAction() {
+    // If Card Collection doesn't have filters enabled, do not apply search from URL search query param
+    if (this.blockData.filters.length === 0) return;
+
     // eslint-disable-next-line max-len
     this.cards = this.allCards.filter((card) => card.contentArea?.title.toLowerCase().includes(this.searchTerm)
       || card.contentArea?.description.toLowerCase().includes(this.searchTerm));
