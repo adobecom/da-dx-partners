@@ -536,7 +536,7 @@ export default class PartnerCards extends LitElement {
                   ${tagsCount
             ? html`
                       <div class="filter-header-selected-tags-mobile">
-                        <span class="filter-header-selected-tags-text-mobile">${tagsString}</span>
+                        <span class="filter-header-selected-tags-text-mobile">${unsafeHTML(tagsString)}</span>
                         <span class="filter-header-selected-tags-count-mobile">+ ${tagsCount}</span>
                       </div>
                     `
