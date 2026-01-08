@@ -29,6 +29,7 @@ export default class Search extends PartnerCards {
     this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
     this.typeaheadOptions = [];
     this.isTypeaheadOpen = false;
+    this.hasResponseData = false;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -164,6 +165,9 @@ export default class Search extends PartnerCards {
         (card) => card.id,
         (card, index) => html`<search-card class="card-wrapper" daa-lh="Search Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title ?? '')}" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf}></search-card>`,
       )}`;
+    }
+    if (!this.hasResponseData) {
+      return html``;
     }
     return html`<div class="no-results">
         <strong class="no-results-title">${this.blockData.localizedText['{{no-results-title}}']}</strong>
