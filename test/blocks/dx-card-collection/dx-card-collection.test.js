@@ -160,4 +160,55 @@ describe('dx-card-collection block', () => {
     expect(infoBox.innerHTML).to.include('<strong>Test</strong>');
   });
 
+  it('should contain card collection analytics attributes', async function () {
+    const block = document.querySelector('.dx-card-collection');
+    expect(block).to.exist;
+
+    const component = await init(block);
+    await component.updateComplete;
+    expect(component).to.exist;
+
+    const partnerNewsWrapper = document.querySelector('.dx-card-collection-wrapper');
+    expect(partnerNewsWrapper.shadowRoot).to.exist;
+
+    expect(partnerNewsWrapper.getAttribute('daa-lh')).to.equal('Card Collection');
+
+    const partnerCards = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards');
+    expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: No Filters | Search Query: None');
+
+    const firstCard = partnerCards.querySelector('.card-wrapper');
+    expect(firstCard.getAttribute('daa-lh')).to.equal(`Card 1 | ${cards[0].contentArea.title} | ${cards[0].id}`);
+
+    const singlePartnerCardBtn = firstCard.shadowRoot.querySelector('.card-btn');
+    expect(singlePartnerCardBtn.getAttribute('daa-ll')).to.equal(singlePartnerCardBtn.textContent);
+  });
+
+  it('should contain card collection analytics attributes with filtering and search', async function () {
+    const block = document.querySelector('.dx-card-collection');
+    expect(block).to.exist;
+    PartnerCards.prototype.firstUpdated.restore();
+
+    sinon.stub(PartnerCards.prototype, 'firstUpdated').callsFake(async function () {
+      this.allCards = cards;
+      this.cards = cards;
+      this.paginatedCards = this.cards.slice(0, 3);
+      this.hasResponseData = true;
+      this.fetchedData = true;
+      this.allTags = tags;
+      this.selectedSortOrder = { key: 'newest', value: 'Newest' };
+      this.searchTerm = 'Adobe';
+      this.selectedFilters = {'content-type': { checked: true, hash: "37mr/hvv", key: "event-session", parentKey: "content-type", value: "Event Session"}}
+    });
+
+    const component = await init(block);
+    await component.updateComplete;
+    expect(component).to.exist;
+
+    const partnerNewsWrapper = document.querySelector('.dx-card-collection-wrapper');
+    expect(partnerNewsWrapper.shadowRoot).to.exist;
+
+    const partnerCards = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards');
+    expect(partnerCards).to.exist;
+    expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: Event Session | Search Query: Adobe');
+  });
 });

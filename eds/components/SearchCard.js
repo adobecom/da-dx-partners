@@ -6,6 +6,7 @@ import DOMPurify from '../libs/deps/purify-wrapper.js';
 const miloLibs = getLibs();
 const config = getConfig();
 const { html, repeat, LitElement, until, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 class SearchCard extends LitElement {
   static properties = {
@@ -43,9 +44,9 @@ class SearchCard extends LitElement {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  getFileType(type) {
-    const supportedFileTypes = ['excel', 'pdf', 'powerpoint', 'video', 'word', 'zip', 'html', 'announcement'];
-    return supportedFileTypes.includes(type) ? type : 'default';
+  getIconNameForContentType(contentType) {
+    const supportedFileTypes = ['excel', 'pdf', 'powerpoint', 'video', 'word', 'zip', 'html', 'course'];
+    return supportedFileTypes.includes(contentType) ? contentType : 'default';
   }
 
   /* eslint-disable indent */
@@ -55,12 +56,12 @@ class SearchCard extends LitElement {
         <div class="card-header">
           <div class="card-title-wrapper">
             <span class="card-chevron-icon"></span>
-            <div class="file-icon" style="background-image: url('/eds/img/icons/${this.getFileType(this.data.contentArea?.type ?? this.data.contentArea?.contentType)}.svg')"></div>
+            <div class="file-icon" style="background-image: url('/eds/img/icons/${this.getIconNameForContentType(this.data.contentArea?.type ?? this.data.contentArea?.contentType)}.svg')"></div>
             <span class="card-title">${this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : ''}</span>
           </div>
           <div class="card-icons">
             <sp-theme theme="spectrum" color="light" scale="medium">
-              <sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}"><sp-icon-open-in /></sp-action-button>
+              <sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}" daa-ll="${processTrackingLabels(this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : '', getConfig(), 30)}"><sp-icon-open-in /></sp-action-button>
             </sp-theme>
           </div>
         </div>
@@ -72,13 +73,13 @@ class SearchCard extends LitElement {
           }
           <div class="card-text">
             <span class="card-date">${this.localizedText['{{last-modified}}']}: ${formatDate(this.data.cardDate, this.ietf)}
-          ${this.data.contentArea?.type !== 'html' && this.data.contentArea?.type !== 'announcement'
+          ${this.data.contentArea?.type !== 'html' && this.data.contentArea?.contentType !== 'course'
         ? html`<span class="card-size">${this.localizedText['{{size}}']}: ${this.data.contentArea?.size}</span>`
         : ''
       }
             </span>
             <p class="card-description">${unsafeHTML(DOMPurify.sanitize(this.data.contentArea?.description))}</p>
-            <div class="card-tags-wrapper">${this.cardTags}</div>
+            ${ this.data.contentArea?.contentType !== 'course' ? html`<div class="card-tags-wrapper">${this.cardTags}</div>` : '' }
           </div>
         </div>
       </div>

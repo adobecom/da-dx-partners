@@ -22,6 +22,7 @@ import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
 import {partnerAgreement} from "./partnerAgreement.js";
 import {bctqBanner, portalMessaging} from "./portalMessaging.js";
+import { certificationExpiresPopup } from "./certificationExpiresPopup.js";
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -45,6 +46,11 @@ let CONFIG = {
   // fallbackRouting: 'off',
   locales: {
     '': { ietf: 'en-US', tk: 'hah7vzn.css' },
+  },
+  jarvis: {
+    id: 'spp_default',
+    version: '1.0',
+    onDemand: false,
   },
   local: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
   stage: {
@@ -118,7 +124,8 @@ async function loadPage() {
   applyPagePersonalization();
   rewriteLinks(document);
   const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
-  await portalMessaging(miloLibs, partnerAgreementDisplayed);
+  const portalMessagingOpen = await portalMessaging(miloLibs, partnerAgreementDisplayed);
+  await certificationExpiresPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
 }
 
 loadPage();

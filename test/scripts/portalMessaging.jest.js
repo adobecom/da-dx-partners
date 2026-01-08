@@ -33,7 +33,7 @@ jest.mock('../../eds/scripts/rewriteLinks.js', () => ({
 jest.mock('../../eds/scripts/utils.js', () => ({
   getCurrentProgramType: jest.fn(() => 'dxp'),
   getMetadataContent: jest.fn(),
-  getPartnerDataCookieValue: jest.fn(),
+  getPartnerCookieValue: jest.fn(),
   isMember: jest.fn(),
 }));
 
@@ -42,7 +42,7 @@ global.fetch = jest.fn();
 describe('Test portalMessaging.js', () => {
   let getCurrentProgramType;
   let getMetadataContent;
-  let getPartnerDataCookieValue;
+  let getPartnerCookieValue;
   let isMember;
   const miloLibs = 'https://test-milo-libs.com';
 
@@ -59,10 +59,10 @@ describe('Test portalMessaging.js', () => {
     const utils = require('../../eds/scripts/utils.js');
     getCurrentProgramType = utils.getCurrentProgramType;
     getMetadataContent = utils.getMetadataContent;
-    getPartnerDataCookieValue = utils.getPartnerDataCookieValue;
+    getPartnerCookieValue = utils.getPartnerCookieValue;
     isMember = utils.isMember;
     isMember.mockReturnValue(true);
-    getPartnerDataCookieValue.mockReturnValue('has-specialstate');
+    getPartnerCookieValue.mockReturnValue('has-specialstate');
 
     const fragmentHtml = `
       <html><body>
@@ -113,7 +113,7 @@ describe('Test portalMessaging.js', () => {
   });
 
   it('returns early when specialstate cookie not present', async () => {
-    getPartnerDataCookieValue.mockReturnValue('');
+    getPartnerCookieValue.mockReturnValue('');
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
     await portalMessaging(miloLibs, false);
     expect(global.fetch).not.toHaveBeenCalled();
@@ -122,7 +122,7 @@ describe('Test portalMessaging.js', () => {
 
   it('warns and returns when fragment path missing', async () => {
     // ensure condition resolves and flow advances
-    getPartnerDataCookieValue.mockReturnValue('submitted-in-review');
+    getPartnerCookieValue.mockReturnValue('submitted-in-review');
     getMetadataContent.mockReturnValue(null);
 
     const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
@@ -139,7 +139,7 @@ describe('Test portalMessaging.js', () => {
   });
 
   it('logs error and warns when fragment fetch fails', async () => {
-    getPartnerDataCookieValue.mockReturnValue('submitted-in-review');
+    getPartnerCookieValue.mockReturnValue('submitted-in-review');
     getMetadataContent.mockReturnValue('/fragments/test-popup');
     global.fetch.mockResolvedValueOnce({ ok: false, status: 500, text: () => Promise.resolve('') });
 
@@ -160,7 +160,7 @@ describe('Test portalMessaging.js', () => {
   });
 
   it('renders submitted-in-review popup', async () => {
-    getPartnerDataCookieValue.mockReturnValue('submitted-in-review');
+    getPartnerCookieValue.mockReturnValue('submitted-in-review');
     getMetadataContent.mockReturnValue('/fragments/submitted-in-review-popup');
 
     const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
@@ -182,7 +182,7 @@ describe('Test portalMessaging.js', () => {
   });
 
   it('renders locked-compliance popup when applicable', async () => {
-    getPartnerDataCookieValue.mockReturnValue('locked-compliance-past');
+    getPartnerCookieValue.mockReturnValue('locked-compliance-past');
     getMetadataContent.mockReturnValue('/fragments/locked-compliance-popup');
 
     const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
@@ -196,7 +196,7 @@ describe('Test portalMessaging.js', () => {
   });
 
   it('renders locked-payment popup when applicable', async () => {
-    getPartnerDataCookieValue.mockReturnValue('locked-payment-future');
+    getPartnerCookieValue.mockReturnValue('locked-payment-future');
     getMetadataContent.mockReturnValue('/fragments/locked-payment-popup');
 
     const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');

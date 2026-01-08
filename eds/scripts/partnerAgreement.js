@@ -3,7 +3,7 @@ import {
     getCookieValue,
     getCurrentProgramType,
     getMetadataContent,
-    getPartnerDataCookieValue,
+    getPartnerCookieValue,
     isMember
 } from "./utils.js";
 
@@ -153,7 +153,7 @@ async function loadAgreementMeta(metadataUrl) {
 }
 
 export async function partnerAgreement(miloLibs) {
-    const latestAgreementAccepted = getPartnerDataCookieValue('latestagreementaccepted');
+    const latestAgreementAccepted = getPartnerCookieValue('latestagreementaccepted');
     if (isMember() && latestAgreementAccepted) return false;
 
     const partnerAgreementMetaPath = getMetadataContent('partner-agreement-meta');

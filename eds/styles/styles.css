@@ -25,6 +25,13 @@
   }
 }
 
-#portal-messaging-modal {
+#portal-messaging-modal, #certification-popup-modal {
   padding: var(--spacing-m);
 }
+
+@media screen and (max-width: 600px) {
+  #portal-messaging-modal, #certification-popup-modal {
+    padding: var(--spacing-xxs);
+  }
+}
+

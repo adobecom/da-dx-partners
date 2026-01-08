@@ -868,6 +868,10 @@ class Gnav {
 
     this.blocks.profile.buttonElem = await decorateProfileTrigger({ avatar });
     decoratedElem.append(this.blocks.profile.buttonElem);
+    // PARTNERS_NAVIGATION START
+    // MWPW-182655 - Manage profile and company Landing page
+    window.dispatchEvent(new CustomEvent('feds:profileImageRendered'));
+    // PARTNERS_NAVIGATION END
 
     // Decorate the profile dropdown
     // after user interacts with button or after 3s have passed
@@ -1474,7 +1478,7 @@ class Gnav {
         clearTimeout(decorationTimeout);
 
         const loadingDesktopMegaMenuHTML = template.querySelector('.feds-popup.loading')?.innerHTML;
-        await (async () => {
+        (async () => {
           try {
             const menuLogic = await loadDecorateMenu();
 
