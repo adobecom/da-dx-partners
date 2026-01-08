@@ -1452,9 +1452,8 @@ describe('SearchCards Unit Tests', () => {
       
       const result = searchComponent.partnerCards;
       
-      // Should return empty template, not the no-results div
       expect(result).to.exist;
-      expect(result.strings).to.deep.equal(['']); // Empty html template
+      expect(result.strings).to.deep.equal(['']);
     });
 
     it('should return no results message when hasResponseData is true but no cards', () => {
@@ -1464,7 +1463,6 @@ describe('SearchCards Unit Tests', () => {
       const result = searchComponent.partnerCards;
       
       expect(result).to.exist;
-      // The result should contain the no-results div
       expect(result.strings[0]).to.include('no-results');
     });
   });
