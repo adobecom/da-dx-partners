@@ -59,6 +59,11 @@ describe('setPopups', () => {
     PORTAL_MESSAGING_DONE = portalMessagingModule.PORTAL_MESSAGING_DONE;
   });
 
+  afterEach(() => {
+    // Clear module cache to prevent mock interference with other test files
+    jest.resetModules();
+  });
+
   describe('when user is not a member', () => {
     it('should not call any functions', async () => {
       // Setup: User is NOT a member
