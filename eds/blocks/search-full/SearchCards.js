@@ -375,7 +375,7 @@ export default class Search extends PartnerCards {
         <div class="partner-cards-content">
           <div class="partner-cards-header">
             <div class="partner-cards-title-wrapper">
-              ${this.blockData.localizedText['{{show}}']}:
+              ${!this.mobileView ? html`${this.blockData.localizedText['{{show}}']}:` : ''}
               <sp-theme theme="spectrum" color="light" scale="medium">
                 <sp-button variant="${this.contentType === 'all' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('all')}" aria-label="${this.blockData.localizedText['{{all}}']}">
                   ${this.blockData.localizedText['{{all}}']} (${this.contentTypeCounter.countAll})</sp-button>

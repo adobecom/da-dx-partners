@@ -72,6 +72,15 @@ export const searchCardsStyles = css`
     font-size: 18px;
     font-weight: bold;
   }
+
+  .partner-cards-header .partner-cards-title-wrapper sp-theme {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    column-gap: 8px;
+    row-gap: 16px;
+  }
   
   .partner-cards-header .partner-cards-sort-wrapper .sort-wrapper {
     border-left : none;
