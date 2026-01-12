@@ -187,7 +187,7 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
     const { key } = this.selectedDateFilter;
     const currentDate = new Date();
 
-    if (key === 'current-month' || key === 'previous-month') {
+    if (key === 'current-month' || key === 'next-month' || key === 'previous-month') {
       const currentMonth = currentDate.getMonth();
       const currentYear = currentDate.getFullYear();
       let targetMonth = currentMonth;
@@ -198,11 +198,27 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
         targetYear = currentMonth === 0 ? currentYear - 1 : currentYear;
       }
 
+      if (key === 'next-month') {
+        targetMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+        targetYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+      }
+
       this.cards = this.cards.filter((card) => {
         const cardDate = new Date(card.cardDate);
         const cardMonth = cardDate.getMonth();
         const cardYear = cardDate.getFullYear();
         return cardMonth === targetMonth && cardYear === targetYear;
+      });
+    }
+
+    if (key === 'next-90-days') {
+      const endDate = new Date(currentDate);
+      endDate.setHours(23, 59, 59, 999);
+      endDate.setDate(endDate.getDate() + 90);
+
+      this.cards = this.cards.filter((card) => {
+        const cardDate = new Date(card.cardDate);
+        return cardDate >= currentDate && cardDate <= endDate;
       });
     }
 

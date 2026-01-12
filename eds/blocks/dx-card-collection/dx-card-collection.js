@@ -31,6 +31,7 @@ export default async function init(el) {
     '{{filter}}': 'Filter',
     '{{filter-by}}': 'Filter by',
     '{{filters}}': 'Filters',
+    '{{next-90-days}}': 'Next 90 days',
     '{{last-90-days}}': 'Last 90 days',
     '{{last-6-months}}': 'Last 6 months',
     '{{load-more}}': 'Load more',
@@ -41,6 +42,7 @@ export default async function init(el) {
     '{{of}}': 'Of',
     '{{page}}': 'Page',
     '{{prev}}': 'Prev',
+    '{{next-month}}': 'Next month',
     '{{previous-month}}': 'Previous month',
     '{{previous-page}}': 'Previous Page',
     '{{results}}': 'Results',
@@ -67,8 +69,8 @@ export default async function init(el) {
     tags: [
       { key: 'show-all', value: localizedText['{{show-all}}'], parentKey: 'date', checked: true, default: true },
       { key: 'current-month', value: localizedText['{{current-month}}'], parentKey: 'date', checked: false },
-      { key: 'previous-month', value: localizedText['{{previous-month}}'], parentKey: 'date', checked: false },
-      { key: 'last-90-days', value: localizedText['{{last-90-days}}'], parentKey: 'date', checked: false },
+      { key: 'next-month', value: localizedText['{{next-month}}'], parentKey: 'date', checked: false },
+      { key: 'next-90-days', value: localizedText['{{next-90-days}}'], parentKey: 'date', checked: false },
     ],
   };
 
