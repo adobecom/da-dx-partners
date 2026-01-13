@@ -166,15 +166,6 @@ export default class Search extends PartnerCards {
         (card, index) => html`<search-card class="card-wrapper" daa-lh="Search Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title ?? '')}" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf}></search-card>`,
       )}`;
     }
-    if (!this.hasResponseData) {
-      return html`
-        <div class="progress-circle-wrapper">
-              <sp-theme theme="spectrum" color="light" scale="medium">
-                <sp-progress-circle label="Cards loading" indeterminate="" size="l" role="progressbar"></sp-progress-circle>
-              </sp-theme>
-            </div>
-        `;
-    }
     return html`<div class="no-results">
         <strong class="no-results-title">${this.blockData.localizedText['{{no-results-title}}']}</strong>
         <p class="no-results-description">${this.blockData.localizedText['{{no-results-description}}']}</p>

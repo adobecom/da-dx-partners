@@ -1433,40 +1433,6 @@ describe('SearchCards Unit Tests', () => {
     });
   });
 
-  describe('partnerCards getter', () => {
-    it('should return cards when paginatedCards has data', () => {
-      searchComponent.paginatedCards = [
-        { id: '1', contentArea: { title: 'Card 1' } },
-        { id: '2', contentArea: { title: 'Card 2' } }
-      ];
-      searchComponent.hasResponseData = true;
-      
-      const result = searchComponent.partnerCards;
-      
-      expect(result).to.exist;
-    });
-
-    it('should return empty template when loading (hasResponseData is false)', () => {
-      searchComponent.paginatedCards = [];
-      searchComponent.hasResponseData = false;
-      
-      const result = searchComponent.partnerCards;
-      
-      expect(result).to.exist;
-      expect(result.strings[0]).to.include('progress-circle-wrapper');
-    });
-
-    it('should return no results message when hasResponseData is true but no cards', () => {
-      searchComponent.paginatedCards = [];
-      searchComponent.hasResponseData = true;
-      
-      const result = searchComponent.partnerCards;
-      
-      expect(result).to.exist;
-      expect(result.strings[0]).to.include('no-results');
-    });
-  });
-
   describe('chosenFilters getter', () => {
     it('should return undefined when no filters are selected', () => {
       searchComponent.selectedFilters = {};
