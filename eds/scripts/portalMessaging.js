@@ -2,13 +2,13 @@ import {
   getCurrentProgramType,
   getMetadataContent,
   getPartnerCookieValue,
-  isMember, PARTNER_AGREEMENT_POPUP, CERTIFICATION_POPUP, SHOW_NEXT_POPUP
+  CERTIFICATION_POPUP,
+  SHOW_NEXT_POPUP,
 } from "./utils.js";
 import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./personalizationConfigDX.js";
 import {personalizePage, personalizePlaceholders} from "./personalization.js";
 import {rewriteLinks} from "./rewriteLinks.js";
 
-export const PORTAL_MESSAGING_DONE = 'dxp:portalMessagingDone';
 export async function loadPopupFragment(popupFragment, modal = 'partner agreement') {
     const response = await fetch(popupFragment);
     if (!response.ok) {
@@ -23,7 +23,13 @@ export async function loadPopupFragment(popupFragment, modal = 'partner agreemen
     return main.firstElementChild;
 }
 
-export async function portalMessaging(miloLibs) {
+export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
+  if (partnerAgreementDisplayed) {
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+    );
+    return false;
+  }
     const modalClosed = sessionStorage.getItem('portal-messaging-popup-closed')
   if (modalClosed === 'true') {
     window.dispatchEvent(
@@ -95,17 +101,16 @@ export async function portalMessaging(miloLibs) {
         new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
       );
       return false;
-    };
+    }
     const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
     await loadArea(modal);
     personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
     personalizePage(modal);
     rewriteLinks(modal);
+    return true;
 }
 
 export async function bctqBanner(miloLibs) {
-    if (!isMember()) return;
-
     let bannerType;
     if (PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d']) {
         bannerType = 'bctq-banner';

@@ -94,7 +94,13 @@ function isMilestoneReached(certification, lastCertificationPopupShown) {
 }
 
 // eslint-disable-next-line import/prefer-default-export,max-len
-async function showPopup(miloLibs, imsClientId) {
+async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
+  if (partnerAgreementDisplayed || portalMessagingOpen) {
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
+  }
   const lastCertificationPopupShown = parseLocalDate(
     localStorage.getItem(LAST_DATE_SHOWN),
   ) || new Date(0); // Jan 1, 1970 at midnight local time
@@ -180,6 +186,7 @@ async function showPopup(miloLibs, imsClientId) {
   personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
   personalizePage(modal);
   rewriteLinks(modal);
+  return true;
 }
 
 export function certificationExpiresPopup(
