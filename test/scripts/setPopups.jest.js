@@ -34,10 +34,10 @@ jest.mock('../../eds/scripts/certificationExpiresPopup.js', () => ({
   certificationExpiresPopup: mockCertificationExpiresPopup,
 }));
 
-describe('showNextPopup', () => {
+describe('setPopups', () => {
   let isMember;
   let partnerAgreement;
-  let showNextPopup;
+  let setPopups;
   let PARTNER_AGREEMENT_POPUP;
   let PORTAL_MESSAGING_POPUP;
   let CERTIFICATION_POPUP;
@@ -56,11 +56,11 @@ describe('showNextPopup', () => {
     // Import mocked modules (fresh after resetModules)
     const utilsModule = require('../../eds/scripts/utils.js');
     const partnerAgreementModule = require('../../eds/scripts/partnerAgreement.js');
-    const showNextPopupModule = require('../../eds/scripts/showNextPopup.js');
+    const setPopupsModule = require('../../eds/scripts/showNextPopup.js');
     
     isMember = utilsModule.isMember;
     partnerAgreement = partnerAgreementModule.partnerAgreement;
-    showNextPopup = showNextPopupModule.showNextPopup;
+    setPopups = setPopupsModule.showNextPopup;
     PARTNER_AGREEMENT_POPUP = utilsModule.PARTNER_AGREEMENT_POPUP;
     PORTAL_MESSAGING_POPUP = utilsModule.PORTAL_MESSAGING_POPUP;
     CERTIFICATION_POPUP = utilsModule.CERTIFICATION_POPUP;
@@ -71,13 +71,15 @@ describe('showNextPopup', () => {
       // Setup: User is NOT a member
       isMember.mockReturnValue(false);
       
-      // Call showNextPopup
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id');
+      // Call setPopups
+      await setPopups('https://test-milo-libs.com', 'test-client-id');
       
       // Verify partnerAgreement was NOT called
       expect(partnerAgreement).not.toHaveBeenCalled();
       expect(mockPortalMessaging).not.toHaveBeenCalled();
     });
+
+
   });
 
   describe('when user is a member', () => {
@@ -92,8 +94,8 @@ describe('showNextPopup', () => {
       // partnerAgreement should NOT be called yet
       expect(partnerAgreement).not.toHaveBeenCalled();
       
-      // Call showNextPopup
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id');
+      // Call setPopups
+      await setPopups('https://test-milo-libs.com', 'test-client-id');
       
       // Verify partnerAgreement was called immediately
       expect(partnerAgreement).toHaveBeenCalledTimes(1);
@@ -101,8 +103,8 @@ describe('showNextPopup', () => {
     });
 
     it('should call all popups in sequence', async () => {
-      // Call showNextPopup
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id');
+      // Call setPopups
+      await setPopups('https://test-milo-libs.com', 'test-client-id');
       
       // Verify all three functions were called in sequence
       expect(partnerAgreement).toHaveBeenCalledTimes(1);
@@ -115,7 +117,7 @@ describe('showNextPopup', () => {
       const customClientId = 'custom-client-id-123';
       
       // Setup with custom values
-      await showNextPopup(customMiloLibs, customClientId);
+      await setPopups(customMiloLibs, customClientId);
       
       // Verify partnerAgreement got customMiloLibs
       expect(partnerAgreement).toHaveBeenCalledWith(customMiloLibs);
@@ -136,7 +138,7 @@ describe('showNextPopup', () => {
       // Mock partnerAgreement to return true (displayed)
       partnerAgreement.mockResolvedValue(true);
       
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id');
+      await setPopups('https://test-milo-libs.com', 'test-client-id');
       
       // Verify portalMessaging received true for partnerAgreementDisplayed
       expect(mockPortalMessaging).toHaveBeenCalledWith('https://test-milo-libs.com', true);
@@ -146,29 +148,13 @@ describe('showNextPopup', () => {
       // Mock portalMessaging to return true (open)
       mockPortalMessaging.mockResolvedValue(true);
       
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id');
+      await setPopups('https://test-milo-libs.com', 'test-client-id');
       
       // Verify certificationExpiresPopup received true for portalMessagingOpen
       expect(mockCertificationExpiresPopup).toHaveBeenCalledWith(
         'https://test-milo-libs.com',
         true, // portalMessagingOpen
         false, // partnerAgreementDisplayed
-        'test-client-id'
-      );
-    });
-
-    it('should pass both portalMessagingOpen and partnerAgreementDisplayed when both are true', async () => {
-      // Mock both to return true
-      partnerAgreement.mockResolvedValue(true);
-      mockPortalMessaging.mockResolvedValue(true);
-      
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id');
-      
-      // Verify certificationExpiresPopup received true for both flags
-      expect(mockCertificationExpiresPopup).toHaveBeenCalledWith(
-        'https://test-milo-libs.com',
-        true, // portalMessagingOpen
-        true, // partnerAgreementDisplayed
         'test-client-id'
       );
     });
@@ -183,7 +169,7 @@ describe('showNextPopup', () => {
     });
 
     it('should only call partner agreement when nextPopup is PARTNER_AGREEMENT_POPUP', async () => {
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id', PARTNER_AGREEMENT_POPUP);
+      await setPopups('https://test-milo-libs.com', 'test-client-id', PARTNER_AGREEMENT_POPUP);
       
       // Should call partnerAgreement
       expect(partnerAgreement).toHaveBeenCalledTimes(1);
@@ -194,7 +180,7 @@ describe('showNextPopup', () => {
     });
 
     it('should only call portal messaging when nextPopup is PORTAL_MESSAGING_POPUP', async () => {
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id', PORTAL_MESSAGING_POPUP);
+      await setPopups('https://test-milo-libs.com', 'test-client-id', PORTAL_MESSAGING_POPUP);
       
       // Should call portalMessaging
       expect(mockPortalMessaging).toHaveBeenCalledTimes(1);
@@ -204,10 +190,10 @@ describe('showNextPopup', () => {
       expect(mockCertificationExpiresPopup).not.toHaveBeenCalled();
     });
 
-    it('should call certification popup when nextPopup is CERTIFICATION_POPUP', async () => {
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id', CERTIFICATION_POPUP);
+    it('should  call certification popup when nextPopup is CERTIFICATION_POPUP', async () => {
+      await setPopups('https://test-milo-libs.com', 'test-client-id', CERTIFICATION_POPUP);
       
-      // Should call certification when nextPopup equals CERTIFICATION_POPUP
+      // Should  call  certification  when nextPopup equals CERTIFICATION_POPUP)
       expect(partnerAgreement).not.toHaveBeenCalled();
       expect(mockPortalMessaging).not.toHaveBeenCalled();
       expect(mockCertificationExpiresPopup).toHaveBeenCalled();
@@ -226,8 +212,8 @@ describe('showNextPopup', () => {
       mockPortalMessaging.mockResolvedValue(false);
       mockCertificationExpiresPopup.mockResolvedValue(false);
       
-      // Call showNextPopup - all popups should be called in sequence
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id');
+      // Call setPopups - all popups should be called in sequence
+      await setPopups('https://test-milo-libs.com', 'test-client-id');
       
       // Verify all three were called
       expect(partnerAgreement).toHaveBeenCalledTimes(1);
@@ -251,7 +237,7 @@ describe('showNextPopup', () => {
       mockPortalMessaging.mockResolvedValue(true);
       mockCertificationExpiresPopup.mockResolvedValue(false);
       
-      await showNextPopup('https://test-milo-libs.com', 'test-client-id');
+      await setPopups('https://test-milo-libs.com', 'test-client-id');
       
       // Verify portalMessaging received true from partnerAgreement
       expect(mockPortalMessaging).toHaveBeenCalledWith('https://test-milo-libs.com', true);
@@ -265,4 +251,5 @@ describe('showNextPopup', () => {
       );
     });
   });
+
 });

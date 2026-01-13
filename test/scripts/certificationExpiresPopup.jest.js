@@ -139,6 +139,36 @@ describe('Test certificationExpiresPopup.js', () => {
     jest.clearAllMocks();
   });
   describe('early exits', () => {
+    it('should exit early if partnerAgreementDisplayed is true', async () => {
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+
+      await certificationExpiresPopup('https://test-milo-libs.com', false, true, 'test-client-id');
+
+      // Should not make API calls or show modal when partnerAgreement was displayed
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(mockGetModal).not.toHaveBeenCalled();
+    });
+
+    it('should exit early if portalMessagingOpen is true', async () => {
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+
+      await certificationExpiresPopup('https://test-milo-libs.com', true, false, 'test-client-id');
+
+      // Should not make API calls or show modal when portal messaging is open
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(mockGetModal).not.toHaveBeenCalled();
+    });
+
+    it('should exit early if both partnerAgreementDisplayed and portalMessagingOpen are true', async () => {
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+
+      await certificationExpiresPopup('https://test-milo-libs.com', true, true, 'test-client-id');
+
+      // Should not make API calls or show modal when both flags are true
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(mockGetModal).not.toHaveBeenCalled();
+    });
+
     it('should exit if popup was already shown today', async () => {
       const todayUTC = normalizeDate(new Date()); // Today at UTC midnight
       mockGetItem.mockReturnValue(todayUTC.toISOString());
