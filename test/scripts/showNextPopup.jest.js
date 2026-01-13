@@ -43,6 +43,9 @@ describe('setPopups', () => {
   let CERTIFICATION_POPUP;
 
   beforeEach(() => {
+    // Reset modules FIRST to ensure fresh imports
+    jest.resetModules();
+    
     // Clear all mock call history
     jest.clearAllMocks();
     
@@ -50,7 +53,7 @@ describe('setPopups', () => {
     mockPortalMessaging.mockResolvedValue(undefined);
     mockCertificationExpiresPopup.mockResolvedValue(undefined);
     
-    // Import mocked modules
+    // Import mocked modules (fresh after resetModules)
     const utilsModule = require('../../eds/scripts/utils.js');
     const partnerAgreementModule = require('../../eds/scripts/partnerAgreement.js');
     const setPopupsModule = require('../../eds/scripts/showNextPopup.js');
@@ -61,11 +64,6 @@ describe('setPopups', () => {
     PARTNER_AGREEMENT_POPUP = utilsModule.PARTNER_AGREEMENT_POPUP;
     PORTAL_MESSAGING_POPUP = utilsModule.PORTAL_MESSAGING_POPUP;
     CERTIFICATION_POPUP = utilsModule.CERTIFICATION_POPUP;
-  });
-
-  afterEach(() => {
-    // Clear module cache to prevent mock interference with other test files
-    jest.resetModules();
   });
 
   describe('when user is not a member', () => {

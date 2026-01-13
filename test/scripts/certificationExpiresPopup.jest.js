@@ -84,6 +84,7 @@ describe('Test certificationExpiresPopup.js', () => {
   };
 
   beforeEach(() => {
+    jest.resetModules();
     jest.clearAllMocks();
     
     // Reset global mocks
