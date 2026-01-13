@@ -53,11 +53,11 @@ describe('setPopups', () => {
     // Import mocked modules
     const utilsModule = require('../../eds/scripts/utils.js');
     const partnerAgreementModule = require('../../eds/scripts/partnerAgreement.js');
-    const setPopupsModule = require('../../eds/scripts/setPopups.js');
+    const setPopupsModule = require('../../eds/scripts/showNextPopup.js');
     
     isMember = utilsModule.isMember;
     partnerAgreement = partnerAgreementModule.partnerAgreement;
-    setPopups = setPopupsModule.setPopups;
+    setPopups = setPopupsModule.showNextPopup;
     PARTNER_AGREEMENT_POPUP = utilsModule.PARTNER_AGREEMENT_POPUP;
     PORTAL_MESSAGING_POPUP = utilsModule.PORTAL_MESSAGING_POPUP;
     CERTIFICATION_POPUP = utilsModule.CERTIFICATION_POPUP;

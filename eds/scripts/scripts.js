@@ -21,7 +21,7 @@ import {
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
 import { bctqBanner } from './portalMessaging.js';
-import { setPopups } from './setPopups.js';
+import { showNextPopup } from './showNextPopup.js';
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -124,14 +124,13 @@ async function loadPage() {
   rewriteLinks(document);
   window.addEventListener(SHOW_NEXT_POPUP, async (e) => {
     if ('detail' in e) {
-      console.log('CustomEvent data:', e.detail.next);
-      await setPopups(miloLibs, imsClientId, e.detail.next);
+      console.log('CustomEvent data:', e.detail?.next);
+      await showNextPopup(miloLibs, imsClientId, e.detail?.next);
     } else {
-      await setPopups(miloLibs, imsClientId);
+      await showNextPopup(miloLibs, imsClientId);
     }
   });
-  await setPopups(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
-
+  await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
 }
 
 loadPage();
