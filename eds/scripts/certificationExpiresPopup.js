@@ -191,9 +191,11 @@ async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplaye
 
 export function certificationExpiresPopup(
   miloLibs,
+  portalMessagingOpen,
+  partnerAgreementDisplayed,
   imsClientId,
 ) {
   return invokeAfterImsIsReady(async () => {
-    await showPopup(miloLibs, imsClientId);
+    await showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
   });
 }

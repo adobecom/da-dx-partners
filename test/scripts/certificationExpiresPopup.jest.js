@@ -144,7 +144,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
 
-      await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(global.fetch).not.toHaveBeenCalled();
       expect(mockGetModal).not.toHaveBeenCalled();
@@ -174,7 +174,7 @@ describe('Test certificationExpiresPopup.js', () => {
       });
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(global.fetch).toHaveBeenCalledWith(
         'https://partner-directory.adobe.io/v1/dxp/contact/credentials',
@@ -204,7 +204,7 @@ describe('Test certificationExpiresPopup.js', () => {
       });
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(global.fetch).toHaveBeenCalledWith(
         'https://partner-directory-stage.adobe.io/v1/dxp/contact/credentials',
@@ -224,7 +224,7 @@ describe('Test certificationExpiresPopup.js', () => {
       });
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
       expect(mockGetModal).not.toHaveBeenCalled();
     });
 
@@ -233,7 +233,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
       const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(errorSpy).toHaveBeenCalledWith('Network error');
       expect(mockGetModal).not.toHaveBeenCalled();
@@ -261,7 +261,7 @@ describe('Test certificationExpiresPopup.js', () => {
       });
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(mockGetModal).not.toHaveBeenCalled();
     });
@@ -278,7 +278,7 @@ describe('Test certificationExpiresPopup.js', () => {
       });
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(mockGetModal).not.toHaveBeenCalled();
     });
@@ -296,7 +296,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         expect(mockGetModal).toHaveBeenCalled();
       });
@@ -313,7 +313,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         expect(mockGetModal).toHaveBeenCalled();
       });
@@ -330,7 +330,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         expect(mockGetModal).not.toHaveBeenCalled();
       });
@@ -349,7 +349,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         expect(mockGetModal).toHaveBeenCalled();
       });
@@ -366,7 +366,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com', 'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         expect(mockGetModal).toHaveBeenCalled();
       });
@@ -385,7 +385,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         expect(mockGetModal).toHaveBeenCalled();
       });
@@ -404,7 +404,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         expect(mockGetModal).toHaveBeenCalled();
       });
@@ -429,7 +429,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         // Should show popup (only once, even though multiple certs at milestones)
         expect(mockGetModal).toHaveBeenCalledTimes(1);
@@ -453,7 +453,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         // Only one popup shown per day
         expect(mockGetModal).toHaveBeenCalledTimes(1);
@@ -476,7 +476,7 @@ describe('Test certificationExpiresPopup.js', () => {
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-        await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
         expect(mockGetModal).not.toHaveBeenCalled();
       });
@@ -502,7 +502,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(warnSpy).toHaveBeenCalledWith('certification-modal should be displayed but popup fragment path is not found');
       expect(mockGetModal).not.toHaveBeenCalled();
@@ -515,7 +515,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(warnSpy).toHaveBeenCalledWith('Popup fragment for /digitalexperience/fragments/modals/certification-modal not found');
       expect(mockGetModal).not.toHaveBeenCalled();
@@ -530,7 +530,7 @@ describe('Test certificationExpiresPopup.js', () => {
       loadPopupFragment.mockResolvedValue(popupContent);
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(mockGetModal).toHaveBeenCalledWith(
         null,
@@ -549,7 +549,7 @@ describe('Test certificationExpiresPopup.js', () => {
       loadPopupFragment.mockResolvedValue(popupContent);
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       const modal = document.querySelector('#certification-popup-modal');
       expect(mockLoadArea).toHaveBeenCalledWith(modal);
@@ -564,7 +564,7 @@ describe('Test certificationExpiresPopup.js', () => {
       loadPopupFragment.mockResolvedValue(popupContent);
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       // Get the closeCallback that was passed to getModal
       const { closeCallback } = mockGetModal.mock.calls[0][1];
@@ -582,7 +582,7 @@ describe('Test certificationExpiresPopup.js', () => {
       mockGetModal.mockResolvedValue(null);
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
-      await certificationExpiresPopup('https://test-milo-libs.com',  'test-client-id');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
 
       expect(mockLoadArea).not.toHaveBeenCalled();
       expect(personalizePage).not.toHaveBeenCalled();
