@@ -1453,7 +1453,7 @@ describe('SearchCards Unit Tests', () => {
       const result = searchComponent.partnerCards;
       
       expect(result).to.exist;
-      expect(result.strings).to.deep.equal(['']);
+      expect(result.strings[0]).to.include('progress-circle-wrapper');
     });
 
     it('should return no results message when hasResponseData is true but no cards', () => {

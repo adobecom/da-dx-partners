@@ -167,7 +167,13 @@ export default class Search extends PartnerCards {
       )}`;
     }
     if (!this.hasResponseData) {
-      return html``;
+      return html`
+        <div class="progress-circle-wrapper">
+              <sp-theme theme="spectrum" color="light" scale="medium">
+                <sp-progress-circle label="Cards loading" indeterminate="" size="l" role="progressbar"></sp-progress-circle>
+              </sp-theme>
+            </div>
+        `;
     }
     return html`<div class="no-results">
         <strong class="no-results-title">${this.blockData.localizedText['{{no-results-title}}']}</strong>
