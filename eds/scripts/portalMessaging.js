@@ -25,9 +25,6 @@ export async function loadPopupFragment(popupFragment, modal = 'partner agreemen
 
 export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
   if (partnerAgreementDisplayed) {
-    window.dispatchEvent(
-      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
-    );
     return false;
   }
     const modalClosed = sessionStorage.getItem('portal-messaging-popup-closed')

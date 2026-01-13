@@ -1,11 +1,9 @@
 import {
-  CERTIFICATION_POPUP,
   getCurrentProgramType,
   getMetadataContent,
   invokeAfterImsIsReady,
-  isMember, NEXT_POPUP_PLACEHOLDER,
-  PORTAL_MESSAGING_POPUP,
-  SHOW_NEXT_POPUP
+  NEXT_POPUP_PLACEHOLDER,
+  SHOW_NEXT_POPUP,
 } from './utils.js';
 import { loadPopupFragment } from './portalMessaging.js';
 import { isProd } from '../blocks/utils/utils.js';
@@ -96,9 +94,6 @@ function isMilestoneReached(certification, lastCertificationPopupShown) {
 // eslint-disable-next-line import/prefer-default-export,max-len
 async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
   if (partnerAgreementDisplayed || portalMessagingOpen) {
-    window.dispatchEvent(
-      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
-    );
     return false;
   }
   const lastCertificationPopupShown = parseLocalDate(
