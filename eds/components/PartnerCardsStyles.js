@@ -366,7 +366,7 @@ export const partnerCardsStyles = css`
     align-items: center;
     min-width: 89px;
     max-width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
     padding: 0 0 0 11px;
     border-radius: 5px;
     font-size: .875rem;

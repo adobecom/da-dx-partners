@@ -76,10 +76,7 @@ export const searchCardsStyles = css`
   .partner-cards-header .partner-cards-title-wrapper sp-theme {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-start;
-    column-gap: 8px;
-    row-gap: 16px;
+    gap: 8px;
   }
   
   .partner-cards-header .partner-cards-sort-wrapper .sort-wrapper {
