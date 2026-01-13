@@ -84,13 +84,15 @@ export async function portalMessaging(miloLibs) {
             content: popupContent,
             closeCallback: () => {
                 sessionStorage.setItem("portal-messaging-popup-closed", "true");
-              window.dispatchEvent(new Event(SHOW_NEXT_POPUP));
+              window.dispatchEvent(
+                new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+              );
             }
         },
     );
     if (!modal) {
       window.dispatchEvent(
-        new CustomEvent(SHOW_NEXT_POPUP, { detail: { skip: CERTIFICATION_POPUP } }),
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
       );
       return false;
     };

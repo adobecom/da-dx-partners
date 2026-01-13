@@ -164,7 +164,7 @@ async function showPopup(miloLibs, imsClientId) {
       closeCallback: () => {
         localStorage.setItem(LAST_DATE_SHOWN, dateToLocalString(normalizeDate(new Date())));
         window.dispatchEvent(
-          new Event(SHOW_NEXT_POPUP),
+          new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
         );
       },
     },

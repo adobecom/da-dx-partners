@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import {PORTAL_MESSAGING_POPUP, SHOW_NEXT_POPUP} from "../../eds/scripts/utils.js";
 
 const mockGetModal = jest.fn();
 const mockLoadArea = jest.fn();
@@ -35,6 +36,10 @@ jest.mock('../../eds/scripts/utils.js', () => ({
   getMetadataContent: jest.fn(),
   getPartnerCookieValue: jest.fn(),
   isMember: jest.fn(),
+  PARTNER_AGREEMENT_POPUP: 'dxp:partnerAgreement',
+  PORTAL_MESSAGING_POPUP: 'dxp:portalMessaging',
+  CERTIFICATION_POPUP: 'dxp:certificationExpires',
+  SHOW_NEXT_POPUP: 'dxp:showNextPopup',
 }));
 
 global.fetch = jest.fn();
@@ -209,7 +214,7 @@ describe('Test portalMessaging.js', () => {
     expect(mockGetModal).toHaveBeenCalled();
   });
 
-  it('dispatches PORTAL_MESSAGING_DONE when getModal returns null', async () => {
+  it('dispatches SHOW_NEXT_POPUP with skip CERTIFICATION_POPUP when getModal returns null', async () => {
     // Setup conditions for popup to be shown
     getPartnerCookieValue.mockReturnValue('submitted-in-review');
     getMetadataContent.mockReturnValue('/fragments/submitted-popup');
@@ -227,13 +232,15 @@ describe('Test portalMessaging.js', () => {
     // Spy on dispatchEvent
     const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
 
-    const { portalMessaging, PORTAL_MESSAGING_DONE } = require('../../eds/scripts/portalMessaging.js');
+    const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
+    const { CERTIFICATION_POPUP } = require('../../eds/scripts/utils.js');
     await portalMessaging(miloLibs, false);
 
-    // Verify event was dispatched
-    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({
-      type: PORTAL_MESSAGING_DONE,
-    }));
+    // Verify event was dispatched with skip: CERTIFICATION_POPUP
+    expect(dispatchEventSpy).toHaveBeenCalled();
+    const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+    expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
+    expect(dispatchedEvent.detail).toEqual({ next: CERTIFICATION_POPUP });
 
     dispatchEventSpy.mockRestore();
   });

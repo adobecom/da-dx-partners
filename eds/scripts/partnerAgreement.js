@@ -22,7 +22,9 @@ async function acceptAgreement(agreementTextContainer, successMessage, errorMess
         addRegeneratePropToCookie();
       setTimeout(() => {
         closeModalCallback(agreementModal);
-        window.dispatchEvent(new Event(SHOW_NEXT_POPUP));
+        window.dispatchEvent(
+          new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
+        );
       }, 2000);
     } else {
         spinner.innerHTML = errorMessage;

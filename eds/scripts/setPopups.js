@@ -12,7 +12,7 @@ export async function setPopups(miloLibs, imsClientId, nextPopup = '') {
   const portalMessagingOpen = !nextPopup || nextPopup === PORTAL_MESSAGING_POPUP
     ? await portalMessaging(miloLibs, partnerAgreementDisplayed) : false;
   // eslint-disable-next-line no-unused-vars
-  const certificationExpiresPopupOpen = !nextPopup && nextPopup !== CERTIFICATION_POPUP
+  const certificationExpiresPopupOpen = !nextPopup || nextPopup === CERTIFICATION_POPUP
     ? await certificationExpiresPopup(
       miloLibs,
       portalMessagingOpen,
