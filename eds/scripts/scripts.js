@@ -16,7 +16,7 @@ import {
   preloadResources,
   redirectLoggedinPartner,
   updateNavigation,
-  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback
+  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback, SHOW_NEXT_POPUP, PARTNER_AGREEMENT_POPUP
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
@@ -122,7 +122,16 @@ async function loadPage() {
   await loadArea();
   applyPagePersonalization();
   rewriteLinks(document);
-  await setPopups(miloLibs, imsClientId);
+  window.addEventListener(SHOW_NEXT_POPUP, async (e) => {
+    if ('detail' in e) {
+      console.log('CustomEvent data:', e.detail.next);
+      await setPopups(miloLibs, imsClientId, e.detail.next);
+    } else {
+      await setPopups(miloLibs, imsClientId);
+    }
+  });
+  await setPopups(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
+
 }
 
 loadPage();

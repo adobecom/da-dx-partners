@@ -1,8 +1,8 @@
 import {
-    getCurrentProgramType,
-    getMetadataContent,
-    getPartnerCookieValue,
-    isMember
+  getCurrentProgramType,
+  getMetadataContent,
+  getPartnerCookieValue,
+  isMember, PARTNER_AGREEMENT_POPUP, CERTIFICATION_POPUP, SHOW_NEXT_POPUP
 } from "./utils.js";
 import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./personalizationConfigDX.js";
 import {personalizePage, personalizePlaceholders} from "./personalization.js";
@@ -26,14 +26,18 @@ export async function loadPopupFragment(popupFragment, modal = 'partner agreemen
 export async function portalMessaging(miloLibs) {
     const modalClosed = sessionStorage.getItem('portal-messaging-popup-closed')
   if (modalClosed === 'true') {
-    window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
-    return;
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+    );
+    return false;
   }
 
     const specialStateCookie = getPartnerCookieValue('specialstate');
     if (!specialStateCookie) {
-      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
-      return;
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+      );
+      return false;
     }
 
     let popupType;
@@ -46,24 +50,29 @@ export async function portalMessaging(miloLibs) {
     if (PERSONALIZATION_CONDITIONS['partner-locked-payment-future']) {
         popupType = 'locked-payment-future-modal';
     }
-    // todo check is this ok, if something goes wrong with it, consider it is done with processing and go to next  modal
     if (!popupType) {
-      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
-      return;
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+      );
+      return false;
     }
 
     const popupFragmentPath = getMetadataContent(popupType);
     if (!popupFragmentPath) {
         console.warn(`${popupType} should be displayed but popup fragment path is not found`);
-      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
-      return;
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+      );
+      return false;
     }
 
     const popupContent = await loadPopupFragment(popupFragmentPath);
     if (!popupContent) {
         console.warn(`Popup fragment for ${popupFragmentPath} not found`);
-      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
-      return;
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+      );
+      return false;
     }
 
     const {getModal} = await import(`${miloLibs}/blocks/modal/modal.js`);
@@ -75,13 +84,15 @@ export async function portalMessaging(miloLibs) {
             content: popupContent,
             closeCallback: () => {
                 sessionStorage.setItem("portal-messaging-popup-closed", "true");
-              window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
+              window.dispatchEvent(new Event(SHOW_NEXT_POPUP));
             }
         },
     );
     if (!modal) {
-      window.dispatchEvent(new Event(PORTAL_MESSAGING_DONE));
-      return;
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { skip: CERTIFICATION_POPUP } }),
+      );
+      return false;
     };
     const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
     await loadArea(modal);

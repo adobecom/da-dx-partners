@@ -1,22 +1,23 @@
-import { AGREEMENT_POPUP_DONE, partnerAgreement } from './partnerAgreement.js';
-import { PORTAL_MESSAGING_DONE, portalMessaging } from './portalMessaging.js';
+import { portalMessaging } from './portalMessaging.js';
 import { certificationExpiresPopup } from './certificationExpiresPopup.js';
-import { isMember } from './utils.js';
+import { CERTIFICATION_POPUP, isMember, PARTNER_AGREEMENT_POPUP, PORTAL_MESSAGING_POPUP} from './utils.js';
+import { partnerAgreement } from './partnerAgreement.js';
 
-export async function setPopups(miloLibs, imsClientId) {
+export async function setPopups(miloLibs, imsClientId, nextPopup = '') {
   if (!isMember()) {
     return;
   }
-  window.addEventListener(AGREEMENT_POPUP_DONE, async () => {
-    await portalMessaging(miloLibs, false);
-  });
-
-  window.addEventListener(PORTAL_MESSAGING_DONE, async () => {
-    await certificationExpiresPopup(
+  const partnerAgreementDisplayed = !nextPopup || nextPopup === PARTNER_AGREEMENT_POPUP
+    ? await partnerAgreement(miloLibs) : false;
+  const portalMessagingOpen = !nextPopup || nextPopup === PORTAL_MESSAGING_POPUP
+    ? await portalMessaging(miloLibs, partnerAgreementDisplayed) : false;
+  // eslint-disable-next-line no-unused-vars
+  const certificationExpiresPopupOpen = !nextPopup && nextPopup !== CERTIFICATION_POPUP
+    ? await certificationExpiresPopup(
       miloLibs,
+      portalMessagingOpen,
+      partnerAgreementDisplayed,
       imsClientId,
-    );
-  });
-
-  await partnerAgreement(miloLibs);
+    )
+    : false;
 }

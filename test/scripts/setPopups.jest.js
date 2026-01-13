@@ -55,7 +55,7 @@ describe('setPopups', () => {
     isMember = utilsModule.isMember;
     partnerAgreement = partnerAgreementModule.partnerAgreement;
     setPopups = setPopupsModule.setPopups;
-    AGREEMENT_POPUP_DONE = partnerAgreementModule.AGREEMENT_POPUP_DONE;
+    AGREEMENT_POPUP_DONE = partnerAgreementModule.PARTNER_AGREEMENT_POPUP;
     PORTAL_MESSAGING_DONE = portalMessagingModule.PORTAL_MESSAGING_DONE;
   });
 

@@ -1,4 +1,12 @@
-import {getCurrentProgramType, getMetadataContent, invokeAfterImsIsReady, isMember} from './utils.js';
+import {
+  CERTIFICATION_POPUP,
+  getCurrentProgramType,
+  getMetadataContent,
+  invokeAfterImsIsReady,
+  isMember, NEXT_POPUP_PLACEHOLDER,
+  PORTAL_MESSAGING_POPUP,
+  SHOW_NEXT_POPUP
+} from './utils.js';
 import { loadPopupFragment } from './portalMessaging.js';
 import { isProd } from '../blocks/utils/utils.js';
 import { rewriteLinks } from './rewriteLinks.js';
@@ -93,7 +101,10 @@ async function showPopup(miloLibs, imsClientId) {
   const today = normalizeDate(new Date());
   // Check if popup was already shown today (compare local calendar days, not time difference)
   if (lastCertificationPopupShown.getTime() >= today.getTime()) {
-    return;
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
   }
 
   const imsToken = window.adobeIMS?.getAccessToken?.()?.token;
@@ -117,19 +128,30 @@ async function showPopup(miloLibs, imsClientId) {
     console.error(error.message);
     console.warn('certification popup skipped');
   }
-  if (!shoulDisplayCertificationModal) return;
+  if (!shoulDisplayCertificationModal) {
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
+  }
 
   const CERTIFICATION_META = 'certification-modal';
   const certificationFragmentPath = getMetadataContent(CERTIFICATION_META);
   if (!certificationFragmentPath) {
     console.warn(`${CERTIFICATION_META} should be displayed but popup fragment path is not found`);
-    return;
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
   }
 
   const popupContent = await loadPopupFragment(certificationFragmentPath, 'certification modal');
   if (!popupContent) {
     console.warn(`Popup fragment for ${certificationFragmentPath} not found`);
-    return;
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
   }
 
   const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`);
@@ -141,10 +163,18 @@ async function showPopup(miloLibs, imsClientId) {
       content: popupContent,
       closeCallback: () => {
         localStorage.setItem(LAST_DATE_SHOWN, dateToLocalString(normalizeDate(new Date())));
+        window.dispatchEvent(
+          new Event(SHOW_NEXT_POPUP),
+        );
       },
     },
   );
-  if (!modal) return;
+  if (!modal) {
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
+  }
   const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
   await loadArea(modal);
   personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
