@@ -29,6 +29,7 @@ export default class Search extends PartnerCards {
     this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
     this.typeaheadOptions = [];
     this.isTypeaheadOpen = false;
+    this.hasResponseData = false;
   }
 
   // eslint-disable-next-line class-methods-use-this
