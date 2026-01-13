@@ -111,18 +111,40 @@ describe('Test portalMessaging.js', () => {
 
   it('returns early when popup already closed (sessionStorage flag)', async () => {
     sessionStorage.setItem('portal-messaging-popup-closed', 'true');
+    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+    
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
+    const { CERTIFICATION_POPUP } = require('../../eds/scripts/utils.js');
     await portalMessaging(miloLibs, false);
     expect(global.fetch).not.toHaveBeenCalled();
     expect(mockGetModal).not.toHaveBeenCalled();
+    
+    // Verify SHOW_NEXT_POPUP event was dispatched
+    expect(dispatchEventSpy).toHaveBeenCalled();
+    const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+    expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
+    expect(dispatchedEvent.detail).toEqual({ next: CERTIFICATION_POPUP });
+    
+    dispatchEventSpy.mockRestore();
   });
 
   it('returns early when specialstate cookie not present', async () => {
     getPartnerCookieValue.mockReturnValue('');
+    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+    
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
+    const { CERTIFICATION_POPUP } = require('../../eds/scripts/utils.js');
     await portalMessaging(miloLibs, false);
     expect(global.fetch).not.toHaveBeenCalled();
     expect(mockGetModal).not.toHaveBeenCalled();
+    
+    // Verify SHOW_NEXT_POPUP event was dispatched
+    expect(dispatchEventSpy).toHaveBeenCalled();
+    const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+    expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
+    expect(dispatchedEvent.detail).toEqual({ next: CERTIFICATION_POPUP });
+    
+    dispatchEventSpy.mockRestore();
   });
 
   it('warns and returns when fragment path missing', async () => {
@@ -136,11 +158,22 @@ describe('Test portalMessaging.js', () => {
     PERSONALIZATION_CONDITIONS['partner-locked-payment-future'] = false;
 
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+    
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
+    const { CERTIFICATION_POPUP } = require('../../eds/scripts/utils.js');
     await portalMessaging(miloLibs, false);
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('should be displayed but popup fragment path is not found'));
     expect(mockGetModal).not.toHaveBeenCalled();
+    
+    // Verify SHOW_NEXT_POPUP event was dispatched
+    expect(dispatchEventSpy).toHaveBeenCalled();
+    const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+    expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
+    expect(dispatchedEvent.detail).toEqual({ next: CERTIFICATION_POPUP });
+    
     warnSpy.mockRestore();
+    dispatchEventSpy.mockRestore();
   });
 
   it('logs error and warns when fragment fetch fails', async () => {
@@ -155,13 +188,24 @@ describe('Test portalMessaging.js', () => {
 
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+    
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
+    const { CERTIFICATION_POPUP } = require('../../eds/scripts/utils.js');
     await portalMessaging(miloLibs, false);
     expect(errorSpy).toHaveBeenCalledWith('Fetching partner agreement metadata failed, status 500');
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Popup fragment for /fragments/test-popup not found'));
     expect(mockGetModal).not.toHaveBeenCalled();
+    
+    // Verify SHOW_NEXT_POPUP event was dispatched
+    expect(dispatchEventSpy).toHaveBeenCalled();
+    const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+    expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
+    expect(dispatchedEvent.detail).toEqual({ next: CERTIFICATION_POPUP });
+    
     errorSpy.mockRestore();
     warnSpy.mockRestore();
+    dispatchEventSpy.mockRestore();
   });
 
   it('renders submitted-in-review popup', async () => {
