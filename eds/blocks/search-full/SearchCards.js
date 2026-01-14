@@ -110,7 +110,7 @@ export default class Search extends PartnerCards {
     this.handleSearch();
   }
 
-  async handleSearch() {
+  handleSearch() {
     if (this.searchTerm) {
       this.urlSearchParams.set('term', this.searchTerm);
     } else {
@@ -118,7 +118,7 @@ export default class Search extends PartnerCards {
     }
     this.handleUrlSearchParams();
     this.paginationCounter = 1;
-    await this.handleActions();
+    this.handleActions();
   }
 
   get typeaheadOptionsHTML() {
