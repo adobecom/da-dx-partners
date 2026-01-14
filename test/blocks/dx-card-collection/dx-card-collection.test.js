@@ -211,4 +211,117 @@ describe('dx-card-collection block', () => {
     expect(partnerCards).to.exist;
     expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: Event Session | Search Query: Adobe');
   });
+
+  describe('PartnerCardsWithDateFilter date filtering', () => {
+    let component;
+    let mockCards;
+
+    beforeEach(async () => {
+      const block = document.querySelector('.dx-card-collection');
+      component = await init(block);
+      await component.updateComplete;
+
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+
+      mockCards = [
+        { id: '1', cardDate: new Date(currentYear, currentMonth, 15).toISOString() },
+        { id: '2', cardDate: new Date(currentYear, currentMonth + 1, 15).toISOString() },
+        { id: '3', cardDate: new Date(currentYear, currentMonth - 1, 15).toISOString() },
+        { id: '4', cardDate: new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString() },
+        { id: '5', cardDate: new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString() },
+      ];
+
+      component.cards = [...mockCards];
+      component.allCards = [...mockCards];
+    });
+
+    it('should filter cards for next-month', () => {
+      component.cards = [...mockCards];
+      component.selectedDateFilter = { key: 'next-month' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('2');
+      expect(filteredIds).to.not.include('3');
+    });
+
+    it('should handle next-month for December year transition', () => {
+      const currentYear = new Date().getFullYear();
+      component.cards = [
+        { id: 'jan-next-year', cardDate: new Date(currentYear + 1, 0, 15).toISOString() },
+      ];
+      
+      const clock = sinon.useFakeTimers(new Date(currentYear, 11, 15).getTime());
+      component.selectedDateFilter = { key: 'next-month' };
+      component.handleDateFilterAction();
+      
+      expect(component.cards.length).to.equal(1);
+      expect(component.cards[0].id).to.equal('jan-next-year');
+      clock.restore();
+    });
+
+    it('should filter cards for previous-month', () => {
+      component.cards = [...mockCards];
+      component.selectedDateFilter = { key: 'previous-month' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('3');
+      expect(filteredIds).to.not.include('2');
+    });
+
+    it('should handle previous-month for January year transition', () => {
+      const currentYear = new Date().getFullYear();
+      component.cards = [
+        { id: 'dec-last-year', cardDate: new Date(currentYear - 1, 11, 15).toISOString() },
+      ];
+      
+      const clock = sinon.useFakeTimers(new Date(currentYear, 0, 15).getTime());
+      component.selectedDateFilter = { key: 'previous-month' };
+      component.handleDateFilterAction();
+      
+      expect(component.cards.length).to.equal(1);
+      expect(component.cards[0].id).to.equal('dec-last-year');
+      clock.restore();
+    });
+
+    it('should filter cards for next-90-days', () => {
+      component.cards = [...mockCards];
+      component.selectedDateFilter = { key: 'next-90-days' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('4');
+      expect(filteredIds).to.not.include('5');
+    });
+
+    it('should handle next-90-days boundary correctly', () => {
+      const today = new Date();
+      component.cards = [
+        { id: 'within-90', cardDate: new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000).toISOString() },
+        { id: 'at-90', cardDate: new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString() },
+        { id: 'beyond-90', cardDate: new Date(today.getTime() + 91 * 24 * 60 * 60 * 1000).toISOString() },
+      ];
+      
+      component.selectedDateFilter = { key: 'next-90-days' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('within-90');
+      expect(filteredIds).to.include('at-90');
+    });
+
+    it('should filter cards for current-month', () => {
+      component.cards = [...mockCards];
+      component.selectedDateFilter = { key: 'current-month' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('1');
+      expect(filteredIds).to.not.include('2');
+      expect(filteredIds).to.not.include('3');
+    });
+  });
 });
