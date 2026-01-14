@@ -72,11 +72,12 @@ export default {
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/multiple-collections-on-page',
       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
+        keyword: 'Multiplecollectionstestcard',
         cardTitle1: 'Cardforfiltertest 1',
         cardTitle2: 'Cardforfiltertest 2',
         oldestSort: 'oldest',
         newstSort: 'newest',
-        checkBoxAfterEffects: 'After Effects',
+        checkBoxMediaEntertainment: 'Media & Entertainment',
         btnRole: 'checkbox',
       },
     },
