@@ -16,13 +16,12 @@ import {
   preloadResources,
   redirectLoggedinPartner,
   updateNavigation,
-  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback
+  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback, SHOW_NEXT_POPUP, PARTNER_AGREEMENT_POPUP
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
-import {partnerAgreement} from "./partnerAgreement.js";
-import {bctqBanner, portalMessaging} from "./portalMessaging.js";
-import { certificationExpiresPopup } from "./certificationExpiresPopup.js";
+import { bctqBanner } from './portalMessaging.js';
+import { showNextPopup } from './showNextPopup.js';
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -123,9 +122,15 @@ async function loadPage() {
   await loadArea();
   applyPagePersonalization();
   rewriteLinks(document);
-  const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
-  const portalMessagingOpen = await portalMessaging(miloLibs, partnerAgreementDisplayed);
-  await certificationExpiresPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
+  window.addEventListener(SHOW_NEXT_POPUP, async (e) => {
+    if ('detail' in e) {
+      console.log('CustomEvent data:', e.detail?.next);
+      await showNextPopup(miloLibs, imsClientId, e.detail?.next);
+    } else {
+      await showNextPopup(miloLibs, imsClientId);
+    }
+  });
+  await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
 }
 
 loadPage();
