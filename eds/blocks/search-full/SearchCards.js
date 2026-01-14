@@ -30,6 +30,8 @@ export default class Search extends PartnerCards {
     this.typeaheadOptions = [];
     this.isTypeaheadOpen = false;
     this.hasResponseData = false;
+    this.abortController = null;
+    this.suggestionAbortController = null;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -75,7 +77,21 @@ export default class Search extends PartnerCards {
         // eslint-disable-next-line no-underscore-dangle
         this._searchInput?.focus();
       }
-      this.typeaheadOptions = await this.getSuggestions();
+      
+      // Cancel previous suggestion request if still in flight
+      if (this.suggestionAbortController) {
+        this.suggestionAbortController.abort();
+      }
+      
+      // Create new AbortController for this suggestion request
+      this.suggestionAbortController = new AbortController();
+      
+      const suggestions = await this.getSuggestions(this.suggestionAbortController.signal);
+      
+      // If request was aborted, suggestions will be undefined
+      if (suggestions) {
+        this.typeaheadOptions = suggestions;
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
@@ -94,7 +110,7 @@ export default class Search extends PartnerCards {
     this.handleSearch();
   }
 
-  handleSearch() {
+  async handleSearch() {
     if (this.searchTerm) {
       this.urlSearchParams.set('term', this.searchTerm);
     } else {
@@ -102,7 +118,7 @@ export default class Search extends PartnerCards {
     }
     this.handleUrlSearchParams();
     this.paginationCounter = 1;
-    this.handleActions();
+    await this.handleActions();
   }
 
   get typeaheadOptionsHTML() {
@@ -129,7 +145,7 @@ export default class Search extends PartnerCards {
   }
 
   // eslint-disable-next-line consistent-return
-  async getSuggestions() {
+  async getSuggestions(signal) {
     let data;
     try {
       const SUGGESTIONS_SIZE = 10;
@@ -143,6 +159,7 @@ export default class Search extends PartnerCards {
           suggestions: 'true',
         },
         this.generateFilters(),
+        signal,
       );
 
 
@@ -153,6 +170,10 @@ export default class Search extends PartnerCards {
       data = await response.json();
       return data.suggested_completions;
     } catch (error) {
+      // Ignore aborted requests
+      if (error.name === 'AbortError') {
+        return;
+      }
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
     }
@@ -179,7 +200,7 @@ export default class Search extends PartnerCards {
   }
 
   // eslint-disable-next-line consistent-return
-  async getCards() {
+  async getCards(signal) {
     const startCardIndex = (this.paginationCounter - 1) * this.cardsPerPage;
     let apiData;
     try {
@@ -192,6 +213,7 @@ export default class Search extends PartnerCards {
           term: this.searchTerm,
         },
         this.generateFilters(),
+        signal,
       );
 
       if (!response.ok) {
@@ -202,6 +224,10 @@ export default class Search extends PartnerCards {
       this.hasResponseData = !!apiData.cards;
       return apiData;
     } catch (error) {
+      // Ignore aborted requests
+      if (error.name === 'AbortError') {
+        return;
+      }
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
     }
@@ -220,7 +246,22 @@ export default class Search extends PartnerCards {
   async handleActions() {
     this.hasResponseData = false;
     this.additionalResetActions();
-    const cardsData = await this.getCards();
+    
+    // Cancel previous request if still in flight
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+    
+    // Create new AbortController for this request
+    this.abortController = new AbortController();
+    
+    const cardsData = await this.getCards(this.abortController.signal);
+    
+    // If request was aborted, cardsData will be undefined
+    if (!cardsData) {
+      return;
+    }
+    
     const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0, courses: 0 } };
     this.cards = cards;
     if (this.blockData.pagination === 'load-more') {
