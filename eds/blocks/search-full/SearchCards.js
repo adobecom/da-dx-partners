@@ -32,6 +32,7 @@ export default class Search extends PartnerCards {
     this.hasResponseData = false;
     this.abortController = null;
     this.suggestionAbortController = null;
+    this.searchInputTimeout = null;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -58,14 +59,21 @@ export default class Search extends PartnerCards {
   async onSearchInput(event) {
     this.searchTerm = event.target.value;
 
+    // Clear previous timeout
+    if (this.searchInputTimeout) {
+      clearTimeout(this.searchInputTimeout);
+    }
+
     // Handle empty input
     if (!this.searchTerm) {
       this.closeTypeahead(SEE_ALL);
       return;
     }
 
-    // Handle non-empty input
-    await this.updateTypeaheadDialog();
+    // Debounce typeahead suggestions (wait 300ms after user stops typing)
+    this.searchInputTimeout = setTimeout(async () => {
+      await this.updateTypeaheadDialog();
+    }, 300);
   }
 
   async updateTypeaheadDialog() {
