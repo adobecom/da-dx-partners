@@ -65,6 +65,7 @@ export default class PartnerCards extends LitElement {
     this.allTagsFlatMap = new Map();
     this.cardFiltersSet = new Set();
     this.updateView = this.updateView.bind(this);
+    this.filterDebounceTimeout = null;
   }
 
   async connectedCallback() {
@@ -799,7 +800,17 @@ export default class PartnerCards extends LitElement {
     }
 
     this.paginationCounter = 1;
-    this.handleActions();
+    
+    // Clear previous timeout
+    if (this.filterDebounceTimeout) {
+      clearTimeout(this.filterDebounceTimeout);
+    }
+    
+    // Debounce the data fetch (wait 250ms after user stops clicking filters)
+    this.filterDebounceTimeout = setTimeout(() => {
+      this.handleActions();
+    }, 250);
+    
     this.handleUrlSearchParams();
   }
 
@@ -827,7 +838,17 @@ export default class PartnerCards extends LitElement {
 
     this.paginationCounter = 1;
     this.handleFilterAction();
-    this.handleActions();
+    
+    // Clear previous timeout
+    if (this.filterDebounceTimeout) {
+      clearTimeout(this.filterDebounceTimeout);
+    }
+    
+    // Debounce the data fetch
+    this.filterDebounceTimeout = setTimeout(() => {
+      this.handleActions();
+    }, 250);
+    
     this.handleUrlSearchParams();
   }
 
@@ -845,7 +866,17 @@ export default class PartnerCards extends LitElement {
 
     this.paginationCounter = 1;
     this.handleFilterAction();
-    this.handleActions();
+    
+    // Clear previous timeout
+    if (this.filterDebounceTimeout) {
+      clearTimeout(this.filterDebounceTimeout);
+    }
+    
+    // Debounce the data fetch
+    this.filterDebounceTimeout = setTimeout(() => {
+      this.handleActions();
+    }, 250);
+    
     this.handleUrlSearchParams();
   }
 
