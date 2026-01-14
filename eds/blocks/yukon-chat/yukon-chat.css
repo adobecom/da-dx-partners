@@ -957,10 +957,6 @@ chat-history-left .user-message {
     width: unset;
   }
 
-  .yc-modal-title {
-    padding: 0px 16px;
-  }
-
   .yc-textarea-grow-wrap textarea {
     font-size: 16px;
   }
