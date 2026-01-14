@@ -947,6 +947,7 @@ chat-history-left .user-message {
     width: 100%;
     border-radius: 24px 24px 0 0;
     height: calc(100% - 120px);
+    inset: 0;
   }
 
   .yukon-chat-button {
@@ -963,6 +964,10 @@ chat-history-left .user-message {
 
   .yukon-chat-container {
     padding-bottom: 0px;
+  }
+
+  .yc-textarea-grow-wrap textarea {
+    font-size: 16px;
   }
 }
 
@@ -983,10 +988,15 @@ chat-history-left .user-message {
     width: 100%;
     border-radius: 24px 24px 0 0;
     height: calc(100% - 120px);
+    inset: 0;
   }
 
   .yukon-chat-container {
     padding-bottom: 0px;
+  }
+
+  .yc-textarea-grow-wrap textarea {
+    font-size: 16px;
   }
 }
 
