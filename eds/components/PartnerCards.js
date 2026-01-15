@@ -7,6 +7,7 @@ import {
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
+import { debounce } from '../blocks/utils/action.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, css, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -65,7 +66,8 @@ export default class PartnerCards extends LitElement {
     this.allTagsFlatMap = new Map();
     this.cardFiltersSet = new Set();
     this.updateView = this.updateView.bind(this);
-    this.filterDebounceTimeout = null;
+    // Create debounced version of handleActions for filter changes
+    this.debouncedHandleActions = debounce(() => this.handleActions(), 250);
   }
 
   async connectedCallback() {
@@ -800,17 +802,7 @@ export default class PartnerCards extends LitElement {
     }
 
     this.paginationCounter = 1;
-    
-    // Clear previous timeout
-    if (this.filterDebounceTimeout) {
-      clearTimeout(this.filterDebounceTimeout);
-    }
-    
-    // Debounce the data fetch (wait 250ms after user stops clicking filters)
-    this.filterDebounceTimeout = setTimeout(() => {
-      this.handleActions();
-    }, 250);
-    
+    this.debouncedHandleActions();
     this.handleUrlSearchParams();
   }
 
@@ -838,17 +830,7 @@ export default class PartnerCards extends LitElement {
 
     this.paginationCounter = 1;
     this.handleFilterAction();
-    
-    // Clear previous timeout
-    if (this.filterDebounceTimeout) {
-      clearTimeout(this.filterDebounceTimeout);
-    }
-    
-    // Debounce the data fetch
-    this.filterDebounceTimeout = setTimeout(() => {
-      this.handleActions();
-    }, 250);
-    
+    this.debouncedHandleActions();
     this.handleUrlSearchParams();
   }
 
@@ -866,17 +848,7 @@ export default class PartnerCards extends LitElement {
 
     this.paginationCounter = 1;
     this.handleFilterAction();
-    
-    // Clear previous timeout
-    if (this.filterDebounceTimeout) {
-      clearTimeout(this.filterDebounceTimeout);
-    }
-    
-    // Debounce the data fetch
-    this.filterDebounceTimeout = setTimeout(() => {
-      this.handleActions();
-    }, 250);
-    
+    this.debouncedHandleActions();
     this.handleUrlSearchParams();
   }
 
