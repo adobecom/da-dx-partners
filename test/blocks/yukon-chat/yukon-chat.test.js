@@ -434,5 +434,68 @@ describe('yukon-chat block', () => {
       expect(sendButton.hasAttribute('disabled')).to.be.false;
       expect(textarea.hasAttribute('disabled')).to.be.false;
     });
+    it('should handle HTML error responses and show error message', async () => {
+      const encoder = new TextEncoder();
+      const htmlChunk = encoder.encode('<!DOCTYPE html><html><head><title>Error</title></head><body>Server Error</body></html>\n');
+
+      fetchStub.callsFake(async (url) => {
+        const urlStr = typeof url === 'string' ? url : url.toString();
+        if (urlStr.includes('placeholders.json')) {
+          return {
+            ok: true,
+            json: async () => ({
+              data: [
+                { key: 'send-message', value: 'Send Message' },
+                { key: 'open-chat', value: 'Open Chat' },
+                { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+              ],
+            }),
+          };
+        }
+        if (urlStr.includes('yukonAIAssistant')) {
+          return {
+            ok: true,
+            status: 200,
+            body: new ReadableStream({
+              start(controller) {
+                controller.enqueue(htmlChunk);
+                controller.close();
+              },
+            }),
+          };
+        }
+        return { ok: false, status: 404 };
+      });
+
+      const block = document.querySelector('.yukon-chat');
+      await init(block);
+
+      const textarea = document.querySelector('#yc-input-field');
+      const sendButton = document.querySelector('.yc-input-field-button');
+
+      textarea.value = 'Test HTML error';
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      expect(sendButton.hasAttribute('disabled')).to.be.false;
+
+      sendButton.click();
+
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((r) => setTimeout(r, 100));
+
+      const modal = document.querySelector('#yukon-chat-modal');
+      expect(modal).to.exist;
+
+      const loadingMessage = modal.querySelector('.chat-loader');
+      expect(loadingMessage).to.not.exist;
+
+      const errorMessage = modal.querySelector('.error-message');
+      expect(errorMessage).to.exist;
+      expect(errorMessage.textContent).to.include(
+        "We’re having trouble processing your request right now. Please try again later",
+      );
+
+      expect(sendButton.hasAttribute('disabled')).to.be.false;
+      expect(textarea.hasAttribute('disabled')).to.be.false;
+    });
   });
 });
