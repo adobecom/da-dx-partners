@@ -276,7 +276,8 @@ export default class Search extends PartnerCards {
       return;
     }
 
-    const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0, courses: 0 } };    this.cards = cards;
+    const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0, courses: 0 } };
+    this.cards = cards;
     if (this.blockData.pagination === 'load-more') {
       this.paginatedCards = this.paginatedCards.concat(cards);
     } else {
