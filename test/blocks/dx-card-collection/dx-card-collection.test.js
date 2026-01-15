@@ -212,6 +212,65 @@ describe('dx-card-collection block', () => {
     expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: Event Session | Search Query: Adobe');
   });
 
+  it('should initialize with past date filter when date-filter is set to past', async function () {
+    document.body.innerHTML = `
+      <div class="dx-card-collection">
+        <div>
+          <div>date-filter</div>
+          <div>past</div>
+        </div>
+      </div>
+    `;
+
+    const block = document.querySelector('.dx-card-collection');
+    const component = await init(block);
+    await component.updateComplete;
+
+    expect(component.blockData.dateFilter).to.exist;
+    expect(component.blockData.dateFilter.tags).to.have.lengthOf(4);
+    expect(component.blockData.dateFilter.tags[0].key).to.equal('show-all');
+    expect(component.blockData.dateFilter.tags[2].key).to.equal('previous-month');
+    expect(component.blockData.dateFilter.tags[3].key).to.equal('last-90-days');
+  });
+
+  it('should initialize with future date filter when date-filter is set to future', async function () {
+    document.body.innerHTML = `
+      <div class="dx-card-collection">
+        <div>
+          <div>date-filter</div>
+          <div>future</div>
+        </div>
+      </div>
+    `;
+
+    const block = document.querySelector('.dx-card-collection');
+    const component = await init(block);
+    await component.updateComplete;
+
+    expect(component.blockData.dateFilter).to.exist;
+    expect(component.blockData.dateFilter.tags).to.have.lengthOf(4);
+    expect(component.blockData.dateFilter.tags[0].key).to.equal('show-all');
+    expect(component.blockData.dateFilter.tags[2].key).to.equal('next-month');
+    expect(component.blockData.dateFilter.tags[3].key).to.equal('next-90-days');
+  });
+
+  it('should not initialize date filter when date-filter row is not authored', async function () {
+    document.body.innerHTML = `
+      <div class="dx-card-collection">
+        <div>
+          <div>Title</div>
+          <div>Sample Title</div>
+        </div>
+      </div>
+    `;
+
+    const block = document.querySelector('.dx-card-collection');
+    const component = await init(block);
+    await component.updateComplete;
+
+    expect(component.blockData.dateFilter).to.be.null;
+  });
+
   describe('PartnerCardsWithDateFilter date filtering', () => {
     let component;
     let mockCards;
