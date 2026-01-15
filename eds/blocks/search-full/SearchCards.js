@@ -3,6 +3,7 @@ import PartnerCards from '../../components/PartnerCards.js';
 import { searchCardsStyles } from './SearchCardsStyles.js';
 import '../../components/SearchCard.js';
 import { generateRequestForSearchAPI } from '../utils/utils.js';
+import { debounce } from '../utils/action.js';
 
 const miloLibs = getLibs();
 const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -32,7 +33,8 @@ export default class Search extends PartnerCards {
     this.hasResponseData = false;
     this.abortController = null;
     this.suggestionAbortController = null;
-    this.searchInputTimeout = null;
+    // Create debounced version of updateTypeaheadDialog for search input
+    this.debouncedUpdateTypeahead = debounce(() => this.updateTypeaheadDialog(), 300);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -56,13 +58,8 @@ export default class Search extends PartnerCards {
     return this.renderRoot.querySelector('.suggestion-dialog');
   }
 
-  async onSearchInput(event) {
+  onSearchInput(event) {
     this.searchTerm = event.target.value;
-
-    // Clear previous timeout
-    if (this.searchInputTimeout) {
-      clearTimeout(this.searchInputTimeout);
-    }
 
     // Handle empty input
     if (!this.searchTerm) {
@@ -71,9 +68,7 @@ export default class Search extends PartnerCards {
     }
 
     // Debounce typeahead suggestions (wait 300ms after user stops typing)
-    this.searchInputTimeout = setTimeout(async () => {
-      await this.updateTypeaheadDialog();
-    }, 300);
+    this.debouncedUpdateTypeahead();
   }
 
   async updateTypeaheadDialog() {
