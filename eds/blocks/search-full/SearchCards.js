@@ -35,6 +35,8 @@ export default class Search extends PartnerCards {
     this.suggestionAbortController = null;
     // Create debounced version of updateTypeaheadDialog for search input
     this.debouncedUpdateTypeahead = debounce(() => this.updateTypeaheadDialog(), 300);
+    // Wrap handleActions with debounce for API calls (override parent's synchronous version)
+    this.handleActions = debounce(() => this.handleActionsCore(), 250);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -257,7 +259,7 @@ export default class Search extends PartnerCards {
     return { filters };
   }
 
-  async handleActions() {
+  async handleActionsCore() {
     this.hasResponseData = false;
     this.additionalResetActions();
     

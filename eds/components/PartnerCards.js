@@ -7,7 +7,6 @@ import {
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
-import { debounce } from '../blocks/utils/action.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, css, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -66,8 +65,6 @@ export default class PartnerCards extends LitElement {
     this.allTagsFlatMap = new Map();
     this.cardFiltersSet = new Set();
     this.updateView = this.updateView.bind(this);
-    // Create debounced version of handleActions for filter changes
-    this.debouncedHandleActions = debounce(() => this.handleActions(), 250);
   }
 
   async connectedCallback() {
@@ -802,7 +799,7 @@ export default class PartnerCards extends LitElement {
     }
 
     this.paginationCounter = 1;
-    this.debouncedHandleActions();
+    this.handleActions();
     this.handleUrlSearchParams();
   }
 
@@ -830,7 +827,7 @@ export default class PartnerCards extends LitElement {
 
     this.paginationCounter = 1;
     this.handleFilterAction();
-    this.debouncedHandleActions();
+    this.handleActions();
     this.handleUrlSearchParams();
   }
 
@@ -848,7 +845,7 @@ export default class PartnerCards extends LitElement {
 
     this.paginationCounter = 1;
     this.handleFilterAction();
-    this.debouncedHandleActions();
+    this.handleActions();
     this.handleUrlSearchParams();
   }
 
