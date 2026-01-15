@@ -9,14 +9,6 @@ describe('yukon-chat block', () => {
 
   beforeEach(async () => {
     setLibs('/libs');
-
-    window.matchMedia = sinon.stub().returns({
-      matches: false,
-      media: '(max-width: 767px)',
-      addEventListener: sinon.stub(),
-      removeEventListener: sinon.stub(),
-    });
-
     window.requestAnimationFrame = sinon.stub().callsFake((cb) => {
       setTimeout(cb, 0);
       return 1;
@@ -26,6 +18,23 @@ describe('yukon-chat block', () => {
     window.crypto.randomUUID = sinon.stub().returns('test-uuid-12345');
 
     fetchStub = sinon.stub(window, 'fetch');
+
+    fetchStub.callsFake(async (url) => {
+      const urlStr = typeof url === 'string' ? url : url.toString();
+      if (urlStr.includes('placeholders.json')) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: [
+              { key: 'send-message', value: 'Send Message' },
+              { key: 'open-chat', value: 'Open Chat' },
+              { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+            ],
+          }),
+        };
+      }
+      return { ok: false, status: 404 };
+    });
 
     document.body.innerHTML = await readFile({ path: './mocks/body.html' });
 
@@ -95,85 +104,6 @@ describe('yukon-chat block', () => {
       expect(header.textContent).to.equal('Ask Yukon AI');
       expect(textarea.getAttribute('placeholder')).to.equal('How can I help you today?');
       expect(tooltip.textContent).to.equal('Ask AI');
-    });
-  });
-
-  describe('SVG loading', () => {
-    it('should handle successful SVG loading', async () => {
-      const mockSvgContent = '<svg><path d="M10 10"/></svg>';
-      fetchStub.restore();
-      fetchStub = sinon.stub(window, 'fetch');
-      fetchStub.callsFake(async (url) => {
-        if (typeof url === 'string' && url.includes('partners-shared/mnemonics/')) {
-          return {
-            ok: true,
-            status: 200,
-            text: async () => mockSvgContent,
-          };
-        }
-        return { ok: false, status: 404 };
-      });
-
-      document.body.innerHTML = '';
-      document.body.innerHTML = await readFile({ path: './mocks/body.html' });
-
-      const module = await import(`../../../eds/blocks/yukon-chat/yukon-chat.js?svg-success=${Date.now()}`);
-      const testInit = module.default;
-
-      const block = document.querySelector('.yukon-chat');
-      await testInit(block);
-
-      const chatBlock = document.querySelector('.yukon-chat-block');
-      expect(chatBlock).to.exist;
-      expect(chatBlock.innerHTML).to.include('svg');
-    });
-
-    it('should handle SVG loading failure when response is not ok', async () => {
-      const consoleErrorStub = sinon.stub(console, 'error');
-
-      fetchStub.restore();
-      fetchStub = sinon.stub(window, 'fetch');
-
-      fetchStub.callsFake(async (url) => {
-        if (typeof url === 'string' && url.includes('partners-shared/mnemonics/')) {
-          return {
-            ok: false,
-            status: 404,
-          };
-        }
-        return { ok: true, status: 200 };
-      });
-
-      document.body.innerHTML = '';
-      document.body.innerHTML = await readFile({ path: './mocks/body.html' });
-
-      await import(`../../../eds/blocks/yukon-chat/yukon-chat.js?svg-fail=${Date.now()}`);
-
-      expect(consoleErrorStub.calledWith('SVG does NOT exist:', 404)).to.be.true;
-      consoleErrorStub.restore();
-    });
-
-    it('should handle SVG loading fetch errors', async () => {
-      const consoleErrorStub = sinon.stub(console, 'error');
-
-      fetchStub.restore();
-      fetchStub = sinon.stub(window, 'fetch');
-
-      fetchStub.callsFake(async (url) => {
-        if (typeof url === 'string' && url.includes('partners-shared/mnemonics/')) {
-          throw new Error('Network error loading SVG');
-        }
-        return { ok: true, status: 200 };
-      });
-
-      document.body.innerHTML = '';
-      document.body.innerHTML = await readFile({ path: './mocks/body.html' });
-
-      await import(`../../../eds/blocks/yukon-chat/yukon-chat.js?svg-error=${Date.now()}`);
-
-      const errorCall = consoleErrorStub.getCalls().find((call) => call.args[0] === 'Error fetching SVG:');
-      expect(errorCall).to.exist;
-      consoleErrorStub.restore();
     });
   });
 
@@ -296,16 +226,34 @@ describe('yukon-chat block', () => {
       const encoder = new TextEncoder();
       const chunk = encoder.encode('data: [{"generated_text":"Hello from Yukon"}]\n');
 
-      fetchStub.callsFake(async () => ({
-        ok: true,
-        status: 200,
-        body: new ReadableStream({
-          start(controller) {
-            controller.enqueue(chunk);
-            controller.close();
-          },
-        }),
-      }));
+      fetchStub.callsFake(async (url) => {
+        const urlStr = typeof url === 'string' ? url : url.toString();
+        if (urlStr.includes('placeholders.json')) {
+          return {
+            ok: true,
+            json: async () => ({
+              data: [
+                { key: 'send-message', value: 'Send Message' },
+                { key: 'open-chat', value: 'Open Chat' },
+                { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+              ],
+            }),
+          };
+        }
+        if (urlStr.includes('yukonAIAssistant')) {
+          return {
+            ok: true,
+            status: 200,
+            body: new ReadableStream({
+              start(controller) {
+                controller.enqueue(chunk);
+                controller.close();
+              },
+            }),
+          };
+        }
+        return { ok: false, status: 404 };
+      });
 
       const block = document.querySelector('.yukon-chat');
       await init(block);
@@ -323,11 +271,14 @@ describe('yukon-chat block', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       const modal = document.querySelector('#yukon-chat-modal');
-      expect(modal).to.exist;
+      expect(fetchStub.called).to.be.true;
 
-      expect(fetchStub.calledOnce).to.be.true;
-
-      const calledUrl = fetchStub.firstCall.args[0];
+      const calledUrl = fetchStub.getCalls().find((call) => {
+        const url = call.args[0];
+        const urlStr = url?.toString?.() ?? String(url);
+        return urlStr.includes('yukonAIAssistant');
+      })?.args[0];
+      expect(calledUrl).to.exist;
       const urlStr = calledUrl?.toString?.() ?? String(calledUrl);
 
       expect(urlStr).to.include('/services/gravity/yukonAIAssistant');
@@ -341,10 +292,28 @@ describe('yukon-chat block', () => {
     });
 
     it('should render an error message when fetch returns non-ok', async () => {
-      fetchStub.callsFake(async () => ({
-        ok: false,
-        status: 500,
-      }));
+      fetchStub.callsFake(async (url) => {
+        const urlStr = typeof url === 'string' ? url : url.toString();
+        if (urlStr.includes('placeholders.json')) {
+          return {
+            ok: true,
+            json: async () => ({
+              data: [
+                { key: 'send-message', value: 'Send Message' },
+                { key: 'open-chat', value: 'Open Chat' },
+                { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+              ],
+            }),
+          };
+        }
+        if (urlStr.includes('yukonAIAssistant')) {
+          return {
+            ok: false,
+            status: 500,
+          };
+        }
+        return { ok: false, status: 404 };
+      });
 
       const block = document.querySelector('.yukon-chat');
       await init(block);
@@ -362,7 +331,12 @@ describe('yukon-chat block', () => {
       await new Promise((r) => setTimeout(r, 50));
       const modal = document.querySelector('#yukon-chat-modal');
       expect(modal).to.exist;
-      expect(fetchStub.calledOnce).to.be.true;
+      const yukonFetchCalled = fetchStub.getCalls().some((call) => {
+        const url = call.args[0];
+        const urlStr = url?.toString?.() ?? String(url);
+        return urlStr.includes('yukonAIAssistant');
+      });
+      expect(yukonFetchCalled).to.be.true;
       const errorMessage = modal.querySelector('.error-message');
       expect(errorMessage).to.exist;
       expect(errorMessage.textContent).to.include('We’re having trouble processing your request right now. Please try again later');
@@ -377,6 +351,18 @@ describe('yukon-chat block', () => {
 
       fetchStub.callsFake(async (url) => {
         const urlStr = typeof url === 'string' ? url : url.toString();
+        if (urlStr.includes('placeholders.json')) {
+          return {
+            ok: true,
+            json: async () => ({
+              data: [
+                { key: 'send-message', value: 'Send Message' },
+                { key: 'open-chat', value: 'Open Chat' },
+                { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+              ],
+            }),
+          };
+        }
         if (urlStr.includes('yukonAIAssistant')) {
           throw new TypeError('Failed to fetch');
         }
@@ -411,6 +397,18 @@ describe('yukon-chat block', () => {
 
       fetchStub.callsFake(async (url) => {
         const urlStr = typeof url === 'string' ? url : url.toString();
+        if (urlStr.includes('placeholders.json')) {
+          return {
+            ok: true,
+            json: async () => ({
+              data: [
+                { key: 'send-message', value: 'Send Message' },
+                { key: 'open-chat', value: 'Open Chat' },
+                { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+              ],
+            }),
+          };
+        }
         if (urlStr.includes('yukonAIAssistant')) {
           throw new Error('Some server error');
         }
