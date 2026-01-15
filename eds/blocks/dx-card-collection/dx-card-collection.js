@@ -63,7 +63,18 @@ export default async function init(el) {
 
   declareDXCardCollection();
 
-  const dateFilter = {
+  const pastDateFilter = {
+    key: 'date',
+    value: localizedText['{{date}}'],
+    tags: [
+      { key: 'show-all', value: localizedText['{{show-all}}'], parentKey: 'date', checked: true, default: true },
+      { key: 'current-month', value: localizedText['{{current-month}}'], parentKey: 'date', checked: false },
+      { key: 'previous-month', value: localizedText['{{previous-month}}'], parentKey: 'date', checked: false },
+      { key: 'last-90-days', value: localizedText['{{last-90-days}}'], parentKey: 'date', checked: false },
+    ],
+  };
+
+  const futureDateFilter = {
     key: 'date',
     value: localizedText['{{date}}'],
     tags: [
@@ -95,6 +106,13 @@ export default async function init(el) {
   });
 
 
+  let dateFilter = null;
+  if (dateFilterValue === 'past') {
+    dateFilter = pastDateFilter;
+  } else if (dateFilterValue === 'future') {
+    dateFilter = futureDateFilter;
+  }
+
   const blockData = {
     localizedText,
     tableData: el.children,
@@ -102,7 +120,6 @@ export default async function init(el) {
     cardsPerPage: 12,
     pagination: 'default',
     caasUrl: getCaasUrl(block),
-    showDateFilter: dateFilterValue
   }
 
   const app = document.createElement('dx-card-collection');

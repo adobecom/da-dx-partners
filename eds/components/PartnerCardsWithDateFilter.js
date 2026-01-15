@@ -51,7 +51,7 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
 
   get filters() {
     return html`
-      ${this.blockData.showDateFilter === 'false' || this.blockData.showDateFilter === '' ? null : this.dateFilter}
+      ${this.blockData.dateFilter ? this.dateFilter : null}
       ${super.filters}
     `;
   }
@@ -102,7 +102,7 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
 
   get filtersMobile() {
     return html`
-      ${this.blockData.showDateFilter === 'false' || this.blockData.showDateFilter === '' ? null : this.dateFilterMobile}
+      ${this.blockData.dateFilter ? this.dateFilterMobile : null}
       ${super.filtersMobile}
     `;
   }
