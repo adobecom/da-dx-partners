@@ -213,12 +213,12 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
 
     if (key === 'next-90-days') {
       const endDate = new Date(currentDate);
-      endDate.setHours(23, 59, 59, 999);
-      endDate.setDate(endDate.getDate() + 90);
+      endDate.setHours(0, 0, 0, 0);
+      endDate.setDate(endDate.getDate() + 91);
 
       this.cards = this.cards.filter((card) => {
         const cardDate = new Date(card.cardDate);
-        return cardDate >= currentDate && cardDate <= endDate;
+        return cardDate >= currentDate && cardDate < endDate;
       });
     }
 
