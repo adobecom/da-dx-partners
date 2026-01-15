@@ -1,8 +1,9 @@
 import {
-    getCurrentProgramType,
-    getMetadataContent,
-    getPartnerCookieValue,
-    isMember
+  getCurrentProgramType,
+  getMetadataContent,
+  getPartnerCookieValue,
+  CERTIFICATION_POPUP,
+  SHOW_NEXT_POPUP,
 } from "./utils.js";
 import {PERSONALIZATION_CONDITIONS, PERSONALIZATION_PLACEHOLDERS} from "./personalizationConfigDX.js";
 import {personalizePage, personalizePlaceholders} from "./personalization.js";
@@ -23,14 +24,24 @@ export async function loadPopupFragment(popupFragment, modal = 'partner agreemen
 }
 
 export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
-    if (partnerAgreementDisplayed) return false;
-    if (!isMember()) return false;
-
+  if (partnerAgreementDisplayed) {
+    return false;
+  }
     const modalClosed = sessionStorage.getItem('portal-messaging-popup-closed')
-    if (modalClosed === 'true') return false;
+  if (modalClosed === 'true') {
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+    );
+    return false;
+  }
 
     const specialStateCookie = getPartnerCookieValue('specialstate');
-    if (!specialStateCookie) return;
+    if (!specialStateCookie) {
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+      );
+      return false;
+    }
 
     let popupType;
     if (PERSONALIZATION_CONDITIONS['partner-submitted-in-review']) {
@@ -42,19 +53,29 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
     if (PERSONALIZATION_CONDITIONS['partner-locked-payment-future']) {
         popupType = 'locked-payment-future-modal';
     }
-    // todo check is this ok, if something goes wrong with it, consider it is done with processing and go to next  modal
-    if (!popupType) return false;
+    if (!popupType) {
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+      );
+      return false;
+    }
 
     const popupFragmentPath = getMetadataContent(popupType);
     if (!popupFragmentPath) {
         console.warn(`${popupType} should be displayed but popup fragment path is not found`);
-        return false;
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+      );
+      return false;
     }
 
     const popupContent = await loadPopupFragment(popupFragmentPath);
     if (!popupContent) {
         console.warn(`Popup fragment for ${popupFragmentPath} not found`);
-        return false;
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+      );
+      return false;
     }
 
     const {getModal} = await import(`${miloLibs}/blocks/modal/modal.js`);
@@ -66,10 +87,18 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
             content: popupContent,
             closeCallback: () => {
                 sessionStorage.setItem("portal-messaging-popup-closed", "true");
+              window.dispatchEvent(
+                new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+              );
             }
         },
     );
-    if (!modal) return false;
+    if (!modal) {
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: CERTIFICATION_POPUP } }),
+      );
+      return false;
+    }
     const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
     await loadArea(modal);
     personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
@@ -79,8 +108,6 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
 }
 
 export async function bctqBanner(miloLibs) {
-    if (!isMember()) return;
-
     let bannerType;
     if (PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d']) {
         bannerType = 'bctq-banner';
