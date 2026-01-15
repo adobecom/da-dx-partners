@@ -506,14 +506,15 @@ describe('SearchCards Unit Tests', () => {
       expect(closeTypeaheadSpy.calledWith('SEE_ALL')).to.be.true;
     });
 
-    it('should handle non-empty search input', async () => {
-      const updateTypeaheadDialogStub = sinon.stub(searchComponent, 'updateTypeaheadDialog');
+    it('should handle non-empty search input', () => {
+      const debouncedSpy = sinon.spy();
+      searchComponent.debouncedUpdateTypeahead = debouncedSpy;
       const event = { target: { value: 'analytics' } };
       
-      await searchComponent.onSearchInput(event);
+      searchComponent.onSearchInput(event);
       
       expect(searchComponent.searchTerm).to.equal('analytics');
-      expect(updateTypeaheadDialogStub.called).to.be.true;
+      expect(debouncedSpy.called).to.be.true;
     });
   });
 
@@ -909,7 +910,7 @@ describe('SearchCards Unit Tests', () => {
       const result = await searchComponent.getCards();
       
       expect(consoleErrorStub.called).to.be.true;
-      expect(result).to.be.undefined;
+      expect(result).to.be.null;
     });
 
     it('should handle network errors gracefully', async () => {
@@ -920,7 +921,7 @@ describe('SearchCards Unit Tests', () => {
       const result = await searchComponent.getCards();
       
       expect(consoleErrorStub.called).to.be.true;
-      expect(result).to.be.undefined;
+      expect(result).to.be.null;
     });
 
     it('should set hasResponseData to false when no cards returned', async () => {
@@ -982,7 +983,7 @@ describe('SearchCards Unit Tests', () => {
       const result = await searchComponent.getSuggestions();
       
       expect(consoleErrorStub.called).to.be.true;
-      expect(result).to.be.undefined;
+      expect(result).to.be.null;
     });
 
     it('should handle network errors gracefully', async () => {
@@ -993,7 +994,7 @@ describe('SearchCards Unit Tests', () => {
       const result = await searchComponent.getSuggestions();
       
       expect(consoleErrorStub.called).to.be.true;
-      expect(result).to.be.undefined;
+      expect(result).to.be.null;
     });
   });
 
@@ -1043,7 +1044,7 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.getCards = sinon.stub().resolves(null);
       
       await searchComponent.handleActions();
-      
+
       expect(searchComponent.cards).to.deep.equal([]);
       expect(searchComponent.countAll).to.equal(0);
       expect(searchComponent.contentTypeCounter).to.deep.equal({

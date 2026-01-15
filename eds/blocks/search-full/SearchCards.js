@@ -91,10 +91,19 @@ export default class Search extends PartnerCards {
       
       const suggestions = await this.getSuggestions(this.suggestionAbortController.signal);
       
-      // If request was aborted, suggestions will be undefined
-      if (suggestions) {
-        this.typeaheadOptions = suggestions;
+      // If request was aborted, don't update (new request coming)
+      if (suggestions?.aborted) {
+        return;
       }
+      
+      // If request failed (null), clear suggestions
+      if (!suggestions) {
+        this.typeaheadOptions = [];
+        return;
+      }
+      
+      // Update with successful suggestions
+      this.typeaheadOptions = suggestions;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
@@ -173,12 +182,13 @@ export default class Search extends PartnerCards {
       data = await response.json();
       return data.suggested_completions;
     } catch (error) {
-      // Ignore aborted requests
+      // Return special marker for aborted requests
       if (error.name === 'AbortError') {
-        return;
+        return { aborted: true };
       }
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
+      return null;
     }
   }
 
@@ -227,12 +237,13 @@ export default class Search extends PartnerCards {
       this.hasResponseData = !!apiData.cards;
       return apiData;
     } catch (error) {
-      // Ignore aborted requests
+      // Return special marker for aborted requests
       if (error.name === 'AbortError') {
-        return;
+        return { aborted: true };
       }
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
+      return null;
     }
   }
 
@@ -260,13 +271,12 @@ export default class Search extends PartnerCards {
     
     const cardsData = await this.getCards(this.abortController.signal);
     
-    // If request was aborted, cardsData will be undefined
-    if (!cardsData) {
+    // If request was aborted, return early without updating (new request coming)
+    if (cardsData?.aborted) {
       return;
     }
-    
-    const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0, courses: 0 } };
-    this.cards = cards;
+
+    const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0, courses: 0 } };    this.cards = cards;
     if (this.blockData.pagination === 'load-more') {
       this.paginatedCards = this.paginatedCards.concat(cards);
     } else {
