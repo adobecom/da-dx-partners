@@ -3,6 +3,7 @@ import PartnerCards from '../../components/PartnerCards.js';
 import { searchCardsStyles } from './SearchCardsStyles.js';
 import '../../components/SearchCard.js';
 import { generateRequestForSearchAPI } from '../utils/utils.js';
+import { debounce } from '../utils/action.js';
 
 const miloLibs = getLibs();
 const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -30,6 +31,13 @@ export default class Search extends PartnerCards {
     this.typeaheadOptions = [];
     this.isTypeaheadOpen = false;
     this.hasResponseData = false;
+    // Create debounced version of updateTypeaheadDialog for search input
+    this.debouncedUpdateTypeahead = debounce(() => this.updateTypeaheadDialog(), 300);
+    // Wrap handleActions with debounce for API calls (override parent's synchronous version)
+    this.handleActions = debounce(() => this.handleActionsCore(), 250);
+    // Tracks order of requests for search and suggestions to use response from last fired request
+    this.searchReqCounter = 0;
+    this.suggestionReqCounter = 0;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -53,7 +61,7 @@ export default class Search extends PartnerCards {
     return this.renderRoot.querySelector('.suggestion-dialog');
   }
 
-  async onSearchInput(event) {
+  onSearchInput(event) {
     this.searchTerm = event.target.value;
 
     // Handle empty input
@@ -62,8 +70,8 @@ export default class Search extends PartnerCards {
       return;
     }
 
-    // Handle non-empty input
-    await this.updateTypeaheadDialog();
+    // Debounce typeahead suggestions (wait 300ms after user stops typing)
+    this.debouncedUpdateTypeahead();
   }
 
   async updateTypeaheadDialog() {
@@ -75,7 +83,21 @@ export default class Search extends PartnerCards {
         // eslint-disable-next-line no-underscore-dangle
         this._searchInput?.focus();
       }
-      this.typeaheadOptions = await this.getSuggestions();
+
+      this.suggestionReqCounter ++;
+      const reqId = this.suggestionReqCounter;
+      const suggestions = await this.getSuggestions();
+      if (this.suggestionReqCounter > reqId) {
+        return;
+      }
+      this.suggestionReqCounter = 0;
+      // If request failed, clear suggestions
+      if (!suggestions) {
+        this.typeaheadOptions = [];
+        return;
+      }
+      // Update with successful suggestions
+      this.typeaheadOptions = suggestions;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
@@ -155,6 +177,7 @@ export default class Search extends PartnerCards {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
+      return null;
     }
   }
 
@@ -204,6 +227,7 @@ export default class Search extends PartnerCards {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
+      return null;
     }
   }
 
@@ -217,10 +241,18 @@ export default class Search extends PartnerCards {
     return { filters };
   }
 
-  async handleActions() {
+  async handleActionsCore() {
+    this.searchReqCounter++;
+    const reqId = this.searchReqCounter;
     this.hasResponseData = false;
     this.additionalResetActions();
+
     const cardsData = await this.getCards();
+    if (this.searchReqCounter > reqId) {
+      return;
+    }
+    this.searchReqCounter = 0;
+
     const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0, courses: 0 } };
     this.cards = cards;
     if (this.blockData.pagination === 'load-more') {
