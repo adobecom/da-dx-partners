@@ -22,12 +22,6 @@ const miloLibs = getLibs();
 const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`);
 const { createTag } = await import(`${miloLibs}/utils/utils.js`);
 
-const USER_ERRORS = {
-  TIMEOUT: 'This is taking longer than expected. Please try again in a moment.',
-  SERVER: 'We’re having trouble processing your request right now. Please try again later.',
-  NETWORK: 'Network error. Please check your connection and try again.',
-};
-
 const mobileView = window.matchMedia('(max-width: 767px)');
 let stickyViewportHandler = null;
 let isModalOpen = false;
@@ -221,7 +215,7 @@ const updateButtonState = (textArea, inputFieldButton) => {
 };
 
 // eslint-disable-next-line no-shadow, max-len
-const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBottomBtn, modalInputWrapper, inputFieldButton) => {
+const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBottomBtn, modalInputWrapper, inputFieldButton, localizedText) => {
   if (!chatHistory) return;
   const question = textArea.value.trim();
   if (!question) return;
@@ -264,9 +258,9 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
     if (!resp || !resp.ok) {
       removeLoadingMessage(loadingElement);
       if (resp?.status === 504) {
-        showChatError(chatHistory, USER_ERRORS.TIMEOUT);
+        showChatError(chatHistory, localizedText['{{timeout-error}}']);
       } else {
-        showChatError(chatHistory, USER_ERRORS.SERVER);
+        showChatError(chatHistory, localizedText['{{server-error}}']);
       }
       textArea.removeAttribute('disabled');
       inputFieldButton.removeAttribute('disabled');
@@ -336,7 +330,7 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
           }
           if (line.startsWith('<!DOCTYPE html') || line.startsWith('<html')) {
             removeLoadingMessage(loadingElement);
-            showChatError(chatHistory, USER_ERRORS.SERVER);
+            showChatError(chatHistory, localizedText['{{server-error}}']);
             reader.cancel();
             break;
           }
@@ -363,9 +357,9 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
       return;
     }
     if (error instanceof TypeError) {
-      showChatError(chatHistory, USER_ERRORS.NETWORK);
+      showChatError(chatHistory, localizedText['{{network-error}}']);
     } else {
-      showChatError(chatHistory, USER_ERRORS.SERVER);
+      showChatError(chatHistory, localizedText['{{server-error}}']);
     }
     textArea.removeAttribute('disabled');
     inputFieldButton.removeAttribute('disabled');
@@ -389,6 +383,9 @@ export default async function init(el) {
     '{{send-message}}': 'Send Message',
     '{{open-chat}}': 'Open Chat',
     '{{scroll-to-bottom}}': 'Scroll to bottom',
+    '{{timeout-error}}': 'This is taking longer than expected. Please try again in a moment.',
+    '{{server-error}}': 'We’re having trouble processing your request right now. Please try again later.',
+    '{{network-error}}': 'Network error. Please check your connection and try again.',
   };
   await localizationPromises(localizedText, config);
 
@@ -585,6 +582,7 @@ export default async function init(el) {
           scrollToBottomBtn,
           modalInputWrapper,
           inputFieldButton,
+          localizedText,
         );
         updateReplicatedValue(textareaWrapper, textArea, scrollToBottomBtn, modalInputWrapper);
       }
@@ -602,6 +600,7 @@ export default async function init(el) {
       scrollToBottomBtn,
       modalInputWrapper,
       inputFieldButton,
+      localizedText,
     );
     updateReplicatedValue(textareaWrapper, textArea, scrollToBottomBtn, modalInputWrapper);
   });

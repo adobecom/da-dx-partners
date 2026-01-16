@@ -29,6 +29,9 @@ describe('yukon-chat block', () => {
               { key: 'send-message', value: 'Send Message' },
               { key: 'open-chat', value: 'Open Chat' },
               { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+              { key: 'timeout-error', value: 'This is taking longer than expected. Please try again in a moment.'},
+              { key: 'server-error', value: 'We’re having trouble processing your request right now. Please try again later.'},
+              { key: 'network-error', value: 'Network error. Please check your connection and try again.'},
             ],
           }),
         };
@@ -236,6 +239,9 @@ describe('yukon-chat block', () => {
                 { key: 'send-message', value: 'Send Message' },
                 { key: 'open-chat', value: 'Open Chat' },
                 { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+                { key: 'timeout-error', value: 'This is taking longer than expected. Please try again in a moment.'},
+                { key: 'server-error', value: 'We’re having trouble processing your request right now. Please try again later.'},
+                { key: 'network-error', value: 'Network error. Please check your connection and try again.'},
               ],
             }),
           };
@@ -448,6 +454,9 @@ describe('yukon-chat block', () => {
                 { key: 'send-message', value: 'Send Message' },
                 { key: 'open-chat', value: 'Open Chat' },
                 { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+                { key: 'timeout-error', value: 'This is taking longer than expected. Please try again in a moment.'},
+                { key: 'server-error', value: 'We’re having trouble processing your request right now. Please try again later.'},
+                { key: 'network-error', value: 'Network error. Please check your connection and try again.'},
               ],
             }),
           };
