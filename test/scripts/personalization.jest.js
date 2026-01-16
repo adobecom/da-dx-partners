@@ -604,7 +604,13 @@ describe('Test personalization.js', () => {
 
       const picture = main.querySelector('picture');
       expect(picture).not.toBeNull();
-      expect(picture.querySelector('img')?.src).toBe('https://example.com/avatar.jpg');
+      const img = picture.querySelector('img');
+      expect(img?.src).toBe('https://example.com/avatar.jpg');
+      expect(img?.style.borderRadius).toBe('50%');
+      expect(img?.width).toBe(96);
+      expect(img?.height).toBe(96);
+      expect(img?.alt).toBe('');
+      expect(img?.dataset.userProfile).toBe('true');
     });
 
     it('should handle companyLogoUrl placeholder with companyLogoUrl in cookie', async () => {
