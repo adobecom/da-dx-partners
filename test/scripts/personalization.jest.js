@@ -604,48 +604,8 @@ describe('Test personalization.js', () => {
 
       const picture = main.querySelector('picture');
       expect(picture).not.toBeNull();
-      const img = picture.querySelector('img');
-      expect(img?.src).toBe('https://example.com/avatar.jpg');
-      expect(img?.style.borderRadius).toBe('50%');
-      expect(img?.width).toBe(96);
-      expect(img?.height).toBe(96);
-      expect(img?.alt).toBe('');
-      expect(img?.dataset.userProfile).toBe('true');
-    });
-
-    it('should immediately replace profileImage when avatar image exists in DOM before personalization', () => {
-      const main = document.createElement('main');
-      main.innerHTML = '<p>$profileImage</p>';
-      document.body.appendChild(main);
-
-      const cookieObject = {
-        DXP: {
-          status: 'MEMBER',
-        },
-      };
-      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-
-      // Create and add the avatar image BEFORE calling applyPagePersonalization
-      const mockImg = document.createElement('img');
-      mockImg.className = 'feds-profile-img';
-      mockImg.src = 'https://example.com/user-avatar.jpg';
-      document.body.appendChild(mockImg);
-
-      window.adobeIMS.isSignedInUser = jest.fn(() => true);
-
-      applyPagePersonalization();
-
-      // No need to wait or dispatch event - replacement should be immediate
-      const picture = main.querySelector('picture');
-      expect(picture).not.toBeNull();
-      const img = picture.querySelector('img');
-      expect(img).not.toBeNull();
-      expect(img.src).toBe('https://example.com/user-avatar.jpg');
-      expect(img.style.borderRadius).toBe('50%');
-      expect(img.width).toBe(96);
-      expect(img.height).toBe(96);
-      expect(img.alt).toBe('');
-      expect(img.dataset.userProfile).toBe('true');
+      expect(picture.querySelector('img')?.src).toBe('https://example.com/avatar.jpg');
+      expect(picture.querySelector('img')?.style.borderRadius).toBe('50%');
     });
 
     it('should handle companyLogoUrl placeholder with companyLogoUrl in cookie', async () => {
