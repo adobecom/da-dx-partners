@@ -72,7 +72,7 @@ export const searchCardsStyles = css`
     font-size: 18px;
     font-weight: bold;
   }
-  
+
   .partner-cards-header .partner-cards-sort-wrapper .sort-wrapper {
     border-left : none;
   }

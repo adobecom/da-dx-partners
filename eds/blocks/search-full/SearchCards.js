@@ -376,16 +376,18 @@ export default class Search extends PartnerCards {
         <div class="partner-cards-content">
           <div class="partner-cards-header">
             <div class="partner-cards-title-wrapper">
-              ${this.blockData.localizedText['{{show}}']}:
+              ${!this.mobileView ? html`${this.blockData.localizedText['{{show}}']}:` : ''}
               <sp-theme theme="spectrum" color="light" scale="medium">
-                <sp-button variant="${this.contentType === 'all' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('all')}" aria-label="${this.blockData.localizedText['{{all}}']}">
-                  ${this.blockData.localizedText['{{all}}']} (${this.contentTypeCounter.countAll})</sp-button>
-                <sp-button variant="${this.contentType === 'asset' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('asset')}" aria-label="${this.blockData.localizedText['{{assets}}']}">
-                  ${this.blockData.localizedText['{{assets}}']} (${this.contentTypeCounter.countAssets})</sp-button>
-                <sp-button variant="${this.contentType === 'page' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('page')}" aria-label="${this.blockData.localizedText['{{pages}}']}">
-                  ${this.blockData.localizedText['{{pages}}']} (${this.contentTypeCounter.countPages})</sp-button>
-                   <sp-button variant="${this.contentType === 'course' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('course')}" aria-label="${this.blockData.localizedText['{{trainings}}']}">
-                  ${this.blockData.localizedText['{{trainings}}']} (${this.contentTypeCounter.countCourses})</sp-button>
+                <sp-button-group>
+                  <sp-button variant="${this.contentType === 'all' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('all')}" aria-label="${this.blockData.localizedText['{{all}}']}">
+                    ${this.blockData.localizedText['{{all}}']} (${this.contentTypeCounter.countAll})</sp-button>
+                  <sp-button variant="${this.contentType === 'asset' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('asset')}" aria-label="${this.blockData.localizedText['{{assets}}']}">
+                    ${this.blockData.localizedText['{{assets}}']} (${this.contentTypeCounter.countAssets})</sp-button>
+                  <sp-button variant="${this.contentType === 'page' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('page')}" aria-label="${this.blockData.localizedText['{{pages}}']}">
+                    ${this.blockData.localizedText['{{pages}}']} (${this.contentTypeCounter.countPages})</sp-button>
+                    <sp-button variant="${this.contentType === 'course' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('course')}" aria-label="${this.blockData.localizedText['{{trainings}}']}">
+                    ${this.blockData.localizedText['{{trainings}}']} (${this.contentTypeCounter.countCourses})</sp-button>
+                </sp-button-group>
               </sp-theme>
             </div>
             <div class="partner-cards-sort-wrapper">
