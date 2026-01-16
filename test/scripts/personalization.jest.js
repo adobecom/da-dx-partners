@@ -557,6 +557,7 @@ describe('Test personalization.js', () => {
 
   describe('Profile Image and Company Logo Personalization', () => {
     const { applyPagePersonalization } = require('../../eds/scripts/personalization.js');
+    const { applyGnavPersonalization } = importModules();
 
     beforeEach(() => {
       document.cookie = 'partner_data=';
@@ -594,6 +595,7 @@ describe('Test personalization.js', () => {
       window.adobeIMS.isSignedInUser = jest.fn(() => true);
 
       applyPagePersonalization();
+      applyGnavPersonalization(gnav);
 
       const event = new CustomEvent('feds:profileImageRendered');
       window.dispatchEvent(event);
