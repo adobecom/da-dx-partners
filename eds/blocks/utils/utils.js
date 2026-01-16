@@ -79,7 +79,7 @@ export function getRuntimeActionUrl(action) {
   );
 }
 
-export function generateRequestForSearchAPI(pageOptions, body, signal) {
+export function generateRequestForSearchAPI(pageOptions, body) {
   const { locales } = getConfig();
   const url = getRuntimeActionUrl(RT_SEARCH_ACTION_PATH);
   const localesData = getLocale(locales);
@@ -99,7 +99,6 @@ export function generateRequestForSearchAPI(pageOptions, body, signal) {
     headers,
     body: JSON.stringify(body),
     credentials: 'include',
-    signal,
   });
 }
 
