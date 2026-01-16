@@ -557,21 +557,6 @@ describe('Test personalization.js', () => {
 
   describe('Profile Image and Company Logo Personalization', () => {
     const { applyPagePersonalization } = require('../../eds/scripts/personalization.js');
-    const { applyGnavPersonalization } = importModules();
-
-    const parser = new DOMParser();
-    let gnav;
-    beforeEach(() => {
-      const gnavString = fs.readFileSync(
-        path.resolve(__dirname, './mocks/gnav-personalization.html'),
-        'utf8',
-      );
-      gnav = parser.parseFromString(gnavString, 'text/html');
-      document.importNode = (node) => node;
-    });
-    afterEach(() => {
-      gnav = null;
-    });
 
     beforeEach(() => {
       document.cookie = 'partner_data=';
