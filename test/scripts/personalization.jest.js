@@ -609,7 +609,6 @@ describe('Test personalization.js', () => {
       window.adobeIMS.isSignedInUser = jest.fn(() => true);
 
       applyPagePersonalization();
-      applyGnavPersonalization(gnav);
 
       const event = new CustomEvent('feds:profileImageRendered');
       window.dispatchEvent(event);
