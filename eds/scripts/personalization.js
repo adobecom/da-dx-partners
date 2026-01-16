@@ -42,6 +42,7 @@ async function replaceProfileImage(elements) {
       img.dataset.userProfile = 'true';
       img.width = 96;
       img.height = 96;
+      img.style.borderRadius = '50%';
 
       const picture = document.createElement('picture');
       picture.appendChild(img);
