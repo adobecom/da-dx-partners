@@ -12,22 +12,30 @@
   --yc-keyboard-focus-color: #5574F7;
   --yc-sticky-mobile-height: 44px;
   --yc-sticky-delay: 3s;
-  --yukon-chat-bg: linear-gradient(122.87deg, #E1E9FF 20.72%, #EFE3FA34 .96%, #F5DFF8 42.08%, #FCDCD5 49.2%, #FFDEC3 91.6%);
+  --yukon-chat-bg: linear-gradient(90deg, #E8EEFF 0%, #FDE4F2 49.52%, #FFE4CF 100%);
 
 }
 
 .yc-block-header {
   color: var(--yc-header-color);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  text-align: center;
-  margin-bottom: 32px;
-  padding: 0 24px;
+  /*display: flex;*/
+  /*flex-direction/: column;*/
+  /*gap: 4px;*/
+  /*text-align: center;*/
+  /*margin-bottom: 32px;*/
+  /*padding: 0 24px;*/
 }
 .yukon-chat-block {
   background: var(--yukon-chat-bg);
-  padding: 80px 48px 12px;
+  /*padding: 80px 48px 12px;*/
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: 10px;
+  border-radius: 36px;
+  margin: 20px;
+  min-height: 72px;
+  max-width: 1632px;
 }
 
 /* Sticky Variant - Only Input at Bottom */
@@ -144,12 +152,13 @@
 .yukon-chat-pill {
   box-sizing: border-box;
   top: var(--feds-height-nav);
-  margin: 0 auto 80px;
+  /*margin: 0 auto;*/
   max-width: calc(768px - 4px);
+  width: 100%;
 }
 
 .yc-input-field {
-  margin-bottom: 40px;
+  /*margin-bottom: 40px;*/
   position: relative;
 }
 
