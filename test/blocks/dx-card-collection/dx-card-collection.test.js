@@ -383,4 +383,34 @@ describe('dx-card-collection block', () => {
       expect(filteredIds).to.not.include('3');
     });
   });
+
+  it('should handle clear all filters when dateFilter is not present', async function () {
+    document.body.innerHTML = `
+      <div class="dx-card-collection">
+        <div>
+          <div>Title</div>
+          <div>Sample Title</div>
+        </div>
+      </div>
+    `;
+
+    const block = document.querySelector('.dx-card-collection');
+    const component = await init(block);
+    await component.updateComplete;
+
+    // Verify dateFilter is null
+    expect(component.blockData.dateFilter).to.be.null;
+
+    // Set up some filters and URL params
+    component.searchTerm = 'test';
+    component.selectedFilters = { 'content-type': [{ key: 'event', value: 'Event', checked: true }] };
+    component.urlSearchParams = new URLSearchParams('?filters=yes&content-type=event&term=test');
+
+    // Call handleResetActions - should not throw error
+    expect(() => component.handleResetActions()).to.not.throw();
+
+    // Verify filters were cleared
+    expect(component.searchTerm).to.equal('');
+    expect(Object.keys(component.selectedFilters).length).to.equal(0);
+  });
 });
