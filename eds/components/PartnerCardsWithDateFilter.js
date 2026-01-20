@@ -151,6 +151,7 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
   }
 
   additionalResetActions() {
+    if(!this.blockData.dateFilter) return;
     this.initDateTags(this.blockData.dateFilter.tags);
   }
 
