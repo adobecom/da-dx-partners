@@ -3,8 +3,9 @@
   --yc-header-color: #131313;
   --yc-container-color: #fff;
   --yc-card-radius: 12px;
-  --yc-input-radius: 28px;
-  --yc-input-height: 52px;
+  --yc-input-radius: 12px;
+  --yc-input-radius-sticky: 28px;
+  --yc-input-height: 44px;
   --yc-input-border: linear-gradient(98.11deg, #9A3CF9 -4.21%, #E743C8 35.46%, #ED457E 68.67%, #FF7918 104.7%);
   --yc-button-dimensions: 32px;
   --yc-button-radius: 50%;
@@ -24,20 +25,38 @@
   /*text-align: center;*/
   /*margin-bottom: 32px;*/
   /*padding: 0 24px;*/
+  font-weight: bold;
+  width: 100%;
+  text-align: right;
+  font-size: 22px;
+  line-height: 29px;
+
 }
 .yukon-chat-block {
   background: var(--yukon-chat-bg);
   /*padding: 80px 48px 12px;*/
   display: flex;
   align-items: center;
-  justify-content: right;
+  justify-content: center;
   gap: 10px;
   border-radius: 36px;
-  margin: 20px;
+  margin: 20px auto;
   min-height: 72px;
-  max-width: 1632px;
+  max-width: 1200px;
+  width: 80%;
+  box-shadow: 0px 6px 16px 0px #00000029;
+  padding: 12px 50px;
+  box-sizing: border-box;
 }
 
+@media (max-width:1024px) {
+  .yukon-chat-block {
+    flex-direction: column;
+  }
+  .yc-block-header {
+    text-align: center;
+  }
+}
 /* Sticky Variant - Only Input at Bottom */
 .yukon-chat-sticky {
   position: fixed;
@@ -62,7 +81,7 @@
 
 .yukon-chat-sticky .yc-input-field::after {
   background: var(--yc-input-border);
-  border-radius: var(--yc-input-radius);
+  border-radius: var(--yc-input-radius-sticky);
   content: '';
   filter: blur(30px);
   height: 100%;
@@ -173,6 +192,12 @@
   position: relative;
   gap: 12px;
   z-index: 9;
+}
+.yukon-chat-sticky .yc-input-field-container {
+  border-radius: calc(var(--yc-input-radius-sticky) - 2px);
+}
+.yukon-chat-sticky .yc-input-field::before {
+  border-radius: calc(var(--yc-input-radius-sticky));
 }
 
 .yc-input-field::before {
@@ -291,7 +316,7 @@
   word-break: break-word;
   visibility: hidden;
   grid-area: 1 / 1 / 2 / 2;
-  padding: 12px 16px;
+  padding: 10px 12px;
   font-family: inherit;
   font-size: 14px;
   line-height: 1.5;
@@ -311,7 +336,7 @@
   white-space: pre-wrap;
   word-wrap: break-word;
   word-break: break-word;
-  padding: 12px 16px;
+  padding: 10px 12px;
   border: none;
   background: transparent;
   font-family: inherit;

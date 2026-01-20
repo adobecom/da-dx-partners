@@ -49,7 +49,6 @@ const createInputField = (textareaEl, buttonEl, isSticky, forModal = false) => {
   textareaWrap.appendChild(textareaEl);
 
   if (forModal || !isSticky) {
-    container.appendChild(label);
     container.appendChild(tooltip);
     container.appendChild(textareaWrap);
     container.appendChild(buttonEl);
@@ -425,7 +424,7 @@ export default async function init(el) {
     mobileView.addEventListener('change', (e) => handleMobileButton(mobileButton, e, stickyContainer, inputField));
     el.replaceWith(stickyContainer);
   } else {
-    chatBlock.appendChild(chatBlockHeader);
+    if (configs?.blockHeader) chatBlock.appendChild(chatBlockHeader);
     chatBlock.appendChild(pillContainer);
     el.replaceWith(chatBlock);
   }
