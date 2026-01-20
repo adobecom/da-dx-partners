@@ -6,11 +6,10 @@ import {
   transformCardUrl,
 } from '../utils/utils.js';
 import {
+  DEFAULT_BACKGROUND_IMAGE_PATH,
   DIGITALEXPERIENCE_PREVIEW_PATH, FILE_EXTENSION_TO_DOWNLOAD_LABEL,
   PARTNER_LEVEL, PX_ASSETS_PREVIEW_PATH,
 } from '../utils/dxConstants.js';
-
-const DEFAULT_BACKGROUND_IMAGE_PATH = '/content/dam/solution/en/images/card-collection/sample_default.png';
 
 import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
