@@ -3,14 +3,14 @@
   --yc-header-color: #131313;
   --yc-container-color: #fff;
   --yc-card-radius: 12px;
-  --yc-input-radius: 12px;
-  --yc-input-height: 44px;
+  --yc-input-radius: 28px;
+  --yc-input-height: 56px;
   --yc-input-border: linear-gradient(98.11deg, #9A3CF9 -4.21%, #E743C8 35.46%, #ED457E 68.67%, #FF7918 104.7%);
   --yc-button-dimensions: 32px;
   --yc-button-radius: 50%;
   --yc-button-color: #292929;
   --yc-keyboard-focus-color: #5574F7;
-  --yukon-chat-bg: linear-gradient(90deg, #E8EEFF 0%, #FDE4F2 49.52%, #FFE4CF 100%);
+  --yukon-chat-bg: linear-gradient(122.87deg, #E1E9FF 20.72%, #EFE3FA34 .96%, #F5DFF8 42.08%, #FCDCD5 49.2%, #FFDEC3 91.6%);
 
 }
 
@@ -24,7 +24,6 @@
 
 }
 .yukon-chat-block {
-  background: var(--yukon-chat-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,9 +33,6 @@
   min-height: 72px;
   max-width: 1200px;
   width: 80%;
-  box-shadow: 0px 6px 16px 0px #00000029;
-  padding: 12px 50px;
-  box-sizing: border-box;
 }
 
 @media (max-width:1024px) {
@@ -60,7 +56,6 @@
 }
 
 .yc-input-field-container {
-  align-items: flex-end;
   background: var(--yc-container-color);
   border-radius: calc(var(--yc-input-radius) - 2px);
   display: flex;
@@ -113,7 +108,7 @@
   user-select: none;
   align-self: flex-start;
   margin-right: -8px;
-  margin-top: 10px;
+  margin-top: 12px;
   height: 32px;
   width: 32px;
   justify-content: center;
@@ -242,7 +237,7 @@
   transition: background 0.3s ease;
   width: var(--yc-button-dimensions);
   align-self: flex-end;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   padding: 0;
   flex-shrink: 0;
 }
@@ -265,8 +260,7 @@
   margin-bottom: 20px;
 }
 
-.modal-input-wrapper .yc-input-field-container .yc-input-field-button,
-.modal-input-wrapper .yc-input-field-container .yc-input-field-button:disabled{
+.yc-input-field-container .yc-input-field-button {
   background: #000;
   border: none;
   transition: background-color 0.3s ease;
@@ -276,14 +270,14 @@
   align-items: center;
   display: flex;
   justify-content: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   align-self: flex-end;
   color: var(--yc-container-color);
   opacity: 1;
   flex-shrink: 0;
 }
 
-.modal-input-wrapper .yc-input-field-container .yc-input-field-button:disabled {
+.yc-input-field-container .yc-input-field-button:disabled {
   background: var(--yc-container-color);
   color: #999;
   pointer-events: none;

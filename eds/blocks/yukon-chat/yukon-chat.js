@@ -44,16 +44,10 @@ const createInputField = (textareaEl, buttonEl) => {
 
   const textareaWrap = createTag('div', { class: 'yc-textarea-grow-wrap' });
   textareaWrap.appendChild(textareaEl);
-  console.log('configs ', configs);
-
-  if (configs.chatTooltip) {
-    console.log('configs ', configs);
-    container.appendChild(label);
-    container.appendChild(tooltip);
-  }
+  container.appendChild(label);
+  container.appendChild(tooltip);
   container.appendChild(textareaWrap);
   container.appendChild(buttonEl);
-
   return container;
 };
 
@@ -542,4 +536,5 @@ export default async function init(el) {
     );
     updateReplicatedValue(textareaWrapper, textArea, scrollToBottomBtn, modalInputWrapper);
   });
+  updateButtonState(textArea, inputFieldButton);
 }
