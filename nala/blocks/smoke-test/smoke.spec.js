@@ -45,7 +45,7 @@ export default {
       tcid: '4',
       name: '@smoke-test-become-a-partner',
       path: '/digitalexperience/?georouting=off&martech=off',
-      tags: '@da-dx-smoke-test',
+      // tags: '@da-dx-smoke-test',
       data: {
         becomAPartnerUrl: '/digitalexperience/s/registration',
       }
@@ -112,7 +112,7 @@ export default {
     {
       tcid: '11',
       name: '@smoke-test-error-flow-abandoned-user-case',
-      path: ' https://partners.stage.adobe.com/digitalexperience/',
+      path: '/digitalexperience/',
       tags: '@da-dx-smoke-test',
       data: {
         partnerLevel: 'dxp-abandoned:',
@@ -122,7 +122,7 @@ export default {
     {
       tcid: '12',
       name: '@smoke-test-error-flow-terminated-user-case',
-      path: ' https://partners.stage.adobe.com/digitalexperience/',
+      path: '/digitalexperience/',
       tags: '@da-dx-smoke-test',
       data: {
         partnerLevel: 'dxp-terminated:',
@@ -132,7 +132,7 @@ export default {
     {
       tcid: '13',
       name: '@smoke-test-error-flow-rejected-user-case',
-      path: ' https://partners.stage.adobe.com/digitalexperience/',
+      path: '/digitalexperience/',
       tags: '@da-dx-smoke-test',
       data: {
         partnerLevel: 'dxp-rejected:',
@@ -142,12 +142,18 @@ export default {
     {
       tcid: '14',
       name: '@smoke-test-error-flow-404-user-case',
-      path: ' https://partners.stage.adobe.com/digitalexperience/home-page',
+      path: '/digitalexperience/home-page',
       tags: '@da-dx-smoke-test',
       data: {
         partnerLevel: 'dxp-gold:',
         expectedToSeeInURL: '/digitalexperience/home-page',
       },
+    },
+    {
+      tcid: '15',
+      name: '@smoke-test-jarvis-chat-validation',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
     },
   ],
 };

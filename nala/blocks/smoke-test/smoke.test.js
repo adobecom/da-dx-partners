@@ -255,6 +255,7 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.productFilterPanel.waitFor({ state: 'visible', timeout: 30000 });
       await smokeTest.productFilterCheckbox.click();
       await smokeTest.loader.waitFor({ state: 'hidden', timeout: 30000 });
+      await page.waitForTimeout(5000);
       const textAfterFilter = await smokeTest.searchAllResults.textContent();
       const matchAfterFilter = textAfterFilter.match(/\((\d+)\)/);
       const numberResultsAfterFilter = Number(matchAfterFilter[1]);
@@ -307,6 +308,20 @@ test.describe('Validate Partner Directory pages', () => {
         await expect(pages[0].url())
           .toContain(`${feature.data.expectedToSeeInURL}`);
       });
+    });
+  });
+  test(`${features[14].name},${features[14].tags}`, async ({ page, baseURL }) => {
+    const { path } = features[14];
+
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+    await test.step('Verify Jarvis Chat', async () => {
+      await smokeTest.jarvisChatButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.jarvisChatButton.click();
+      await smokeTest.jarvisChatPanel.waitFor({ state: 'visible', timeout: 30000 });
     });
   });
 });
