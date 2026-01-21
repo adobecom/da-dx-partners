@@ -46,6 +46,8 @@ export default async function init(el) {
   declareAssetPreview();
   const app = document.createElement('partnership-progress');
   app.className = 'partnership-progress-block';
+  app.setAttribute('daa-lh', 'Partnership Progress Block');
+
   const blockClasses = el.classList;
   if (blockClasses.length > 1) {
     blockClasses.remove('partnership-progress');

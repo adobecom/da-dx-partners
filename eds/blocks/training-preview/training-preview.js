@@ -52,6 +52,7 @@ export default async function init(el) {
   declareTrainingPreview();
   const app = document.createElement('training-preview');
   app.className = 'training-preview-block';
+  app.setAttribute('daa-lh', 'Training Preview Block');
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
   keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'training-not-available-fragment');

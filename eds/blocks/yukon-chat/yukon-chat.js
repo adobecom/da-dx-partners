@@ -392,6 +392,7 @@ export default async function init(el) {
   populateLocalizedTextFromListItems(el, localizedText);
 
   const chatBlock = createTag('div', { class: 'yukon-chat-block' });
+  chatBlock.setAttribute('daa-lh', 'Yukon Chat Block');
   const chatBlockHeader = createTag('div', { class: 'yc-block-header' }, configs?.blockHeader);
   const pillContainer = createTag('div', { class: 'yukon-chat-pill' });
   const inputField = createTag('section', { class: 'yc-input-field' });
@@ -406,6 +407,7 @@ export default async function init(el) {
     class: 'yc-input-field-button',
     disabled: true,
     'aria-label': localizedText['{{send-message}}'],
+    'daa-ll': localizedText['{{send-message}}']
   }, submitIconString);
 
   const sharedInputField = createInputField(textArea, inputFieldButton, isSticky);

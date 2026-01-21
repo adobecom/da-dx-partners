@@ -71,6 +71,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   feedbackButton.classList.add('hidden');
   const feedbackDialog = document.createElement('div');
   feedbackDialog.className = 'feedback-dialog';
+  feedbackDialog.setAttribute('daa-lh', 'Feedback Dialog');
   const dialogBody = document.createElement('div');
   dialogBody.className = 'feedback-dialog-body';
   const title = document.createElement('h4');
@@ -158,8 +159,10 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   const cancelButton = document.createElement('button');
   cancelButton.className = 'feedback-dialog-button secondary-cta';
   cancelButton.textContent = config.cancel;
+  cancelButton.setAttribute('daa-ll', config.cancel);
   sendButton.className = 'feedback-dialog-button cta';
   sendButton.textContent = config.send;
+  sendButton.setAttribute('daa-ll', config.send);
   sendButton.disabled = config.savedRating === 0;
   const closeDialog = () => {
     feedbackDialog.remove();
@@ -317,9 +320,11 @@ export default async function init(el) {
 
   const app = document.createElement('div');
   app.className = 'feedback-mechanism';
+  app.setAttribute('daa-lh', 'Feedback');
   const stickyFeedbackButton = document.createElement('button');
   stickyFeedbackButton.className = 'sticky-feedback-button sticky-cta';
   stickyFeedbackButton.textContent = config.feedbackStickyButton;
+  stickyFeedbackButton.setAttribute('daa-ll', config.feedbackStickyButton);
   app.appendChild(stickyFeedbackButton);
   stickyFeedbackButton.addEventListener('click', () => renderDialog(stickyFeedbackButton, url, config));
   el.replaceWith(app);
