@@ -27,15 +27,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 30px;
   border-radius: 36px;
   margin: 20px auto;
   min-height: 72px;
   max-width: 1200px;
   width: 80%;
+  padding: 20px 0;
 }
 
-@media (max-width:1024px) {
+@media (max-width:1199px) {
   .yukon-chat-block {
     flex-direction: column;
   }
