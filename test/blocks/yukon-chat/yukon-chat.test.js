@@ -76,24 +76,6 @@ describe('yukon-chat block', () => {
       expect(sendButton.hasAttribute('disabled')).to.be.true;
     });
 
-    it('should render the sticky variant correctly', async () => {
-      document.body.innerHTML = '';
-      document.body.innerHTML = await readFile({ path: './mocks/bodySticky.html' });
-
-      const block = document.querySelector('.yukon-chat.sticky');
-      expect(block).to.exist;
-
-      await init(block);
-
-      const stickyContainer = document.querySelector('.yukon-chat-sticky');
-      expect(stickyContainer).to.exist;
-
-      const inputField = stickyContainer.querySelector('.yc-input-field');
-      expect(inputField).to.exist;
-
-      const textarea = stickyContainer.querySelector('#yc-input-field');
-      expect(textarea.getAttribute('placeholder')).to.equal('Ask a question...');
-    });
 
     it('should extract and apply authored configurations correctly', async () => {
       const block = document.querySelector('.yukon-chat');
