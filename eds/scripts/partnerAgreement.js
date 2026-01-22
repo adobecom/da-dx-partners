@@ -14,12 +14,12 @@ const SPINNER_ANIMATION = `<sp-theme system="light" color="light" scale="medium"
 
 let agreementModal;
 
-function handleRedirects(redirectsDomains) {
-  const allowedDomains = redirectsDomains.split(',').map(url => url.trim().toLowerCase());
+function handleRedirects(agreementRedirectDomains) {
+  if (!agreementRedirectDomains) return;
+  const allowedDomains = agreementRedirectDomains.split(',').map(url => url.trim().toLowerCase());
   const params = new URLSearchParams(window.location.search);
-
   const redirectUrl = params.get('redirectUrl');
-  if (!redirectUrl) return; // no redirect param, do nothing
+  if (!redirectUrl) return;
 
   let redirectDomain;
 
@@ -34,7 +34,7 @@ function handleRedirects(redirectsDomains) {
     window.location.href = redirectUrl;
   }
 }
-async function acceptAgreement(agreementTextContainer, successMessage, errorMessage, redirectsDomains, spinner, closeModalCallback) {
+async function acceptAgreement(agreementTextContainer, successMessage, errorMessage, agreementRedirectDomains, spinner, closeModalCallback) {
     agreementTextContainer.replaceWith(spinner);
     const success = await handleAgreement('accept');
     if (success) {
@@ -46,7 +46,7 @@ async function acceptAgreement(agreementTextContainer, successMessage, errorMess
           new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
         );
       }, 2000);
-      handleRedirects(redirectsDomains);
+      handleRedirects(agreementRedirectDomains);
     } else {
         spinner.innerHTML = errorMessage;
     }
@@ -77,7 +77,7 @@ async function createContent(miloLibs, agreementMeta, agreementContent) {
         agreementText,
         agreementMeta.agreementSuccessMessage,
         agreementMeta.agreementErrorMessage,
-        agreementMeta.redirectsDomains,
+        agreementMeta.agreementRedirectDomains,
         agreementSpinner,
         closeModal));
     const agreementFooter = createTag('div', {class: 'agreement-footer'}, agreementCta);
@@ -175,6 +175,7 @@ async function loadAgreementMeta(metadataUrl) {
         agreementCtaLabel: head.querySelector('meta[name="agreementctalabel"]')?.content || 'Agreement CTA label',
         agreementSuccessMessage: head.querySelector('meta[name="agreementsuccessmessage"]')?.content || 'Agreement Success Message',
         agreementErrorMessage: head.querySelector('meta[name="agreementerrormessage"]')?.content || 'Agreement Error Message',
+        agreementRedirectDomains: head.querySelector('meta[name="agreementredirectdomains"]')?.content || '',
     };
 }
 
