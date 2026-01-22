@@ -834,62 +834,6 @@ describe('SearchCards Unit Tests', () => {
       
       expect(closeTypeaheadSpy.called).to.be.false;
     });
-
-    it('should close typeahead when clicking on Gnav menu (simulating the bug fix)', () => {
-      searchComponent.isTypeaheadOpen = true;
-      
-      const mockDialog = {
-        getBoundingClientRect: sinon.stub().returns({ left: 50, right: 150, top: 50, bottom: 150 })
-      };
-      const mockSearchInput = {
-        getBoundingClientRect: sinon.stub().returns({ left: 200, right: 300, top: 50, bottom: 100 })
-      };
-      const mockTypeaheadDialog = { close: sinon.spy(), returnValue: '' };
-      
-      const querySelectorStub = sinon.stub();
-      querySelectorStub.withArgs('.suggestion-dialog').returns(mockDialog);
-      querySelectorStub.withArgs('#search').returns(mockSearchInput);
-      querySelectorStub.withArgs('dialog#typeahead').returns(mockTypeaheadDialog);
-      
-      searchComponent.renderRoot = {
-        querySelector: querySelectorStub
-      };
-      
-      const closeTypeaheadSpy = sinon.spy(searchComponent, 'closeTypeahead');
-      
-      // Simulate clicking on a Gnav menu item (far away from search component)
-      searchComponent.handleClickOutside({ clientX: 1000, clientY: 50 });
-      
-      expect(closeTypeaheadSpy.calledWith('SEE_ALL')).to.be.true;
-    });
-
-    it('should not close typeahead when clicking inside search input', () => {
-      searchComponent.isTypeaheadOpen = true;
-      
-      const mockDialog = {
-        getBoundingClientRect: sinon.stub().returns({ left: 50, right: 150, top: 50, bottom: 150 })
-      };
-      const mockSearchInput = {
-        getBoundingClientRect: sinon.stub().returns({ left: 200, right: 300, top: 50, bottom: 100 })
-      };
-      const mockTypeaheadDialog = { close: sinon.spy(), returnValue: '' };
-      
-      const querySelectorStub = sinon.stub();
-      querySelectorStub.withArgs('.suggestion-dialog').returns(mockDialog);
-      querySelectorStub.withArgs('#search').returns(mockSearchInput);
-      querySelectorStub.withArgs('dialog#typeahead').returns(mockTypeaheadDialog);
-      
-      searchComponent.renderRoot = {
-        querySelector: querySelectorStub
-      };
-      
-      const closeTypeaheadSpy = sinon.spy(searchComponent, 'closeTypeahead');
-      
-      // Click inside search input
-      searchComponent.handleClickOutside({ clientX: 250, clientY: 75 });
-      
-      expect(closeTypeaheadSpy.called).to.be.false;
-    });
   });
 
   describe('shouldDisplayLoadMore', () => {

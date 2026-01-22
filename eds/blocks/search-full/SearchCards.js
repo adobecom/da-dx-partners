@@ -38,17 +38,6 @@ export default class Search extends PartnerCards {
     // Tracks order of requests for search and suggestions to use response from last fired request
     this.searchReqCounter = 0;
     this.suggestionReqCounter = 0;
-    this.handleClickOutsideBound = this.handleClickOutside.bind(this);
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    document.addEventListener('click', this.handleClickOutsideBound);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    document.removeEventListener('click', this.handleClickOutsideBound);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -370,7 +359,7 @@ export default class Search extends PartnerCards {
   /* eslint-disable indent */
   render() {
     return html`
-      <div class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}" daa-lh="Search Box">
+      <div @click="${this.handleClickOutside}" class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}" daa-lh="Search Box">
         <div class="search-box content">
           <h3 class="partner-cards-title">
             ${this.searchTerm && !this.isTypeaheadOpen
@@ -393,7 +382,7 @@ export default class Search extends PartnerCards {
         </div>
 
       </div>
-      <div class="content"
+      <div @click="${this.handleClickOutside}" class="content"
         daa-lh="Search Cards Content | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
       >
         <div class="partner-cards">
