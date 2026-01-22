@@ -14,7 +14,27 @@ const SPINNER_ANIMATION = `<sp-theme system="light" color="light" scale="medium"
 
 let agreementModal;
 
-async function acceptAgreement(agreementTextContainer, successMessage, errorMessage, spinner, closeModalCallback) {
+function handleRedirects(redirectsDomains) {
+  const allowedDomains = redirectsDomains.split(',').map(url => url.trim().toLowerCase());
+  const params = new URLSearchParams(window.location.search);
+
+  const redirectUrl = params.get('redirectUrl');
+  if (!redirectUrl) return; // no redirect param, do nothing
+
+  let redirectDomain;
+
+  try {
+    redirectDomain = new URL(redirectUrl).hostname.toLowerCase();
+  } catch {
+    // Invalid URL
+    return;
+  }
+
+  if (allowedDomains.includes(redirectDomain)) {
+    window.location.href = redirectUrl;
+  }
+}
+async function acceptAgreement(agreementTextContainer, successMessage, errorMessage, redirectsDomains, spinner, closeModalCallback) {
     agreementTextContainer.replaceWith(spinner);
     const success = await handleAgreement('accept');
     if (success) {
@@ -26,6 +46,7 @@ async function acceptAgreement(agreementTextContainer, successMessage, errorMess
           new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
         );
       }, 2000);
+      handleRedirects(redirectsDomains);
     } else {
         spinner.innerHTML = errorMessage;
     }
@@ -56,6 +77,7 @@ async function createContent(miloLibs, agreementMeta, agreementContent) {
         agreementText,
         agreementMeta.agreementSuccessMessage,
         agreementMeta.agreementErrorMessage,
+        agreementMeta.redirectsDomains,
         agreementSpinner,
         closeModal));
     const agreementFooter = createTag('div', {class: 'agreement-footer'}, agreementCta);
