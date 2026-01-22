@@ -22,14 +22,11 @@ const miloLibs = getLibs();
 const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`);
 const { createTag } = await import(`${miloLibs}/utils/utils.js`);
 
-const mobileView = window.matchMedia('(max-width: 767px)');
-let stickyViewportHandler = null;
-let isModalOpen = false;
 let currentAbortController = null; // Store abort controller for ongoing requests
 const requestId = crypto.randomUUID();
 const configs = {};
 
-const createInputField = (textareaEl, buttonEl, isSticky, forModal = false) => {
+const createInputField = (textareaEl, buttonEl) => {
   const container = createTag('div', { class: 'yc-input-field-container' });
 
   const label = createTag('label', {
@@ -47,47 +44,12 @@ const createInputField = (textareaEl, buttonEl, isSticky, forModal = false) => {
 
   const textareaWrap = createTag('div', { class: 'yc-textarea-grow-wrap' });
   textareaWrap.appendChild(textareaEl);
-
-  if (forModal || !isSticky) {
-    container.appendChild(label);
-    container.appendChild(tooltip);
-    container.appendChild(textareaWrap);
-    container.appendChild(buttonEl);
-  } else {
-    stickyViewportHandler = (e) => {
-      if (isModalOpen) return;
-      while (container.firstChild) {
-        container.removeChild(container.firstChild);
-      }
-      if (!e.matches) {
-        container.appendChild(label);
-        container.appendChild(tooltip);
-        container.appendChild(textareaWrap);
-        container.appendChild(buttonEl);
-      }
-    };
-
-    stickyViewportHandler(mobileView);
-    mobileView.addEventListener('change', stickyViewportHandler);
-  }
-
+  container.appendChild(label);
+  container.appendChild(tooltip);
+  container.appendChild(textareaWrap);
+  container.appendChild(buttonEl);
   return container;
 };
-
-// Function to handle mobile button visibility for sticky variant
-function handleMobileButton(mobileButton, e, stickyContainer, inputField) {
-  if (e.matches) {
-    stickyContainer.appendChild(mobileButton);
-    if (inputField.parentNode === stickyContainer) {
-      stickyContainer.removeChild(inputField);
-    }
-  } else {
-    if (mobileButton.parentNode === stickyContainer) {
-      stickyContainer.removeChild(mobileButton);
-    }
-    stickyContainer.appendChild(inputField);
-  }
-}
 
 function updateScrollButtonPosition(scrollToBottomBtn, modalInputWrapper) {
   if (!scrollToBottomBtn || !modalInputWrapper) return;
@@ -376,7 +338,6 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
 };
 
 export default async function init(el) {
-  const isSticky = el.classList.contains('sticky');
   extractAuthoredConfigs(configs, el.children);
   const config = getConfig();
   const localizedText = {
@@ -410,27 +371,13 @@ export default async function init(el) {
     'daa-ll': localizedText['{{send-message}}']
   }, submitIconString);
 
-  const sharedInputField = createInputField(textArea, inputFieldButton, isSticky);
+  const sharedInputField = createInputField(textArea, inputFieldButton);
   inputField.appendChild(sharedInputField);
   pillContainer.appendChild(inputField);
 
-  let mobileButton = null;
-
-  // For sticky variant, create sticky container instead of regular block
-  if (isSticky) {
-    const stickyContainer = createTag('div', { class: 'yukon-chat-sticky' });
-    mobileButton = createTag('button', {
-      class: 'yc-mobile-button',
-      'aria-label': localizedText['{{open-chat}}'],
-    }, aiChatIconString);
-    handleMobileButton(mobileButton, mobileView, stickyContainer, inputField);
-    mobileView.addEventListener('change', (e) => handleMobileButton(mobileButton, e, stickyContainer, inputField));
-    el.replaceWith(stickyContainer);
-  } else {
-    chatBlock.appendChild(chatBlockHeader);
-    chatBlock.appendChild(pillContainer);
-    el.replaceWith(chatBlock);
-  }
+  if (configs?.blockHeader) chatBlock.appendChild(chatBlockHeader);
+  chatBlock.appendChild(pillContainer);
+  el.replaceWith(chatBlock);
 
   let chatHistory;
   let modalInputWrapper;
@@ -487,17 +434,6 @@ export default async function init(el) {
   };
   // Function to show modal using getModal
   const showModal = async () => {
-    isModalOpen = true;
-    if (isSticky) {
-      const container = sharedInputField;
-      const label = container.querySelector('.yc-input-field-label');
-      if (!label || !label.parentNode) {
-        const tempContainer = createInputField(textArea, inputFieldButton, isSticky, true);
-        while (tempContainer.firstChild) {
-          container.appendChild(tempContainer.firstChild);
-        }
-      }
-    }
     // Check if modal already exists in DOM
     if (modalInstance && document.body.contains(modalInstance)) {
       if (modalInputWrapper && !modalInputWrapper.contains(sharedInputField)) {
@@ -520,7 +456,6 @@ export default async function init(el) {
           // eslint-disable-next-line no-promise-executor-return
           await new Promise((resolve) => setTimeout(resolve, 500));
         }
-        isModalOpen = false;
         // Abort any ongoing request
         if (currentAbortController) {
           currentAbortController.abort();
@@ -531,9 +466,6 @@ export default async function init(el) {
         // Move input field back to pill when modal closes
         if (inputField && sharedInputField) {
           inputField.appendChild(sharedInputField);
-          if (isSticky && stickyViewportHandler) {
-            stickyViewportHandler(mobileView);
-          }
         }
         textArea.value = '';
         updateButtonState(textArea, inputFieldButton);
@@ -606,10 +538,5 @@ export default async function init(el) {
     );
     updateReplicatedValue(textareaWrapper, textArea, scrollToBottomBtn, modalInputWrapper);
   });
-
-  if (mobileButton) {
-    mobileButton.addEventListener('click', async () => {
-      await showModal();
-    });
-  }
+  updateButtonState(textArea, inputFieldButton);
 }
