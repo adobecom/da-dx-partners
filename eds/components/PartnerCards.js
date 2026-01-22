@@ -536,7 +536,7 @@ export default class PartnerCards extends LitElement {
                   ${tagsCount
             ? html`
                       <div class="filter-header-selected-tags-mobile">
-                        <span class="filter-header-selected-tags-text-mobile">${tagsString}</span>
+                        <span class="filter-header-selected-tags-text-mobile">${unsafeHTML(DOMPurify.sanitize(tagsString))}</span>
                         <span class="filter-header-selected-tags-count-mobile">+ ${tagsCount}</span>
                       </div>
                     `
@@ -582,7 +582,7 @@ export default class PartnerCards extends LitElement {
       (tag) => tag.key,
       (tag) => html`
         <button class="sidebar-chosen-filter-btn" @click="${() => this.handleRemoveTag(tag)}" aria-label="${tag.value}">
-          ${unsafeHTML(tag.value)}
+          ${unsafeHTML(DOMPurify.sanitize(tag.value))}
         </button>`,
     )}`;
 

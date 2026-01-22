@@ -10,6 +10,9 @@ const domainConfigs = {
   'solutionpartners.adobe.com': { stage: { domain: 'solutionpartners.stage2.adobe.com' } },
   'exchange.adobe.com': { stage: { domain: 'stage.exchange.adobe.com' } },
   'cbconnection.adobe.com': { stage: { domain: 'cbconnection-stage.adobe.com' } },
+  'partnerbenefitscenter.adobe.com': { stage: { domain: 'pp-staging.adobe.com' } },
+  'adobe.com': { stage: { domain: 'stage.adobe.com' } },
+  'experienceleague.adobe.com': { stage: { domain: 'experienceleague.stage.adobe.com' } },
 };
 
 /**

@@ -445,6 +445,7 @@ class Gnav {
     this.customLinks = getConfig()?.customLinks?.split(',') || [];
     // PARTNERS_NAVIGATION START
     // MWPW-168681 - GNAV Links & Authorable Icons
+    // MWPW-186006 - Short cut icons - External links open in the same tab instead of a new tab
     const shortcutIcons = [];
     const MAX_GNAV_ICONS_COUNT = 8;
     Array.from(this.content.querySelectorAll('.shortcut-icons > div')).slice(0, MAX_GNAV_ICONS_COUNT).forEach((icon) => {
@@ -463,6 +464,7 @@ class Gnav {
         iconKey: iconKey[0]?.trim(),
         mobileIconKey: iconKey[1]?.trim(),
         iconLink: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('href'),
+        target: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('target')
       });
     });
     // PARTNERS_NAVIGATION END
@@ -505,9 +507,10 @@ class Gnav {
 
   // PARTNERS_NAVIGATION START
   // MWPW-168681 - GNAV Links & Authorable Icons
+  // MWPW-186006 - Short cut icons - External links open in the same tab instead of a new tab
   decorateShortcutIcons = (isMobile) => {
     let html = this.blocks.shortcutIcons.filter((el) => el.iconLink && el.iconKey).map((obj) => `
-    <a href="${obj.iconLink}" class="shortcut-icons-link">
+    <a href="${obj.iconLink}" class="shortcut-icons-link" ${obj.target ? `target="${obj.target}" rel="noopener noreferrer"` : ''}>
       <img src="/eds/partners-shared/mnemonics/${isMobile && obj.mobileIconKey ? obj.mobileIconKey : obj.iconKey}.svg" alt="Image" class="shortcut-icons-img" />
     </a>
   `).join('');

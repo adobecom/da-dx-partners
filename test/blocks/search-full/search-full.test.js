@@ -41,7 +41,7 @@ describe('search-full block', () => {
 
     sinon.stub(Search.prototype, 'fetchTags').resolves({ tags: [] });
 
-    sinon.stub(Search.prototype, 'handleActions').callsFake(async function () {
+    sinon.stub(Search.prototype, 'handleActionsCore').callsFake(async function () {
       this.cards = cards;
       this.paginatedCards = this.cards.slice(0, 12);
       this.hasResponseData = true;
@@ -82,7 +82,7 @@ describe('search-full block', () => {
     fetchStub.restore();
     Search.prototype.fetchData.restore();
     Search.prototype.fetchTags.restore();
-    Search.prototype.handleActions.restore();
+    Search.prototype.handleActionsCore.restore();
     Search.prototype.getSuggestions.restore();
     Search.prototype.setBlockData.restore();
     Search.prototype.firstUpdated.restore();
@@ -186,10 +186,10 @@ describe('search-full block', () => {
   });
 
   it('should display no results when no cards are found', async function () {
-    Search.prototype.handleActions.restore();
+    Search.prototype.handleActionsCore.restore();
     Search.prototype.firstUpdated.restore();
     
-    sinon.stub(Search.prototype, 'handleActions').callsFake(async function () {
+    sinon.stub(Search.prototype, 'handleActionsCore').callsFake(async function () {
       this.cards = [];
       this.paginatedCards = [];
       this.hasResponseData = true;
@@ -228,10 +228,10 @@ describe('search-full block', () => {
       statusText: 'Server Error'
     });
 
-    Search.prototype.handleActions.restore();
+    Search.prototype.handleActionsCore.restore();
     Search.prototype.firstUpdated.restore();
     
-    sinon.stub(Search.prototype, 'handleActions').callsFake(async function () {
+    sinon.stub(Search.prototype, 'handleActionsCore').callsFake(async function () {
       this.cards = [];
       this.paginatedCards = [];
       this.hasResponseData = true;
@@ -255,7 +255,7 @@ describe('search-full block', () => {
   });
 
   it('should display loading indicator when data is being fetched', async function () {
-    Search.prototype.handleActions.restore();
+    Search.prototype.handleActionsCore.restore();
     Search.prototype.firstUpdated.restore();
     
     // Stub firstUpdated to set hasResponseData to false initially
@@ -269,8 +269,8 @@ describe('search-full block', () => {
       this.selectedSortOrder = { key: 'most-recent', value: 'Most Recent' };
     });
 
-    // Stub handleActions to keep hasResponseData as false
-    sinon.stub(Search.prototype, 'handleActions').callsFake(async function () {
+    // Stub handleActionsCore to keep hasResponseData as false
+    sinon.stub(Search.prototype, 'handleActionsCore').callsFake(async function () {
       this.cards = [];
       this.paginatedCards = [];
       this.hasResponseData = false;  // Keep as false to maintain loading state
@@ -300,7 +300,7 @@ describe('search-full block', () => {
   });
 
   it('should render chosen filter buttons when filters are selected', async function () {
-    Search.prototype.handleActions.restore();
+    Search.prototype.handleActionsCore.restore();
     Search.prototype.firstUpdated.restore();
     Search.prototype.setBlockData.restore();
     
@@ -367,7 +367,7 @@ describe('search-full block', () => {
       };
     });
 
-    sinon.stub(Search.prototype, 'handleActions').callsFake(async function () {
+    sinon.stub(Search.prototype, 'handleActionsCore').callsFake(async function () {
       this.cards = cards;
       this.paginatedCards = this.cards.slice(0, 12);
       this.hasResponseData = true;
@@ -506,14 +506,15 @@ describe('SearchCards Unit Tests', () => {
       expect(closeTypeaheadSpy.calledWith('SEE_ALL')).to.be.true;
     });
 
-    it('should handle non-empty search input', async () => {
-      const updateTypeaheadDialogStub = sinon.stub(searchComponent, 'updateTypeaheadDialog');
+    it('should handle non-empty search input', () => {
+      const debouncedSpy = sinon.spy();
+      searchComponent.debouncedUpdateTypeahead = debouncedSpy;
       const event = { target: { value: 'analytics' } };
       
-      await searchComponent.onSearchInput(event);
+      searchComponent.onSearchInput(event);
       
       expect(searchComponent.searchTerm).to.equal('analytics');
-      expect(updateTypeaheadDialogStub.called).to.be.true;
+      expect(debouncedSpy.called).to.be.true;
     });
   });
 
@@ -909,7 +910,7 @@ describe('SearchCards Unit Tests', () => {
       const result = await searchComponent.getCards();
       
       expect(consoleErrorStub.called).to.be.true;
-      expect(result).to.be.undefined;
+      expect(result).to.be.null;
     });
 
     it('should handle network errors gracefully', async () => {
@@ -920,7 +921,7 @@ describe('SearchCards Unit Tests', () => {
       const result = await searchComponent.getCards();
       
       expect(consoleErrorStub.called).to.be.true;
-      expect(result).to.be.undefined;
+      expect(result).to.be.null;
     });
 
     it('should set hasResponseData to false when no cards returned', async () => {
@@ -982,7 +983,7 @@ describe('SearchCards Unit Tests', () => {
       const result = await searchComponent.getSuggestions();
       
       expect(consoleErrorStub.called).to.be.true;
-      expect(result).to.be.undefined;
+      expect(result).to.be.null;
     });
 
     it('should handle network errors gracefully', async () => {
@@ -993,7 +994,7 @@ describe('SearchCards Unit Tests', () => {
       const result = await searchComponent.getSuggestions();
       
       expect(consoleErrorStub.called).to.be.true;
-      expect(result).to.be.undefined;
+      expect(result).to.be.null;
     });
   });
 
@@ -1007,7 +1008,7 @@ describe('SearchCards Unit Tests', () => {
         count: { all: 15, assets: 5, pages: 5, courses: 5 }
       });
       
-      await searchComponent.handleActions();
+      await searchComponent.handleActionsCore();
       
       expect(searchComponent.hasResponseData).to.be.true;
       expect(searchComponent.additionalResetActions.called).to.be.true;
@@ -1031,7 +1032,7 @@ describe('SearchCards Unit Tests', () => {
         count: { all: 15, assets: 5, pages: 5, courses: 5 }
       });
       
-      await searchComponent.handleActions();
+      await searchComponent.handleActionsCore();
       
       expect(searchComponent.hasResponseData).to.be.true;
       expect(searchComponent.cards).to.deep.equal([{ id: 2 }, { id: 3 }]);
@@ -1042,8 +1043,8 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.additionalResetActions = sinon.spy();
       searchComponent.getCards = sinon.stub().resolves(null);
       
-      await searchComponent.handleActions();
-      
+      await searchComponent.handleActionsCore();
+
       expect(searchComponent.cards).to.deep.equal([]);
       expect(searchComponent.countAll).to.equal(0);
       expect(searchComponent.contentTypeCounter).to.deep.equal({

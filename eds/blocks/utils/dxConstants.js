@@ -6,6 +6,8 @@ export const DX_PROGRAM_TYPE = 'dxp';
 
 export const PARTNER_LEVEL = getPartnerCookieValue('level', DX_PROGRAM_TYPE);
 
+export const DEFAULT_BACKGROUND_IMAGE_PATH = '/eds/partners-shared/images/card-collection/sample-default.png';
+
 export const DIGITALEXPERIENCE_PREVIEW_PATH = '/digitalexperience/preview/';
 export const DIGITALEXPERIENCE_ASSETS_PATH = '/digitalexperience-assets/';
 export const PX_ASSETS_PREVIEW_PATH = '/digitalexperience-assets/preview/';

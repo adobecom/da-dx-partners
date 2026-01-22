@@ -15,6 +15,12 @@ const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
 export const PARTNER_LOGIN_QUERY = 'partnerLogin';
 export const CAAS_TAGS_URL = 'https://www.adobe.com/chimera-api/tags';
+export const SHOW_NEXT_POPUP = 'dxp:showNextPopup';
+export const PARTNER_AGREEMENT_POPUP = 'dxp:partnerAgreement';
+export const PORTAL_MESSAGING_POPUP = 'dxp:portalMessaging';
+export const CERTIFICATION_POPUP = 'dxp:certificationExpires';
+export const NEXT_POPUP_PLACEHOLDER = 'dxp:nextPopupPlaceholder';
+
 /**
  * The decision engine for where to get Milo's libs from.
  */

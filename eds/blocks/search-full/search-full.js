@@ -60,6 +60,7 @@ export default async function init(el) {
     import(`${miloLibs}/features/spectrum-web-components/dist/progress-circle.js`),
     import(`${miloLibs}/features/spectrum-web-components/dist/action-button.js`),
     import(`${miloLibs}/features/spectrum-web-components/dist/icons-workflow.js`),
+    import(`${miloLibs}/features/spectrum-web-components/dist/button-group.js`),
   ]);
 
   declareSearch();

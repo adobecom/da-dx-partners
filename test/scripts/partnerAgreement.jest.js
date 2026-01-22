@@ -34,6 +34,9 @@ jest.mock('../../eds/scripts/utils.js', () => ({
   getMetadataContent: jest.fn(),
   getPartnerCookieValue: jest.fn(),
   isMember: jest.fn(),
+  SHOW_NEXT_POPUP: 'dxp:showNextPopup',
+  PORTAL_MESSAGING_POPUP: 'dxp:portalMessaging',
+  CERTIFICATION_POPUP: 'dxp:certificationExpires',
 }));
 
 // Global fetch mock
@@ -137,10 +140,22 @@ describe('Test partnerAgreement.js', () => {
       isMember.mockReturnValue(true);
       getPartnerCookieValue.mockReturnValue('true');
 
+      const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+      
       const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
+      const { PORTAL_MESSAGING_POPUP } = require('../../eds/scripts/utils.js');
       await partnerAgreement('https://test-milo-libs.com');
 
       expect(getMetadataContent).not.toHaveBeenCalled();
+      
+      // Verify SHOW_NEXT_POPUP event was dispatched
+      const { SHOW_NEXT_POPUP } = require('../../eds/scripts/utils.js');
+      expect(dispatchEventSpy).toHaveBeenCalled();
+      const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+      expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
+      expect(dispatchedEvent.detail).toEqual({ next: PORTAL_MESSAGING_POPUP });
+      
+      dispatchEventSpy.mockRestore();
     });
 
     it('warns when partner agreement meta path is missing', async () => {
@@ -149,11 +164,23 @@ describe('Test partnerAgreement.js', () => {
       getMetadataContent.mockReturnValue(null);
 
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+      
       const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
+      const { PORTAL_MESSAGING_POPUP } = require('../../eds/scripts/utils.js');
       await partnerAgreement('https://test-milo-libs.com');
 
       expect(warnSpy).toHaveBeenCalledWith('Partner agreement should be displayed but partner agreement meta path is not authored');
+      
+      // Verify SHOW_NEXT_POPUP event was dispatched
+      const { SHOW_NEXT_POPUP } = require('../../eds/scripts/utils.js');
+      expect(dispatchEventSpy).toHaveBeenCalled();
+      const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+      expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
+      expect(dispatchedEvent.detail).toEqual({ next: PORTAL_MESSAGING_POPUP });
+      
       warnSpy.mockRestore();
+      dispatchEventSpy.mockRestore();
     });
 
     it('logs error if metadata fetch fails', async () => {
@@ -164,11 +191,23 @@ describe('Test partnerAgreement.js', () => {
       global.fetch.mockResolvedValueOnce({ ok: false, status: 404, text: () => Promise.resolve('') });
 
       const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+      
       const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
+      const { PORTAL_MESSAGING_POPUP } = require('../../eds/scripts/utils.js');
       await partnerAgreement('https://test-milo-libs.com');
 
       expect(errorSpy).toHaveBeenCalledWith('Fetching partner agreement metadata failed, status 404');
+      
+      // Verify SHOW_NEXT_POPUP event was dispatched
+      const { SHOW_NEXT_POPUP } = require('../../eds/scripts/utils.js');
+      expect(dispatchEventSpy).toHaveBeenCalled();
+      const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+      expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
+      expect(dispatchedEvent.detail).toEqual({ next: PORTAL_MESSAGING_POPUP });
+      
       errorSpy.mockRestore();
+      dispatchEventSpy.mockRestore();
     });
   });
 

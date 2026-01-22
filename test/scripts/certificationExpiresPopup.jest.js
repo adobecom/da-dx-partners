@@ -84,6 +84,7 @@ describe('Test certificationExpiresPopup.js', () => {
   };
 
   beforeEach(() => {
+    jest.resetModules();
     jest.clearAllMocks();
     
     // Reset global mocks
@@ -137,22 +138,33 @@ describe('Test certificationExpiresPopup.js', () => {
     document.body.innerHTML = '';
     jest.clearAllMocks();
   });
-
   describe('early exits', () => {
-    it('should exit if partner agreement is displayed', async () => {
-      const {certificationExpiresPopup} = require('../../eds/scripts/certificationExpiresPopup.js');
+    it('should exit early if partnerAgreementDisplayed is true', async () => {
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
 
       await certificationExpiresPopup('https://test-milo-libs.com', false, true, 'test-client-id');
 
+      // Should not make API calls or show modal when partnerAgreement was displayed
       expect(global.fetch).not.toHaveBeenCalled();
       expect(mockGetModal).not.toHaveBeenCalled();
     });
 
-    it('should exit if portal messaging is open', async () => {
+    it('should exit early if portalMessagingOpen is true', async () => {
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
 
       await certificationExpiresPopup('https://test-milo-libs.com', true, false, 'test-client-id');
 
+      // Should not make API calls or show modal when portal messaging is open
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(mockGetModal).not.toHaveBeenCalled();
+    });
+
+    it('should exit early if both partnerAgreementDisplayed and portalMessagingOpen are true', async () => {
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+
+      await certificationExpiresPopup('https://test-milo-libs.com', true, true, 'test-client-id');
+
+      // Should not make API calls or show modal when both flags are true
       expect(global.fetch).not.toHaveBeenCalled();
       expect(mockGetModal).not.toHaveBeenCalled();
     });

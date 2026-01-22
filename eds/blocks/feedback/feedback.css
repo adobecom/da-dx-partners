@@ -6,7 +6,7 @@
   rotate: -90deg;
   transform: translateX(calc(50% + 32px));
   transform-origin: right bottom;
-  z-index: 999;
+  z-index: 9;
 }
 
 .feedback-mechanism .sticky-feedback-button {
@@ -68,7 +68,7 @@
   border: 1px solid #707070;
   border-radius: 4px;
   font-size: 12px;
-  z-index: 1000;
+  z-index: 9;
 }
 
 /* Tablet */
