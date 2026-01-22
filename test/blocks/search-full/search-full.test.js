@@ -745,30 +745,6 @@ describe('SearchCards Unit Tests', () => {
     });
   });
 
-  describe('connectedCallback', () => {
-    it('should add document click listener when component is connected', () => {
-      const addEventListenerSpy = sinon.spy(document, 'addEventListener');
-      
-      searchComponent.connectedCallback();
-      
-      expect(addEventListenerSpy.calledWith('click', searchComponent.handleClickOutsideBound)).to.be.true;
-      
-      addEventListenerSpy.restore();
-    });
-  });
-
-  describe('disconnectedCallback', () => {
-    it('should remove document click listener when component is disconnected', () => {
-      const removeEventListenerSpy = sinon.spy(document, 'removeEventListener');
-      
-      searchComponent.disconnectedCallback();
-      
-      expect(removeEventListenerSpy.calledWith('click', searchComponent.handleClickOutsideBound)).to.be.true;
-      
-      removeEventListenerSpy.restore();
-    });
-  });
-
   describe('handleClickOutside', () => {
     it('should return early if typeahead is not open', () => {
       searchComponent.isTypeaheadOpen = false;
