@@ -21,6 +21,7 @@ async function localizationPromises(localizedText, config) {
 const miloLibs = getLibs();
 const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`);
 const { createTag } = await import(`${miloLibs}/utils/utils.js`);
+const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 let currentAbortController = null; // Store abort controller for ongoing requests
 const requestId = crypto.randomUUID();
@@ -368,7 +369,7 @@ export default async function init(el) {
     class: 'yc-input-field-button',
     disabled: true,
     'aria-label': localizedText['{{send-message}}'],
-    'daa-ll': localizedText['{{send-message}}']
+    'daa-ll': processTrackingLabels(localizedText['{{send-message}}'], getConfig(), 30),
   }, submitIconString);
 
   const sharedInputField = createInputField(textArea, inputFieldButton);
