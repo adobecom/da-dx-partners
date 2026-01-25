@@ -238,30 +238,24 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.searchField.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Search for keyword', async () => {
-      const numberResultsBeforeSearch = await smokeTest.searchAllResults.textContent();
-      const matchBeforeSearch = numberResultsBeforeSearch.match(/\((\d+)\)/);
-      const numberResultsBeforeSearchValue = Number(matchBeforeSearch[1]);
+      await smokeTest.waitForSearchResults();
+      const numberResultsBeforeSearch = await smokeTest.getResultsCount();
+      
+      await smokeTest.searchFor(data.searchKeyword);
 
-      await smokeTest.searchField.fill(data.searchKeyword);
-      await smokeTest.searchField.press('Enter');
-      await page.waitForTimeout(5000);
-      await smokeTest.searchAllResults.waitFor({ state: 'visible', timeout: 30000 });
-      const textAfterSearch = await smokeTest.searchAllResults.textContent();
-      const matchAfterSearch = textAfterSearch.match(/\((\d+)\)/);
-      const numberResultsAfterSearch = Number(matchAfterSearch[1]);
-      await expect(numberResultsBeforeSearchValue).toBeGreaterThanOrEqual(numberResultsAfterSearch);
+      await smokeTest.waitForSearchResults();
+      const numberResultsAfterSearch = await smokeTest.getResultsCount();
+      await expect(numberResultsBeforeSearch).toBeGreaterThanOrEqual(numberResultsAfterSearch);
 
       await smokeTest.productFilter.click();
       await smokeTest.productFilterPanel.waitFor({ state: 'visible', timeout: 30000 });
       await smokeTest.productFilterCheckbox.click();
-      await smokeTest.loader.waitFor({ state: 'hidden', timeout: 30000 });
-      await page.waitForTimeout(5000);
-      const textAfterFilter = await smokeTest.searchAllResults.textContent();
-      const matchAfterFilter = textAfterFilter.match(/\((\d+)\)/);
-      const numberResultsAfterFilter = Number(matchAfterFilter[1]);
+      await page.waitForTimeout(3000);
+      await smokeTest.waitForSearchResults();
+      const numberResultsAfterFilter = await smokeTest.getResultsCount();
       await expect(numberResultsAfterFilter).toBeLessThan(numberResultsAfterSearch);
     });
-  });
+  }); 
   test(`${features[9].name},${features[9].tags}`, async ({ page, baseURL, context }) => {
     const { data, path } = features[9];
 

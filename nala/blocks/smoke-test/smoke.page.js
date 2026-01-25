@@ -44,6 +44,7 @@ export default class SmokeTest {
     this.firstFilterCheckbox = page.locator('.filter').first().locator('sp-checkbox').first();
     this.jarvisChatButton = page.getByRole('button', { name: 'Chat with us' });
     this.jarvisChatPanel = page.locator('iframe[title="Adobe Virtual Assistant"]').contentFrame().getByText('We\'re here to help.');
+    this.searchCardsCollection = page.locator('.partner-cards-collection');
   }
 
   async smokeSignIn(page, baseURL, partnerLevel) {
@@ -72,5 +73,25 @@ export default class SmokeTest {
 
   async verifyIfFooterIsPresent() {
     return await this.footer.isVisible();
+  }
+
+  async getResultsCount() {
+    const text = await this.searchAllResults.textContent();
+    const match = text?.match(/\((\d+)\)/);
+    return Number(match?.[1] ?? 0);
+  }
+
+  async waitForSearchResults() {
+    await this.loader.waitFor({ state: 'hidden', timeout: 30000 });
+    await this.searchCardsCollection.waitFor({ state: 'visible', timeout: 30000 });
+    await this.searchAllResults.waitFor({ state: 'visible', timeout: 30000 });
+  }
+
+  async searchFor(keyword) {
+    await this.searchField.focus();
+    await this.searchField.fill('');
+    await this.searchField.type(keyword, { delay: 80 });
+    await this.page.waitForTimeout(5000);
+    await this.page.keyboard.press('Enter');
   }
 }
