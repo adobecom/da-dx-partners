@@ -61,7 +61,7 @@ async function replaceProfileImage(elements) {
 
 function personalizeProfileImage(elements) {
   if (!elements.length) return;
-  
+
   const existingAvatarImg = document.querySelector(imgSelector);
   if (existingAvatarImg?.src) {
     replaceProfileImage(elements);
@@ -297,7 +297,7 @@ function personalizeProfile(gnav) {
 export function applyGnavPersonalization(gnav) {
   if (!isMember()) return gnav;
   const importedGnav = document.importNode(gnav, true);
-  personalizeMainNav(importedGnav);
+  personalizeMainNav(importedGnav);  // not sure if this actually is needed: at this point gnav does not contain loaded fragments
   personalizeProfile(importedGnav);
   return importedGnav;
 }
