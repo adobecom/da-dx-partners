@@ -74,47 +74,50 @@ test.describe('Search Page', () => {
     await test.step('Search for asset', async () => {
       await searchPage.searchField.fill(data.searchKeyword);
       await searchPage.searchField.press('Enter');
-      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.waitForResultsToSettle();
       const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
     });
     await test.step('Check Filter Journey Phase Explore', async () => {
       await searchPage.journeyPhaseFilter.click();
-      await page.waitForTimeout(5000);
-      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.waitForResultsToSettle();
+
       await searchPage.exploreCheckBox.click();
-      await page.waitForTimeout(5000);
-      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
+      await expect(searchPage.exploreCheckBox).toBeChecked();
+      await searchPage.waitForResultsToSettle();
+
       const firstCardTitle = await searchPage.getCardTitle();
       await expect(firstCardTitle).toBe(data.assetTitle1);
     });
     await test.step('Check Filter Journey Phase Discover', async () => {
-      await searchPage.discoverCheckBox.click();
+      await searchPage.discoverCheckBox.click({ force: true });
+      await searchPage.waitForResultsToSettle();
+      await expect(searchPage.discoverCheckBox).toBeChecked();
       const cardTitle2 = await searchPage.getCardTitle();
       await expect(cardTitle2).toBe(data.assetTitle2);
     });
     await test.step('Check Filter Functionality Analysis & Insights', async () => { 
       await searchPage.functionalityFilter.click();
-      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.waitForResultsToSettle();
       await searchPage.analysisInsgightCheckBox.click();
-      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.waitForResultsToSettle();
       const cardTitle3 = await searchPage.getCardTitle();
       await expect(cardTitle3).toBe(data.assetTitle2);
     });
     await test.step('Check Silver Asset', async () => {
       await searchPage.clearAll.click();
       await searchPage.searchField.fill(data.silverAsset);
-      await page.waitForTimeout(5000);
       await searchPage.searchField.press('Enter');
-      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.waitForResultsToSettle();
       const firstCardTitle = await searchPage.getCardTitle();
       await expect(firstCardTitle).toBe(data.silverAsset);
 
       const card = searchPage.getCardByTitle(data.silverAsset);
+      await card.waitFor({ state: 'visible', timeout: 15000 });
       await card.click();
 
       const cardDate = searchPage.getCardDateLocator(card);
-      await expect(cardDate).toBeVisible();
+      await expect(cardDate).toBeVisible({ timeout: 15000 });
     });
   });
   test(`${features[2].name},${features[2].tags}`, async ({ page, context }) => {
@@ -450,6 +453,7 @@ test.describe('Search Page', () => {
       await searchPage.searchField.fill(data.searchKeyword);
       await page.waitForTimeout(5000);
       await searchPage.searchField.press('Enter');
+      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       await page.waitForLoadState('networkidle');
       const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
@@ -478,23 +482,22 @@ test.describe('Search Page', () => {
       await expect(cardTitle4).toBe(data.assetTitle3);
     });
     await test.step('Check Filter Cross-functional', async () => {
-      await searchPage.crossFunctionalCheckBox.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.crossFunctionalCheckBox.waitFor({ state: 'visible', timeout: 10000 });
       await searchPage.crossFunctionalCheckBox.isVisible();
       await searchPage.crossFunctionalCheckBox.click();
-      // await page.waitForTimeout(5000);
-      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.waitForResultsToSettle();
       const cardTitle5 = await searchPage.getCardTitle();
       await expect(cardTitle5).toBe(data.assetTitle4);
     });
     await test.step('Uncheck Filter Clear All', async () => {
-      await searchPage.crossFunctionalCheckBox.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.crossFunctionalCheckBox.waitFor({ state: 'visible', timeout: 10000 });
       await searchPage.crossFunctionalCheckBox.isVisible();
       await searchPage.crossFunctionalCheckBox.click();
-      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
-      await searchPage.b2bCheckBox.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.waitForResultsToSettle();
+      await expect(searchPage.crossFunctionalCheckBox).not.toBeChecked();
       await searchPage.b2bCheckBox.isVisible();
       await searchPage.b2bCheckBox.click();
-      await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.waitForResultsToSettle();
       const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
     });
