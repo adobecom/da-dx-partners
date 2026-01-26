@@ -121,7 +121,7 @@ async function loadPage() {
   await setFeedback(getConfig);
   await loadArea();
   applyPagePersonalization();
-  rewriteLinks(document);
+  rewriteLinks(document.querySelector('main') ?? document);
   window.addEventListener(SHOW_NEXT_POPUP, async (e) => {
     if ('detail' in e) {
       console.log('CustomEvent data:', e.detail?.next);
