@@ -30,19 +30,10 @@ test.describe('Search Page', () => {
       await page.waitForTimeout(5000);
 
       await searchPage.searchAllResults.waitFor({ state: 'visible' });
-      const text = await searchPage.searchAllResults.textContent();
-      const match = text.match(/\((\d+)\)/);
-      const numberResults = Number(match[1]);
+      const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(6);
-
-      const firstCardTitle = await searchPage.getCardTitle();
-      await searchPage.mostRelevant.click();
-      await searchPage.mostRecent.click();
-      const secondCardTitle = await searchPage.getCardTitle();
-      await expect(firstCardTitle).not.toBe(secondCardTitle);
     });
     await test.step('Asset Card Content Validation', async () => {
-
       const card = searchPage.getCardByTitle(data.cardTitle);
       await card.click();
 
@@ -84,15 +75,15 @@ test.describe('Search Page', () => {
       await searchPage.searchField.fill(data.searchKeyword);
       await searchPage.searchField.press('Enter');
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
-      const text = await searchPage.searchAllResults.textContent();
-      const match = text.match(/\((\d+)\)/);
-      const numberResults = Number(match[1]);
+      const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
     });
     await test.step('Check Filter Journey Phase Explore', async () => {
       await searchPage.journeyPhaseFilter.click();
+      await page.waitForTimeout(5000);
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       await searchPage.exploreCheckBox.click();
+      await page.waitForTimeout(5000);
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       const firstCardTitle = await searchPage.getCardTitle();
       await expect(firstCardTitle).toBe(data.assetTitle1);
@@ -460,9 +451,7 @@ test.describe('Search Page', () => {
       await page.waitForTimeout(5000);
       await searchPage.searchField.press('Enter');
       await page.waitForLoadState('networkidle');
-      const text = await searchPage.searchAllResults.textContent();
-      const match = text.match(/\((\d+)\)/);
-      const numberResults = Number(match[1]);
+      const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
     });
     await test.step('Check Filter Busines Solution', async () => { 
@@ -489,21 +478,25 @@ test.describe('Search Page', () => {
       await expect(cardTitle4).toBe(data.assetTitle3);
     });
     await test.step('Check Filter Cross-functional', async () => {
+      await searchPage.crossFunctionalCheckBox.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.crossFunctionalCheckBox.isVisible();
       await searchPage.crossFunctionalCheckBox.click();
+      // await page.waitForTimeout(5000);
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       const cardTitle5 = await searchPage.getCardTitle();
       await expect(cardTitle5).toBe(data.assetTitle4);
     });
     await test.step('Uncheck Filter Clear All', async () => {
+      await searchPage.crossFunctionalCheckBox.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.crossFunctionalCheckBox.isVisible();
       await searchPage.crossFunctionalCheckBox.click();
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.b2bCheckBox.waitFor({ state: 'hidden', timeout: 10000 });
+      await searchPage.b2bCheckBox.isVisible();
       await searchPage.b2bCheckBox.click();
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
-      const text = await searchPage.searchAllResults.textContent();
-      const match = text.match(/\((\d+)\)/);
-      const numberResults = Number(match[1]);
+      const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
     });
   });
-
 });

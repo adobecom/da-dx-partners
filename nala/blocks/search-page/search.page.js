@@ -88,4 +88,11 @@ export default class SearchPage {
     const href = await buttonLink.getAttribute('href');
     expect(href).toBe(expectedUrl);
   }
+
+  async getNumberOfResults() {
+    const text = await this.searchAllResults.textContent();
+    const match = text.match(/\((\d+)\)/);
+    const numberResults = Number(match[1]);
+    return numberResults;
+  }
 }
