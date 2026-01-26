@@ -1179,6 +1179,10 @@ export const singlePartnerCardStyles = css`
     -webkit-line-clamp: 3;
   }
 
+  .card-description * {
+    margin: 0;
+  }
+
   .single-partner-card .card-footer {
     display: flex;
     justify-content: space-between;
