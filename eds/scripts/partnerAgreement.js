@@ -46,7 +46,7 @@ async function acceptAgreement(agreementTextContainer, successMessage, errorMess
           new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
         );
       }, 2000);
-      handleRedirects(agreementRedirectDomains);
+        handleRedirects(agreementRedirectDomains);
     } else {
         spinner.innerHTML = errorMessage;
     }
