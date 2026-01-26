@@ -40,7 +40,9 @@ export default class SearchPage {
   }
 
   async getCardTitle() {
-    const titleText = (await this.cardTilte.textContent()).trim();
+    await this.cardTilte.first().waitFor({ state: 'visible', timeout: 15000 });
+    await expect(this.cardTilte.first()).not.toHaveText('', { timeout: 15000 });
+    const titleText = (await this.cardTilte.first().textContent())?.trim() ?? '';
     return titleText;
   }
 
@@ -87,5 +89,17 @@ export default class SearchPage {
     await expect(buttonLink).toBeVisible();
     const href = await buttonLink.getAttribute('href');
     expect(href).toBe(expectedUrl);
+  }
+
+  async getNumberOfResults() {
+    const text = await this.searchAllResults.textContent();
+    const match = text.match(/\((\d+)\)/);
+    const numberResults = Number(match[1]);
+    return numberResults;
+  }
+
+  async waitForResultsToSettle() {
+    await this.loader.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
+    await this.loader.waitFor({ state: 'hidden', timeout: 15000 });
   }
 }
