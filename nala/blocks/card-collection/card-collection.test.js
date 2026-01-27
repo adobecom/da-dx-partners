@@ -165,6 +165,7 @@ test.describe('Validate card collection block', () => {
     });
     await test.step('Sort main collection', async () => {
       await cardCollectionPage.clearAll.click();
+      await expect(cardCollectionPage.checkedFilterButton).not.toBeVisible();
       const mainCardTitleBefore = await cardCollectionPage.getFirstCardMainCollection();
       const additionalCardTitleBefore = await cardCollectionPage.getFirstCardAdditionalCollection();
 
