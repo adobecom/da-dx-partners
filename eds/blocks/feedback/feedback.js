@@ -1,6 +1,9 @@
 import { getCurrentProgramType, getPartnerCookieObject, partnerIsSignedIn, getLibs, prodHosts } from '../../scripts/utils.js';
 import { getConfig } from '../utils/utils.js';
 
+const miloLibs = getLibs();
+const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
+
 function showToast(success, onTryAgain, config) {
   const existingToast = document.querySelector('.feedback-toast');
   if (existingToast) existingToast.remove();
@@ -71,6 +74,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   feedbackButton.classList.add('hidden');
   const feedbackDialog = document.createElement('div');
   feedbackDialog.className = 'feedback-dialog';
+  feedbackDialog.setAttribute('daa-lh', 'Feedback Dialog');
   const dialogBody = document.createElement('div');
   dialogBody.className = 'feedback-dialog-body';
   const title = document.createElement('h4');
@@ -158,8 +162,10 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   const cancelButton = document.createElement('button');
   cancelButton.className = 'feedback-dialog-button secondary-cta';
   cancelButton.textContent = config.cancel;
+  cancelButton.setAttribute('daa-ll', processTrackingLabels(config.cancel, getConfig(), 30));
   sendButton.className = 'feedback-dialog-button cta';
   sendButton.textContent = config.send;
+  sendButton.setAttribute('daa-ll', processTrackingLabels(config.send, getConfig(), 30));
   sendButton.disabled = config.savedRating === 0;
   const closeDialog = () => {
     feedbackDialog.remove();
@@ -255,8 +261,6 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
 export default async function init(el) {
   const formDefinitionUrl = el.querySelector('a[href$="feedback-definition.json"]');
 
-  const miloLibs = getLibs();
-
   await Promise.all([
     import(`${miloLibs}/features/spectrum-web-components/dist/theme.js`),
     import(`${miloLibs}/features/spectrum-web-components/dist/button.js`),
@@ -317,9 +321,11 @@ export default async function init(el) {
 
   const app = document.createElement('div');
   app.className = 'feedback-mechanism';
+  app.setAttribute('daa-lh', 'Feedback');
   const stickyFeedbackButton = document.createElement('button');
   stickyFeedbackButton.className = 'sticky-feedback-button sticky-cta';
   stickyFeedbackButton.textContent = config.feedbackStickyButton;
+  stickyFeedbackButton.setAttribute('daa-ll', processTrackingLabels(config.feedbackStickyButton, getConfig(), 30));
   app.appendChild(stickyFeedbackButton);
   stickyFeedbackButton.addEventListener('click', () => renderDialog(stickyFeedbackButton, url, config));
   el.replaceWith(app);
