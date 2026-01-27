@@ -43,7 +43,7 @@ export default class SmokeTest {
     this.firstFilterList = page.locator('.filter').first().locator('.filter-list');
     this.firstFilterCheckbox = page.locator('.filter').first().locator('sp-checkbox').first();
     this.jarvisChatButton = page.getByRole('button', { name: 'Chat with us' });
-    this.jarvisChatPanel = page.locator('iframe[title="Adobe Virtual Assistant"]').contentFrame().getByText('We\'re here to help.');
+    this.jarvisChatPanel = page.frameLocator('iframe[title="Adobe Virtual Assistant"]').getByText("We're here to help.");
     this.searchCardsCollection = page.locator('.partner-cards-collection');
   }
 
