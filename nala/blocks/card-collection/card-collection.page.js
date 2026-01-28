@@ -29,6 +29,7 @@ export default class CardCollectionPage {
     this.productFilterPanel = page.getByRole('list').filter({ hasText: 'After Effects Bridge InDesign' });
     this.industryFilter = page.getByRole('button', { name: 'Industry' });
     this.industryFilterPanel = page.getByRole('list').filter({ hasText: 'Media & Entertainment Retail' });
+    this.checkedFilterButton = page.getByRole('button', { name: 'Media & Entertainment' });
   }
 
   filterCheckbox(role, name) {
