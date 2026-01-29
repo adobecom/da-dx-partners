@@ -5,7 +5,7 @@ export default {
       tcid: '1',
       name: '@login-redirect-to-protected-home',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
         expectedProtectedURL: '/digitalexperience/drafts/automation/regression/protected-home',
@@ -16,7 +16,7 @@ export default {
       tcid: '2',
       name: '@login-redirection-to-spp-gold-page',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/gold/gold-page',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-gold:',
         expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/gold/gold-page',
@@ -27,7 +27,7 @@ export default {
       name: '@login-accessing-public-home-page-with-member-user-logged-in-to-adobe',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
       baseURL: 'http://www.stage.adobe.com?akamaiLocale=us',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-community:',
         expectedProtectedURL: '/digitalexperience/drafts/automation/regression/protected-home',
@@ -38,7 +38,7 @@ export default {
       name: '@login-accessing-restricted-home-page-with-member-user-logged-in-to-adobe',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
       baseURL: 'http://www.stage.adobe.com?akamaiLocale=us',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
         expectedProtectedURL: '/digitalexperience/drafts/automation/regression/protected-home',
@@ -49,7 +49,7 @@ export default {
       name: '@login-accessing-public-page-with-non-member-user-logged-in-to-adobe',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
       baseURL: 'http://www.stage.adobe.com?akamaiLocale=us',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'cpp-distributor-india:',
         expectedProtectedURL: '/digitalexperience/drafts/automation/regression/public-page',
@@ -60,7 +60,7 @@ export default {
       name: '@login-accessing-protected-page-with-non-member-user-logged-in-to-adobe',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
       baseURL: 'http://www.stage.adobe.com?akamaiLocale=us',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'cpp-distributor-india:',
         expectedProtectedURL: '/digitalexperience/error/contact-not-found',
@@ -70,7 +70,7 @@ export default {
       tcid: '7',
       name: '@login-accessing-publick-page-with-non-member-user',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'cpp-distributor-india:',
         expectedToSeeInURL: '/digitalexperience/error/contact-not-found',
@@ -81,7 +81,7 @@ export default {
       name: '@login-accessing-protected-page-with-non-member-user-logged-in-partner-portal',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
       protectedPageUrl: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/protected-home',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'cpp-distributor-india:',
         expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/protected-home',
@@ -91,7 +91,7 @@ export default {
       tcid: '9',
       name: '@error-flow-abandoned-user-case',
       path: ' https://partners.stage.adobe.com/digitalexperience/',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-abandoned:',
         expectedToSeeInURL: '/digitalexperience/error/account-inactive',
@@ -101,7 +101,7 @@ export default {
       tcid: '10',
       name: '@error-flow-terminated-user-case',
       path: ' https://partners.stage.adobe.com/digitalexperience/',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-terminated:',
         expectedToSeeInURL: '/digitalexperience/error/ineligible',
@@ -111,7 +111,7 @@ export default {
       tcid: '11',
       name: '@error-flow-rejected-user-case',
       path: ' https://partners.stage.adobe.com/digitalexperience/',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-rejected:',
         expectedToSeeInURL: '/digitalexperience/error/decline',
@@ -121,7 +121,7 @@ export default {
       tcid: '12',
       name: '@error-flow-non-member-user-case',
       path: ' https://partners.stage.adobe.com/digitalexperience/',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'cpp-distributor-india:',
         expectedToSeeInURL: '/digitalexperience/error/contact-not-found',
@@ -131,7 +131,7 @@ export default {
       tcid: '13',
       name: '@error-flow-404-user-case',
       path: ' https://partners.stage.adobe.com/digitalexperience/home-page',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-gold:',
         expectedToSeeInURL: '/digitalexperience/home-page',
@@ -141,7 +141,7 @@ export default {
       tcid: '14',
       name: '@login-redirection-to-spp-platinum-page-forbidden-access',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/platinum/platinum-page',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-gold:',
         expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/platinum/platinum-page',
@@ -151,7 +151,7 @@ export default {
       tcid: '15',
       name: '@login-redirection-to-spp-gold-page-forbidden-access',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/gold/gold-page',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'spp-silver:',
         expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/gold/gold-page',
@@ -161,7 +161,7 @@ export default {
       tcid: '16',
       name: '@login-redirection-to-platinum-page-folder',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/platinum/platinum-page',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
         expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/platinum/platinum-page',
@@ -171,7 +171,7 @@ export default {
       tcid: '17',
       name: '@login-redirection-to-silver-page-folder',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/silver/silver-page',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-silver:',
         expectedToSeeInURL: '/digitalexperience/drafts/automation/regression/silver/silver-page',
@@ -181,7 +181,7 @@ export default {
       tcid: '18',
       name: '@double-access-protected-page-with-non-member-user',
       path: 'https://partners.stage.adobe.com/digitalexperience/drafts/automation/regression/public-page',
-      tags: '@da-dx-signin @regression @circleCi',
+//       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'cpp-distributor-india:',
         expectedToContactNotFoundInURL: '/digitalexperience/error/contact-not-found#',

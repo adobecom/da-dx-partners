@@ -5,7 +5,7 @@ export default {
       tcid: '1',
       name: '@card-collection-no-tags-configured',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-tags1',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         keyword: 'cardcollection',
         cardTitle1: 'Cardcollection Quiz Analyst card',
@@ -21,7 +21,7 @@ export default {
       tcid: '2',
       name: '@card-collection-one-tag-configured',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-tags2',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         cardTitle1: 'Cardcollection All Tags card',
         cardTitle2: 'Cardcollection Retail-Decision-maker card',
@@ -31,7 +31,7 @@ export default {
       tcid: '3',
       name: '@card-collection-and-logic',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-tags3',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         cardTitle1: 'Cardcollection All Tags card',
         cardTitle2: 'Cardcollection Story-Services-IT card',
@@ -43,7 +43,7 @@ export default {
       tcid: '4',
       name: '@card-collection-or-logic',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-tags4',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         cardTitle1: 'Cardcollection All Tags card',
         cardTitle2: 'Cardcollection Healthcare-Video card',
@@ -53,7 +53,7 @@ export default {
       tcid: '5',
       name: '@card-collection-and-or-logic',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-tags5',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         cardTitle1: 'Cardcollection Quiz Analyst card',
         cardTitle2: 'Cardcollection All Tags card',
@@ -64,13 +64,13 @@ export default {
       tcid: '6',
       name: '@card-collection-card-collection-page-without-cards',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-tags6',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
     },
     {
       tcid: '7',
       name: '@multiple-card-collections-on-one-page',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/multiple-collections-on-page',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         keyword: 'Multiplecollectionstestcard',
         cardTitle1: 'Cardforfiltertest 1',
@@ -85,7 +85,7 @@ export default {
       tcid: '8',
       name: '@card-collection-mutually-exclusive-filters-across-groups',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-filters1',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         keyword: 'Cardforfiltertest',
         numberOfFilteredCards: 11,
@@ -105,7 +105,7 @@ export default {
       tcid: '9',
       name: '@card-collection-or-logic-inside-same-group',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-filters1',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         keyword: 'Cardforfiltertest',
         numberOfFilteredCards: 1,
@@ -123,7 +123,7 @@ export default {
       tcid: '10',
       name: '@card-collection-removing-one-of-several-active-filters',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-filters1',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         numberOfFilteredCards: 5,
         topicWorkFromAnywhere: 2,
@@ -139,7 +139,7 @@ export default {
       tcid: '11',
       name: '@card-collection-duplicate-tag-handling',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-filters1',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         numberOfFilteredCards: 1,
         partnerConfidential: 1,
@@ -160,7 +160,7 @@ export default {
       tcid: '12',
       name: '@card-collection-overlapping-filters-inside-one-group',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-filters1',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         numberOfFilteredCards: 5,
         audienceEnterpriseResult: 5,
@@ -181,7 +181,7 @@ export default {
       tcid: '13',
       name: '@card-collection-data-filter-test-case',
       path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-date',
-      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+//       tags: '@da-dx-card-collection @regression @circleCi @anonymous',
       data: {
         keyword: 'Datefiltertestcard',
         numberOfSearcheddCards: 3,
