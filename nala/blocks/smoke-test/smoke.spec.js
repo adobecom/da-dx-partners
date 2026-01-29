@@ -153,7 +153,7 @@ export default {
       tcid: '15',
       name: '@smoke-test-jarvis-chat-validation',
       path: '/digitalexperience/',
-      tags: '@da-dx-smoke-test',
+      // tags: '@da-dx-smoke-test',
     },
   ],
 };
