@@ -27,8 +27,7 @@ test.describe('Search Page', () => {
       await expect(searchPage.searchField).toBeVisible();
       await searchPage.searchField.fill(data.searchKeyword);
       await searchPage.searchField.press('Enter');
-      await page.waitForTimeout(5000);
-
+      await searchPage.waitForResultsToSettle();
       await searchPage.searchAllResults.waitFor({ state: 'visible' });
       const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(6);
@@ -66,7 +65,7 @@ test.describe('Search Page', () => {
     const { data } = features[1];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[1].path}`);
-      await page.waitForLoadState('networkidle');
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
@@ -80,8 +79,7 @@ test.describe('Search Page', () => {
     });
     await test.step('Check Filter Journey Phase Explore', async () => {
       await searchPage.journeyPhaseFilter.click();
-      await searchPage.waitForResultsToSettle();
-
+      await searchPage.journeyPhaseFilterPanel.waitFor({ state: 'visible', timeout: 30000 });
       await searchPage.exploreCheckBox.click();
       await expect(searchPage.exploreCheckBox).toBeChecked();
       await searchPage.waitForResultsToSettle();
@@ -90,16 +88,18 @@ test.describe('Search Page', () => {
       await expect(firstCardTitle).toBe(data.assetTitle1);
     });
     await test.step('Check Filter Journey Phase Discover', async () => {
-      await searchPage.discoverCheckBox.click({ force: true });
-      await searchPage.waitForResultsToSettle();
+      await searchPage.discoverCheckBox.click();
       await expect(searchPage.discoverCheckBox).toBeChecked();
+      await searchPage.waitForResultsToSettle();
+      await searchPage.waitForNumberOfResults(2);
       const cardTitle2 = await searchPage.getCardTitle();
       await expect(cardTitle2).toBe(data.assetTitle2);
     });
     await test.step('Check Filter Functionality Analysis & Insights', async () => { 
       await searchPage.functionalityFilter.click();
-      await searchPage.waitForResultsToSettle();
+      await searchPage.functionalityFilterPanel.waitFor({ state: 'visible', timeout: 30000 });
       await searchPage.analysisInsgightCheckBox.click();
+      await expect(searchPage.analysisInsgightCheckBox).toBeChecked();
       await searchPage.waitForResultsToSettle();
       const cardTitle3 = await searchPage.getCardTitle();
       await expect(cardTitle3).toBe(data.assetTitle2);
@@ -432,7 +432,6 @@ test.describe('Search Page', () => {
         searchPage.trainingPreviewButton.click()
       ]);
 
-      // Wait for URL to contain the expected training link after all redirects complete
       await newPage.waitForURL((url) => url.toString().includes(data.trainingLink), { timeout: 30000 });
 
       const newPageUrl = newPage.url();
@@ -485,7 +484,9 @@ test.describe('Search Page', () => {
       await searchPage.crossFunctionalCheckBox.waitFor({ state: 'visible', timeout: 10000 });
       await searchPage.crossFunctionalCheckBox.isVisible();
       await searchPage.crossFunctionalCheckBox.click();
+      await expect(searchPage.crossFunctionalCheckBox).toBeChecked();
       await searchPage.waitForResultsToSettle();
+      await searchPage.waitForNumberOfResults(2);
       const cardTitle5 = await searchPage.getCardTitle();
       await expect(cardTitle5).toBe(data.assetTitle4);
     });
@@ -498,6 +499,7 @@ test.describe('Search Page', () => {
       await searchPage.b2bCheckBox.isVisible();
       await searchPage.b2bCheckBox.click();
       await searchPage.waitForResultsToSettle();
+      await searchPage.waitForNumberOfResults(4);
       const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
     });

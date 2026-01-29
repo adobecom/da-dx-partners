@@ -37,6 +37,8 @@ export default class SearchPage {
     this.loader = page.locator('.progress-circle-wrapper');
     this.clearAll = page.getByRole('button', { name: 'Clear all' });
     this.oneTrustBanner = page.getByRole('button', { name: 'Enable all' });
+    this.journeyPhaseFilterPanel = page.getByRole('list').filter({ hasText: 'Discover Explore Evaluate Use' });
+    this.functionalityFilterPanel = page.getByRole('list').filter({ hasText: 'Data Activation Analysis &' });
   }
 
   async getCardTitle() {
@@ -98,8 +100,20 @@ export default class SearchPage {
     return numberResults;
   }
 
+  async waitForNumberOfResults(expectedMin, timeout = 30_000) {
+    await expect
+      .poll(
+        async () => {
+          const text = await this.searchAllResults.textContent();
+          const match = text?.match(/\((\d+)\)/);
+          return match ? Number(match[1]) : 0;
+        },
+        { timeout }
+      )
+      .toBeGreaterThanOrEqual(expectedMin);
+  }
+
   async waitForResultsToSettle() {
-    await this.loader.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
-    await this.loader.waitFor({ state: 'hidden', timeout: 15000 });
+    await this.loader.waitFor({ state: 'hidden', timeout: 30000 });
   }
 }
