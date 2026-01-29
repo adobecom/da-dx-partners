@@ -68,7 +68,7 @@ export const assetPreviewStyles = css`
     display: flex;
     max-width: 1200px;
     gap: 24px;
-    margin: 24px auto;
+    margin: 24px 0;
     align-items: center;
   }
 
