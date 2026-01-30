@@ -42,6 +42,7 @@ export const assetPreviewStyles = css`
     margin: 0 auto;
     max-width: 1200px;
     gap: 40px;
+    width: 100%;
   }
 
   .asset-preview-block-details-left {
