@@ -12,7 +12,6 @@ export const assetPreviewStyles = css`
     flex-direction: column;
     max-width: 1200px;
     margin: 0 auto;
-    width: 83.4%;
     padding: 24px;
     font-family: 'Adobe Clean', adobe-clean, sans-serif;
   }
@@ -24,7 +23,6 @@ export const assetPreviewStyles = css`
   .asset-preview-block-header {
     width: 100%;
     margin: 0 auto;
-    padding: 80px 0;
     font-size: 44px;
     font-weight: bold;
     line-height: 125%;
@@ -40,14 +38,17 @@ export const assetPreviewStyles = css`
     line-height: 150%; /* 24px */
     display: flex;
     flex-direction: row;
+    align-items: flex-start;
     margin: 0 auto;
-    width: 83.4%;
     max-width: 1200px;
     gap: 40px;
   }
 
   .asset-preview-block-details-left {
     width: 100%;
+  }
+  .asset-preview-block-details-left p:first-of-type {
+    margin-top: 0;
   }
 
   span.asset-preview-block-details-left-label {
@@ -65,10 +66,9 @@ export const assetPreviewStyles = css`
 
   .asset-preview-block-actions {
     display: flex;
-    width: 83.4%;
     max-width: 1200px;
     gap: 24px;
-    margin: 24px auto;
+    margin: 24px 0;
     align-items: center;
   }
 
@@ -127,7 +127,6 @@ export const assetPreviewStyles = css`
   .asset-preview-block-video {
     display: flex;
     margin: 24px auto;
-    width: 83.4%;
   }
   .asset-preview-block-video .video-container.video-holder {
     display: flex;
