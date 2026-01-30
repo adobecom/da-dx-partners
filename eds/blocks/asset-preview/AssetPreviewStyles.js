@@ -62,7 +62,6 @@ export const assetPreviewStyles = css`
   .asset-preview-block-details-right img {
     max-width: 100%;
     height: auto;
-    border: 2px solid purple;
   }
   .asset-preview-block-actions {
     display: flex;
