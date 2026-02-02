@@ -34,7 +34,7 @@ test.describe('Search Page', () => {
     });
     await test.step('Asset Card Content Validation', async () => {
       const card = searchPage.getCardByTitle(data.cardTitle);
-      await card.click();
+      await searchPage.clickCard(card);
 
       const cardDate = searchPage.getCardDateLocator(card);
       await expect(cardDate).toBeVisible();

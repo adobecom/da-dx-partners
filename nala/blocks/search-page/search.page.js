@@ -63,6 +63,14 @@ export default class SearchPage {
     return this.page.locator('.search-card').filter({ hasText: title }).first();
   }
 
+  async clickCard(card, timeout = 15000) {
+    await card.waitFor({ state: 'visible', timeout });
+    await card.scrollIntoViewIfNeeded();
+    await expect(card).toBeVisible({ timeout });
+    await card.click({ timeout });
+    await this.waitForCardToExpand(card, timeout);
+  }
+
   getCardDateLocator(card) {
     return card.locator('.card-date');
   }
@@ -75,9 +83,19 @@ export default class SearchPage {
     return card.locator('.card-tag').filter({ hasText: tagText });
   }
 
+  async waitForCardToExpand(card, timeout = 10000) {
+    await expect.poll(
+      async () => {
+        const classList = await card.evaluate((el) => el.classList.toString());
+        return classList.includes('expanded');
+      },
+      { timeout }
+    ).toBe(true);
+  }
+
   async verifyCardTag(card, tagText) {
     const tag = this.getCardTagByText(card, tagText);
-    await expect(tag).toBeVisible();
+    await expect(tag).toBeVisible({ timeout: 10000 });
     const text = await tag.textContent();
     expect(text.trim()).toBe(tagText);
   }
