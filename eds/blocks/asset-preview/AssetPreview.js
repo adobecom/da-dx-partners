@@ -195,6 +195,13 @@ export default class AssetPreview extends LitElement {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  _handleImgError = (e) => {
+    console.log('error', e);
+    const img = e.currentTarget;
+    img.src = transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH);
+  };
+
   render() {
     return html`<div class="asset-preview-block-container" daa-lh="Asset preview container | ${this.title}">
       ${this.assetHasData && !this.isLoading ? html`
@@ -207,17 +214,8 @@ export default class AssetPreview extends LitElement {
               ${this.getTagsTitlesString(this.fileFormatTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Type}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.fileFormatTags))}</p>` : ''}
               ${this.getTagsTitlesString(this.tags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Tags}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.tags))}</p>` : ''}
               ${this.size ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span class="bold">${unsafeHTML(this.size)}</p>` : ''}
-            </div>
-            <div class="asset-preview-block-details-right"
-                 style="background-image:
-                  url(${transformCardUrl(this.previewImage)}),
-                   url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})"
-            >
-            </div>
-         </div>
-         
-         
-          ${!this.isRestrictedAssetForUser() ? html`
+
+              ${!this.isRestrictedAssetForUser() ? html`
               <div class="asset-preview-block-actions" daa-lh="Asset preview block actions">
               ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button
                 class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}" daa-ll="View"> View </a></button>` : ''}
@@ -229,6 +227,13 @@ export default class AssetPreview extends LitElement {
               ${this.backButtonUrl ? html`<a
                 class="link" href="${this.backButtonUrl}" daa-ll="${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
               </div>` : ''}
+            </div>
+            <div class="asset-preview-block-details-right">
+                    <img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>
+            </div>
+         </div>
+         
+
   
         ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
         <div class="asset-preview-block-video">

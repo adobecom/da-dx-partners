@@ -46,7 +46,7 @@ export const assetPreviewStyles = css`
   }
 
   .asset-preview-block-details-left {
-    width: 100%;
+    flex: 1;
   }
   .asset-preview-block-details-left p:first-of-type {
     margin-top: 0;
@@ -57,21 +57,20 @@ export const assetPreviewStyles = css`
   }
 
   .asset-preview-block-details-right {
-    width: 100%;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    background-size: contain;
-    aspect-ratio: 16/9;
-    max-width: 600px;
+    flex: 1;
   }
-
+  .asset-preview-block-details-right img {
+    max-width: 100%;
+    height: auto;
+  }
   .asset-preview-block-actions {
     display: flex;
     max-width: 1200px;
     gap: 24px;
     margin: 24px 0;
     align-items: center;
-  }
+    flex-wrap: wrap;
+ }
 
   .asset-preview-block-actions button {
     border: 2px solid ${black};
@@ -185,7 +184,7 @@ export const assetPreviewStyles = css`
   }
 
   @media screen and (max-width: 600px) {
-    .asset-preview-block-actions, .asset-preview-block-details {
+    .asset-preview-block-details {
       flex-direction: column;
     }
 
