@@ -16,7 +16,7 @@ test.describe('Search Page', () => {
     const { data } = features[0];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[0].path}`);
-      await page.waitForLoadState('networkidle');
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 15000 });
       await signInPage.signInButton.click();
     });
     await test.step('Sign in', async () => {
@@ -124,12 +124,10 @@ test.describe('Search Page', () => {
     const { data } = features[2];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[2].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Verify asset details', async () => {
-      await expect(searchPage.assetTitlePreview).toBeVisible();
-      const assetTitle = await searchPage.assetTitlePreview.textContent();
-      await expect(assetTitle).toBe(data.assetTitle);
+      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
       // asset date
       await expect(searchPage.assetDate).toBeVisible();
       const assetDate = await searchPage.assetDate.textContent();
@@ -175,12 +173,10 @@ test.describe('Search Page', () => {
     const { data } = features[3];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[3].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Verify asset details', async () => {
-      await expect(searchPage.assetTitlePreview).toBeVisible();
-      const assetTitle = await searchPage.assetTitlePreview.textContent();
-      await expect(assetTitle).toBe(data.assetTitle);
+      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
       // asset date
       await expect(searchPage.assetDate).toBeVisible();
       const assetDate = await searchPage.assetDate.textContent();
@@ -220,16 +216,15 @@ test.describe('Search Page', () => {
     });
     await test.step('Search All Assets', async () => {
       await searchPage.searchAllAssetsButton.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       const currentUrl = page.url();
       await expect(currentUrl).toContain(data.searchAllAssetsPath);
     });
     await test.step('Go to Gold Asset', async () => {
       await page.goto(`${data.goldAssetLink}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await expect(searchPage.assetTitlePreview).toBeVisible();
-      const assetTitle = await searchPage.assetTitlePreview.textContent();
-      await expect(assetTitle).toBe(data.asssetPreviewTitle);
+      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.asssetPreviewTitle, { timeout: 15000 });
 
       await expect(searchPage.downloadAssetButton).toBeHidden();
     });
@@ -238,12 +233,11 @@ test.describe('Search Page', () => {
     const { data } = features[4];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[4].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Verify asset details without login', async () => {
       await expect(searchPage.assetTitlePreview).toBeVisible();
-      const assetTitle = await searchPage.assetTitlePreview.textContent();
-      await expect(assetTitle).toBe(data.assetTitle);
+      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
       await expect(searchPage.downloadPPTButton).toBeHidden();
 
       // asset date
@@ -284,15 +278,14 @@ test.describe('Search Page', () => {
     const { data } = features[5];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[5].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
     await test.step('Verify asset details without login', async () => {
       await expect(searchPage.assetTitlePreview).toBeVisible();
-      const assetTitle = await searchPage.assetTitlePreview.textContent();
-      await expect(assetTitle).toBe(data.assetTitle);
+      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
       await expect(searchPage.downloadPPTButton).toBeHidden();
 
       // asset date
@@ -330,15 +323,14 @@ test.describe('Search Page', () => {
     const { data } = features[6];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[6].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
     await test.step('Verify asset details without login', async () => {
       await expect(searchPage.assetTitlePreview).toBeVisible();
-      const assetTitle = await searchPage.assetTitlePreview.textContent();
-      await expect(assetTitle).toBe(data.assetTitle);
+      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
       await expect(searchPage.downloadPPTButton).toBeHidden();
 
       // asset date
@@ -374,15 +366,14 @@ test.describe('Search Page', () => {
     const { data } = features[7];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[7].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
     await test.step('Verify asset details', async () => {
       await expect(searchPage.assetTitlePreview).toBeVisible();
-      const assetTitle = await searchPage.assetTitlePreview.textContent();
-      await expect(assetTitle).toBe(data.assetTitle);
+      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
       await expect(searchPage.downloadPPTButton).toBeHidden();
 
       // asset date
@@ -418,7 +409,7 @@ test.describe('Search Page', () => {
     const { data } = features[8];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[8].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
@@ -443,7 +434,7 @@ test.describe('Search Page', () => {
     const { data } = features[9];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[9].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
@@ -453,7 +444,7 @@ test.describe('Search Page', () => {
       await page.waitForTimeout(5000);
       await searchPage.searchField.press('Enter');
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
     });
@@ -475,7 +466,7 @@ test.describe('Search Page', () => {
       await searchPage.functionalityFilter.click();
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
 
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const cardTitle4 = await searchPage.getCardTitle();
       await expect(cardTitle4).toBe(data.assetTitle3);
