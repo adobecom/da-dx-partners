@@ -118,7 +118,7 @@ function preloadLit(miloLibs) {
 
 export function getProgramType(path) {
   switch (true) {
-    case /\/(digitalexperience|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return DX_PROGRAM_TYPE;
+    case /\/(digitalexperience|digitalexperience-assets|eds|directory|join|self-service-forms\/definition)\//.test(path) || /^\/(directory|join|)$/.test(path): return DX_PROGRAM_TYPE;
     case /channelpartners/.test(path): return 'cpp';
     case /channelpartnerassets/.test(path): return 'cpp';
     default: return '';
@@ -244,13 +244,13 @@ export function getPartnerCookieObject(programType) {
 
   const partnerDataObj = partnerDataCookie ? JSON.parse(decodeURIComponent(partnerDataCookie)) : {};
   const partnerInfoObj = partnerInfoCookie ? JSON.parse(decodeURIComponent(partnerInfoCookie)) : {};
-  
+
   const programKey = programType.toUpperCase();
   const portalData = {
     ...(partnerDataObj?.[programKey] ?? {}),
     ...partnerInfoObj
   };
-  
+
   return portalData;
 }
 
