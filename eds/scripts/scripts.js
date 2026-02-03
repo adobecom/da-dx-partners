@@ -57,7 +57,7 @@ let CONFIG = {
     marTechUrl:
       'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-f10da6991680-staging.min.js',
   },
-  prod: { },
+  prod: { marTechUrl: 'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-78b077e5ada7.min.js' },
 };
 
 (function removePartnerLoginQuery() {
