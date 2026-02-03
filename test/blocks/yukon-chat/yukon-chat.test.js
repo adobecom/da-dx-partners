@@ -488,5 +488,49 @@ describe('yukon-chat block', () => {
       expect(sendButton.hasAttribute('disabled')).to.be.false;
       expect(textarea.hasAttribute('disabled')).to.be.false;
     });
+    it('should render multiple links with target="_blank" in AI responses', async () => {
+      const encoder = new TextEncoder();
+      const responseWithLinks = 'Visit [Adobe](https://adobe.com) and [Partners Portal](https://partners.adobe.com).';
+      const chunk = encoder.encode(`data: [{"generated_text":"${responseWithLinks}"}]\n`);
+
+      fetchStub.callsFake(async () => ({
+        ok: true,
+        status: 200,
+        body: new ReadableStream({
+          start(controller) {
+            controller.enqueue(chunk);
+            controller.close();
+          },
+        }),
+      }));
+
+      const block = document.querySelector('.yukon-chat');
+      await init(block);
+
+      const textarea = document.querySelector('#yc-input-field');
+      const sendButton = document.querySelector('.yc-input-field-button');
+
+      textarea.value = 'Show me links';
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+      sendButton.click();
+
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((r) => setTimeout(r, 100));
+
+      const modal = document.querySelector('#yukon-chat-modal');
+      expect(modal).to.exist;
+
+      const yukonMessage = modal.querySelector('.yukon-message .message-text');
+      expect(yukonMessage).to.exist;
+
+      // check all links have target="_blank"
+      const links = yukonMessage.querySelectorAll('a');
+      expect(links.length).to.equal(2);
+
+      links.forEach((link) => {
+        expect(link.getAttribute('target')).to.equal('_blank');
+      });
+    })
   });
 });
