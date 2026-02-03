@@ -516,6 +516,85 @@ describe('SearchCards Unit Tests', () => {
       expect(searchComponent.searchTerm).to.equal('analytics');
       expect(debouncedSpy.called).to.be.true;
     });
+
+    it('should truncate search input when exceeding max length (500 characters)', () => {
+      const debouncedSpy = sinon.spy();
+      searchComponent.debouncedUpdateTypeahead = debouncedSpy;
+      
+      // Create a string longer than 500 characters
+      const longString = 'a'.repeat(600);
+      const event = { target: { value: longString } };
+      
+      searchComponent.onSearchInput(event);
+      
+      // Should be truncated to exactly 500 characters
+      expect(searchComponent.searchTerm).to.have.lengthOf(500);
+      expect(searchComponent.searchTerm).to.equal('a'.repeat(500));
+      expect(event.target.value).to.equal('a'.repeat(500));
+      expect(debouncedSpy.called).to.be.true;
+    });
+
+    it('should not truncate search input when under max length', () => {
+      const debouncedSpy = sinon.spy();
+      searchComponent.debouncedUpdateTypeahead = debouncedSpy;
+      
+      // Create a string exactly at 500 characters
+      const maxLengthString = 'b'.repeat(500);
+      const event = { target: { value: maxLengthString } };
+      
+      searchComponent.onSearchInput(event);
+      
+      expect(searchComponent.searchTerm).to.have.lengthOf(500);
+      expect(searchComponent.searchTerm).to.equal(maxLengthString);
+      expect(debouncedSpy.called).to.be.true;
+    });
+
+    it('should handle exact boundary case at 501 characters', () => {
+      const debouncedSpy = sinon.spy();
+      searchComponent.debouncedUpdateTypeahead = debouncedSpy;
+      
+      // Create a string just over the limit
+      const overLimitString = 'c'.repeat(501);
+      const event = { target: { value: overLimitString } };
+      
+      searchComponent.onSearchInput(event);
+      
+      // Should be truncated to exactly 500
+      expect(searchComponent.searchTerm).to.have.lengthOf(500);
+      expect(event.target.value).to.equal('c'.repeat(500));
+      expect(debouncedSpy.called).to.be.true;
+    });
+
+    it('should truncate very long search input (8260 characters)', () => {
+      const debouncedSpy = sinon.spy();
+      searchComponent.debouncedUpdateTypeahead = debouncedSpy;
+      
+      // Simulate the actual bug scenario with 8260 characters
+      const veryLongString = 'Lorem ipsum '.repeat(688); // Creates ~8256 chars
+      const event = { target: { value: veryLongString } };
+      
+      searchComponent.onSearchInput(event);
+      
+      // Should be truncated to 500 characters
+      expect(searchComponent.searchTerm).to.have.lengthOf(500);
+      expect(event.target.value).to.have.lengthOf(500);
+      expect(debouncedSpy.called).to.be.true;
+    });
+
+    it('should preserve special characters when truncating', () => {
+      const debouncedSpy = sinon.spy();
+      searchComponent.debouncedUpdateTypeahead = debouncedSpy;
+      
+      // String with special characters that exceeds limit
+      const specialCharsString = 'test@#$%^&*()_+-=[]{}|;:\'",.<>?/~`'.repeat(20); // ~680 chars
+      const event = { target: { value: specialCharsString } };
+      
+      searchComponent.onSearchInput(event);
+      
+      expect(searchComponent.searchTerm).to.have.lengthOf(500);
+      expect(searchComponent.searchTerm).to.equal(specialCharsString.substring(0, 500));
+      expect(debouncedSpy.called).to.be.true;
+    });
   });
 
   describe('updateTypeaheadDialog', () => {

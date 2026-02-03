@@ -9,6 +9,7 @@ const miloLibs = getLibs();
 const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 const SEE_ALL = 'SEE_ALL';
+const MAX_SEARCH_LENGTH = 500;
 
 export default class Search extends PartnerCards {
   static styles = [
@@ -62,7 +63,12 @@ export default class Search extends PartnerCards {
   }
 
   onSearchInput(event) {
-    this.searchTerm = event.target.value;
+    let inputValue = event.target.value;
+    if (inputValue.length > MAX_SEARCH_LENGTH) {
+      inputValue = inputValue.substring(0, MAX_SEARCH_LENGTH);
+      event.target.value = inputValue;
+    }
+    this.searchTerm = inputValue;
 
     // Handle empty input
     if (!this.searchTerm) {
