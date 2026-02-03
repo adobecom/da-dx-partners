@@ -8,6 +8,27 @@ async function initMarkdownIt() {
       breaks: true,
       linkify: true,
     });
+
+    // Force links to open in a new tab
+    // eslint-disable-next-line func-names,max-len
+    const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
+      return self.renderToken(tokens, idx, options);
+    };
+
+    // add target="_blank"
+    // eslint-disable-next-line func-names
+    md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+      const token = tokens[idx];
+
+      const targetIndex = token.attrIndex('target');
+      if (targetIndex < 0) {
+        token.attrPush(['target', '_blank']);
+      } else {
+        token.attrs[targetIndex][1] = '_blank';
+      }
+
+      return defaultRender(tokens, idx, options, env, self);
+    };
   }
   return md;
 }
