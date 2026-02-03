@@ -39,6 +39,7 @@ imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STA
 let CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
+  useDotHtml: false,
   imsClientId,
   clientEnv: isProd ? 'prod' : null,
   // geoRouting: 'off',
