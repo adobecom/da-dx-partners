@@ -761,7 +761,7 @@ export default class PartnerCards extends LitElement {
       url.search = '';
     }
 
-    window.history.pushState({}, '', url);
+    window.history.replaceState({}, '', url);
   }
 
   handleTag(event, tag, filterKey) {
