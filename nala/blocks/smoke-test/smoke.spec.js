@@ -54,7 +54,7 @@ export default {
       tcid: '5',
       name: '@smoke-test-find-a-partner-validation',
       path: '/digitalexperience/?georouting=off&martech=off',
-      // tags: '@da-dx-smoke-test',
+      tags: '@da-dx-smoke-test',
       data: {
         findAPartnerUrl: '/s/directory/solution',
       }

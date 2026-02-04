@@ -225,7 +225,7 @@ test.describe('Validate Partner Directory pages', () => {
       const currentPageUrl = page.url();
       expect(currentPageUrl).toContain(data.contactNotFoundUrl);
 
-      await smokeTest.becomeAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.findAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
     });
   });
   test(`${features[8].name},${features[8].tags}`, async ({ page, baseURL, context }) => {
