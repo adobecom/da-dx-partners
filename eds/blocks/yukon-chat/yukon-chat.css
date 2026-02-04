@@ -171,8 +171,7 @@
 .yc-textarea-grow-wrap {
   flex: 1;
   display: grid;
-  align-items: flex-end;
-  place-items: anchor-center;
+  align-items: center;
 }
 
 .yc-textarea-grow-wrap::after {
@@ -395,7 +394,7 @@
 
 @media (max-width: 768px) {
   .yc-textarea-grow-wrap textarea {
-    padding: 0;
+    padding-left: 0;
   }
 
   .yc-textarea-grow-wrap textarea:placeholder-shown {
