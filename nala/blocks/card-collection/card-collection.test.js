@@ -124,6 +124,7 @@ test.describe('Validate card collection block', () => {
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[5].path}`);
       await page.waitForLoadState('domcontentloaded');
+      await cardCollectionPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await expect(cardCollectionPage.noResults).toBeVisible();
     });
   });
@@ -165,6 +166,7 @@ test.describe('Validate card collection block', () => {
     });
     await test.step('Sort main collection', async () => {
       await cardCollectionPage.clearAll.click();
+      await expect(cardCollectionPage.checkedFilterButton).not.toBeVisible();
       const mainCardTitleBefore = await cardCollectionPage.getFirstCardMainCollection();
       const additionalCardTitleBefore = await cardCollectionPage.getFirstCardAdditionalCollection();
 

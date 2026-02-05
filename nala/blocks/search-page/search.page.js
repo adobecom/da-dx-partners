@@ -37,10 +37,14 @@ export default class SearchPage {
     this.loader = page.locator('.progress-circle-wrapper');
     this.clearAll = page.getByRole('button', { name: 'Clear all' });
     this.oneTrustBanner = page.getByRole('button', { name: 'Enable all' });
+    this.journeyPhaseFilterPanel = page.getByRole('list').filter({ hasText: 'Discover Explore Evaluate Use' });
+    this.functionalityFilterPanel = page.getByRole('list').filter({ hasText: 'Data Activation Analysis &' });
   }
 
   async getCardTitle() {
-    const titleText = (await this.cardTilte.textContent()).trim();
+    await this.cardTilte.first().waitFor({ state: 'visible', timeout: 15000 });
+    await expect(this.cardTilte.first()).not.toHaveText('', { timeout: 15000 });
+    const titleText = (await this.cardTilte.first().textContent())?.trim() ?? '';
     return titleText;
   }
 
@@ -59,6 +63,14 @@ export default class SearchPage {
     return this.page.locator('.search-card').filter({ hasText: title }).first();
   }
 
+  async clickCard(card, timeout = 15000) {
+    await card.waitFor({ state: 'visible', timeout });
+    await card.scrollIntoViewIfNeeded();
+    await expect(card).toBeVisible({ timeout });
+    await card.click({ timeout });
+    await this.waitForCardToExpand(card, timeout);
+  }
+
   getCardDateLocator(card) {
     return card.locator('.card-date');
   }
@@ -71,9 +83,19 @@ export default class SearchPage {
     return card.locator('.card-tag').filter({ hasText: tagText });
   }
 
+  async waitForCardToExpand(card, timeout = 10000) {
+    await expect.poll(
+      async () => {
+        const classList = await card.evaluate((el) => el.classList.toString());
+        return classList.includes('expanded');
+      },
+      { timeout }
+    ).toBe(true);
+  }
+
   async verifyCardTag(card, tagText) {
     const tag = this.getCardTagByText(card, tagText);
-    await expect(tag).toBeVisible();
+    await expect(tag).toBeVisible({ timeout: 10000 });
     const text = await tag.textContent();
     expect(text.trim()).toBe(tagText);
   }
@@ -87,5 +109,29 @@ export default class SearchPage {
     await expect(buttonLink).toBeVisible();
     const href = await buttonLink.getAttribute('href');
     expect(href).toBe(expectedUrl);
+  }
+
+  async getNumberOfResults() {
+    const text = await this.searchAllResults.textContent();
+    const match = text.match(/\((\d+)\)/);
+    const numberResults = Number(match[1]);
+    return numberResults;
+  }
+
+  async waitForNumberOfResults(expectedMin, timeout = 30_000) {
+    await expect
+      .poll(
+        async () => {
+          const text = await this.searchAllResults.textContent();
+          const match = text?.match(/\((\d+)\)/);
+          return match ? Number(match[1]) : 0;
+        },
+        { timeout }
+      )
+      .toBeGreaterThanOrEqual(expectedMin);
+  }
+
+  async waitForResultsToSettle() {
+    await this.loader.waitFor({ state: 'hidden', timeout: 30000 });
   }
 }

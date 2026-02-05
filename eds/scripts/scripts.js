@@ -39,6 +39,7 @@ imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STA
 let CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
+  useDotHtml: false,
   imsClientId,
   clientEnv: isProd ? 'prod' : null,
   // geoRouting: 'off',
@@ -57,7 +58,7 @@ let CONFIG = {
     marTechUrl:
       'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-f10da6991680-staging.min.js',
   },
-  prod: { },
+  prod: { marTechUrl: 'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-78b077e5ada7.min.js' },
 };
 
 (function removePartnerLoginQuery() {
@@ -121,7 +122,7 @@ async function loadPage() {
   await setFeedback(getConfig);
   await loadArea();
   applyPagePersonalization();
-  rewriteLinks(document);
+  rewriteLinks(document.querySelector('main') ?? document);
   window.addEventListener(SHOW_NEXT_POPUP, async (e) => {
     if ('detail' in e) {
       console.log('CustomEvent data:', e.detail?.next);

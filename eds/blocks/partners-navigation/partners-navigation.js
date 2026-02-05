@@ -1736,10 +1736,9 @@ export default async function init(block) {
   // PARTNERS_NAVIGATION START
   // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
   block.classList.add('global-navigation');
+  // Enable personalization and link rewriting in the profile dropdown
+  // this happens directly after the profile dropdown is loaded, it's not injected into DOM yet
   content = applyGnavPersonalization(content);
-  // PARTNERS_NAVIGATION END
-  // PARTNERS_NAVIGATION START
-  // MWPW-165727 - Links without "www" don't change locale for helpx.adobe.com & business.adobe.com
   content = rewriteLinks(content);
   // PARTNERS_NAVIGATION END
 

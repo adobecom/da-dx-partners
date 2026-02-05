@@ -28,7 +28,10 @@ import {
   setAriaAtributes,
 } from '../utilities.js';
 
-import { personalizeMainNav, shouldHideLinkGroup } from "../../../../scripts/personalization.js";
+import {personalizeMainNav, personalizePlaceholders, shouldHideLinkGroup} from "../../../../scripts/personalization.js";
+import {rewriteLinks} from "../../../../scripts/rewriteLinks.js";
+import {PERSONALIZATION_PLACEHOLDERS} from "../../../../scripts/personalizationConfigDX.js";
+import {DX_PROGRAM_TYPE} from "../../../utils/dxConstants.js";
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 function getAnalyticsValue(str, index) {
@@ -477,7 +480,10 @@ const decorateMenu = (config) => logErrorFor(async () => {
   config.template?.append(menuTemplate);
   // PARTNERS_NAVIGATION START
   // MWPW-170795 - Personalization on Gnav links
-  personalizeMainNav(document.querySelector('header'));
+  let gnav = document.querySelector('header');
+  personalizeMainNav(gnav);
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, gnav, DX_PROGRAM_TYPE, false);
+  rewriteLinks(gnav);
   // PARTNERS_NAVIGATION END
   if (config.type === 'asyncDropdownTrigger') {
     setAriaAtributes(menuTemplate.previousElementSibling);
