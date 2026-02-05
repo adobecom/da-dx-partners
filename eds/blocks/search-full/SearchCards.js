@@ -22,6 +22,7 @@ export default class Search extends PartnerCards {
     contentTypeCounter: { type: Object },
     typeaheadOptions: { type: Array },
     isTypeaheadOpen: { type: Boolean },
+    searchExecuted: { type: Boolean },
   };
 
   constructor() {
@@ -31,6 +32,7 @@ export default class Search extends PartnerCards {
     this.typeaheadOptions = [];
     this.isTypeaheadOpen = false;
     this.hasResponseData = false;
+    this.searchExecuted = false;
     // Create debounced version of updateTypeaheadDialog for search input
     this.debouncedUpdateTypeahead = debounce(() => this.updateTypeaheadDialog(), 300);
     // Wrap handleActions with debounce for API calls (override parent's synchronous version)
@@ -63,6 +65,7 @@ export default class Search extends PartnerCards {
 
   onSearchInput(event) {
     this.searchTerm = event.target.value;
+    this.searchExecuted = false;
 
     // Handle empty input
     if (!this.searchTerm) {
@@ -124,6 +127,7 @@ export default class Search extends PartnerCards {
     }
     this.handleUrlSearchParams();
     this.paginationCounter = 1;
+    this.searchExecuted = true;
     this.handleActions();
   }
 
@@ -362,7 +366,7 @@ export default class Search extends PartnerCards {
       <div @click="${this.handleClickOutside}" class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}" daa-lh="Search Box">
         <div class="search-box content">
           <h3 class="partner-cards-title">
-            ${this.searchTerm && !this.isTypeaheadOpen
+            ${!this.isTypeaheadOpen && this.searchExecuted && this.searchTerm
               ? `${this.blockData.localizedText['{{showing-results-for}}']} ${this.searchTerm}`
               : this.blockData.title
             }
