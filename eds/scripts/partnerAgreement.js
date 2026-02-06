@@ -124,7 +124,7 @@ async function handleAgreement(action) {
             }
             return responseJson.terms?.[0];
         } else {
-          //error code "41012" means agreement already accepted
+            //error code "41012" means agreement already accepted
             if (responseJson.errorCode && responseJson.errorCode !== '41012') {
                 console.error(`Accepting partner agreement failed! Error code: ${responseJson.errorCode}`);
                 return false;
