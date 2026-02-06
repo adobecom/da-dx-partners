@@ -413,4 +413,161 @@ describe('dx-card-collection block', () => {
     expect(component.searchTerm).to.equal('');
     expect(Object.keys(component.selectedFilters).length).to.equal(0);
   });
+
+  describe('Pagination scroll behavior', () => {
+    let component;
+    let windowScrollToStub;
+    let mockHeader;
+
+    beforeEach(async () => {
+      // Create mock header element
+      mockHeader = document.createElement('header');
+      Object.defineProperty(mockHeader, 'offsetHeight', {
+        configurable: true,
+        value: 80
+      });
+      document.body.appendChild(mockHeader);
+
+      // Stub window.scrollTo
+      windowScrollToStub = sinon.stub(window, 'scrollTo');
+
+      // Stub window.pageYOffset
+      Object.defineProperty(window, 'pageYOffset', {
+        configurable: true,
+        value: 500
+      });
+
+      const block = document.querySelector('.dx-card-collection');
+      component = await init(block);
+      await component.updateComplete;
+
+      // Set up pagination
+      component.cardsPerPage = 3;
+      component.paginationCounter = 1;
+      component.totalPages = 3;
+      component.blockData.pagination = 'default';
+    });
+
+    afterEach(() => {
+      windowScrollToStub.restore();
+      if (mockHeader.parentNode) {
+        mockHeader.parentNode.removeChild(mockHeader);
+      }
+      delete window.pageYOffset;
+    });
+
+    it('should scroll to top when clicking next page', () => {
+      component.handleNextPage();
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      expect(windowScrollToStub.firstCall.args[0]).to.have.property('behavior', 'auto');
+    });
+
+    it('should scroll to top when clicking prev page', () => {
+      component.paginationCounter = 2;
+      component.handlePrevPage();
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      expect(windowScrollToStub.firstCall.args[0]).to.have.property('behavior', 'auto');
+    });
+
+    it('should scroll to top when clicking specific page number', () => {
+      component.handlePageNum(2);
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      expect(windowScrollToStub.firstCall.args[0]).to.have.property('behavior', 'auto');
+    });
+
+    it('should not scroll if already on the same page', () => {
+      component.paginationCounter = 2;
+      component.handlePageNum(2);
+
+      expect(windowScrollToStub.called).to.be.false;
+    });
+
+    it('should not scroll if at first page and clicking prev', () => {
+      component.paginationCounter = 1;
+      component.handlePrevPage();
+
+      expect(windowScrollToStub.called).to.be.false;
+    });
+
+    it('should not scroll if at last page and clicking next', () => {
+      component.paginationCounter = 3;
+      component.totalPages = 3;
+      component.handleNextPage();
+
+      expect(windowScrollToStub.called).to.be.false;
+    });
+
+    it('should calculate scroll position accounting for gnav height', () => {
+      const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
+      const mockRect = { top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      sinon.stub(partnerCardsHeader, 'getBoundingClientRect').returns(mockRect);
+
+      component.handleNextPage();
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      const scrollOptions = windowScrollToStub.firstCall.args[0];
+      // Expected: headerTop (200) + pageYOffset (500) - gnavHeight (80) = 620
+      expect(scrollOptions.top).to.equal(620);
+      expect(scrollOptions.behavior).to.equal('auto');
+
+      partnerCardsHeader.getBoundingClientRect.restore();
+    });
+
+    it('should handle missing gnav gracefully', () => {
+      // Remove the mock header
+      mockHeader.parentNode.removeChild(mockHeader);
+
+      const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
+      const mockRect = { top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      sinon.stub(partnerCardsHeader, 'getBoundingClientRect').returns(mockRect);
+
+      component.handleNextPage();
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      const scrollOptions = windowScrollToStub.firstCall.args[0];
+      // Expected: headerTop (200) + pageYOffset (500) - gnavHeight (0) = 700
+      expect(scrollOptions.top).to.equal(700);
+
+      partnerCardsHeader.getBoundingClientRect.restore();
+    });
+
+    it('should fallback to scrollIntoView if partner-cards-header not found', () => {
+      const scrollIntoViewStub = sinon.stub(component, 'scrollIntoView');
+      
+      // Remove the header from shadow DOM
+      const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
+      if (partnerCardsHeader) {
+        partnerCardsHeader.remove();
+      }
+
+      component.handleNextPage();
+
+      expect(windowScrollToStub.called).to.be.false;
+      expect(scrollIntoViewStub.calledOnce).to.be.true;
+      expect(scrollIntoViewStub.calledWith({ behavior: 'auto', block: 'start' })).to.be.true;
+
+      scrollIntoViewStub.restore();
+    });
+
+    it('should update pagination counter and scroll when navigating pages', () => {
+      expect(component.paginationCounter).to.equal(1);
+      
+      component.handleNextPage();
+      
+      expect(component.paginationCounter).to.equal(2);
+      expect(windowScrollToStub.calledOnce).to.be.true;
+    });
+
+    it('should not change pagination counter if scroll conditions not met', () => {
+      component.paginationCounter = 1;
+      
+      component.handlePrevPage();
+      
+      expect(component.paginationCounter).to.equal(1);
+      expect(windowScrollToStub.called).to.be.false;
+    });
+  });
 });
