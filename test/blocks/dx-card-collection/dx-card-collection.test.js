@@ -431,8 +431,8 @@ describe('dx-card-collection block', () => {
       // Stub window.scrollTo
       windowScrollToStub = sinon.stub(window, 'scrollTo');
 
-      // Stub window.pageYOffset
-      Object.defineProperty(window, 'pageYOffset', {
+      // Stub window.scrollY
+      Object.defineProperty(window, 'scrollY', {
         configurable: true,
         value: 500
       });
@@ -453,7 +453,7 @@ describe('dx-card-collection block', () => {
       if (mockHeader.parentNode) {
         mockHeader.parentNode.removeChild(mockHeader);
       }
-      delete window.pageYOffset;
+      delete window.scrollY;
     });
 
     it('should scroll to top when clicking next page', () => {
@@ -509,7 +509,7 @@ describe('dx-card-collection block', () => {
 
       expect(windowScrollToStub.calledOnce).to.be.true;
       const scrollOptions = windowScrollToStub.firstCall.args[0];
-      // Expected: headerTop (200) + pageYOffset (500) - gnavHeight (80) = 620
+      // Expected: headerTop (200) + scrollY (500) - gnavHeight (80) = 620
       expect(scrollOptions.top).to.equal(620);
       expect(scrollOptions.behavior).to.equal('auto');
 
@@ -528,14 +528,15 @@ describe('dx-card-collection block', () => {
 
       expect(windowScrollToStub.calledOnce).to.be.true;
       const scrollOptions = windowScrollToStub.firstCall.args[0];
-      // Expected: headerTop (200) + pageYOffset (500) - gnavHeight (0) = 700
+      // Expected: headerTop (200) + scrollY (500) - gnavHeight (0) = 700
       expect(scrollOptions.top).to.equal(700);
 
       partnerCardsHeader.getBoundingClientRect.restore();
     });
 
-    it('should fallback to scrollIntoView if partner-cards-header not found', () => {
-      const scrollIntoViewStub = sinon.stub(component, 'scrollIntoView');
+    it('should fallback to component itself if partner-cards-header not found', () => {
+      const componentRect = { top: 100, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      sinon.stub(component, 'getBoundingClientRect').returns(componentRect);
       
       // Remove the header from shadow DOM
       const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
@@ -545,11 +546,13 @@ describe('dx-card-collection block', () => {
 
       component.handleNextPage();
 
-      expect(windowScrollToStub.called).to.be.false;
-      expect(scrollIntoViewStub.calledOnce).to.be.true;
-      expect(scrollIntoViewStub.calledWith({ behavior: 'auto', block: 'start' })).to.be.true;
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      const scrollOptions = windowScrollToStub.firstCall.args[0];
+      // Expected: componentTop (100) + scrollY (500) - gnavHeight (80) = 520
+      expect(scrollOptions.top).to.equal(520);
+      expect(scrollOptions.behavior).to.equal('auto');
 
-      scrollIntoViewStub.restore();
+      component.getBoundingClientRect.restore();
     });
 
     it('should update pagination counter and scroll when navigating pages', () => {

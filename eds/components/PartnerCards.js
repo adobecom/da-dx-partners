@@ -877,16 +877,12 @@ export default class PartnerCards extends LitElement {
 
   scrollToTopOfCardCollection() {
     const partnerCardsHeader = this.shadowRoot.querySelector('.partner-cards-header');
-    if (!partnerCardsHeader) {
-      this.scrollIntoView({ behavior: 'auto', block: 'start' });
-      return;
-    }
-
-    const headerRect = partnerCardsHeader.getBoundingClientRect();
+    const targetElement = partnerCardsHeader || this;
     const gnavHeight = document.querySelector('header')?.offsetHeight || 0;
+    const targetRect = targetElement.getBoundingClientRect();
     
     window.scrollTo({
-      top: headerRect.top + window.pageYOffset - gnavHeight,
+      top: targetRect.top + window.scrollY - gnavHeight,
       behavior: 'auto'
     });
   }
