@@ -559,9 +559,15 @@ describe('SearchCards Unit Tests', () => {
 
     it('should handle errors gracefully', async () => {
       const mockDialog = { show: sinon.spy() };
+      const mockInput = { focus: sinon.spy() };
       searchComponent.renderRoot = {
-        querySelector: sinon.stub().withArgs('dialog#typeahead').returns(mockDialog)
+        querySelector: sinon.stub()
+          .withArgs('dialog#typeahead').returns(mockDialog)
+          .withArgs('#search').returns(mockInput)
       };
+      
+      searchComponent.searchTerm = 'test';
+      searchComponent.isTypeaheadOpen = false;
       
       // Stub getSuggestions on the instance to reject
       const getSuggestionsStub = sinon.stub(searchComponent, 'getSuggestions').rejects(new Error('API Error'));
