@@ -72,9 +72,18 @@ async function getGitHubMiloLibsBranchLiveUrl() {
 }
 
 async function getCircleCIBranchLiveUrl() {
+  const explicitUrl = process.env.LOCAL_TEST_LIVE_URL;
   const stageUrl = STAGE_URL;
 
   try {
+    if (explicitUrl) {
+      if (await isBranchURLValid(explicitUrl)) {
+        process.env.PR_BRANCH_LIVE_URL = explicitUrl;
+        console.info('CircleCI Requested Live URL : ', explicitUrl);
+        return;
+      }
+      console.warn('Warning => Requested CircleCI live URL is invalid : ', explicitUrl);
+    }
     if (await isBranchURLValid(stageUrl)) {
       process.env.PR_BRANCH_LIVE_URL = stageUrl;
     }
