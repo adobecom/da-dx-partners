@@ -2,12 +2,12 @@ export default class SmokeTest {
   constructor(page) {
     this.page = page;
     this.gnav = page.locator('.global-navigation.ready');
-    this.contactUsLinkSP = page.locator('a[href*="/solution-partners/contact.html"]');
+    this.contactUsLinkSP = page.locator('a[href*="/digitalexperience/m/forms/case"]').nth(0);
     this.findPartnerLinkSP = page.locator('a[href*="/s/directory/solution"]');
-    this.learnMoreLinkSP = page.locator('a[href*="/solution-partners/about.html"]');
-    this.contactUsLinkTP = page.locator('a[href*="/technologyprogram/experiencecloud/support.html"]');
+    this.learnMoreLinkSP = page.locator('a[href*="/digitalexperience/about"]').nth(0);
+    this.contactUsLinkTP = page.locator('a[href*="/digitalexperience/m/forms/case"]').nth(1);;
     this.findPartnerLinkTP = page.locator('a[href*="/s/directory/technology"]');
-    this.learnMoreLinkTP = page.locator('a[href*="/technologyprogram/experiencecloud/about.html"]');
+    this.learnMoreLinkTP = page.locator('a[href*="/digitalexperience/about"]').nth(1);
     this.contactUsLinkAR = page.locator('a[href*="/en/apc-helpdesk"]');
     this.findPartnerLinkAR = page.locator('a[href*="/channel?lang=en"]');
     this.learnMoreLinkAR = page.locator('a[href*="/channelpartners/"]').nth(1);

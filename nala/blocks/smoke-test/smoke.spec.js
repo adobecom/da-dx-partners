@@ -14,12 +14,12 @@ export default {
       testId: '@MWPW-168683',
       tags: '@da-dx-smoke-test',
       data: {
-        contactUsSPURL: '/solution-partners/contact.html',
+        contactUsSPURL: '/digitalexperience/m/forms/case',
         findPartnerSPURL: '/s/directory/solution',
-        learnMoreSPURL: '/solution-partners/about.html',
-        contactUsTPURL: '/technologyprogram/experiencecloud/support.html',
+        learnMoreSPURL: '/digitalexperience/about',
+        contactUsTPURL: '/digitalexperience/m/forms/case',
         findPartnerTPURL: '/s/directory/technology',
-        learnMoreTPURL: '/technologyprogram/experiencecloud/about.html',
+        learnMoreTPURL: '/digitalexperience/about',
         contactUsARURL: '/en/apc-helpdesk',
         findPartnerARURL: '/channel?lang=en',
         learnMoreARURL: '/channelpartners/',
@@ -54,7 +54,7 @@ export default {
       tcid: '5',
       name: '@smoke-test-find-a-partner-validation',
       path: '/digitalexperience/?georouting=off&martech=off',
-      // tags: '@da-dx-smoke-test',
+      tags: '@da-dx-smoke-test',
       data: {
         findAPartnerUrl: '/s/directory/solution',
       }
