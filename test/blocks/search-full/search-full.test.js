@@ -542,6 +542,21 @@ describe('SearchCards Unit Tests', () => {
       expect(searchComponent.isTypeaheadOpen).to.be.true;
     });
 
+    it('should not update typeahead when searchTerm is empty', async () => {
+      const mockDialog = { show: sinon.spy() };
+      searchComponent.renderRoot = {
+        querySelector: sinon.stub().withArgs('dialog#typeahead').returns(mockDialog)
+      };
+      
+      searchComponent.searchTerm = '';
+      searchComponent.typeaheadOptions = ['existing', 'suggestions'];
+      
+      await searchComponent.updateTypeaheadDialog();
+      
+      expect(searchComponent.typeaheadOptions).to.deep.equal([]);
+      expect(mockDialog.show.called).to.be.false;
+    });
+
     it('should handle errors gracefully', async () => {
       const mockDialog = { show: sinon.spy() };
       searchComponent.renderRoot = {
