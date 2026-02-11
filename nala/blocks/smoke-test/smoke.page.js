@@ -12,8 +12,8 @@ export default class SmokeTest {
     this.findPartnerLinkAR = page.locator('a[href*="/channel?lang=en"]');
     this.learnMoreLinkAR = page.locator('a[href*="/channelpartners/"]').nth(1);
     this.visitAdobeExchangeLink = page.locator('a[href*="exchange.adobe.com/"]');
-    this.joinNowLinkSP = page.locator('a[href*="/solution-partners/registration.html"]');
-    this.joinNowLinkTP = page.locator('a[href*="/technologyprogram/experiencecloud/registration.html"]');
+    this.joinNowLinkSP = page.locator('a[href*="/digitalexperience/s/registration/"]').nth(0);
+    this.joinNowLinkTP = page.locator('a[href*="/digitalexperience/s/registration/"]').nth(1);
     this.joinNowLinkAR = page.locator('a[href*="/na/channelpartners/enrollment/"]');
     this.footer = page.locator('.global-footer');
     this.becomeAPartnerButton = page.getByRole('link', { name: 'Become a partner' });
