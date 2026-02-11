@@ -76,6 +76,10 @@ export default class Search extends PartnerCards {
 
   async updateTypeaheadDialog() {
     try {
+      if (!this.searchTerm) {
+        this.typeaheadOptions = [];
+        return;
+      }
       if (!this.isTypeaheadOpen) {
         this.isTypeaheadOpen = true;
         // eslint-disable-next-line no-underscore-dangle
