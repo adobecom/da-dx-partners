@@ -875,10 +875,23 @@ export default class PartnerCards extends LitElement {
     this.handleActions();
   }
 
+  scrollToTopOfCardCollection() {
+    const partnerCardsHeader = this.shadowRoot.querySelector('.partner-cards-header');
+    const targetElement = partnerCardsHeader || this;
+    const gnavHeight = document.querySelector('header')?.offsetHeight || 0;
+    const targetRect = targetElement.getBoundingClientRect();
+    
+    window.scrollTo({
+      top: targetRect.top + window.scrollY - gnavHeight,
+      behavior: 'auto'
+    });
+  }
+
   handlePageNum(pageNum) {
     if (this.paginationCounter !== pageNum) {
       this.paginationCounter = pageNum;
       this.handleActions();
+      this.scrollToTopOfCardCollection();
     }
   }
 
@@ -886,6 +899,7 @@ export default class PartnerCards extends LitElement {
     if (this.paginationCounter > 1) {
       this.paginationCounter -= 1;
       this.handleActions();
+      this.scrollToTopOfCardCollection();
     }
   }
 
@@ -893,6 +907,7 @@ export default class PartnerCards extends LitElement {
     if (this.paginationCounter < this.totalPages) {
       this.paginationCounter += 1;
       this.handleActions();
+      this.scrollToTopOfCardCollection();
     }
   }
 

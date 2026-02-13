@@ -516,6 +516,7 @@ describe('SearchCards Unit Tests', () => {
       expect(searchComponent.searchTerm).to.equal('analytics');
       expect(debouncedSpy.called).to.be.true;
     });
+
   });
 
   describe('updateTypeaheadDialog', () => {
