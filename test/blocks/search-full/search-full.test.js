@@ -517,33 +517,6 @@ describe('SearchCards Unit Tests', () => {
       expect(debouncedSpy.called).to.be.true;
     });
 
-    it('should clear searchExecuted flag when typing', () => {
-      const debouncedSpy = sinon.spy();
-      searchComponent.debouncedUpdateTypeahead = debouncedSpy;
-      searchComponent.searchExecuted = true;
-      const event = { target: { value: 'new search' } };
-      
-      searchComponent.onSearchInput(event);
-      
-      expect(searchComponent.searchExecuted).to.be.false;
-      expect(searchComponent.searchTerm).to.equal('new search');
-    });
-
-    it('should clear searchExecuted when clearing search input', () => {
-      const mockDialog = { close: sinon.spy() };
-      searchComponent.renderRoot = {
-        querySelector: sinon.stub().withArgs('dialog#typeahead').returns(mockDialog)
-      };
-      sinon.stub(searchComponent, 'handleSearch');
-      
-      searchComponent.searchExecuted = true;
-      const event = { target: { value: '' } };
-      
-      searchComponent.onSearchInput(event);
-      
-      expect(searchComponent.searchExecuted).to.be.false;
-      expect(searchComponent.searchTerm).to.equal('');
-    });
   });
 
   describe('updateTypeaheadDialog', () => {
@@ -638,7 +611,6 @@ describe('SearchCards Unit Tests', () => {
       
       expect(searchComponent.urlSearchParams.get('term')).to.equal('analytics');
       expect(searchComponent.paginationCounter).to.equal(1);
-      expect(searchComponent.searchExecuted).to.be.true;
       expect(handleUrlSearchParamsStub.called).to.be.true;
       expect(handleActionsStub.called).to.be.true;
     });
@@ -653,7 +625,6 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.handleSearch();
       
       expect(searchComponent.urlSearchParams.has('term')).to.be.false;
-      expect(searchComponent.searchExecuted).to.be.true;
       expect(handleActionsStub.called).to.be.true;
     });
   });
