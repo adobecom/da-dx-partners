@@ -2,34 +2,53 @@ import { DIGITALEXPERIENCE_PREVIEW_PATH } from '../utils/dxConstants.js';
 
 export default async function init(el) {
   const currentAssetPath = window.location.origin + window.location.pathname;
-  const redirectsMap = {};
+  const baseURL = window.location.origin + DIGITALEXPERIENCE_PREVIEW_PATH;
+  let redirectValue = null;
+  let hasLoop = false;
+
   const assetRedirectRows = Array.from(el.children);
 
-  assetRedirectRows.forEach((row) => {
+  for (const row of assetRedirectRows) {
     const cols = Array.from(row.children);
     const originalAssetURL = cols[0]?.innerText.trim().toLowerCase().replace(/ /g, '-');
     const redirectAssetURL = cols[1]?.innerText.trim().toLowerCase().replace(/ /g, '-');
-    try {
-      const baseURl = window.location.origin + DIGITALEXPERIENCE_PREVIEW_PATH;
 
+    if (!originalAssetURL || !redirectAssetURL) continue;
+
+    try {
+      // Parse URLs without lowercasing (URLs are case-sensitive in paths)
       const tokensOriginal = originalAssetURL.split(DIGITALEXPERIENCE_PREVIEW_PATH);
       const pathnameOriginal = tokensOriginal[1];
-      const originalUrl = new URL(pathnameOriginal, baseURl);
+      if (!pathnameOriginal) continue;
 
       const tokensRedirect = redirectAssetURL.split(DIGITALEXPERIENCE_PREVIEW_PATH);
       const pathnameRedirect = tokensRedirect[1];
-      const redirectUrl = new URL(pathnameRedirect, baseURl);
-      redirectsMap[originalUrl] = redirectUrl;
+      if (!pathnameRedirect) continue;
+
+      const originalUrl = new URL(pathnameOriginal, baseURL).href;
+      const redirectUrl = new URL(pathnameRedirect, baseURL).href;
+
+      // Check for redirect match and loop prevention in same iteration
+      if (originalUrl === currentAssetPath) {
+        redirectValue = redirectUrl;
+      }
+      if (redirectUrl === currentAssetPath) {
+        hasLoop = true;
+        break; // Early exit if loop detected
+      }
     } catch (error) {
       console.error('redirect url invalid:', originalAssetURL, redirectAssetURL);
     }
-  });
+  }
+
   el.remove();
-  if (Object.values(redirectsMap).some((href) => href === currentAssetPath)) {
+
+  if (hasLoop) {
     console.log('Skipping redirect to avoid redirect loop');
     return;
   }
-  const redirectKey = Object.keys(redirectsMap).find((href) => href === currentAssetPath);
-  const redirectValue = redirectsMap[redirectKey];
-  if (redirectValue) window.location.replace(redirectValue);
+
+  if (redirectValue) {
+    window.location.replace(redirectValue);
+  }
 }
