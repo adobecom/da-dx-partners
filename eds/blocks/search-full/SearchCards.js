@@ -9,6 +9,7 @@ const miloLibs = getLibs();
 const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 const SEE_ALL = 'SEE_ALL';
+const MAX_SEARCH_LENGTH = 200;
 
 export default class Search extends PartnerCards {
   static styles = [
@@ -62,7 +63,7 @@ export default class Search extends PartnerCards {
   }
 
   onSearchInput(event) {
-    this.searchTerm = event.target.value;
+   this.searchTerm = event.target.value;
 
     // Handle empty input
     if (!this.searchTerm) {
@@ -372,7 +373,7 @@ export default class Search extends PartnerCards {
             }
           </h3>
           <sp-theme class="search-wrapper" theme="spectrum" color="light" scale="medium">
-            <sp-search @keydown="${this.handleEnter}" id="search" size="m" value="${this.searchTerm}" @input="${this.onSearchInput}" @submit="${(event) => event.preventDefault()}" placeholder="${this.blockData.localizedText['{{search-topics-resources-files}}']}"></sp-search>
+            <sp-search @keydown="${this.handleEnter}" id="search" size="m" maxlength="${MAX_SEARCH_LENGTH}" value="${this.searchTerm}" @input="${this.onSearchInput}" @submit="${(event) => event.preventDefault()}" placeholder="${this.blockData.localizedText['{{search-topics-resources-files}}']}"></sp-search>
             <dialog class="suggestion-dialog-wrapper" @close="${this.dialogClosed}" id="typeahead">
               <div class="suggestion-dialog ">
                 ${this.typeaheadOptionsHTML}
