@@ -9,8 +9,8 @@ function extractRedirectRules(el) {
 
   for (const row of assetRedirectRows) {
     const cols = Array.from(row.children);
-    const originalAssetURL = cols[0]?.innerText?.trim().toLowerCase().replace(/ /g, '-');
-    const redirectAssetURL = cols[1]?.innerText?.trim().toLowerCase().replace(/ /g, '-');
+    const originalAssetURL = cols[0]?.innerText?.trim().replace(/ /g, '-');
+    const redirectAssetURL = cols[1]?.innerText?.trim().replace(/ /g, '-');
 
     if (originalAssetURL && redirectAssetURL) {
       redirectRules.push([originalAssetURL, redirectAssetURL]);
