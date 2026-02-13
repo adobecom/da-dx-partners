@@ -1,15 +1,14 @@
 import { DIGITALEXPERIENCE_PREVIEW_PATH } from '../utils/dxConstants.js';
 
 export default async function init(el) {
-  console.log('el', el);
-  const currentAsset = window.location.origin + window.location.pathname;
+  const currentAssetPath = window.location.origin + window.location.pathname;
   const redirectsMap = {};
   const assetRedirectRows = Array.from(el.children);
 
   assetRedirectRows.forEach((row) => {
     const cols = Array.from(row.children);
-    const originalAssetURL = cols[0].innerText.trim().toLowerCase().replace(/ /g, '-');
-    const redirectAssetURL = cols[1].textContent.trim();
+    const originalAssetURL = cols[0]?.innerText.trim().toLowerCase().replace(/ /g, '-');
+    const redirectAssetURL = cols[1]?.innerText.trim().toLowerCase().replace(/ /g, '-');
     try {
       const baseURl = window.location.origin + DIGITALEXPERIENCE_PREVIEW_PATH;
 
@@ -24,16 +23,13 @@ export default async function init(el) {
     } catch (error) {
       console.error('redirect url invalid:', originalAssetURL, redirectAssetURL);
     }
-    el.remove();
   });
-console.log(Object.values(redirectsMap));
-console.log(Object.keys(redirectsMap));
-
-  if (Object.values(redirectsMap).some((href) => href === currentAsset)) {
-    console.log('Skipping redirect to avoid redirect loop, since current url is already used in redirect column');
+  el.remove();
+  if (Object.values(redirectsMap).some((href) => href === currentAssetPath)) {
+    console.log('Skipping redirect to avoid redirect loop');
     return;
   }
-  const redirectKey = Object.keys(redirectsMap).find((href) => href === currentAsset);
+  const redirectKey = Object.keys(redirectsMap).find((href) => href === currentAssetPath);
   const redirectValue = redirectsMap[redirectKey];
   if (redirectValue) window.location.replace(redirectValue);
 }
