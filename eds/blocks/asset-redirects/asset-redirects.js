@@ -31,7 +31,6 @@ export default async function init(el) {
       // Check for redirect match and loop prevention in same iteration
       if (originalUrl === currentAssetPath) {
         redirectValue = redirectUrl;
-        break;
       }
       if (redirectUrl === currentAssetPath) {
         hasLoop = true;
