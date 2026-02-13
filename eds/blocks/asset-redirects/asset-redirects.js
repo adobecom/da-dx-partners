@@ -33,6 +33,7 @@ console.log(Object.keys(redirectsMap));
     console.log('Skipping redirect to avoid redirect loop, since current url is already used in redirect column');
     return;
   }
-  const redirectValue = Object.keys(redirectsMap).find((href) => href === currentAsset);
+  const redirectKey = Object.keys(redirectsMap).find((href) => href === currentAsset);
+  const redirectValue = redirectsMap[redirectKey];
   if (redirectValue) window.location.replace(redirectValue);
 }
