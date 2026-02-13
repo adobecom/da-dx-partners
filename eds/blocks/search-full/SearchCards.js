@@ -9,7 +9,7 @@ const miloLibs = getLibs();
 const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 const SEE_ALL = 'SEE_ALL';
-const MAX_SEARCH_LENGTH = 500;
+const MAX_SEARCH_LENGTH = 200;
 
 export default class Search extends PartnerCards {
   static styles = [
