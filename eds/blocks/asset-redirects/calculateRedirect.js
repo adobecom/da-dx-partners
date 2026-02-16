@@ -1,45 +1,38 @@
 import { DIGITALEXPERIENCE_PREVIEW_PATH } from '../utils/dxConstants.js';
 
+function getFqUrl(url) {
+  return url.startsWith('http') ? url : window.location.origin + url;
+}
+
 /**
- * Calculates the redirect URL based on the current URL and redirect rules
- * @param {string} currentAssetPath - The current full URL path (origin + pathname)
+ * Calculates the redirect URL based on the current URL (window.location) and redirect rules
  * @param {Array<Array<string>>} redirectRules - Array of [originalURL, redirectURL] pairs
- * @returns {Object} - { redirectUrl: string | null, hasLoop: boolean }
+ * @returns {URL|null} - Redirect URL, or null if no match or redirect would loop
  */
-export function calculateRedirect(currentAssetPath, redirectRules) {
-  const baseURL = new URL(currentAssetPath).origin + DIGITALEXPERIENCE_PREVIEW_PATH;
-  let redirectValue = null;
-  let hasLoop = false;
+export function calculateRedirect(redirectRules) {
 
   for (const [originalAssetURL, redirectAssetURL] of redirectRules) {
     if (!originalAssetURL || !redirectAssetURL) continue;
 
+    const fqRedirectSource = getFqUrl(originalAssetURL);
+    const fqRedirectTarget = getFqUrl(redirectAssetURL);
+
+
     try {
-      const tokensOriginal = originalAssetURL.split(DIGITALEXPERIENCE_PREVIEW_PATH);
-      const pathnameOriginal = tokensOriginal[1];
-      if (!pathnameOriginal) continue;
-
-      const tokensRedirect = redirectAssetURL.split(DIGITALEXPERIENCE_PREVIEW_PATH);
-      const pathnameRedirect = tokensRedirect[1];
-
-      if (!pathnameRedirect) continue;
-
-      const originalUrl = new URL(pathnameOriginal, baseURL).href;
-      const redirectUrl = new URL(pathnameRedirect, baseURL).href;
+      const originalUrl = new URL(fqRedirectSource);
+      const redirectUrl = new URL(fqRedirectTarget);
 
       // Check for redirect match and loop prevention in same iteration
-      if (originalUrl === currentAssetPath) {
-        redirectValue = redirectUrl;
-      }
-      if (redirectUrl === currentAssetPath) {
-        hasLoop = true;
-        break; // Early exit if loop detected
+      if (originalUrl.origin === window.location.origin && originalUrl.pathname === window.location.pathname) {
+        //check if the target is the same as the current URL
+        if (!(redirectUrl.origin === window.location.origin && redirectUrl.pathname === window.location.pathname)) {
+          return redirectUrl;
+        }
       }
     } catch (error) {
       console.error('redirect url invalid:', originalAssetURL, redirectAssetURL);
     }
   }
-
-  return { redirectUrl: redirectValue, hasLoop };
+  return null;
 }
 

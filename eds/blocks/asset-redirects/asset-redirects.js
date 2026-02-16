@@ -21,16 +21,10 @@ function extractRedirectRules(el) {
 }
 
 export default async function init(el) {
-  const currentAssetPath = window.location.origin + window.location.pathname;
   const redirectRules = extractRedirectRules(el);
-  const { redirectUrl, hasLoop } = calculateRedirect(currentAssetPath, redirectRules);
+  const redirectUrl = calculateRedirect(redirectRules);
 
   el.remove();
-
-  if (hasLoop) {
-    console.log('Skipping redirect to avoid redirect loop');
-    return;
-  }
 
   if (redirectUrl) {
     window.location.replace(redirectUrl);
