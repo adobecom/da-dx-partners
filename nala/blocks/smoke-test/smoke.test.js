@@ -159,6 +159,7 @@ test.describe('Validate Partner Directory pages', () => {
     await test.step('Check Analytics Card Collection', async () => {
       await smokeTest.collectionBlock.waitFor({ state: 'visible', timeout: 30000 });
       await smokeTest.collectionBlock.scrollIntoViewIfNeeded();
+      await smokeTest.cardCollectionSortButton.waitFor({ state: 'visible', timeout: 10000 });
       await expect(smokeTest.collectionBlock).toBeVisible();
 
       const result = await smokeTest.cardsResults.textContent();

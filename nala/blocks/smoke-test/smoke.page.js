@@ -45,6 +45,7 @@ export default class SmokeTest {
     this.jarvisChatButton = page.getByRole('button', { name: 'Chat with us' });
     this.jarvisChatPanel = page.frameLocator('iframe[title="Adobe Virtual Assistant"]').getByText("We're here to help.");
     this.searchCardsCollection = page.locator('.partner-cards-collection');
+    this.cardCollectionSortButton = page.getByRole('button', { name: 'date: newest' });
   }
 
   async smokeSignIn(page, baseURL, partnerLevel) {
