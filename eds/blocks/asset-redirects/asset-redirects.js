@@ -1,0 +1,32 @@
+import { calculateRedirect } from './calculateRedirect.js';
+
+/**
+ * Extracts redirect rules from DOM element
+ */
+function extractRedirectRules(el) {
+  const assetRedirectRows = Array.from(el.children);
+  const redirectRules = [];
+
+  for (const row of assetRedirectRows) {
+    const cols = Array.from(row.children);
+    const originalAssetURL = cols[0]?.innerText?.trim().replace(/ /g, '-');
+    const redirectAssetURL = cols[1]?.innerText?.trim().replace(/ /g, '-');
+
+    if (originalAssetURL && redirectAssetURL) {
+      redirectRules.push([originalAssetURL, redirectAssetURL]);
+    }
+  }
+
+  return redirectRules;
+}
+
+export default async function init(el) {
+  const redirectRules = extractRedirectRules(el);
+  const redirectUrl = calculateRedirect(redirectRules);
+
+  el.remove();
+
+  if (redirectUrl) {
+    window.location.replace(redirectUrl);
+  }
+}
