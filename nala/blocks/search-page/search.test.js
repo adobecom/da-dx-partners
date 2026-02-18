@@ -35,6 +35,7 @@ test.describe('Search Page', () => {
     await test.step('Asset Card Content Validation', async () => {
       const card = searchPage.getCardByTitle(data.cardTitle);
       await searchPage.clickCard(card);
+      await searchPage.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
 
       const cardDate = searchPage.getCardDateLocator(card);
       await expect(cardDate).toBeVisible();
@@ -47,6 +48,7 @@ test.describe('Search Page', () => {
       expect(sizeText).toContain(data.cardSize);
 
       for (const tagText of data.cardTags) {
+        await searchPage.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
         await searchPage.verifyCardTag(card, tagText);
       }
 

@@ -39,6 +39,7 @@ export default class SearchPage {
     this.oneTrustBanner = page.getByRole('button', { name: 'Enable all' });
     this.journeyPhaseFilterPanel = page.getByRole('list').filter({ hasText: 'Discover Explore Evaluate Use' });
     this.functionalityFilterPanel = page.getByRole('list').filter({ hasText: 'Data Activation Analysis &' });
+    this.searchCardExpended = page.locator('.search-card.expanded');
   }
 
   async getCardTitle() {
