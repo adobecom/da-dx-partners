@@ -75,7 +75,6 @@ export default class SearchPage {
     try {
       await this.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
     } catch (error) {
-      console.log('Card not expanded, retrying click...');
       await card.click({ timeout });
       await this.waitForCardToExpand(card, timeout);
       await this.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
@@ -105,6 +104,15 @@ export default class SearchPage {
   }
 
   async verifyCardTag(card, tagText) {
+    // Check if card is expanded, if not click it
+    const isExpanded = await card.evaluate((el) => el.classList.contains('expanded')).catch(() => false);
+    
+    if (!isExpanded) {
+      await card.click({ timeout: 15000 });
+      await this.waitForCardToExpand(card, 15000);
+      await this.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
+    }
+    
     const tag = this.getCardTagByText(card, tagText);
     await expect(tag).toBeVisible({ timeout: 10000 });
     const text = await tag.textContent();
