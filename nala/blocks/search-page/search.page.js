@@ -70,6 +70,16 @@ export default class SearchPage {
     await expect(card).toBeVisible({ timeout });
     await card.click({ timeout });
     await this.waitForCardToExpand(card, timeout);
+    
+    // Check if card is expanded, if not try clicking again
+    try {
+      await this.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
+    } catch (error) {
+      console.log('Card not expanded, retrying click...');
+      await card.click({ timeout });
+      await this.waitForCardToExpand(card, timeout);
+      await this.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
+    }
   }
 
   getCardDateLocator(card) {
