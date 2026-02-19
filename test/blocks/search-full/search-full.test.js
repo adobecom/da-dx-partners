@@ -516,6 +516,7 @@ describe('SearchCards Unit Tests', () => {
       expect(searchComponent.searchTerm).to.equal('analytics');
       expect(debouncedSpy.called).to.be.true;
     });
+
   });
 
   describe('updateTypeaheadDialog', () => {
@@ -542,11 +543,32 @@ describe('SearchCards Unit Tests', () => {
       expect(searchComponent.isTypeaheadOpen).to.be.true;
     });
 
-    it('should handle errors gracefully', async () => {
+    it('should not update typeahead when searchTerm is empty', async () => {
       const mockDialog = { show: sinon.spy() };
       searchComponent.renderRoot = {
         querySelector: sinon.stub().withArgs('dialog#typeahead').returns(mockDialog)
       };
+      
+      searchComponent.searchTerm = '';
+      searchComponent.typeaheadOptions = ['existing', 'suggestions'];
+      
+      await searchComponent.updateTypeaheadDialog();
+      
+      expect(searchComponent.typeaheadOptions).to.deep.equal([]);
+      expect(mockDialog.show.called).to.be.false;
+    });
+
+    it('should handle errors gracefully', async () => {
+      const mockDialog = { show: sinon.spy() };
+      const mockInput = { focus: sinon.spy() };
+      searchComponent.renderRoot = {
+        querySelector: sinon.stub()
+          .withArgs('dialog#typeahead').returns(mockDialog)
+          .withArgs('#search').returns(mockInput)
+      };
+      
+      searchComponent.searchTerm = 'test';
+      searchComponent.isTypeaheadOpen = false;
       
       // Stub getSuggestions on the instance to reject
       const getSuggestionsStub = sinon.stub(searchComponent, 'getSuggestions').rejects(new Error('API Error'));

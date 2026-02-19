@@ -9,9 +9,7 @@ const errorFlowCases = features.slice(10, 13);
 test.describe('Validate Partner Directory pages', () => {
   test.beforeEach(async ({ page, browserName, baseURL, context }) => {
     smokeTest = new SmokeTest(page);
-    if (!baseURL.includes('partners.stage.adobe.com')) {
-      await context.setExtraHTTPHeaders({ authorization: `token ${process.env.MILO_AEM_API_KEY}` });
-    }
+   
     if (browserName === 'chromium' && !baseURL.includes('partners.stage.adobe.com')) {
       await page.route('https://www.adobe.com/chimera-api/**', async (route, request) => {
         const newUrl = request.url().replace(
@@ -160,6 +158,8 @@ test.describe('Validate Partner Directory pages', () => {
     });
     await test.step('Check Analytics Card Collection', async () => {
       await smokeTest.collectionBlock.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.collectionBlock.scrollIntoViewIfNeeded();
+      await smokeTest.cardCollectionSortButton.waitFor({ state: 'visible', timeout: 10000 });
       await expect(smokeTest.collectionBlock).toBeVisible();
 
       const result = await smokeTest.cardsResults.textContent();
@@ -225,7 +225,7 @@ test.describe('Validate Partner Directory pages', () => {
       const currentPageUrl = page.url();
       expect(currentPageUrl).toContain(data.contactNotFoundUrl);
 
-      await smokeTest.becomeAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.findAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
     });
   });
   test(`${features[8].name},${features[8].tags}`, async ({ page, baseURL, context }) => {
