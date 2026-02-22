@@ -34,10 +34,7 @@ test.describe('Search Page', () => {
     });
     await test.step('Asset Card Content Validation', async () => {
       const card = searchPage.getCardByTitle(data.cardTitle);
-      await searchPage.clickCard(card);
-      const outerHTML = await card.evaluate(el => el.outerHTML);
-      console.log('CARD outerHTML: ', outerHTML);
-      await searchPage.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
+      await searchPage.clickCard(card, 15000);
 
       const cardDate = searchPage.getCardDateLocator(card);
       await expect(cardDate).toBeVisible();

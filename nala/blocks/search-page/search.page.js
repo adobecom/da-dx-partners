@@ -65,24 +65,24 @@ export default class SearchPage {
   }
 
   async clickCard(card, timeout = 15000) {
-    await card.waitFor({ state: 'visible', timeout });
-    await card.scrollIntoViewIfNeeded();
-    await expect(card).toBeVisible({ timeout });
-    await card.click({ timeout });
-    await this.waitForCardToExpand(card, timeout);
-    
-    // Check if card is expanded, if not try clicking again
-    try {
-      await this.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
-    } catch (error) {
-      await card.click({ timeout });
-      await this.waitForCardToExpand(card, timeout);
-      await this.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
-    }
+    await this.ensureCardExpanded(card, timeout);
   }
 
   getCardDateLocator(card) {
     return card.locator('.card-date');
+  }
+  async verifyCardDate(card, expectedDate) {
+    const cardDate = this.getCardDateLocator(card);
+    await expect(cardDate).toBeVisible({ timeout: 10000 });
+    const dateText = (await cardDate.innerText()).trim();
+    expect(dateText).toContain(expectedDate);
+  }
+
+  async verifyCardSize(card, expectedSize) {
+    const cardSize = this.getCardSizeLocator(card);
+    await expect(cardSize).toBeVisible({ timeout: 10000 });
+    const sizeText = (await cardSize.innerText()).trim();
+    expect(sizeText).toContain(expectedSize);
   }
 
   getCardSizeLocator(card) {
@@ -90,33 +90,43 @@ export default class SearchPage {
   }
 
   getCardTagByText(card, tagText) {
-    return card.locator('.card-tag').filter({ hasText: tagText });
+    return card.locator('.card-tag', { hasText: tagText });
   }
 
-  async waitForCardToExpand(card, timeout = 10000) {
-    await expect.poll(
-      async () => {
-        const classList = await card.evaluate((el) => el.classList.toString());
-        return classList.includes('expanded');
-      },
-      { timeout }
-    ).toBe(true);
-  }
+  async ensureCardExpanded(card, timeout = 10000) {
+    await card.waitFor({ state: 'visible', timeout });
+    await expect(card).toBeVisible({ timeout });
 
-  async verifyCardTag(card, tagText) {
-    // Check if card is expanded, if not click it
-    const isExpanded = await card.evaluate((el) => el.classList.contains('expanded')).catch(() => false);
-    
-    if (!isExpanded) {
-      await card.click({ timeout: 15000 });
-      await this.waitForCardToExpand(card, 15000);
-      await this.searchCardExpended.waitFor({ state: 'visible', timeout: 10000 });
+    const klass = await card.getAttribute('class');
+    if (klass?.includes('expanded')) return;
+
+    const clickable = card.locator('.card-header').first();
+    await clickable.waitFor({ state: 'visible', timeout });
+
+    const deadline = Date.now() + timeout;
+
+    while (true) {
+      await clickable.click({ timeout });
+
+      try {
+        await expect(card).toHaveClass(/expanded/, { timeout: 2000 });
+        return;
+      } catch {}
+
+      if (Date.now() > deadline) {
+        const html = await card.evaluate(el => el.outerHTML).catch(() => '<failed to read outerHTML>');
+        throw new Error(`Card did not expand within ${timeout}ms. CARD outerHTML:\n${html}`);
+      }
     }
-    
+  }
+
+  async verifyCardTag(card, tagText, timeout = 15000) {
+    await this.ensureCardExpanded(card, timeout);
+
     const tag = this.getCardTagByText(card, tagText);
     await expect(tag).toBeVisible({ timeout: 10000 });
-    const text = await tag.textContent();
-    expect(text.trim()).toBe(tagText);
+    const text = (await tag.innerText()).trim();
+    await expect(tag).toHaveText(tagText, { timeout: 10000 });
   }
 
   getCardButtonLink(card, expectedUrl) {
