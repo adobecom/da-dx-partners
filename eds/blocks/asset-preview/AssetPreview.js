@@ -54,10 +54,13 @@ export default class AssetPreview extends LitElement {
     this.isVideoLoading = false;
     this.assetPartnerLevel = [];
   }
+    createRenderRoot() {
+    return this;
+  }
 
   // eslint-disable-next-line no-underscore-dangle
   get _video() {
-    return this.shadowRoot.querySelector('video');
+    return document.querySelector('video');
   }
 
   togglePlay() {
@@ -89,6 +92,12 @@ export default class AssetPreview extends LitElement {
       console.log('error', error);
     }
     await this.getAssetMetadata();
+    await this.updateComplete;
+    const target = document.querySelector('.asset-preview-block-details-left');
+
+    if (target && this.isRestrictedAssetForUser()) {
+      target.appendChild(this.fragment);
+    }
   }
 
   addDynamicKeyForLocalization(key) {
@@ -99,6 +108,7 @@ export default class AssetPreview extends LitElement {
   }
 
   setBlockData() {
+    this.fragment =  document.querySelector('.fragment');
     this.blockData = { ...this.blockData };
 
     const blockDataActions = {

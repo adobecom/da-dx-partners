@@ -1,7 +1,21 @@
 import { getLibs } from '../../scripts/utils.js';
 import AssetPreview from './AssetPreview.js';
 import { getConfig, populateLocalizedTextFromListItems, replaceText } from '../utils/utils.js';
+function keepInlineFragmentInDOM(tableRows, blockElement, fragmentRowTitle) {
+  tableRows.forEach((row) => {
+    const cols = Array.from(row.children);
+    const rowTitle = cols[0].innerText.trim().toLowerCase().replace(/ /g, '-');
+    const colsContent = cols.slice(1);
+    if (rowTitle === fragmentRowTitle) {
+      const inlineXfContent = document.createElement('div');
+      inlineXfContent.append(...colsContent[0].childNodes);
 
+      inlineXfContent.style.display = 'none';
+      inlineXfContent.id = fragmentRowTitle;
+      blockElement.appendChild(inlineXfContent);
+    }
+  });
+}
 function declareAssetPreview() {
   if (customElements.get('asset-preview')) return;
   customElements.define('asset-preview', AssetPreview);
@@ -61,6 +75,7 @@ export default async function init(el) {
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
   app.setAttribute('daa-lh', 'Asset Preview Block')
+  keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'fragment-link');
   el.replaceWith(app);
 
   await deps;
