@@ -435,6 +435,7 @@ export default async function init(el) {
   };
   // Function to show modal using getModal
   const showModal = async () => {
+    document.body.classList.add('yc-disable-scroll');
     // Check if modal already exists in DOM
     if (modalInstance && document.body.contains(modalInstance)) {
       if (modalInputWrapper && !modalInputWrapper.contains(sharedInputField)) {
@@ -452,6 +453,7 @@ export default async function init(el) {
       closeEvent: 'yukon:modal:closed',
       class: 'yukon-chat-modal-wrapper',
       closeCallback: async () => {
+        document.body.classList.remove('yc-disable-scroll');
         if (modalInstance) {
           modalInstance.classList.add('closing');
           // eslint-disable-next-line no-promise-executor-return

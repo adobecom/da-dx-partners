@@ -849,6 +849,11 @@ chat-history-left .user-message {
     font-size: 16px;
   }
 }
+@supports (-webkit-touch-callout: none) {
+  #yukon-chat-modal.dialog-modal {
+    height: 100%; /* ios only */
+  }
+}
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .chat-interface {
@@ -1032,4 +1037,7 @@ chat-history-left .user-message {
 
 .message-text table tbody tr:nth-child(even):hover {
   background: #F5F5F5;
+}
+.yc-disable-scroll {
+  position: fixed;
 }
