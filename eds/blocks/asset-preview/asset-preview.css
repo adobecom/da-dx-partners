@@ -167,7 +167,7 @@
   }
   
   :is(.asset-preview-block-video .video-container .pause-play-wrapper, .asset-preview-block-video .aside.split.split-left .split-image) img.accessibility-control,
-  .brick.split.row.media-right .foreground .brick-media img.accessibility-control {
+  .asset-preview-block-video .brick.split.row.media-right .foreground .brick-media img.accessibility-control {
     width: inherit;
     height: inherit;
     margin: 0;
