@@ -13,7 +13,7 @@ async function localizationPromises(localizedText, config) {
       if (value.length) localizedText[key] = value;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.debug('Failed to replace text for key:', key, error);
+      console.debug('Failed to replace text for key: ', key, error);
     }
   }));
 }
