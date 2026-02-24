@@ -166,7 +166,7 @@
     background: var(--color-gray-800);
   }
   
-  :is(.video-container .pause-play-wrapper, .aside.split.split-left .split-image) img.accessibility-control,
+  :is(.asset-preview-block-video .video-container .pause-play-wrapper, .aside.split.split-left .split-image) img.accessibility-control,
   .brick.split.row.media-right .foreground .brick-media img.accessibility-control {
     width: inherit;
     height: inherit;
