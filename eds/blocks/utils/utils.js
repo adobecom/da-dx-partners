@@ -127,3 +127,19 @@ export function transformCardUrl(url) {
 export function isProd() {
   return prodHosts.includes(window.location.host);
 }
+
+export function keepInlineFragmentInDOM(tableRows, blockElement, fragmentRowTitle) {
+  tableRows.forEach((row) => {
+    const cols = Array.from(row.children);
+    const rowTitle = cols[0].innerText.trim().toLowerCase().replace(/ /g, '-');
+    const colsContent = cols.slice(1);
+    if (rowTitle === fragmentRowTitle) {
+      const inlineXfContent = document.createElement('div');
+      inlineXfContent.append(...colsContent[0].childNodes);
+
+      inlineXfContent.style.display = 'none';
+      inlineXfContent.id = fragmentRowTitle;
+      blockElement.appendChild(inlineXfContent);
+    }
+  });
+}

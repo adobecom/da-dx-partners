@@ -1,5 +1,4 @@
 import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
-import { assetPreviewStyles } from './AssetPreviewStyles.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,
@@ -17,10 +16,6 @@ const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
 export default class AssetPreview extends LitElement {
-  static styles = [
-    assetPreviewStyles,
-  ];
-
   static properties = {
     blockData: { type: Object },
     title: { type: String },

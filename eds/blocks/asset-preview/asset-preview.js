@@ -1,21 +1,7 @@
 import { getLibs } from '../../scripts/utils.js';
 import AssetPreview from './AssetPreview.js';
-import { getConfig, populateLocalizedTextFromListItems, replaceText } from '../utils/utils.js';
-function keepInlineFragmentInDOM(tableRows, blockElement, fragmentRowTitle) {
-  tableRows.forEach((row) => {
-    const cols = Array.from(row.children);
-    const rowTitle = cols[0].innerText.trim().toLowerCase().replace(/ /g, '-');
-    const colsContent = cols.slice(1);
-    if (rowTitle === fragmentRowTitle) {
-      const inlineXfContent = document.createElement('div');
-      inlineXfContent.append(...colsContent[0].childNodes);
+import { getConfig, populateLocalizedTextFromListItems, replaceText, keepInlineFragmentInDOM } from '../utils/utils.js';
 
-      inlineXfContent.style.display = 'none';
-      inlineXfContent.id = fragmentRowTitle;
-      blockElement.appendChild(inlineXfContent);
-    }
-  });
-}
 function declareAssetPreview() {
   if (customElements.get('asset-preview')) return;
   customElements.define('asset-preview', AssetPreview);
