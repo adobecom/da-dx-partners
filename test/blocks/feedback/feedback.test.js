@@ -451,5 +451,25 @@ describe('feedback block', () => {
       const stickyButton = document.querySelector('.sticky-feedback-button');
       expect(stickyButton).to.exist;
     });
+
+    it('should render feedback modal and remove feedback param from URL when feedback=true', async () => {
+      window.history.pushState({}, '', '?feedback=true');
+      const replaceStateSpy = sinon.spy(window.history, 'replaceState');
+
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      await init(block);
+
+      const dialog = document.querySelector('.feedback-dialog');
+      expect(dialog).to.exist;
+
+      const newUrl = replaceStateSpy.firstCall.args[2];
+      expect(newUrl).to.not.include('feedback');
+
+      expect(replaceStateSpy.calledOnce).to.be.true;
+
+      replaceStateSpy.restore();
+      window.history.pushState({}, '', '/');
+    });
   });
 });
