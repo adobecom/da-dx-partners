@@ -5,6 +5,7 @@
   --yc-card-radius: 12px;
   --yc-input-radius: 28px;
   --yc-input-height: 56px;
+  --yc-header-height: 57px;
   --yc-input-border: linear-gradient(98.11deg, #9A3CF9 -4.21%, #E743C8 35.46%, #ED457E 68.67%, #FF7918 104.7%);
   --yc-button-dimensions: 32px;
   --yc-button-radius: 50%;
@@ -1032,4 +1033,22 @@ chat-history-left .user-message {
 
 .message-text table tbody tr:nth-child(even):hover {
   background: #F5F5F5;
+}
+.yc-disable-scroll {
+  position: fixed;
+}
+@media (orientation: landscape) and (max-width: 1366px) {
+  #yukon-chat-modal.dialog-modal {
+    height: calc(100vh - var(--feds-height-nav)) ;
+    max-height: calc(100vh - var(--feds-height-nav)) ;
+    height: calc(100dvh - var(--feds-height-nav)) ;
+    max-height: calc(100dvh - var(--feds-height-nav)) ;
+  }
+  .yukon-chat-dialog-body {
+    max-height: calc(100vh - var(--yc-header-height) - var(--feds-height-nav));
+    max-height: calc(100dvh - var(--yc-header-height) - var(--feds-height-nav));
+  }
+  .yukon-chat-container {
+    padding-bottom: 0;
+  }
 }
