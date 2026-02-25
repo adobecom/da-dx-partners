@@ -336,6 +336,6 @@ export default async function init(el) {
   if (feedbackParam === 'true' || feedbackParam === '') {
     await renderDialog(stickyFeedbackButton, url, config);
     searchParams.delete('feedback');
-    window.history.replaceState({}, '', currentUrl.toString());
+    window.history.replaceState({}, '', decodeURIComponent(currentUrl.toString()));
   }
 }
