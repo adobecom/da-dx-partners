@@ -180,7 +180,7 @@
   }
 
   @media screen and (max-width: 600px) {
-    .asset-preview-block-video .asset-preview-block-details {
+   .asset-preview-block-details {
       flex-direction: column;
     }
 
@@ -236,7 +236,3 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
-
-  asset-preview .fragment {
-    font-style: italic;
-  }
