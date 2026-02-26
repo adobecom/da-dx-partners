@@ -236,3 +236,6 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+.asset-preview-block {
+  --grid-container-width: 83.4%;
+}
