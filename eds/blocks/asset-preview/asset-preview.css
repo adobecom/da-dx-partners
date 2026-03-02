@@ -180,7 +180,7 @@
   }
 
   @media screen and (max-width: 600px) {
-    .asset-preview-block-video .asset-preview-block-details {
+   .asset-preview-block-details {
       flex-direction: column;
     }
 
@@ -237,6 +237,10 @@
     to { transform: rotate(360deg); }
 }
 
-  asset-preview .fragment {
-    font-style: italic;
-  }
+.asset-preview-block {
+  --grid-container-width: 83.4%;
+}
+
+.asset-preview-block .italic {
+  font-style: italic;
+}
