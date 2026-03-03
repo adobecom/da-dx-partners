@@ -329,4 +329,13 @@ export default async function init(el) {
   app.appendChild(stickyFeedbackButton);
   stickyFeedbackButton.addEventListener('click', () => renderDialog(stickyFeedbackButton, url, config));
   el.replaceWith(app);
+
+  const currentUrl = new URL(window.location.href);
+  const { searchParams } = currentUrl;
+  const feedbackParam = searchParams.get('feedback');
+  if (feedbackParam === 'true' || feedbackParam === '') {
+    await renderDialog(stickyFeedbackButton, url, config);
+    searchParams.delete('feedback');
+    window.history.replaceState({}, '', decodeURIComponent(currentUrl.toString()));
+  }
 }

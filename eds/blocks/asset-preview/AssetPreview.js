@@ -1,5 +1,4 @@
 import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
-import { assetPreviewStyles } from './AssetPreviewStyles.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,
@@ -17,10 +16,6 @@ const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
 export default class AssetPreview extends LitElement {
-  static styles = [
-    assetPreviewStyles,
-  ];
-
   static properties = {
     blockData: { type: Object },
     title: { type: String },
@@ -54,10 +49,13 @@ export default class AssetPreview extends LitElement {
     this.isVideoLoading = false;
     this.assetPartnerLevel = [];
   }
+    createRenderRoot() {
+    return this;
+  }
 
   // eslint-disable-next-line no-underscore-dangle
   get _video() {
-    return this.shadowRoot.querySelector('video');
+    return document.querySelector('video');
   }
 
   togglePlay() {
@@ -89,6 +87,12 @@ export default class AssetPreview extends LitElement {
       console.log('error', error);
     }
     await this.getAssetMetadata();
+    await this.updateComplete;
+    const target = document.querySelector('.asset-preview-block-details-left');
+
+    if (target && this.isRestrictedAssetForUser()) {
+      target.appendChild(this.fragment);
+    }
   }
 
   addDynamicKeyForLocalization(key) {
@@ -99,6 +103,7 @@ export default class AssetPreview extends LitElement {
   }
 
   setBlockData() {
+    this.fragment =  document.querySelector('.fragment');
     this.blockData = { ...this.blockData };
 
     const blockDataActions = {

@@ -514,6 +514,13 @@ export default class PartnerCards extends LitElement {
     return this.cards?.length;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  handleMobileFilterBackdropClick(e) {
+    if (e.target === e.currentTarget) {
+      e.currentTarget.classList.remove('expanded');
+    }
+  }
+
   get filtersMobile() {
     if (!this.blockData?.filters?.length) return;
 
@@ -528,7 +535,7 @@ export default class PartnerCards extends LitElement {
 
         /* eslint-disable indent */
         return html`
-          <div class="filter-wrapper-mobile">
+          <div class="filter-wrapper-mobile" @click=${this.handleMobileFilterBackdropClick}>
             <div class="filter-mobile">
               <button class="filter-header-mobile" @click=${(e) => this.toggleFilter(e.target.closest('.filter-wrapper-mobile'))} aria-label="${filter.value}">
                 <div class="filter-header-content-mobile">
