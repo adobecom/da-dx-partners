@@ -7,6 +7,7 @@ import {
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
+import {dispatchCustomEventOnSearch} from "../blocks/utils/analyticsUtils.js";
 
 const miloLibs = getLibs();
 const { html, LitElement, css, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -657,6 +658,11 @@ export default class PartnerCards extends LitElement {
     // eslint-disable-next-line no-return-assign
     this.cards.forEach((card, index) => card.orderNum = index + 1);
     this.updatePaginatedCards();
+    dispatchCustomEventOnSearch(
+      this.searchTerm,
+      //todo get caas full path ,if key starts with caas: that should be used value, if not,than reconstruct (caas: + parent key + / + key
+      Object.keys(this.selectedFilters),
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this

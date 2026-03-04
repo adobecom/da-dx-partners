@@ -4,6 +4,7 @@ import { searchCardsStyles } from './SearchCardsStyles.js';
 import '../../components/SearchCard.js';
 import { generateRequestForSearchAPI } from '../utils/utils.js';
 import { debounce } from '../utils/action.js';
+import {dispatchCustomEventOnSearch} from "../utils/analyticsUtils.js";
 
 const miloLibs = getLibs();
 const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -211,6 +212,12 @@ export default class Search extends PartnerCards {
     const startCardIndex = (this.paginationCounter - 1) * this.cardsPerPage;
     let apiData;
     try {
+      const filters = this.generateFilters();
+      dispatchCustomEventOnSearch(
+        this.searchTerm,
+        Object.keys(filters.filters).map((key) => filters.filters[key]).flat(),
+      );
+
       const response = await generateRequestForSearchAPI(
         {
           size: this.cardsPerPage,
@@ -219,7 +226,7 @@ export default class Search extends PartnerCards {
           type: this.contentType,
           term: this.searchTerm,
         },
-        this.generateFilters(),
+        filters,
       );
 
       if (!response.ok) {

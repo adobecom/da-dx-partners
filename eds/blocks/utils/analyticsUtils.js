@@ -24,6 +24,11 @@ export function dispatchCustomEventOnLinkClick(e, link, linkText) {
   );
 }
 
-export function dispatchCustomEventOnSearch() {
-  console.log('');
+export function dispatchCustomEventOnSearch(term, filters) {
+  window.dispatchEvent(
+    createCustomEvent(
+      eventTypeSearch,
+      { term, filters },
+    ),
+  );
 }
