@@ -18,7 +18,6 @@ export function dispatchCustomEventOnLinkClick(e, link, linkText) {
   window.dispatchEvent(
     createCustomEvent(
       eventTypeLinkClick,
-      // todo check for linkText what value they need
       { link, linkText },
     ),
   );
