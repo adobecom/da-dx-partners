@@ -9,6 +9,7 @@ const loggedInAdobe = features.slice(3, 6);
 const errorFlowCases = features.slice(8, 12);
 const forbiddenAccess = features.slice(13, 15);
 const silverPlatinumPage = features.slice(15, 17);
+const downgradedUsers = features.slice(18, 25);
 
 test.describe('MAPP sign in flow', () => {
   test.beforeEach(async ({ page, browserName, baseURL, context }) => {
@@ -286,6 +287,32 @@ test.describe('MAPP sign in flow', () => {
         .toContain(`${features[17].data.expectedToContactNotFoundInURL}`);
       await page.goto(`${features[17].data.secondaccess404Url}`);
       await expect(signInPage.notFound).toBeVisible();
+    });
+  });
+  downgradedUsers.forEach((feature) => {
+    test(`${feature.name},${feature.tags}`, async ({ page, baseURL }) => {
+      const { data, path } = feature;
+      await test.step('Go to public home page', async () => {
+        await page.goto(`${baseURL}${feature.path}`);
+      });
+  
+      await test.step('Sign in', async () => {
+        await signInPage.signIn(page, `${feature.data.partnerLevel}`);
+        await signInPage.popupCloseButton.waitFor({ state: 'visible', timeout: 30000 });
+        await signInPage.popupCloseButton.click();
+      });
+      await test.step('Verify assets visibility', async () => {
+        await signInPage.searchField.fill(data.searchKeyword);
+        await signInPage.searchField.press('Enter');
+        await signInPage.waitForResultsToSettle();
+        const numberResults = await signInPage.getNumberOfResults();
+        await expect(numberResults).toEqual(4);
+
+        await expect(signInPage.assetTitleCheck(data.assetTitle1)).toBeVisible();
+        await expect(signInPage.assetTitleCheck(data.assetTitle2)).toBeVisible();
+        await expect(signInPage.assetTitleCheck(data.assetTitle3)).toBeVisible();
+        await expect(signInPage.assetTitleCheck(data.assetTitle4)).toBeVisible();
+      });
     });
   });
 });
