@@ -658,12 +658,7 @@ export default class PartnerCards extends LitElement {
     // eslint-disable-next-line no-return-assign
     this.cards.forEach((card, index) => card.orderNum = index + 1);
     this.updatePaginatedCards();
-    dispatchCustomEventOnSearch(
-      this.searchTerm,
-      //todo get caas full path ,if key starts with caas: that should be used value, if not,than reconstruct (caas: + parent key + / + key
-      Object.keys(this.selectedFilters),
-    );
-  }
+    this.handleFilterAnalytics();
 
   // eslint-disable-next-line class-methods-use-this
   additionalActions() {}
@@ -757,6 +752,23 @@ export default class PartnerCards extends LitElement {
     } else {
       this.urlSearchParams.delete('filters');
     }
+  }
+
+  handleFilterAnalytics() {
+    const selectedFiltersAnalytics = Object.entries(this.selectedFilters).flatMap(
+      ([key, values]) =>
+        values.map(value => {
+          if (value.key.startsWith('caas:')) return value.key;
+          return `caas:${key}/${value.key}`;
+        })
+    );
+
+    dispatchCustomEventOnSearch(
+      this.searchTerm,
+      selectedFiltersAnalytics,
+      //todo get caas full path ,if key starts with caas: that should be used value, if not,than reconstruct (caas: + parent key + / + key
+      Object.keys(this.selectedFilters),
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -893,7 +905,7 @@ export default class PartnerCards extends LitElement {
     const targetElement = partnerCardsHeader || this;
     const gnavHeight = document.querySelector('header')?.offsetHeight || 0;
     const targetRect = targetElement.getBoundingClientRect();
-    
+
     window.scrollTo({
       top: targetRect.top + window.scrollY - gnavHeight,
       behavior: 'auto'

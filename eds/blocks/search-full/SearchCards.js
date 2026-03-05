@@ -4,7 +4,7 @@ import { searchCardsStyles } from './SearchCardsStyles.js';
 import '../../components/SearchCard.js';
 import { generateRequestForSearchAPI } from '../utils/utils.js';
 import { debounce } from '../utils/action.js';
-import {dispatchCustomEventOnSearch} from "../utils/analyticsUtils.js";
+import { dispatchCustomEventOnSearch } from '../utils/analyticsUtils.js';
 
 const miloLibs = getLibs();
 const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -173,7 +173,6 @@ export default class Search extends PartnerCards {
         this.generateFilters(),
       );
 
-
       if (!response.ok) {
         throw new Error(`Error message: ${response.statusText}`);
       }
@@ -280,6 +279,7 @@ export default class Search extends PartnerCards {
       countCourses: count.courses,
     };
     this.hasResponseData = true;
+    this.handleFilterAnalytics();
   }
 
   handleContentType(contentType) {
