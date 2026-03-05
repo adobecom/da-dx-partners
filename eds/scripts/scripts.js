@@ -135,11 +135,7 @@ async function loadPage() {
 }
 
 loadPage();
-//todo remove on pr
-const a = function(e) {
-  console.log('event', e)
-};
-window.addEventListener('aep:TrackEvent',a);
+
 (async function loadDa() {
   if (!new URL(window.location.href).searchParams.get('dapreview')) return;
   // eslint-disable-next-line import/no-unresolved

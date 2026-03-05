@@ -659,6 +659,7 @@ export default class PartnerCards extends LitElement {
     this.cards.forEach((card, index) => card.orderNum = index + 1);
     this.updatePaginatedCards();
     this.handleFilterAnalytics();
+  }
 
   // eslint-disable-next-line class-methods-use-this
   additionalActions() {}
@@ -766,8 +767,6 @@ export default class PartnerCards extends LitElement {
     dispatchCustomEventOnSearch(
       this.searchTerm,
       selectedFiltersAnalytics,
-      //todo get caas full path ,if key starts with caas: that should be used value, if not,than reconstruct (caas: + parent key + / + key
-      Object.keys(this.selectedFilters),
     );
   }
 
