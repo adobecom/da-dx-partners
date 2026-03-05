@@ -35,6 +35,11 @@ const isProd = prodHosts.includes(window.location.host);
 let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 'ims_client_id_stage' }]`)?.content
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
+const localesDefault = { '': { ietf: 'en-US', tk: 'hah7vzn.css' } };
+//typekits with swap
+const localesSafari = { '': { ietf: 'en-US', tk: 'vti0xwb.css' } };
+const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome');
+
 // Add any config options.
 let CONFIG = {
   codeRoot: '/eds',
@@ -44,9 +49,7 @@ let CONFIG = {
   clientEnv: isProd ? 'prod' : null,
   // geoRouting: 'off',
   // fallbackRouting: 'off',
-  locales: {
-    '': { ietf: 'en-US', tk: 'hah7vzn.css' },
-  },
+  locales: isSafari ? localesSafari : localesDefault,
   jarvis: {
     id: 'spp_default',
     version: '1.0',
