@@ -36,6 +36,7 @@ let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
 const localesDefault = { '': { ietf: 'en-US', tk: 'hah7vzn.css' } };
+//typekits with swap
 const localesSafari = { '': { ietf: 'en-US', tk: 'vti0xwb.css' } };
 const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome');
 
