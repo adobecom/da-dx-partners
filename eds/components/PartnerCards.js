@@ -7,7 +7,7 @@ import {
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
-import {dispatchCustomEventOnSearch} from "../blocks/utils/analyticsUtils.js";
+import { dispatchCustomEventOnSearch } from '../blocks/utils/analyticsUtils.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, css, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -658,7 +658,7 @@ export default class PartnerCards extends LitElement {
     // eslint-disable-next-line no-return-assign
     this.cards.forEach((card, index) => card.orderNum = index + 1);
     this.updatePaginatedCards();
-    this.handleFilterAnalytics();
+    this.handleOnSearchAnalytics();
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -755,7 +755,7 @@ export default class PartnerCards extends LitElement {
     }
   }
 
-  handleFilterAnalytics() {
+  handleOnSearchAnalytics() {
     const selectedFiltersAnalytics = Object.entries(this.selectedFilters).flatMap(
       ([key, values]) =>
         values.map(value => {

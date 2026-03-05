@@ -272,7 +272,7 @@ export default class Search extends PartnerCards {
       countCourses: count.courses,
     };
     this.hasResponseData = true;
-    this.handleFilterAnalytics();
+    this.handleOnSearchAnalytics();
   }
 
   handleContentType(contentType) {
