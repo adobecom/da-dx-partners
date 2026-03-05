@@ -305,6 +305,7 @@ test.describe('MAPP sign in flow', () => {
         await signInPage.searchField.fill(data.searchKeyword);
         await signInPage.searchField.press('Enter');
         await signInPage.waitForResultsToSettle();
+        await signInPage.cardWrapper.waitFor({ state: 'visible', timeout: 30000 });
         const numberResults = await signInPage.getNumberOfResults();
         await expect(numberResults).toEqual(4);
 
