@@ -31,11 +31,6 @@ export const FILE_EXTENSION_TO_DOWNLOAD_LABEL = {
   doc: 'Download Word',
   docx: 'Download Word',
 
-  // Videos
-  mp4: 'Download Video',
-  mov: 'Download Video',
-  m4v: 'Download Video',
-
   // PDF
   pdf: 'Download PDF',
 
