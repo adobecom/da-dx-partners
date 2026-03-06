@@ -8,7 +8,7 @@ export default class ProfileDropdownPage {
     this.profileEmail = page.locator('.feds-profile-email');
     this.profileJob = page.locator('.primaryjobrole-placeholder');
     this.accountName = page.locator('.accountname-placeholder');
-    this.partnerLevelDropdown = page.locator('.level-placeholder');
+    this.partnerLevelDropdown = page.locator('.purchasedpartnerlevel-placeholder');
     this.updateProfile = page.getByRole('link', { name: 'Update your profile' });
     this.manageCompanyAccount = page.getByRole('link', { name: 'Manage Company Account' });
     this.signOut = page.getByRole('link', { name: 'Sign Out' });

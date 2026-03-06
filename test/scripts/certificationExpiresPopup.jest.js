@@ -15,6 +15,7 @@ jest.mock('../../eds/scripts/utils.js', () => ({
   getCurrentProgramType: jest.fn(() => 'dxp'),
   getMetadataContent: jest.fn(),
   isMember: jest.fn(),
+  invokeAfterImsIsReady: jest.fn(async (callback) => await callback()), // Immediately invoke callback and await result
 }));
 
 jest.mock('../../eds/scripts/portalMessaging.js', () => ({ loadPopupFragment: jest.fn() }));
@@ -32,11 +33,12 @@ jest.mock('../../eds/scripts/personalizationConfigDX.js', () => ({ PERSONALIZATI
 
 // Global mocks
 global.fetch = jest.fn();
+window.dxpImsReady = 'eventhappend';
 
-// Mock sessionStorage
+// Mock localStorage
 const mockGetItem = jest.fn();
 const mockSetItem = jest.fn();
-Object.defineProperty(global, 'sessionStorage', {
+Object.defineProperty(global, 'localStorage', {
   value: {
     getItem: mockGetItem,
     setItem: mockSetItem,
@@ -51,6 +53,7 @@ describe('Test certificationExpiresPopup.js', () => {
   let getCurrentProgramType;
   let getMetadataContent;
   let isMember;
+  let invokeAfterImsIsReady;
   let loadPopupFragment;
   let isProd;
   let rewriteLinks;
@@ -81,6 +84,7 @@ describe('Test certificationExpiresPopup.js', () => {
   };
 
   beforeEach(() => {
+    jest.resetModules();
     jest.clearAllMocks();
     
     // Reset global mocks
@@ -108,6 +112,7 @@ describe('Test certificationExpiresPopup.js', () => {
     getCurrentProgramType = utilsModule.getCurrentProgramType;
     getMetadataContent = utilsModule.getMetadataContent;
     isMember = utilsModule.isMember;
+    invokeAfterImsIsReady = utilsModule.invokeAfterImsIsReady;
 
     const portalMessagingModule = require('../../eds/scripts/portalMessaging.js');
     loadPopupFragment = portalMessagingModule.loadPopupFragment;
@@ -133,22 +138,33 @@ describe('Test certificationExpiresPopup.js', () => {
     document.body.innerHTML = '';
     jest.clearAllMocks();
   });
-
   describe('early exits', () => {
-    it('should exit if partner agreement is displayed', async () => {
+    it('should exit early if partnerAgreementDisplayed is true', async () => {
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
 
       await certificationExpiresPopup('https://test-milo-libs.com', false, true, 'test-client-id');
 
+      // Should not make API calls or show modal when partnerAgreement was displayed
       expect(global.fetch).not.toHaveBeenCalled();
       expect(mockGetModal).not.toHaveBeenCalled();
     });
 
-    it('should exit if portal messaging is open', async () => {
+    it('should exit early if portalMessagingOpen is true', async () => {
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
 
       await certificationExpiresPopup('https://test-milo-libs.com', true, false, 'test-client-id');
 
+      // Should not make API calls or show modal when portal messaging is open
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(mockGetModal).not.toHaveBeenCalled();
+    });
+
+    it('should exit early if both partnerAgreementDisplayed and portalMessagingOpen are true', async () => {
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+
+      await certificationExpiresPopup('https://test-milo-libs.com', true, true, 'test-client-id');
+
+      // Should not make API calls or show modal when both flags are true
       expect(global.fetch).not.toHaveBeenCalled();
       expect(mockGetModal).not.toHaveBeenCalled();
     });

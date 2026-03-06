@@ -16,13 +16,12 @@ import {
   preloadResources,
   redirectLoggedinPartner,
   updateNavigation,
-  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback
+  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback, SHOW_NEXT_POPUP, PARTNER_AGREEMENT_POPUP
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
-import {partnerAgreement} from "./partnerAgreement.js";
-import {bctqBanner, portalMessaging} from "./portalMessaging.js";
-import { certificationExpiresPopup } from "./certificationExpiresPopup.js";
+import { bctqBanner } from './portalMessaging.js';
+import { showNextPopup } from './showNextPopup.js';
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -36,17 +35,21 @@ const isProd = prodHosts.includes(window.location.host);
 let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 'ims_client_id_stage' }]`)?.content
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
+const localesDefault = { '': { ietf: 'en-US', tk: 'hah7vzn.css' } };
+//typekits with swap
+const localesSafari = { '': { ietf: 'en-US', tk: 'vti0xwb.css' } };
+const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome');
+
 // Add any config options.
 let CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
+  useDotHtml: false,
   imsClientId,
   clientEnv: isProd ? 'prod' : null,
   // geoRouting: 'off',
   // fallbackRouting: 'off',
-  locales: {
-    '': { ietf: 'en-US', tk: 'hah7vzn.css' },
-  },
+  locales: isSafari ? localesSafari : localesDefault,
   jarvis: {
     id: 'spp_default',
     version: '1.0',
@@ -56,9 +59,9 @@ let CONFIG = {
   stage: {
     edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e',
     marTechUrl:
-      'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-184d20637aa8-development.min.js',
+      'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-f10da6991680-staging.min.js',
   },
-  prod: { },
+  prod: { marTechUrl: 'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-78b077e5ada7.min.js' },
 };
 
 (function removePartnerLoginQuery() {
@@ -122,10 +125,16 @@ async function loadPage() {
   await setFeedback(getConfig);
   await loadArea();
   applyPagePersonalization();
-  rewriteLinks(document);
-  const partnerAgreementDisplayed = await partnerAgreement(miloLibs);
-  const portalMessagingOpen = await portalMessaging(miloLibs, partnerAgreementDisplayed);
-  await certificationExpiresPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
+  rewriteLinks(document.querySelector('main') ?? document);
+  window.addEventListener(SHOW_NEXT_POPUP, async (e) => {
+    if ('detail' in e) {
+      console.log('CustomEvent data:', e.detail?.next);
+      await showNextPopup(miloLibs, imsClientId, e.detail?.next);
+    } else {
+      await showNextPopup(miloLibs, imsClientId);
+    }
+  });
+  await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
 }
 
 loadPage();

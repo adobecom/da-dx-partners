@@ -1,21 +1,6 @@
 import { getLibs } from '../../scripts/utils.js';
 import TrainingPreview from './TrainingPreview.js';
-import { getConfig, populateLocalizedTextFromListItems, replaceText } from '../utils/utils.js';
-
-function keepInlineFragmentInDOM(tableRows, blockElement, fragmentRowTitle) {
-  tableRows.forEach((row) => {
-    const cols = Array.from(row.children);
-    const rowTitle = cols[0].innerText.trim().toLowerCase().replace(/ /g, '-');
-    const colsContent = cols.slice(1);
-    if (rowTitle === fragmentRowTitle) {
-      const inlineXfContent = document.createElement('div');
-      inlineXfContent.innerHTML = colsContent[0].innerHTML;
-      inlineXfContent.style.display = 'none';
-      inlineXfContent.id = fragmentRowTitle;
-      blockElement.appendChild(inlineXfContent);
-    }
-  });
-}
+import { getConfig, populateLocalizedTextFromListItems, replaceText, keepInlineFragmentInDOM } from '../utils/utils.js';
 
 function declareTrainingPreview() {
   if (customElements.get('training-preview')) return;
@@ -52,6 +37,7 @@ export default async function init(el) {
   declareTrainingPreview();
   const app = document.createElement('training-preview');
   app.className = 'training-preview-block';
+  app.setAttribute('daa-lh', 'Training Preview Block');
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
   keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'training-not-available-fragment');

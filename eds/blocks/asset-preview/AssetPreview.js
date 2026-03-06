@@ -1,16 +1,14 @@
 import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
-import { assetPreviewStyles } from './AssetPreviewStyles.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,
   transformCardUrl,
 } from '../utils/utils.js';
 import {
+  DEFAULT_BACKGROUND_IMAGE_PATH,
   DIGITALEXPERIENCE_PREVIEW_PATH, FILE_EXTENSION_TO_DOWNLOAD_LABEL,
   PARTNER_LEVEL, PX_ASSETS_PREVIEW_PATH,
 } from '../utils/dxConstants.js';
-
-const DEFAULT_BACKGROUND_IMAGE_PATH = '/content/dam/solution/en/images/card-collection/sample_default.png';
 
 import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
@@ -18,10 +16,6 @@ const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
 export default class AssetPreview extends LitElement {
-  static styles = [
-    assetPreviewStyles,
-  ];
-
   static properties = {
     blockData: { type: Object },
     title: { type: String },
@@ -55,10 +49,13 @@ export default class AssetPreview extends LitElement {
     this.isVideoLoading = false;
     this.assetPartnerLevel = [];
   }
+    createRenderRoot() {
+    return this;
+  }
 
   // eslint-disable-next-line no-underscore-dangle
   get _video() {
-    return this.shadowRoot.querySelector('video');
+    return document.querySelector('video');
   }
 
   togglePlay() {
@@ -90,6 +87,12 @@ export default class AssetPreview extends LitElement {
       console.log('error', error);
     }
     await this.getAssetMetadata();
+    await this.updateComplete;
+    const target = document.querySelector('.asset-preview-block-details-left');
+
+    if (target && this.isRestrictedAssetForUser()) {
+      target.appendChild(this.fragment);
+    }
   }
 
   addDynamicKeyForLocalization(key) {
@@ -100,6 +103,7 @@ export default class AssetPreview extends LitElement {
   }
 
   setBlockData() {
+    this.fragment =  document.querySelector('.fragment');
     this.blockData = { ...this.blockData };
 
     const blockDataActions = {
@@ -196,8 +200,15 @@ export default class AssetPreview extends LitElement {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  _handleImgError = (e) => {
+    console.log('error', e);
+    const img = e.currentTarget;
+    img.src = transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH);
+  };
+
   render() {
-    return html`<div class="asset-preview-block-container">
+    return html`<div class="asset-preview-block-container" daa-lh="Asset preview container | ${this.title}">
       ${this.assetHasData && !this.isLoading ? html`
           <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${unsafeHTML(this.title)}  ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}</p></div>
           <div class="asset-preview-block-details ">
@@ -208,28 +219,26 @@ export default class AssetPreview extends LitElement {
               ${this.getTagsTitlesString(this.fileFormatTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Type}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.fileFormatTags))}</p>` : ''}
               ${this.getTagsTitlesString(this.tags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Tags}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.tags))}</p>` : ''}
               ${this.size ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span class="bold">${unsafeHTML(this.size)}</p>` : ''}
+
+              ${!this.isRestrictedAssetForUser() ? html`
+              <div class="asset-preview-block-actions" daa-lh="Asset preview block actions">
+              ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button
+                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}" daa-ll="View"> View </a></button>` : ''}
+                <button class="filled"><a download="${this.title}" href="${this.getDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>
+                ${this.webinarPresentation ? html`
+                  <button class="filled"><a  download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
+                ` : ''}
+
+              ${this.backButtonUrl ? html`<a
+                class="link" href="${this.backButtonUrl}" daa-ll="${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
+              </div>` : ''}
             </div>
-            <div class="asset-preview-block-details-right"
-                 style="background-image:
-                  url(${transformCardUrl(this.previewImage)}),
-                   url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})"
-            >
+            <div class="asset-preview-block-details-right">
+                    <img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>
             </div>
          </div>
          
-         
-          ${!this.isRestrictedAssetForUser() ? html`
-              <div class="asset-preview-block-actions">
-              ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button 
-                class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}"> View </a></button>` : ''}
-                <button class="filled"><a  download="${this.title}" href="${this.getDownloadUrl()}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>
-                ${this.webinarPresentation ? html`
-                  <button class="filled"><a  download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
-                ` : ''}
-                
-              ${this.backButtonUrl ? html`<a 
-                class="link" href="${this.backButtonUrl}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
-              </div>` : ''}
+
   
         ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
         <div class="asset-preview-block-video">

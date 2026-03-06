@@ -1,4 +1,10 @@
-import { getCurrentProgramType, getMetadataContent, isMember } from './utils.js';
+import {
+  getCurrentProgramType,
+  getMetadataContent,
+  invokeAfterImsIsReady,
+  NEXT_POPUP_PLACEHOLDER,
+  SHOW_NEXT_POPUP,
+} from './utils.js';
 import { loadPopupFragment } from './portalMessaging.js';
 import { isProd } from '../blocks/utils/utils.js';
 import { rewriteLinks } from './rewriteLinks.js';
@@ -86,20 +92,23 @@ function isMilestoneReached(certification, lastCertificationPopupShown) {
 }
 
 // eslint-disable-next-line import/prefer-default-export,max-len
-export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
-  if (partnerAgreementDisplayed) return;
-  if (portalMessagingOpen) return;
-  if (!isMember()) return;
+async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId) {
+  if (partnerAgreementDisplayed || portalMessagingOpen) {
+    return false;
+  }
   const lastCertificationPopupShown = parseLocalDate(
-    sessionStorage.getItem(LAST_DATE_SHOWN),
+    localStorage.getItem(LAST_DATE_SHOWN),
   ) || new Date(0); // Jan 1, 1970 at midnight local time
   const today = normalizeDate(new Date());
   // Check if popup was already shown today (compare local calendar days, not time difference)
   if (lastCertificationPopupShown.getTime() >= today.getTime()) {
-    return;
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
   }
 
-  const imsToken = window.adobeIMS.getAccessToken().token;
+  const imsToken = window.adobeIMS?.getAccessToken?.()?.token;
   let shoulDisplayCertificationModal = false;
 
   try {
@@ -118,20 +127,32 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
     }
   } catch (error) {
     console.error(error.message);
+    console.warn('certification popup skipped');
   }
-  if (!shoulDisplayCertificationModal) return;
+  if (!shoulDisplayCertificationModal) {
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
+  }
 
   const CERTIFICATION_META = 'certification-modal';
   const certificationFragmentPath = getMetadataContent(CERTIFICATION_META);
   if (!certificationFragmentPath) {
     console.warn(`${CERTIFICATION_META} should be displayed but popup fragment path is not found`);
-    return;
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
   }
 
   const popupContent = await loadPopupFragment(certificationFragmentPath, 'certification modal');
   if (!popupContent) {
     console.warn(`Popup fragment for ${certificationFragmentPath} not found`);
-    return;
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
   }
 
   const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`);
@@ -142,14 +163,34 @@ export async function certificationExpiresPopup(miloLibs, portalMessagingOpen, p
       class: 's-size',
       content: popupContent,
       closeCallback: () => {
-        sessionStorage.setItem(LAST_DATE_SHOWN, dateToLocalString(normalizeDate(new Date())));
+        localStorage.setItem(LAST_DATE_SHOWN, dateToLocalString(normalizeDate(new Date())));
+        window.dispatchEvent(
+          new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+        );
       },
     },
   );
-  if (!modal) return;
+  if (!modal) {
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
+    );
+    return false;
+  }
   const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
   await loadArea(modal);
   personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
   personalizePage(modal);
   rewriteLinks(modal);
+  return true;
+}
+
+export function certificationExpiresPopup(
+  miloLibs,
+  portalMessagingOpen,
+  partnerAgreementDisplayed,
+  imsClientId,
+) {
+  return invokeAfterImsIsReady(async () => {
+    await showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplayed, imsClientId);
+  });
 }

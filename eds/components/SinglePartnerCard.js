@@ -3,12 +3,11 @@ import { formatDate, getLibs } from '../scripts/utils.js';
 import { getConfig, transformCardUrl } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
+import { DEFAULT_BACKGROUND_IMAGE_PATH } from '../blocks/utils/dxConstants.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
-
-const DEFAULT_BACKGROUND_IMAGE_PATH = '/content/dam/solution/en/images/card-collection/sample_default.png';
 
 class SinglePartnerCard extends LitElement {
   static properties = {
@@ -21,7 +20,7 @@ class SinglePartnerCard extends LitElement {
 
   render() {
     return html`
-      <div class="single-partner-card" data-dll-cardid="${this.data.id}">
+      <div class="single-partner-card">
         <div class="card-header" style="background-image: url(${transformCardUrl(this.data.styles?.backgroundImage)}), url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})">
         </div>
         <div class="card-content">

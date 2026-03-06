@@ -139,7 +139,7 @@ export default class PartnerCards extends LitElement {
             parentKey: filterKey,
             value: getTagValue(tagKey),
             checked: false,
-          })),
+          })).sort((a, b) => a.value.localeCompare(b.value)),
         };
         this.blockData.filters.push(filterObj);
       },
@@ -148,7 +148,11 @@ export default class PartnerCards extends LitElement {
         const filter = caasFilter.innerText.trim().toLowerCase().replace(/ /g, '-');
         const tag = extractFilterData(filter, this.allTags);
         if (tag) {
-          this.blockData.filters.push(tag);
+          const updatedTag = {
+            ...tag,
+            tags: tag.tags.sort((a, b) => a.value.localeCompare(b.value)),
+          };
+          this.blockData.filters.push(updatedTag);
         }
       },
       sort: (cols) => {
@@ -514,6 +518,13 @@ export default class PartnerCards extends LitElement {
     return this.cards?.length;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  handleMobileFilterBackdropClick(e) {
+    if (e.target === e.currentTarget) {
+      e.currentTarget.classList.remove('expanded');
+    }
+  }
+
   get filtersMobile() {
     if (!this.blockData?.filters?.length) return;
 
@@ -528,7 +539,7 @@ export default class PartnerCards extends LitElement {
 
         /* eslint-disable indent */
         return html`
-          <div class="filter-wrapper-mobile">
+          <div class="filter-wrapper-mobile" @click=${this.handleMobileFilterBackdropClick}>
             <div class="filter-mobile">
               <button class="filter-header-mobile" @click=${(e) => this.toggleFilter(e.target.closest('.filter-wrapper-mobile'))} aria-label="${filter.value}">
                 <div class="filter-header-content-mobile">
@@ -536,7 +547,7 @@ export default class PartnerCards extends LitElement {
                   ${tagsCount
             ? html`
                       <div class="filter-header-selected-tags-mobile">
-                        <span class="filter-header-selected-tags-text-mobile">${tagsString}</span>
+                        <span class="filter-header-selected-tags-text-mobile">${unsafeHTML(DOMPurify.sanitize(tagsString))}</span>
                         <span class="filter-header-selected-tags-count-mobile">+ ${tagsCount}</span>
                       </div>
                     `
@@ -582,7 +593,7 @@ export default class PartnerCards extends LitElement {
       (tag) => tag.key,
       (tag) => html`
         <button class="sidebar-chosen-filter-btn" @click="${() => this.handleRemoveTag(tag)}" aria-label="${tag.value}">
-          ${unsafeHTML(tag.value)}
+          ${unsafeHTML(DOMPurify.sanitize(tag.value))}
         </button>`,
     )}`;
 
@@ -675,15 +686,18 @@ export default class PartnerCards extends LitElement {
   additionalResetActions() {}
 
   handleSearchAction() {
+    // If Card Collection doesn't have filters enabled, do not apply search from URL search query param
+    if (this.blockData.filtersPanel === 'disable') return;
+
     // eslint-disable-next-line max-len
-    this.cards = this.allCards.filter((card) => card.contentArea?.title.toLowerCase().includes(this.searchTerm)
-      || card.contentArea?.description.toLowerCase().includes(this.searchTerm));
+    this.cards = this.allCards.filter((card) => card.contentArea?.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      || card.contentArea?.description.toLowerCase().includes(this.searchTerm.toLowerCase()));
   }
 
   handleSearch(event) {
-    this.searchTerm = event.target.value.toLowerCase();
+    this.searchTerm = event.target.value;
     if (this.searchTerm) {
-      this.urlSearchParams.set('term', this.searchTerm);
+      this.urlSearchParams.set('term', this.searchTerm.toLowerCase());
     } else {
       this.urlSearchParams.delete('term');
     }
@@ -758,7 +772,7 @@ export default class PartnerCards extends LitElement {
       url.search = '';
     }
 
-    window.history.pushState({}, '', url);
+    window.history.replaceState({}, '', url);
   }
 
   handleTag(event, tag, filterKey) {
@@ -872,10 +886,23 @@ export default class PartnerCards extends LitElement {
     this.handleActions();
   }
 
+  scrollToTopOfCardCollection() {
+    const partnerCardsHeader = this.shadowRoot.querySelector('.partner-cards-header');
+    const targetElement = partnerCardsHeader || this;
+    const gnavHeight = document.querySelector('header')?.offsetHeight || 0;
+    const targetRect = targetElement.getBoundingClientRect();
+    
+    window.scrollTo({
+      top: targetRect.top + window.scrollY - gnavHeight,
+      behavior: 'auto'
+    });
+  }
+
   handlePageNum(pageNum) {
     if (this.paginationCounter !== pageNum) {
       this.paginationCounter = pageNum;
       this.handleActions();
+      this.scrollToTopOfCardCollection();
     }
   }
 
@@ -883,6 +910,7 @@ export default class PartnerCards extends LitElement {
     if (this.paginationCounter > 1) {
       this.paginationCounter -= 1;
       this.handleActions();
+      this.scrollToTopOfCardCollection();
     }
   }
 
@@ -890,6 +918,7 @@ export default class PartnerCards extends LitElement {
     if (this.paginationCounter < this.totalPages) {
       this.paginationCounter += 1;
       this.handleActions();
+      this.scrollToTopOfCardCollection();
     }
   }
 

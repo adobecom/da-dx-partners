@@ -28,7 +28,8 @@ test.describe('Validate card collection block', () => {
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[0].path}`);
       await page.waitForLoadState('domcontentloaded');
-      await cardCollectionPage.searchField.click();
+      await cardCollectionPage.searchField.waitFor({ state: 'visible', timeout: 10000 });
+      await cardCollectionPage.searchField.click({ force: true });
       await cardCollectionPage.searchField.type(data.keyword);
       await cardCollectionPage.cardTitleByText(data.cardTitle1);
       await cardCollectionPage.cardTitleByText(data.cardTitle2);
@@ -123,6 +124,7 @@ test.describe('Validate card collection block', () => {
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[5].path}`);
       await page.waitForLoadState('domcontentloaded');
+      await cardCollectionPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await expect(cardCollectionPage.noResults).toBeVisible();
     });
   });
@@ -181,6 +183,7 @@ test.describe('Validate card collection block', () => {
     });
     await test.step('Sort main collection', async () => {
       await cardCollectionPage.clearAll.click();
+      await expect(cardCollectionPage.checkedFilterButton).not.toBeVisible();
       const mainCardTitleBefore = await cardCollectionPage.getFirstCardMainCollection();
       const additionalCardTitleBefore = await cardCollectionPage.getFirstCardAdditionalCollection();
 
@@ -203,9 +206,10 @@ test.describe('Validate card collection block', () => {
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[7].path}`);
       await page.waitForLoadState('domcontentloaded');
+      await cardCollectionPage.searchField.waitFor({ state: 'visible', timeout: 10000 });
     });
     await test.step('Search and Filter Collection', async () => {
-      await cardCollectionPage.searchField.click();
+      await cardCollectionPage.searchField.click({ force: true });
       await cardCollectionPage.searchField.type(data.keyword);
       await cardCollectionPage.expectResultsNumber(data.numberOfFilteredCards);
       await cardCollectionPage.filterCheckbox(data.buttonRole, data.topicFilter).click();
@@ -311,6 +315,15 @@ test.describe('Validate card collection block', () => {
     await test.step('Search and filter by Date', async () => {
       await cardCollectionPage.searchField.type(data.keyword);
       await cardCollectionPage.expectResultsNumber(data.numberOfSearcheddCards);
+      
+      // Print all card titles and dates
+      const cardsData = await cardCollectionPage.getAllCardTitlesAndDates();
+      console.log('\n=== All Cards on Page ===');
+      cardsData.forEach((card, index) => {
+        console.log(`${index + 1}. Title: ${card.title} | Date: ${card.date}`);
+      });
+      console.log(`Total cards: ${cardsData.length}\n`);
+      
       await cardCollectionPage.dateFilterButton.click();
       await cardCollectionPage.filterCheckbox(data.btnRoleCurrentMonth, data.checkBoxCurrentMonth).click();
       await cardCollectionPage.expectResultsNumber(data.numberOfCardsCurrentMonth);

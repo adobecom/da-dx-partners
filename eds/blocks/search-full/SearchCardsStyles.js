@@ -72,7 +72,7 @@ export const searchCardsStyles = css`
     font-size: 18px;
     font-weight: bold;
   }
-  
+
   .partner-cards-header .partner-cards-sort-wrapper .sort-wrapper {
     border-left : none;
   }
@@ -100,7 +100,7 @@ export const searchCardsStyles = css`
   }
   .suggestion-dialog-wrapper {
     width: 100%;
-    z-index: 10;
+    z-index: 9;
     background: transparent;
     border: none;
     max-width: var(--grid-container-width);

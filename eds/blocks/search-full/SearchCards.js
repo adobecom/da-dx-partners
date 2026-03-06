@@ -3,11 +3,13 @@ import PartnerCards from '../../components/PartnerCards.js';
 import { searchCardsStyles } from './SearchCardsStyles.js';
 import '../../components/SearchCard.js';
 import { generateRequestForSearchAPI } from '../utils/utils.js';
+import { debounce } from '../utils/action.js';
 
 const miloLibs = getLibs();
 const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 const SEE_ALL = 'SEE_ALL';
+const MAX_SEARCH_LENGTH = 200;
 
 export default class Search extends PartnerCards {
   static styles = [
@@ -29,6 +31,14 @@ export default class Search extends PartnerCards {
     this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
     this.typeaheadOptions = [];
     this.isTypeaheadOpen = false;
+    this.hasResponseData = false;
+    // Create debounced version of updateTypeaheadDialog for search input
+    this.debouncedUpdateTypeahead = debounce(() => this.updateTypeaheadDialog(), 300);
+    // Wrap handleActions with debounce for API calls (override parent's synchronous version)
+    this.handleActions = debounce(() => this.handleActionsCore(), 250);
+    // Tracks order of requests for search and suggestions to use response from last fired request
+    this.searchReqCounter = 0;
+    this.suggestionReqCounter = 0;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -52,8 +62,8 @@ export default class Search extends PartnerCards {
     return this.renderRoot.querySelector('.suggestion-dialog');
   }
 
-  async onSearchInput(event) {
-    this.searchTerm = event.target.value;
+  onSearchInput(event) {
+   this.searchTerm = event.target.value;
 
     // Handle empty input
     if (!this.searchTerm) {
@@ -61,12 +71,16 @@ export default class Search extends PartnerCards {
       return;
     }
 
-    // Handle non-empty input
-    await this.updateTypeaheadDialog();
+    // Debounce typeahead suggestions (wait 300ms after user stops typing)
+    this.debouncedUpdateTypeahead();
   }
 
   async updateTypeaheadDialog() {
     try {
+      if (!this.searchTerm) {
+        this.typeaheadOptions = [];
+        return;
+      }
       if (!this.isTypeaheadOpen) {
         this.isTypeaheadOpen = true;
         // eslint-disable-next-line no-underscore-dangle
@@ -74,7 +88,21 @@ export default class Search extends PartnerCards {
         // eslint-disable-next-line no-underscore-dangle
         this._searchInput?.focus();
       }
-      this.typeaheadOptions = await this.getSuggestions();
+
+      this.suggestionReqCounter ++;
+      const reqId = this.suggestionReqCounter;
+      const suggestions = await this.getSuggestions();
+      if (this.suggestionReqCounter > reqId) {
+        return;
+      }
+      this.suggestionReqCounter = 0;
+      // If request failed, clear suggestions
+      if (!suggestions) {
+        this.typeaheadOptions = [];
+        return;
+      }
+      // Update with successful suggestions
+      this.typeaheadOptions = suggestions;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
@@ -154,6 +182,7 @@ export default class Search extends PartnerCards {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
+      return null;
     }
   }
 
@@ -203,6 +232,7 @@ export default class Search extends PartnerCards {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
+      return null;
     }
   }
 
@@ -216,10 +246,18 @@ export default class Search extends PartnerCards {
     return { filters };
   }
 
-  async handleActions() {
+  async handleActionsCore() {
+    this.searchReqCounter++;
+    const reqId = this.searchReqCounter;
     this.hasResponseData = false;
     this.additionalResetActions();
+
     const cardsData = await this.getCards();
+    if (this.searchReqCounter > reqId) {
+      return;
+    }
+    this.searchReqCounter = 0;
+
     const { cards, count } = cardsData || { cards: [], count: { all: 0, assets: 0, pages: 0, courses: 0 } };
     this.cards = cards;
     if (this.blockData.pagination === 'load-more') {
@@ -329,13 +367,13 @@ export default class Search extends PartnerCards {
       <div @click="${this.handleClickOutside}" class="search-box-wrapper" style="${this.blockData.backgroundColor ? `background: ${this.blockData.backgroundColor}` : ''}" daa-lh="Search Box">
         <div class="search-box content">
           <h3 class="partner-cards-title">
-            ${this.searchTerm && !this.isTypeaheadOpen
+            ${this.searchTerm && this.urlSearchParams?.get('term') === this.searchTerm
               ? `${this.blockData.localizedText['{{showing-results-for}}']} ${this.searchTerm}`
               : this.blockData.title
             }
           </h3>
           <sp-theme class="search-wrapper" theme="spectrum" color="light" scale="medium">
-            <sp-search @keydown="${this.handleEnter}" id="search" size="m" value="${this.searchTerm}" @input="${this.onSearchInput}" @submit="${(event) => event.preventDefault()}" placeholder="${this.blockData.localizedText['{{search-topics-resources-files}}']}"></sp-search>
+            <sp-search @keydown="${this.handleEnter}" id="search" size="m" maxlength="${MAX_SEARCH_LENGTH}" value="${this.searchTerm}" @input="${this.onSearchInput}" @submit="${(event) => event.preventDefault()}" placeholder="${this.blockData.localizedText['{{search-topics-resources-files}}']}"></sp-search>
             <dialog class="suggestion-dialog-wrapper" @close="${this.dialogClosed}" id="typeahead">
               <div class="suggestion-dialog ">
                 ${this.typeaheadOptionsHTML}
@@ -375,16 +413,18 @@ export default class Search extends PartnerCards {
         <div class="partner-cards-content">
           <div class="partner-cards-header">
             <div class="partner-cards-title-wrapper">
-              ${this.blockData.localizedText['{{show}}']}:
+              ${!this.mobileView ? html`${this.blockData.localizedText['{{show}}']}:` : ''}
               <sp-theme theme="spectrum" color="light" scale="medium">
-                <sp-button variant="${this.contentType === 'all' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('all')}" aria-label="${this.blockData.localizedText['{{all}}']}">
-                  ${this.blockData.localizedText['{{all}}']} (${this.contentTypeCounter.countAll})</sp-button>
-                <sp-button variant="${this.contentType === 'asset' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('asset')}" aria-label="${this.blockData.localizedText['{{assets}}']}">
-                  ${this.blockData.localizedText['{{assets}}']} (${this.contentTypeCounter.countAssets})</sp-button>
-                <sp-button variant="${this.contentType === 'page' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('page')}" aria-label="${this.blockData.localizedText['{{pages}}']}">
-                  ${this.blockData.localizedText['{{pages}}']} (${this.contentTypeCounter.countPages})</sp-button>
-                   <sp-button variant="${this.contentType === 'course' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('course')}" aria-label="${this.blockData.localizedText['{{trainings}}']}">
-                  ${this.blockData.localizedText['{{trainings}}']} (${this.contentTypeCounter.countCourses})</sp-button>
+                <sp-button-group>
+                  <sp-button variant="${this.contentType === 'all' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('all')}" aria-label="${this.blockData.localizedText['{{all}}']}">
+                    ${this.blockData.localizedText['{{all}}']} (${this.contentTypeCounter.countAll})</sp-button>
+                  <sp-button variant="${this.contentType === 'asset' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('asset')}" aria-label="${this.blockData.localizedText['{{assets}}']}">
+                    ${this.blockData.localizedText['{{assets}}']} (${this.contentTypeCounter.countAssets})</sp-button>
+                  <sp-button variant="${this.contentType === 'page' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('page')}" aria-label="${this.blockData.localizedText['{{pages}}']}">
+                    ${this.blockData.localizedText['{{pages}}']} (${this.contentTypeCounter.countPages})</sp-button>
+                    <sp-button variant="${this.contentType === 'course' ? 'primary' : 'secondary'}" size="m" @click="${() => this.handleContentType('course')}" aria-label="${this.blockData.localizedText['{{trainings}}']}">
+                    ${this.blockData.localizedText['{{trainings}}']} (${this.contentTypeCounter.countCourses})</sp-button>
+                </sp-button-group>
               </sp-theme>
             </div>
             <div class="partner-cards-sort-wrapper">

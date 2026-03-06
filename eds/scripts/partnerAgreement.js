@@ -1,10 +1,9 @@
 import {getConfig, getRuntimeActionUrl} from "../blocks/utils/utils.js";
 import {
-    getCookieValue,
-    getCurrentProgramType,
-    getMetadataContent,
-    getPartnerDataCookieValue,
-    isMember
+  getCookieValue,
+  getCurrentProgramType,
+  getMetadataContent,
+  getPartnerCookieValue, PORTAL_MESSAGING_POPUP, PARTNER_LOGIN_QUERY, SHOW_NEXT_POPUP,
 } from "./utils.js";
 
 const RT_PARTNER_AGREEMENT_PATH = '/api/v1/web/dx-partners-runtime/partner-agreement';
@@ -15,13 +14,39 @@ const SPINNER_ANIMATION = `<sp-theme system="light" color="light" scale="medium"
 
 let agreementModal;
 
-async function acceptAgreement(agreementTextContainer, successMessage, errorMessage, spinner, closeModalCallback) {
+function handleRedirects(agreementRedirectDomains) {
+  if (!agreementRedirectDomains) return;
+  const allowedDomains = agreementRedirectDomains.split(',').map(url => url.trim().toLowerCase());
+  const params = new URLSearchParams(window.location.search);
+  const redirectUrl = params.get('redirectUrl');
+  if (!redirectUrl) return;
+
+  let redirectDomain;
+
+  try {
+    redirectDomain = new URL(redirectUrl).hostname.toLowerCase();
+  } catch {
+    // Invalid URL
+    return;
+  }
+
+  if (allowedDomains.includes(redirectDomain)) {
+    window.location.href = redirectUrl;
+  }
+}
+async function acceptAgreement(agreementTextContainer, successMessage, errorMessage, agreementRedirectDomains, spinner, closeModalCallback) {
     agreementTextContainer.replaceWith(spinner);
     const success = await handleAgreement('accept');
     if (success) {
         spinner.innerHTML = successMessage;
         addRegeneratePropToCookie();
-        setTimeout(() => closeModalCallback(agreementModal), 2000);
+      setTimeout(() => {
+        closeModalCallback(agreementModal);
+        window.dispatchEvent(
+          new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
+        );
+      }, 2000);
+        handleRedirects(agreementRedirectDomains);
     } else {
         spinner.innerHTML = errorMessage;
     }
@@ -52,6 +77,7 @@ async function createContent(miloLibs, agreementMeta, agreementContent) {
         agreementText,
         agreementMeta.agreementSuccessMessage,
         agreementMeta.agreementErrorMessage,
+        agreementMeta.agreementRedirectDomains,
         agreementSpinner,
         closeModal));
     const agreementFooter = createTag('div', {class: 'agreement-footer'}, agreementCta);
@@ -98,7 +124,8 @@ async function handleAgreement(action) {
             }
             return responseJson.terms?.[0];
         } else {
-            if (responseJson.errorCode) {
+            //error code "41012" means agreement already accepted
+            if (responseJson.errorCode && responseJson.errorCode !== '41012') {
                 console.error(`Accepting partner agreement failed! Error code: ${responseJson.errorCode}`);
                 return false;
             }
@@ -149,24 +176,44 @@ async function loadAgreementMeta(metadataUrl) {
         agreementCtaLabel: head.querySelector('meta[name="agreementctalabel"]')?.content || 'Agreement CTA label',
         agreementSuccessMessage: head.querySelector('meta[name="agreementsuccessmessage"]')?.content || 'Agreement Success Message',
         agreementErrorMessage: head.querySelector('meta[name="agreementerrormessage"]')?.content || 'Agreement Error Message',
+        agreementRedirectDomains: head.querySelector('meta[name="agreementredirectdomains"]')?.content || '',
     };
 }
 
 export async function partnerAgreement(miloLibs) {
-    const latestAgreementAccepted = getPartnerDataCookieValue('latestagreementaccepted');
-    if (isMember() && latestAgreementAccepted) return false;
+    const latestAgreementAccepted = getPartnerCookieValue('latestagreementaccepted');
+    if (latestAgreementAccepted) {
+      window.dispatchEvent(
+        new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
+      );
 
-    const partnerAgreementMetaPath = getMetadataContent('partner-agreement-meta');
-    if (!partnerAgreementMetaPath) {
-        console.warn('Partner agreement should be displayed but partner agreement meta path is not authored');
-        return false;
+      return false;
     }
 
+    const partnerAgreementMetaPath = getMetadataContent('partner-agreement-meta');
+  if (!partnerAgreementMetaPath) {
+    console.warn('Partner agreement should be displayed but partner agreement meta path is not authored');
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
+    );
+    return false;
+  }
+
     const agreementMeta = await loadAgreementMeta(partnerAgreementMetaPath);
-    if (!agreementMeta) return false;
+  if (!agreementMeta) {
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
+    );
+    return false;
+  }
 
     const agreementContent = await handleAgreement('fetch');
-    if (!agreementContent) return false;
+  if (!agreementContent) {
+    window.dispatchEvent(
+      new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
+    );
+    return false;
+  }
 
     const content = await createContent(miloLibs, agreementMeta, agreementContent);
 

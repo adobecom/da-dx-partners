@@ -1,6 +1,6 @@
 import { getLibs } from '../../scripts/utils.js';
 import AssetPreview from './AssetPreview.js';
-import { getConfig, populateLocalizedTextFromListItems, replaceText } from '../utils/utils.js';
+import { getConfig, populateLocalizedTextFromListItems, replaceText, keepInlineFragmentInDOM } from '../utils/utils.js';
 
 function declareAssetPreview() {
   if (customElements.get('asset-preview')) return;
@@ -60,6 +60,8 @@ export default async function init(el) {
   app.className = 'asset-preview-block';
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
+  app.setAttribute('daa-lh', 'Asset Preview Block')
+  keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'fragment-link');
   el.replaceWith(app);
 
   await deps;

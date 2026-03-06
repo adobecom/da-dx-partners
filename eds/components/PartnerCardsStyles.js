@@ -298,7 +298,7 @@ export const partnerCardsStyles = css`
   @media screen and (max-width: 1200px) {
     .partner-cards-header {
       flex-direction: column-reverse;
-      padding-bottom: 16px;
+      padding-bottom: 24px;
     }
   }
   
@@ -349,6 +349,7 @@ export const partnerCardsStyles = css`
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding-bottom: 24px;
     }
 
     .partner-cards-header .partner-cards-sort-wrapper.filters-disabled {
@@ -366,7 +367,6 @@ export const partnerCardsStyles = css`
     align-items: center;
     min-width: 89px;
     max-width: 100%;
-    margin-bottom: 10px;
     padding: 0 0 0 11px;
     border-radius: 5px;
     font-size: .875rem;
@@ -1177,6 +1177,10 @@ export const singlePartnerCardStyles = css`
     -webkit-box-orient: vertical;
     overflow: hidden;
     -webkit-line-clamp: 3;
+  }
+
+  .card-description * {
+    margin: 0;
   }
 
   .single-partner-card .card-footer {

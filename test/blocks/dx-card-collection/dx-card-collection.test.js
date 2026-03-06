@@ -76,6 +76,24 @@ describe('dx-card-collection block', () => {
     const firstFilter = filtersWrapper.querySelector('.filter-wrapper-mobile');
     expect(firstFilter).to.exist;
   });
+
+  it('should remove expanded class when clicking mobile filter backdrop', async () => {
+    const { partnerNewsWrapper } = await setupAndCommonTest(500);
+    const filtersWrapper = partnerNewsWrapper.shadowRoot.querySelector('.all-filters-wrapper-mobile');
+    const filterWrapperMobile = filtersWrapper.querySelector('.filter-wrapper-mobile');
+    expect(filterWrapperMobile).to.exist;
+
+    filterWrapperMobile.classList.add('expanded');
+    expect(filterWrapperMobile.classList.contains('expanded')).to.be.true;
+
+    const backdropClickEvent = {
+      target: filterWrapperMobile,
+      currentTarget: filterWrapperMobile,
+    };
+    partnerNewsWrapper.handleMobileFilterBackdropClick(backdropClickEvent);
+    expect(filterWrapperMobile.classList.contains('expanded')).to.be.false;
+  });
+
   it('should have shadow root and render partner cards for desktop', async function () {
     const { partnerNewsWrapper } = await setupAndCommonTest(1500);
 
@@ -177,9 +195,6 @@ describe('dx-card-collection block', () => {
     expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: No Filters | Search Query: None');
 
     const firstCard = partnerCards.querySelector('.card-wrapper');
-    const singlePartnerCard = firstCard.shadowRoot.querySelector('.single-partner-card');
-
-    expect(singlePartnerCard.getAttribute('data-dll-cardid')).to.equal(cards[0].id);
     expect(firstCard.getAttribute('daa-lh')).to.equal(`Card 1 | ${cards[0].contentArea.title} | ${cards[0].id}`);
 
     const singlePartnerCardBtn = firstCard.shadowRoot.querySelector('.card-btn');
@@ -213,5 +228,367 @@ describe('dx-card-collection block', () => {
     const partnerCards = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards');
     expect(partnerCards).to.exist;
     expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: Event Session | Search Query: Adobe');
+  });
+
+  it('should initialize with past date filter when date-filter is set to past', async function () {
+    document.body.innerHTML = `
+      <div class="dx-card-collection">
+        <div>
+          <div>date-filter</div>
+          <div>past</div>
+        </div>
+      </div>
+    `;
+
+    const block = document.querySelector('.dx-card-collection');
+    const component = await init(block);
+    await component.updateComplete;
+
+    expect(component.blockData.dateFilter).to.exist;
+    expect(component.blockData.dateFilter.tags).to.have.lengthOf(4);
+    expect(component.blockData.dateFilter.tags[0].key).to.equal('show-all');
+    expect(component.blockData.dateFilter.tags[2].key).to.equal('previous-month');
+    expect(component.blockData.dateFilter.tags[3].key).to.equal('last-90-days');
+  });
+
+  it('should initialize with future date filter when date-filter is set to future', async function () {
+    document.body.innerHTML = `
+      <div class="dx-card-collection">
+        <div>
+          <div>date-filter</div>
+          <div>future</div>
+        </div>
+      </div>
+    `;
+
+    const block = document.querySelector('.dx-card-collection');
+    const component = await init(block);
+    await component.updateComplete;
+
+    expect(component.blockData.dateFilter).to.exist;
+    expect(component.blockData.dateFilter.tags).to.have.lengthOf(4);
+    expect(component.blockData.dateFilter.tags[0].key).to.equal('show-all');
+    expect(component.blockData.dateFilter.tags[2].key).to.equal('next-month');
+    expect(component.blockData.dateFilter.tags[3].key).to.equal('next-90-days');
+  });
+
+  it('should not initialize date filter when date-filter row is not authored', async function () {
+    document.body.innerHTML = `
+      <div class="dx-card-collection">
+        <div>
+          <div>Title</div>
+          <div>Sample Title</div>
+        </div>
+      </div>
+    `;
+
+    const block = document.querySelector('.dx-card-collection');
+    const component = await init(block);
+    await component.updateComplete;
+
+    expect(component.blockData.dateFilter).to.be.null;
+  });
+
+  describe('PartnerCardsWithDateFilter date filtering', () => {
+    let component;
+    let mockCards;
+
+    beforeEach(async () => {
+      const block = document.querySelector('.dx-card-collection');
+      component = await init(block);
+      await component.updateComplete;
+
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+
+      mockCards = [
+        { id: '1', cardDate: new Date(currentYear, currentMonth, 15).toISOString() },
+        { id: '2', cardDate: new Date(currentYear, currentMonth + 1, 15).toISOString() },
+        { id: '3', cardDate: new Date(currentYear, currentMonth - 1, 15).toISOString() },
+        { id: '4', cardDate: new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString() },
+        { id: '5', cardDate: new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString() },
+      ];
+
+      component.cards = [...mockCards];
+      component.allCards = [...mockCards];
+    });
+
+    it('should filter cards for next-month', () => {
+      component.cards = [...mockCards];
+      component.selectedDateFilter = { key: 'next-month' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('2');
+      expect(filteredIds).to.not.include('3');
+    });
+
+    it('should handle next-month for December year transition', () => {
+      const currentYear = new Date().getFullYear();
+      component.cards = [
+        { id: 'jan-next-year', cardDate: new Date(currentYear + 1, 0, 15).toISOString() },
+      ];
+      
+      const clock = sinon.useFakeTimers(new Date(currentYear, 11, 15).getTime());
+      component.selectedDateFilter = { key: 'next-month' };
+      component.handleDateFilterAction();
+      
+      expect(component.cards.length).to.equal(1);
+      expect(component.cards[0].id).to.equal('jan-next-year');
+      clock.restore();
+    });
+
+    it('should filter cards for previous-month', () => {
+      component.cards = [...mockCards];
+      component.selectedDateFilter = { key: 'previous-month' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('3');
+      expect(filteredIds).to.not.include('2');
+    });
+
+    it('should handle previous-month for January year transition', () => {
+      const currentYear = new Date().getFullYear();
+      component.cards = [
+        { id: 'dec-last-year', cardDate: new Date(currentYear - 1, 11, 15).toISOString() },
+      ];
+      
+      const clock = sinon.useFakeTimers(new Date(currentYear, 0, 15).getTime());
+      component.selectedDateFilter = { key: 'previous-month' };
+      component.handleDateFilterAction();
+      
+      expect(component.cards.length).to.equal(1);
+      expect(component.cards[0].id).to.equal('dec-last-year');
+      clock.restore();
+    });
+
+    it('should filter cards for next-90-days', () => {
+      component.cards = [...mockCards];
+      component.selectedDateFilter = { key: 'next-90-days' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('4');
+      expect(filteredIds).to.not.include('5');
+    });
+
+    it('should handle next-90-days boundary correctly', () => {
+      const today = new Date();
+      component.cards = [
+        { id: 'within-90', cardDate: new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000).toISOString() },
+        { id: 'at-90', cardDate: new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString() },
+        { id: 'beyond-90', cardDate: new Date(today.getTime() + 91 * 24 * 60 * 60 * 1000).toISOString() },
+      ];
+      
+      component.selectedDateFilter = { key: 'next-90-days' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('within-90');
+      expect(filteredIds).to.include('at-90');
+    });
+
+    it('should filter cards for current-month', () => {
+      component.cards = [...mockCards];
+      component.selectedDateFilter = { key: 'current-month' };
+      component.handleDateFilterAction();
+      
+      const filteredIds = component.cards.map(card => card.id);
+      expect(filteredIds).to.include('1');
+      expect(filteredIds).to.not.include('2');
+      expect(filteredIds).to.not.include('3');
+    });
+  });
+
+  it('should handle clear all filters when dateFilter is not present', async function () {
+    document.body.innerHTML = `
+      <div class="dx-card-collection">
+        <div>
+          <div>Title</div>
+          <div>Sample Title</div>
+        </div>
+      </div>
+    `;
+
+    const block = document.querySelector('.dx-card-collection');
+    const component = await init(block);
+    await component.updateComplete;
+
+    // Verify dateFilter is null
+    expect(component.blockData.dateFilter).to.be.null;
+
+    // Set up some filters and URL params
+    component.searchTerm = 'test';
+    component.selectedFilters = { 'content-type': [{ key: 'event', value: 'Event', checked: true }] };
+    component.urlSearchParams = new URLSearchParams('?filters=yes&content-type=event&term=test');
+
+    // Call handleResetActions - should not throw error
+    expect(() => component.handleResetActions()).to.not.throw();
+
+    // Verify filters were cleared
+    expect(component.searchTerm).to.equal('');
+    expect(Object.keys(component.selectedFilters).length).to.equal(0);
+  });
+
+  describe('Pagination scroll behavior', () => {
+    let component;
+    let windowScrollToStub;
+    let mockHeader;
+
+    beforeEach(async () => {
+      // Create mock header element
+      mockHeader = document.createElement('header');
+      Object.defineProperty(mockHeader, 'offsetHeight', {
+        configurable: true,
+        value: 80
+      });
+      document.body.appendChild(mockHeader);
+
+      // Stub window.scrollTo
+      windowScrollToStub = sinon.stub(window, 'scrollTo');
+
+      // Stub window.scrollY
+      Object.defineProperty(window, 'scrollY', {
+        configurable: true,
+        value: 500
+      });
+
+      const block = document.querySelector('.dx-card-collection');
+      component = await init(block);
+      await component.updateComplete;
+
+      // Set up pagination
+      component.cardsPerPage = 3;
+      component.paginationCounter = 1;
+      component.totalPages = 3;
+      component.blockData.pagination = 'default';
+    });
+
+    afterEach(() => {
+      windowScrollToStub.restore();
+      if (mockHeader.parentNode) {
+        mockHeader.parentNode.removeChild(mockHeader);
+      }
+      delete window.scrollY;
+    });
+
+    it('should scroll to top when clicking next page', () => {
+      component.handleNextPage();
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      expect(windowScrollToStub.firstCall.args[0]).to.have.property('behavior', 'auto');
+    });
+
+    it('should scroll to top when clicking prev page', () => {
+      component.paginationCounter = 2;
+      component.handlePrevPage();
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      expect(windowScrollToStub.firstCall.args[0]).to.have.property('behavior', 'auto');
+    });
+
+    it('should scroll to top when clicking specific page number', () => {
+      component.handlePageNum(2);
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      expect(windowScrollToStub.firstCall.args[0]).to.have.property('behavior', 'auto');
+    });
+
+    it('should not scroll if already on the same page', () => {
+      component.paginationCounter = 2;
+      component.handlePageNum(2);
+
+      expect(windowScrollToStub.called).to.be.false;
+    });
+
+    it('should not scroll if at first page and clicking prev', () => {
+      component.paginationCounter = 1;
+      component.handlePrevPage();
+
+      expect(windowScrollToStub.called).to.be.false;
+    });
+
+    it('should not scroll if at last page and clicking next', () => {
+      component.paginationCounter = 3;
+      component.totalPages = 3;
+      component.handleNextPage();
+
+      expect(windowScrollToStub.called).to.be.false;
+    });
+
+    it('should calculate scroll position accounting for gnav height', () => {
+      const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
+      const mockRect = { top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      sinon.stub(partnerCardsHeader, 'getBoundingClientRect').returns(mockRect);
+
+      component.handleNextPage();
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      const scrollOptions = windowScrollToStub.firstCall.args[0];
+      // Expected: headerTop (200) + scrollY (500) - gnavHeight (80) = 620
+      expect(scrollOptions.top).to.equal(620);
+      expect(scrollOptions.behavior).to.equal('auto');
+
+      partnerCardsHeader.getBoundingClientRect.restore();
+    });
+
+    it('should handle missing gnav gracefully', () => {
+      // Remove the mock header
+      mockHeader.parentNode.removeChild(mockHeader);
+
+      const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
+      const mockRect = { top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      sinon.stub(partnerCardsHeader, 'getBoundingClientRect').returns(mockRect);
+
+      component.handleNextPage();
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      const scrollOptions = windowScrollToStub.firstCall.args[0];
+      // Expected: headerTop (200) + scrollY (500) - gnavHeight (0) = 700
+      expect(scrollOptions.top).to.equal(700);
+
+      partnerCardsHeader.getBoundingClientRect.restore();
+    });
+
+    it('should fallback to component itself if partner-cards-header not found', () => {
+      const componentRect = { top: 100, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      sinon.stub(component, 'getBoundingClientRect').returns(componentRect);
+      
+      // Remove the header from shadow DOM
+      const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
+      if (partnerCardsHeader) {
+        partnerCardsHeader.remove();
+      }
+
+      component.handleNextPage();
+
+      expect(windowScrollToStub.calledOnce).to.be.true;
+      const scrollOptions = windowScrollToStub.firstCall.args[0];
+      // Expected: componentTop (100) + scrollY (500) - gnavHeight (80) = 520
+      expect(scrollOptions.top).to.equal(520);
+      expect(scrollOptions.behavior).to.equal('auto');
+
+      component.getBoundingClientRect.restore();
+    });
+
+    it('should update pagination counter and scroll when navigating pages', () => {
+      expect(component.paginationCounter).to.equal(1);
+      
+      component.handleNextPage();
+      
+      expect(component.paginationCounter).to.equal(2);
+      expect(windowScrollToStub.calledOnce).to.be.true;
+    });
+
+    it('should not change pagination counter if scroll conditions not met', () => {
+      component.paginationCounter = 1;
+      
+      component.handlePrevPage();
+      
+      expect(component.paginationCounter).to.equal(1);
+      expect(windowScrollToStub.called).to.be.false;
+    });
   });
 });

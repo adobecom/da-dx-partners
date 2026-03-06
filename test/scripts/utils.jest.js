@@ -13,9 +13,9 @@ import {
   getProgramHomePage,
   getCurrentProgramType,
   getCookieValue,
-  getPartnerDataCookieObject,
+  getPartnerCookieObject,
   isMember,
-  getPartnerDataCookieValue,
+  getPartnerCookieValue,
   partnerIsSignedIn,
   signedInNonMember,
   getMetadata,
@@ -28,7 +28,7 @@ import {
   getCaasUrl,
   getNodesByXPath,
   setLibs,
-  partnerDataCookieContainsValue,
+  partnerCookieContainsValue,
   getDaysFromRegistration,
   isReturningUser,
 } from '../../eds/scripts/utils.js';
@@ -74,6 +74,7 @@ describe('Test utils.js', () => {
     it('Protected footer is shown for members', async () => {
       const cookieObject = { DXP: { status: 'MEMBER' } };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({})}`;
       const locales = {
         '': { ietf: 'en-US', tk: 'hah7vzn.css' },
         de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
@@ -100,6 +101,7 @@ describe('Test utils.js', () => {
     it('Protected navigation is shown for members', async () => {
       const cookieObject = { DXP: { status: 'MEMBER' } };
       document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({})}`;
       const locales = {
         '': { ietf: 'en-US', tk: 'hah7vzn.css' },
         de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
@@ -142,19 +144,22 @@ describe('Test utils.js', () => {
   });
   it('Should get empty string if cookie JSON is not valid', () => {
     document.cookie = 'partner_data={dxp: {test1:test, test2:test}}';
-    expect(getPartnerDataCookieValue('test_cookie', DX_PROGRAM_TYPE)).toEqual('');
+    expect(getPartnerCookieValue('test_cookie', DX_PROGRAM_TYPE)).toEqual('');
   });
   it('Should return partner data cookie object', () => {
     const cookieObject = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(getPartnerDataCookieObject('dxp')).toStrictEqual(cookieObject.DXP);
+    document.cookie = `partner_info=${JSON.stringify({})}`;
+    expect(getPartnerCookieObject('dxp')).toStrictEqual(cookieObject.DXP);
   });
   it('Check if user is a member', () => {
     const cookieObjectMember = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(isMember()).toEqual(true);
     const cookieObjectNotMember = { DXP: { status: 'NOT_PARTNER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectNotMember)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(isMember()).toEqual(false);
   });
   it('Check if partner is signed id', () => {
@@ -164,6 +169,7 @@ describe('Test utils.js', () => {
   it('Check if signed in partner is non member', () => {
     const cookieObjectNotMember = { DXP: { status: 'NOT_PARTNER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectNotMember)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(signedInNonMember()).toBeTruthy();
   });
   it('Get meta tag content value', () => {
@@ -183,17 +189,20 @@ describe('Test utils.js', () => {
   it('Don\'t redirect logged in partner to protected home if he is not a member', () => {
     const cookieObjectNotMember = { DXP: { status: 'NOT_MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectNotMember)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(redirectLoggedinPartner()).toBeFalsy();
   });
   it('Don\'t redirect logged in partner to protected home if metadata is not set', () => {
     const cookieObjectMember = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(redirectLoggedinPartner()).toBeFalsy();
   });
   it('Redirect logged in partner to protected home', () => {
     window.location.pathname = '/digitalexperience/';
     const cookieObjectMember = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     const metaTag = document.createElement('meta');
     metaTag.name = 'adobe-target-after-login';
     metaTag.content = '/digitalexperience/home';
@@ -248,7 +257,8 @@ describe('Test utils.js', () => {
     expect(locale).toStrictEqual({ ietf: 'en-US', tk: 'hah7vzn.css', prefix: '' });
   });
   it('Get caas url', () => {
-    document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"company":"Yugo DXP Stage Platinum Spain"%2C"firstName":"DXP Stage"%2C"lastName":"Spain Platinum"%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}}';
+    document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}}';
+    document.cookie = 'partner_info={"firstName":"DXP Stage"%2C"lastName":"Spain Platinum"%2C"company":"Yugo DXP Stage Platinum Spain"}';
     const locales = {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
@@ -270,7 +280,8 @@ describe('Test utils.js', () => {
     expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&featuredCards=c2608c6f-1727-5d62-8094-a225bdc701stage%2Cc2608c6f-1727-5d62-8094-a225bdc701stage&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
   });
   it('Get caas url prod', () => {
-    document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"company":"Yugo DXP Stage Platinum Spain"%2C"firstName":"DXP Stage"%2C"lastName":"Spain Platinum"%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}}';
+    document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}}';
+    document.cookie = 'partner_info={"firstName":"DXP Stage"%2C"lastName":"Spain Platinum"%2C"company":"Yugo DXP Stage Platinum Spain"}';
     const locales = {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
@@ -319,38 +330,44 @@ describe('Test utils.js', () => {
     expect(elements[0].id).toEqual('test-id');
   });
   it('Should have access if sales center is present in partner data cookie', async () => {
-    const cookieObject = { DXP: { firstName: 'test' , salesCenterAccess: true }};
+    const cookieObject = { DXP: { salesCenterAccess: true }};
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    document.cookie = `partner_info=${JSON.stringify({ firstName: 'test' })}`;
     expect(hasSalesCenterAccess()).toBe(true);
   });
   it('Should not have access if sales center is not present in partner data cookie', async () => {
-    const cookieObject = { DXP: { firstName: 'test' , salesCenterAccess: false }};
+    const cookieObject = { DXP: { salesCenterAccess: false }};
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(hasSalesCenterAccess()).toBe(false);
+    document.cookie = `partner_info=${JSON.stringify({ firstName: 'test' })}`;
+    expect(hasSalesCenterAccess()).toBeFalsy();
   });
-  it('partnerDataCookieContainsValue returns true when accessType value matches', () => {
+  it('partnerCookieContainsValue returns true when accessType value matches', () => {
     const cookieObject = { DXP: { accessType: 'Billing Admin' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(partnerDataCookieContainsValue('accesstype', 'billing admin')).toBe(true);
+    document.cookie = `partner_info=${JSON.stringify({})}`;
+    expect(partnerCookieContainsValue('accesstype', 'billing admin')).toBe(true);
   });
-  it('partnerDataCookieContainsValue returns false when key missing or cookie absent', () => {
+  it('partnerCookieContainsValue returns false when key missing or cookie absent', () => {
     document.cookie = 'partner_data=';
-    expect(partnerDataCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
+    expect(partnerCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
     const cookieObject = { DXP: { other: 'value' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
-    expect(partnerDataCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
+    document.cookie = `partner_info=${JSON.stringify({})}`;
+    expect(partnerCookieContainsValue('designationtype', 'legal and compliance')).toBe(false);
   });
   it('getDaysFromRegistration returns null when not signed in or missing createddate', () => {
     document.cookie = 'partner_data=';
     expect(getDaysFromRegistration()).toBeNull();
     const cookieObject = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(getDaysFromRegistration()).toBeNull();
   });
   it('getDaysFromRegistration returns null for future registration date', () => {
     const future = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
     const cookieObject = { DXP: { status: 'MEMBER', createddate: future } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(getDaysFromRegistration()).toBeNull();
   });
   it('getDaysFromRegistration returns days since registration (approximate)', () => {
@@ -358,6 +375,7 @@ describe('Test utils.js', () => {
     const past = new Date(Date.now() - tenDaysMs).toISOString();
     const cookieObject = { DXP: { status: 'MEMBER', createddate: past } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     const days = getDaysFromRegistration();
     expect(days).toBeGreaterThanOrEqual(9);
     expect(days).toBeLessThan(11);
@@ -367,6 +385,7 @@ describe('Test utils.js', () => {
     expect(isReturningUser(30)).toBe(false);
     const cookieObject = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(isReturningUser(30)).toBe(false);
   });
   it('isReturningUser true if days within (daysNumber+1)-30 window', () => {
@@ -375,6 +394,7 @@ describe('Test utils.js', () => {
     const past = new Date(Date.now() - fiveDaysMs).toISOString();
     const cookieObject = { DXP: { status: 'MEMBER', createddate: past } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(isReturningUser(30)).toBe(true);
   });
   it('isReturningUser false if below lower bound (< 1 day)', () => {
@@ -382,6 +402,7 @@ describe('Test utils.js', () => {
     const past = new Date(Date.now() - halfDayMs).toISOString();
     const cookieObject = { DXP: { status: 'MEMBER', createddate: past } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(isReturningUser(30)).toBe(false);
   });
   it('isReturningUser false if at or above upper bound (>= daysNumber+1)', () => {
@@ -389,6 +410,7 @@ describe('Test utils.js', () => {
     const past = new Date(Date.now() - thirtyOneDaysMs).toISOString();
     const cookieObject = { DXP: { status: 'MEMBER', createddate: past } };
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(isReturningUser(30)).toBe(false);
   });
 });

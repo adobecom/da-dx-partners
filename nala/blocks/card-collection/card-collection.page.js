@@ -22,6 +22,7 @@ export default class CardCollectionPage {
     this.additionalCollection = page.locator('div.content:has(p:has-text("Additional Card Collection without filters and sorting"))');
     this.productFilter = page.getByLabel('Products');
     this.partnerCardCollection = page.locator('.partner-cards-collection ');
+    this.additionalCollectionLayout = page.locator('.partner-cards-collection.layout-4-up');
     this.inproductfilter = page.getByRole('checkbox', { name: 'InDesign' });
     this.premiereRush = page.getByRole('checkbox', { name: 'Premiere Rush' });
     this.workFromAnywhere = page.getByRole('checkbox', { name: 'Work from anywhere' });
@@ -53,8 +54,8 @@ export default class CardCollectionPage {
   }
 
   async getFirstCardAdditionalCollection() {
-    const additionalCollection = this.partnerCardCollection.nth(1);
-    const firstCardTitle = await additionalCollection.locator('.card-content')
+    const additionalCollection = this.additionalCollectionLayout.first();
+    const firstCardTitle = await additionalCollection.locator('.card-title')
       .first()
       .textContent();
     return firstCardTitle.trim();

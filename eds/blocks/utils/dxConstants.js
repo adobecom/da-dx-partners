@@ -1,10 +1,12 @@
-import { getPartnerDataCookieValue } from '../../scripts/utils.js';
+import { getPartnerCookieValue } from '../../scripts/utils.js';
 
 export const RT_SEARCH_ACTION_PATH = '/api/v1/web/dx-partners-runtime/search-dxp?';
 
 export const DX_PROGRAM_TYPE = 'dxp';
 
-export const PARTNER_LEVEL = getPartnerDataCookieValue('level', DX_PROGRAM_TYPE);
+export const PARTNER_LEVEL = getPartnerCookieValue('level', DX_PROGRAM_TYPE);
+
+export const DEFAULT_BACKGROUND_IMAGE_PATH = '/eds/partners-shared/images/card-collection/sample-default.png';
 
 export const DIGITALEXPERIENCE_PREVIEW_PATH = '/digitalexperience/preview/';
 export const DIGITALEXPERIENCE_ASSETS_PATH = '/digitalexperience-assets/';

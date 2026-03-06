@@ -445,6 +445,7 @@ class Gnav {
     this.customLinks = getConfig()?.customLinks?.split(',') || [];
     // PARTNERS_NAVIGATION START
     // MWPW-168681 - GNAV Links & Authorable Icons
+    // MWPW-186006 - Short cut icons - External links open in the same tab instead of a new tab
     const shortcutIcons = [];
     const MAX_GNAV_ICONS_COUNT = 8;
     Array.from(this.content.querySelectorAll('.shortcut-icons > div')).slice(0, MAX_GNAV_ICONS_COUNT).forEach((icon) => {
@@ -463,6 +464,7 @@ class Gnav {
         iconKey: iconKey[0]?.trim(),
         mobileIconKey: iconKey[1]?.trim(),
         iconLink: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('href'),
+        target: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('target')
       });
     });
     // PARTNERS_NAVIGATION END
@@ -505,9 +507,10 @@ class Gnav {
 
   // PARTNERS_NAVIGATION START
   // MWPW-168681 - GNAV Links & Authorable Icons
+  // MWPW-186006 - Short cut icons - External links open in the same tab instead of a new tab
   decorateShortcutIcons = (isMobile) => {
     let html = this.blocks.shortcutIcons.filter((el) => el.iconLink && el.iconKey).map((obj) => `
-    <a href="${obj.iconLink}" class="shortcut-icons-link">
+    <a href="${obj.iconLink}" class="shortcut-icons-link" ${obj.target ? `target="${obj.target}" rel="noopener noreferrer"` : ''}>
       <img src="/eds/partners-shared/mnemonics/${isMobile && obj.mobileIconKey ? obj.mobileIconKey : obj.iconKey}.svg" alt="Image" class="shortcut-icons-img" />
     </a>
   `).join('');
@@ -868,6 +871,10 @@ class Gnav {
 
     this.blocks.profile.buttonElem = await decorateProfileTrigger({ avatar });
     decoratedElem.append(this.blocks.profile.buttonElem);
+    // PARTNERS_NAVIGATION START
+    // MWPW-182655 - Manage profile and company Landing page
+    window.dispatchEvent(new CustomEvent('feds:profileImageRendered'));
+    // PARTNERS_NAVIGATION END
 
     // Decorate the profile dropdown
     // after user interacts with button or after 3s have passed
@@ -1729,10 +1736,9 @@ export default async function init(block) {
   // PARTNERS_NAVIGATION START
   // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
   block.classList.add('global-navigation');
+  // Enable personalization and link rewriting in the profile dropdown
+  // this happens directly after the profile dropdown is loaded, it's not injected into DOM yet
   content = applyGnavPersonalization(content);
-  // PARTNERS_NAVIGATION END
-  // PARTNERS_NAVIGATION START
-  // MWPW-165727 - Links without "www" don't change locale for helpx.adobe.com & business.adobe.com
   content = rewriteLinks(content);
   // PARTNERS_NAVIGATION END
 

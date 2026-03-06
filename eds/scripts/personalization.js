@@ -1,7 +1,7 @@
 import {
   isMember,
   getNodesByXPath,
-  getPartnerDataCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration
+  getPartnerCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration, getLibs
 } from './utils.js';
 import {
   PERSONALIZATION_PLACEHOLDERS,
@@ -15,20 +15,132 @@ import {
 } from './personalizationUtils.js';
 import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
 
-export function personalizePlaceholders(placeholders, context = document, programType) {
-  Object.entries(placeholders).forEach(([key, value]) => {
-    const programData = getPartnerDataCookieObject(programType);
+const imgSelector = 'img.feds-profile-img';
+
+async function replaceProfileImage(elements) {
+  try {
+    const isSignedIn = typeof window.adobeIMS?.isSignedInUser === 'function' && window.adobeIMS.isSignedInUser();
+    if (!isSignedIn) {
+      elements.forEach((el) => el.remove());
+      return;
+    }
+
+    const existingAvatarImg = document.querySelector(imgSelector);
+    if (!existingAvatarImg?.src) {
+      elements.forEach((el) => el.remove());
+      return;
+    }
+
+    const userAvatar = existingAvatarImg.src;
+
+    elements.forEach((el) => {
+      if (!el.textContent.includes('$profileImage')) return;
+
+      const img = document.createElement('img');
+      img.src = userAvatar;
+      img.alt = '';
+      img.dataset.userProfile = 'true';
+      img.width = 96;
+      img.height = 96;
+
+      const picture = document.createElement('picture');
+      picture.appendChild(img);
+
+      if (el.tagName === 'P') {
+        el.classList.add('icon-area');
+      }
+
+      el.textContent = '';
+      el.appendChild(picture);
+    });
+  } catch (error) {
+    console.warn('Failed to replace profile image placeholders:', error);
+    elements.forEach(el => el.remove());
+  }
+}
+
+function personalizeProfileImage(elements) {
+  if (!elements.length) return;
+
+  const existingAvatarImg = document.querySelector(imgSelector);
+  if (existingAvatarImg?.src) {
+    replaceProfileImage(elements);
+  } else {
+    window.addEventListener('feds:profileImageRendered', () => {
+      replaceProfileImage(elements);
+    });
+  }
+}
+
+async function replaceCompanyLogo(elements) {
+  try {
+    const programData = getPartnerCookieObject(getCurrentProgramType());
+    const companyLogoUrl = programData?.companyLogoUrl;
+
+    if (!companyLogoUrl) {
+      elements.forEach(el => el.remove());
+      return;
+    }
+
+    elements.forEach((el) => {
+      if (!el.textContent.includes('$companyLogoUrl')) return;
+
+      const img = document.createElement('img');
+      img.src = companyLogoUrl;
+      img.alt = 'Company Logo URL';
+      img.dataset.companyLogoUrl = 'true';
+      img.width = 96;
+      img.height = 96;
+
+      const picture = document.createElement('picture');
+      picture.appendChild(img);
+
+      el.textContent = '';
+      el.appendChild(picture);
+    });
+  } catch (error) {
+    console.warn('Failed to replace company logo placeholders:', error);
+    elements.forEach(el => el.remove());
+  }
+}
+function replaceDirectText(node, search, replace) {
+  node.childNodes.forEach((child) => {
+    if (child.nodeType === Node.TEXT_NODE) {
+      child.nodeValue = child.nodeValue.replaceAll(search, replace);
+    }
+  });
+}
+export function personalizePlaceholders(placeholders, context = document, programType, addClass = false) {
+  const sortedEntries = Object.entries(placeholders).sort((a, b) => b[0].length - a[0].length);
+  sortedEntries.forEach(([key, value]) => {
+    const elements = getNodesByXPath(value, context);
+    const programData = getPartnerCookieObject(programType);
     let placeholderValue = programData[key];
+
+    if (key === 'profileImage' && elements.length > 0) {
+      personalizeProfileImage(elements);
+      return;
+    }
+
+    if (key === 'companyLogoUrl' && elements.length > 0) {
+      replaceCompanyLogo(elements);
+      return;
+    }
+
     if (key === 'bctqExpirationDays') {
       placeholderValue = getDaysUntilComplianceExpiration();
     }
-    getNodesByXPath(value, context).forEach((el) => {
+    elements.forEach((el) => {
       if (!placeholderValue) {
         el.remove();
         return;
       }
-      el.textContent = el.textContent.replace(`$${key}`, placeholderValue);
-      el.classList.add(`${key.toLowerCase()}-placeholder`);
+
+      replaceDirectText(el, `$${key}`, placeholderValue);
+
+      if (addClass) {
+        el.classList.add(`${key.toLowerCase()}-placeholder`);
+      }
     });
   });
 }
@@ -178,14 +290,14 @@ export function shouldHideLinkGroup(elem) {
 
 function personalizeProfile(gnav) {
   const profile = gnav.querySelector('.profile');
-  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, profile, DX_PROGRAM_TYPE);
+  personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, profile, DX_PROGRAM_TYPE, true);
   personalizeDropdownElements(profile);
 }
 
 export function applyGnavPersonalization(gnav) {
   if (!isMember()) return gnav;
   const importedGnav = document.importNode(gnav, true);
-  personalizeMainNav(importedGnav);
+  personalizeMainNav(importedGnav);  // not sure if this actually is needed: at this point gnav does not contain loaded fragments
   personalizeProfile(importedGnav);
   return importedGnav;
 }
