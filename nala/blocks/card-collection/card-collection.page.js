@@ -27,10 +27,6 @@ export default class CardCollectionPage {
     this.premiereRush = page.getByRole('checkbox', { name: 'Premiere Rush' });
     this.workFromAnywhere = page.getByRole('checkbox', { name: 'Work from anywhere' });
     this.productFilterPanel = page.getByRole('list').filter({ hasText: 'After Effects Bridge InDesign' });
-    this.industryFilter = page.getByRole('button', { name: 'Industry' });
-    this.industryFilterPanel = page.getByRole('list').filter({ hasText: 'Media & Entertainment Retail' });
-    this.signInButton = page.locator('.feds-profile');
-    this.checkedFilterButton = page.getByRole('button', { name: 'Media & Entertainment' });
   }
 
   filterCheckbox(role, name) {
