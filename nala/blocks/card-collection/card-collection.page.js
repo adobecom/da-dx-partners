@@ -78,4 +78,22 @@ export default class CardCollectionPage {
     await option.waitFor({ state: 'visible' }); // ensure it's visible
     await option.click();
   }
+
+  // meeds to be included
+  async getAllCardTitlesAndDates() {
+    const cardCount = await this.cards.count();
+    const cardsData = [];
+    
+    for (let i = 0; i < cardCount; i++) {
+      const card = this.cards.nth(i);
+      const title = await card.locator('.card-title').textContent();
+      const date = await card.locator('.card-date').textContent();
+      cardsData.push({
+        title: title ? title.trim() : 'No title',
+        date: date ? date.trim() : 'No date'
+      });
+    }
+    
+    return cardsData;
+  }
 }
