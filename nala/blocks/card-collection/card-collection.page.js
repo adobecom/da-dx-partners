@@ -28,7 +28,7 @@ export default class CardCollectionPage {
     this.workFromAnywhere = page.getByRole('checkbox', { name: 'Work from anywhere' });
     this.productFilterPanel = page.getByRole('list').filter({ hasText: 'After Effects Bridge InDesign' });
     this.industryFilter = page.getByRole('button', { name: 'Industry' });
-    this.industryFilterPanel = page.getByRole('list').filter({ hasText: 'Media & Entertainment Retail' });
+    this.industryFilterPanel = page.getByRole('list').filter({ hasText: 'Architecture Gaming' });
     this.signInButton = page.locator('.feds-profile');
     this.checkedFilterButton = page.getByRole('button', { name: 'Media & Entertainment' });
   }
@@ -77,5 +77,22 @@ export default class CardCollectionPage {
     const option = this.page.locator(`button.sort-item[value="${value}"]`);
     await option.waitFor({ state: 'visible' }); // ensure it's visible
     await option.click();
+  }
+
+  async getAllCardTitlesAndDates() {
+    const cardCount = await this.cards.count();
+    const cardsData = [];
+    
+    for (let i = 0; i < cardCount; i++) {
+      const card = this.cards.nth(i);
+      const title = await card.locator('.card-title').textContent();
+      const date = await card.locator('.card-date').textContent();
+      cardsData.push({
+        title: title ? title.trim() : 'No title',
+        date: date ? date.trim() : 'No date'
+      });
+    }
+    
+    return cardsData;
   }
 }

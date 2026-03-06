@@ -297,6 +297,15 @@ test.describe('Validate card collection block', () => {
     await test.step('Search and filter by Date', async () => {
       await cardCollectionPage.searchField.type(data.keyword);
       await cardCollectionPage.expectResultsNumber(data.numberOfSearcheddCards);
+      
+      // Print all card titles and dates
+      const cardsData = await cardCollectionPage.getAllCardTitlesAndDates();
+      console.log('\n=== All Cards on Page ===');
+      cardsData.forEach((card, index) => {
+        console.log(`${index + 1}. Title: ${card.title} | Date: ${card.date}`);
+      });
+      console.log(`Total cards: ${cardsData.length}\n`);
+      
       await cardCollectionPage.dateFilterButton.click();
       await cardCollectionPage.filterCheckbox(data.btnRoleCurrentMonth, data.checkBoxCurrentMonth).click();
       await cardCollectionPage.expectResultsNumber(data.numberOfCardsCurrentMonth);
