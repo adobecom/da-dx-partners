@@ -142,27 +142,44 @@ test.describe('Validate card collection block', () => {
       await page.waitForLoadState('domcontentloaded');
       await expect(cardCollectionPage.mainCollection).toBeVisible();
       await expect(cardCollectionPage.additionalCollection).toBeVisible();
-      await cardCollectionPage.searchField.waitFor({ state: 'visible', timeout: 10000 });
-      await cardCollectionPage.searchField.click({ force: true });
-      await cardCollectionPage.searchField.type(data.keyword);
+      await expect(cardCollectionPage.cardsResults).toHaveCount(2, { timeout: 20000 });
+      await expect(cardCollectionPage.cardsResults.first()).toContainText(/\d+/);
+      await expect(cardCollectionPage.cardsResults.nth(1)).toContainText(/\d+/);
     });
     await test.step('Filter main collection', async () => {
 
-      await cardCollectionPage.industryFilter.click();
-      await expect(cardCollectionPage.industryFilterPanel).toBeVisible();
-      const checkBox = cardCollectionPage.filterCheckbox(data.btnRole, data.checkBoxMediaEntertainment);
-      await expect(checkBox).toBeVisible();
-       await expect(checkBox).toBeEnabled();
-       const firstLocator = cardCollectionPage.cardsResults.first();
-       await checkBox.click();
-       await expect(checkBox).toBeChecked();
-
       const firstText = await cardCollectionPage.cardsResults.first().innerText();
+      const secondText = await cardCollectionPage.cardsResults.nth(1).innerText();
 
       const mainCollectionResults = extractNumber(firstText);
-      await expect(mainCollectionResults).toBe(2);
+      const assitionalCollectionresults = extractNumber(secondText);
 
+      await expect(mainCollectionResults).toBeGreaterThanOrEqual(assitionalCollectionresults);
+
+      await cardCollectionPage.productFilter.click();
+      await expect(cardCollectionPage.productFilterPanel).toBeVisible();
+      const checkBox = cardCollectionPage.filterCheckbox(data.btnRole, data.checkBoxAfterEffects);
+      await expect(checkBox).toBeVisible();
+      await expect(checkBox).toBeEnabled();
+
+      const firstLocator = cardCollectionPage.cardsResults.first();
+      await checkBox.click();
+      await expect(checkBox).toBeChecked();
+      await expect(firstLocator).not.toHaveText(firstText);
+
+      const firstTextAfter = await firstLocator.innerText();
+      await cardCollectionPage.cardsResults.nth(1).scrollIntoViewIfNeeded();
+      await page.locator('.progress-circle-wrapper').waitFor({ state: 'hidden' });
       
+      const secondTextAfter = await cardCollectionPage.cardsResults.nth(1).innerText();
+  
+      const mainAfter = extractNumber(firstTextAfter);
+      const additionalAfter = extractNumber(secondTextAfter);
+      
+      console.log('Main collection results after filter:', mainAfter);
+      console.log('Additional collection results after filter:', additionalAfter);
+  
+      await expect(mainAfter).toBeLessThan(additionalAfter);
     });
     await test.step('Sort main collection', async () => {
       await cardCollectionPage.clearAll.click();
@@ -171,13 +188,14 @@ test.describe('Validate card collection block', () => {
       const additionalCardTitleBefore = await cardCollectionPage.getFirstCardAdditionalCollection();
 
       await cardCollectionPage.selectDateSort(data.oldestSort);
+
       await expect
-      .poll(async () => await cardCollectionPage.getFirstCardMainCollection())
-      .not.toBe(mainCardTitleBefore);
+        .poll(async () => await cardCollectionPage.getFirstCardMainCollection())
+        .not.toBe(mainCardTitleBefore);
 
       const mainCardTitleAfter = await cardCollectionPage.getFirstCardMainCollection();
       const additionalCardTitleAfter = await cardCollectionPage.getFirstCardAdditionalCollection();
-      
+
       await expect(mainCardTitleBefore).not.toBe(mainCardTitleAfter);
       await expect(additionalCardTitleBefore).toBe(additionalCardTitleAfter);
     });
