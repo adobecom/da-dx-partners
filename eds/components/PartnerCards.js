@@ -7,6 +7,7 @@ import {
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
+import { dispatchCustomEventOnSearch } from '../blocks/utils/analyticsUtils.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, css, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -661,6 +662,7 @@ export default class PartnerCards extends LitElement {
     // eslint-disable-next-line no-return-assign
     this.cards.forEach((card, index) => card.orderNum = index + 1);
     this.updatePaginatedCards();
+    this.handleOnSearchAnalytics();
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -755,6 +757,21 @@ export default class PartnerCards extends LitElement {
     } else {
       this.urlSearchParams.delete('filters');
     }
+  }
+
+  handleOnSearchAnalytics() {
+    const selectedFiltersAnalytics = Object.entries(this.selectedFilters).flatMap(
+      ([key, values]) =>
+        values.map(value => {
+          if (value.key.startsWith('caas:')) return value.key;
+          return `caas:${key}/${value.key}`;
+        })
+    );
+
+    dispatchCustomEventOnSearch(
+      this.searchTerm,
+      selectedFiltersAnalytics,
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -891,7 +908,7 @@ export default class PartnerCards extends LitElement {
     const targetElement = partnerCardsHeader || this;
     const gnavHeight = document.querySelector('header')?.offsetHeight || 0;
     const targetRect = targetElement.getBoundingClientRect();
-    
+
     window.scrollTo({
       top: targetRect.top + window.scrollY - gnavHeight,
       behavior: 'auto'

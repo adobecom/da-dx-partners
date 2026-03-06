@@ -172,7 +172,6 @@ export default class Search extends PartnerCards {
         this.generateFilters(),
       );
 
-
       if (!response.ok) {
         throw new Error(`Error message: ${response.statusText}`);
       }
@@ -273,6 +272,7 @@ export default class Search extends PartnerCards {
       countCourses: count.courses,
     };
     this.hasResponseData = true;
+    this.handleOnSearchAnalytics();
   }
 
   handleContentType(contentType) {

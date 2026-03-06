@@ -4,6 +4,7 @@ import { getConfig, transformCardUrl } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
 import { DEFAULT_BACKGROUND_IMAGE_PATH } from '../blocks/utils/dxConstants.js';
+import { dispatchCustomEventOnLinkClick } from '../blocks/utils/analyticsUtils.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -15,6 +16,13 @@ class SinglePartnerCard extends LitElement {
     ietf: { type: String },
     design: { type: String },
   };
+
+  willUpdate(changedProps) {
+    if (changedProps.has('data')) {
+      // eslint-disable-next-line max-len
+      this.footerBtnLabel = processTrackingLabels(this.data.footer[0]?.right[0]?.text, getConfig(), 30);
+    }
+  }
 
   static styles = singlePartnerCardStyles;
 
@@ -30,7 +38,7 @@ class SinglePartnerCard extends LitElement {
           </div>
           <div class="card-footer">
             <span class="card-date">${formatDate(this.data.cardDate, this.ietf)}</span>
-            <a class="card-btn" daa-ll="${processTrackingLabels(this.data.footer[0]?.right[0]?.text, getConfig(), 30)}" href="${transformCardUrl(this.data.contentArea?.url)}" target="_blank" rel="nooopener noreferrer">${this.data.footer[0]?.right[0]?.text}</a>
+            <a @click=${(e) => dispatchCustomEventOnLinkClick(e, e.target.href, this.footerBtnLabel)} class="card-btn" daa-ll="${this.footerBtnLabel}" href="${transformCardUrl(this.data.contentArea?.url)}" target="_blank" rel="nooopener noreferrer">${this.data.footer[0]?.right[0]?.text}</a>
           </div>
         </div>
       </div>
