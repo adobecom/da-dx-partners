@@ -1194,7 +1194,7 @@ describe('Test personalization.js', () => {
           const { prependContent } = require('../../eds/scripts/portalMessaging.js');
           await prependContent();
 
-          expect(prependSpy).toHaveBeenCalledTimes(2);
+          expect(prependSpy).toHaveBeenCalledTimes(3);
           expect(prependSpy.mock.calls[0][0].className).toBe('global-banner');
           expect(prependSpy.mock.calls[1][0].className).toBe('bctq-banner');
 
@@ -1220,10 +1220,29 @@ describe('Test personalization.js', () => {
           const { prependContent } = require('../../eds/scripts/portalMessaging.js');
           await prependContent();
 
-          expect(prependSpy).toHaveBeenCalledTimes(1);
+          expect(prependSpy).toHaveBeenCalledTimes(2);
           expect(prependSpy.mock.calls[0][0].className).toBe('global-banner');
 
           prependSpy.mockRestore();
+        });
+
+        it('should create and prepend notificationRibbon element to main', async () => {
+          mockGetMetadataContent.mockReturnValue(null);
+          global.fetch.mockResolvedValue({
+            ok: true,
+            text: async () => '<main><div>Content</div></main>',
+          });
+
+          const { prependContent } = require('../../eds/scripts/portalMessaging.js');
+          await prependContent();
+
+          const mainElement = document.querySelector('main');
+          const notificationRibbon = document.getElementById('notificationRibbon');
+
+          expect(notificationRibbon).not.toBeNull();
+          expect(notificationRibbon.tagName).toBe('DIV');
+          expect(mainElement.contains(notificationRibbon)).toBe(true);
+          expect(mainElement.firstElementChild).toBe(notificationRibbon);
         });
       });
     });

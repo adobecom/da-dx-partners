@@ -147,4 +147,8 @@ export async function prependContent() {
 
   if (globalBannerContent) documentMain.prepend(globalBannerContent);
   if (bctqBannerContent) documentMain.prepend(bctqBannerContent);
+
+  const notificationRibbon = document.createElement('div');
+  notificationRibbon.id = 'notificationRibbon'
+  documentMain.prepend(notificationRibbon);
 }
