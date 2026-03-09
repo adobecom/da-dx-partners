@@ -56,7 +56,7 @@ class SearchCard extends LitElement {
     e.stopImmediatePropagation();
     if (e.isTrusted) {
       e.preventDefault();
-      dispatchCustomEventOnLinkClick(e, e.target.getAttribute('href'), processTrackingLabels(e.target.getAttribute('aria-label'), config, 30));
+      dispatchCustomEventOnLinkClick(e, e.target.getAttribute('href'), processTrackingLabels(e.target.getAttribute('daa-ll'), config, 30));
     }
   }
 
