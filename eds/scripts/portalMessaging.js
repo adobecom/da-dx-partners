@@ -149,6 +149,6 @@ export async function prependContent() {
   if (bctqBannerContent) documentMain.prepend(bctqBannerContent);
 
   const notificationRibbon = document.createElement('div');
-  notificationRibbon.id = 'notificationRibbon'
+  notificationRibbon.id = 'notificationRibbon';
   documentMain.prepend(notificationRibbon);
 }
