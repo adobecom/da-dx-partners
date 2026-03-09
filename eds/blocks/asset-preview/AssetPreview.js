@@ -224,7 +224,7 @@ export default class AssetPreview extends LitElement {
               <div class="asset-preview-block-actions" daa-lh="Asset preview block actions">
               ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button
                 class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}" daa-ll="View"> View </a></button>` : ''}
-                <button class="filled"><a download="${this.title}" href="${this.getDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>
+                ${!this.isVideo ? html`<button class="filled"><a download="${this.title}" href="${this.getDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>` : ''}
                 ${this.webinarPresentation ? html`
                   <button class="filled"><a  download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
                 ` : ''}
@@ -258,6 +258,7 @@ export default class AssetPreview extends LitElement {
               playsinline="" 
               loop="" 
               data-video-source="${this.getDownloadUrl()}"
+              oncontextmenu="return false;"
             >
               <source src="${this.getDownloadUrl()}" type="${this.fileType}">
               <source src="${this.getDownloadUrl()}" type="video/mp4">
