@@ -20,7 +20,7 @@ import {
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
-import { bctqBanner } from './portalMessaging.js';
+import { prependContent } from './portalMessaging.js';
 import { showNextPopup } from './showNextPopup.js';
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
@@ -110,7 +110,7 @@ function setUpPage() {
   updateFooter();
 }
 async function loadPage() {
-  await bctqBanner(miloLibs);
+  await prependContent();
   applyPagePersonalization();
   setUpPage();
   redirectLoggedinPartner();

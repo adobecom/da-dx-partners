@@ -993,30 +993,21 @@ describe('Test personalization.js', () => {
       });
     });
 
-    describe('bctqBanner function', () => {
-      const miloLibs = 'https://test-milo-libs.com';
-      let mockIsMember;
+    describe('Banner functions', () => {
       let mockGetMetadataContent;
 
       beforeEach(() => {
         jest.resetModules();
         jest.clearAllMocks();
-        
-        // Create mocks
-        mockIsMember = jest.fn();
+
         mockGetMetadataContent = jest.fn();
-        
-        // Mock the utils module
+
         jest.doMock('../../eds/scripts/utils.js', () => ({
           ...jest.requireActual('../../eds/scripts/utils.js'),
-          isMember: mockIsMember,
           getMetadataContent: mockGetMetadataContent,
         }));
-        
-        // Reset DOM
+
         document.body.innerHTML = '<main></main>';
-        
-        // Mock fetch
         global.fetch = jest.fn();
       });
 
@@ -1024,116 +1015,216 @@ describe('Test personalization.js', () => {
         jest.dontMock('../../eds/scripts/utils.js');
       });
 
-      it('should return early when user is not a member', async () => {
-        mockIsMember.mockReturnValue(false);
+      describe('getBctqBanner', () => {
+        it('should return null when banner condition is not met', async () => {
+          const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+          PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = false;
 
-        const { bctqBanner } = require('../../eds/scripts/portalMessaging.js');
-        await bctqBanner(miloLibs);
+          const { getBctqBanner } = require('../../eds/scripts/portalMessaging.js');
+          const result = await getBctqBanner();
 
-        expect(mockGetMetadataContent).not.toHaveBeenCalled();
-      });
-
-      it('should return early when banner condition is not met', async () => {
-        mockIsMember.mockReturnValue(true);
-
-        const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
-        PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = false;
-
-        const { bctqBanner } = require('../../eds/scripts/portalMessaging.js');
-        await bctqBanner(miloLibs);
-
-        expect(mockGetMetadataContent).not.toHaveBeenCalled();
-      });
-
-      it('should warn and return when fragment path is missing', async () => {
-        mockIsMember.mockReturnValue(true);
-
-        const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
-        PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
-
-        mockGetMetadataContent.mockReturnValue(null);
-
-        const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-
-        const { bctqBanner } = require('../../eds/scripts/portalMessaging.js');
-        await bctqBanner(miloLibs);
-
-        expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('bctq-banner should be displayed but popup fragment path is not found')
-        );
-        expect(global.fetch).not.toHaveBeenCalled();
-
-        consoleWarnSpy.mockRestore();
-      });
-
-      it('should warn and return when fragment content is not found', async () => {
-        mockIsMember.mockReturnValue(true);
-
-        const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
-        PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
-
-        mockGetMetadataContent.mockReturnValue('/fragments/bctq-banner');
-        global.fetch.mockResolvedValue({
-          ok: true,
-          text: async () => '<main></main>',
+          expect(result).toBeNull();
+          expect(mockGetMetadataContent).not.toHaveBeenCalled();
         });
 
-        const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+        it('should warn and return when fragment path is missing', async () => {
+          const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+          PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
 
-        const { bctqBanner } = require('../../eds/scripts/portalMessaging.js');
-        await bctqBanner(miloLibs);
+          mockGetMetadataContent.mockReturnValue(null);
 
-        expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('Popup fragment for /fragments/bctq-banner not found')
-        );
+          const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
-        consoleWarnSpy.mockRestore();
-      });
+          const { getBctqBanner } = require('../../eds/scripts/portalMessaging.js');
+          await getBctqBanner();
 
-      it('should return when main element is not found', async () => {
-        mockIsMember.mockReturnValue(true);
+          expect(consoleWarnSpy).toHaveBeenCalledWith(
+            expect.stringContaining('bctq-banner should be displayed but popup fragment path is not found')
+          );
+          expect(global.fetch).not.toHaveBeenCalled();
 
-        const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
-        PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
-
-        mockGetMetadataContent.mockReturnValue('/fragments/bctq-banner');
-        global.fetch.mockResolvedValue({
-          ok: true,
-          text: async () => '<main><div>Banner content</div></main>',
+          consoleWarnSpy.mockRestore();
         });
 
-        // Remove main element from document
-        const originalMain = document.querySelector('main');
-        if (originalMain) originalMain.remove();
+        it('should warn and return when fragment content is not found', async () => {
+          const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+          PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
 
-        const { bctqBanner } = require('../../eds/scripts/portalMessaging.js');
-        await bctqBanner(miloLibs);
+          mockGetMetadataContent.mockReturnValue('/fragments/bctq-banner');
+          global.fetch.mockResolvedValue({
+            ok: true,
+            text: async () => '<main></main>',
+          });
 
-        // Should return early, prepend not called - no error should be thrown
-      });
+          const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
-      it('should prepend banner content to main when all conditions are met', async () => {
-        mockIsMember.mockReturnValue(true);
+          const { getBctqBanner } = require('../../eds/scripts/portalMessaging.js');
+          await getBctqBanner();
 
-        const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
-        PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
+          expect(consoleWarnSpy).toHaveBeenCalledWith(
+            expect.stringContaining('Popup fragment for /fragments/bctq-banner not found')
+          );
 
-        mockGetMetadataContent.mockReturnValue('/fragments/bctq-banner');
-        global.fetch.mockResolvedValue({
-          ok: true,
-          text: async () => '<main><div class="bctq-banner">Banner content</div></main>',
+          consoleWarnSpy.mockRestore();
         });
 
-        const mainElement = document.querySelector('main');
-        const prependSpy = jest.spyOn(mainElement, 'prepend');
+        it('should return banner content when condition is met', async () => {
+          const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+          PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
 
-        const { bctqBanner } = require('../../eds/scripts/portalMessaging.js');
-        await bctqBanner(miloLibs);
+          mockGetMetadataContent.mockReturnValue('/fragments/bctq-banner');
+          global.fetch.mockResolvedValue({
+            ok: true,
+            text: async () => '<main><div class="bctq-banner">Banner content</div></main>',
+          });
 
-        expect(prependSpy).toHaveBeenCalled();
-        expect(prependSpy.mock.calls[0][0].className).toBe('bctq-banner');
+          const { getBctqBanner } = require('../../eds/scripts/portalMessaging.js');
+          const result = await getBctqBanner();
 
-        prependSpy.mockRestore();
+          expect(result).not.toBeNull();
+          expect(result.className).toBe('bctq-banner');
+        });
+      });
+
+      describe('getGlobalBanner', () => {
+        it('should warn and return when fragment path is missing', async () => {
+          mockGetMetadataContent.mockReturnValue(null);
+
+          const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+          const { getGlobalBanner } = require('../../eds/scripts/portalMessaging.js');
+          const result = await getGlobalBanner();
+
+          expect(result).toBeUndefined();
+          expect(consoleWarnSpy).toHaveBeenCalledWith(
+            expect.stringContaining('global-banner should be displayed but popup fragment path is not found')
+          );
+
+          consoleWarnSpy.mockRestore();
+        });
+
+        it('should return banner content when fragment exists', async () => {
+          mockGetMetadataContent.mockReturnValue('/fragments/global-banner');
+          global.fetch.mockResolvedValue({
+            ok: true,
+            text: async () => '<main><div class="global-banner">Global Banner</div></main>',
+          });
+
+          const { getGlobalBanner } = require('../../eds/scripts/portalMessaging.js');
+          const result = await getGlobalBanner();
+
+          expect(result).not.toBeNull();
+          expect(result.className).toBe('global-banner');
+        });
+      });
+
+      describe('prependContent', () => {
+        it('should return early when main element is not found', async () => {
+          document.body.innerHTML = '';
+
+          const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+          PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
+
+          mockGetMetadataContent.mockReturnValue('/fragments/bctq-banner');
+          global.fetch.mockResolvedValue({
+            ok: true,
+            text: async () => '<main><div>Banner content</div></main>',
+          });
+
+          const { prependContent } = require('../../eds/scripts/portalMessaging.js');
+          await prependContent();
+          // Should return early without error
+        });
+
+        it('should prepend bctq banner content to main', async () => {
+          const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+          PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
+
+          mockGetMetadataContent.mockImplementation((type) => {
+            if (type === 'bctq-banner') return '/fragments/bctq-banner';
+            return null;
+          });
+          global.fetch.mockResolvedValue({
+            ok: true,
+            text: async () => '<main><div class="bctq-banner">Banner content</div></main>',
+          });
+
+          const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+          const mainElement = document.querySelector('main');
+          const prependSpy = jest.spyOn(mainElement, 'prepend');
+
+          const { prependContent } = require('../../eds/scripts/portalMessaging.js');
+          await prependContent();
+
+          const bctqCall = prependSpy.mock.calls.find(call => call[0]?.className === 'bctq-banner');
+          expect(bctqCall).toBeTruthy();
+
+          prependSpy.mockRestore();
+          consoleWarnSpy.mockRestore();
+        });
+
+        it('should prepend both bctq and global banner content to main', async () => {
+          const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+          PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = true;
+
+          mockGetMetadataContent.mockImplementation((type) => {
+            if (type === 'bctq-banner') return '/fragments/bctq-banner';
+            if (type === 'global-banner') return '/fragments/global-banner';
+            return null;
+          });
+          global.fetch.mockImplementation((url) => {
+            if (url === '/fragments/bctq-banner') {
+              return Promise.resolve({
+                ok: true,
+                text: async () => '<main><div class="bctq-banner">BCTQ Banner</div></main>',
+              });
+            }
+            if (url === '/fragments/global-banner') {
+              return Promise.resolve({
+                ok: true,
+                text: async () => '<main><div class="global-banner">Global Banner</div></main>',
+              });
+            }
+            return Promise.resolve({ ok: false });
+          });
+
+          const mainElement = document.querySelector('main');
+          const prependSpy = jest.spyOn(mainElement, 'prepend');
+
+          const { prependContent } = require('../../eds/scripts/portalMessaging.js');
+          await prependContent();
+
+          expect(prependSpy).toHaveBeenCalledTimes(2);
+          expect(prependSpy.mock.calls[0][0].className).toBe('global-banner');
+          expect(prependSpy.mock.calls[1][0].className).toBe('bctq-banner');
+
+          prependSpy.mockRestore();
+        });
+
+        it('should prepend only global banner when bctq condition is not met', async () => {
+          const { PERSONALIZATION_CONDITIONS } = require('../../eds/scripts/personalizationConfigDX.js');
+          PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d'] = false;
+
+          mockGetMetadataContent.mockImplementation((type) => {
+            if (type === 'global-banner') return '/fragments/global-banner';
+            return null;
+          });
+          global.fetch.mockResolvedValue({
+            ok: true,
+            text: async () => '<main><div class="global-banner">Global Banner</div></main>',
+          });
+
+          const mainElement = document.querySelector('main');
+          const prependSpy = jest.spyOn(mainElement, 'prepend');
+
+          const { prependContent } = require('../../eds/scripts/portalMessaging.js');
+          await prependContent();
+
+          expect(prependSpy).toHaveBeenCalledTimes(1);
+          expect(prependSpy.mock.calls[0][0].className).toBe('global-banner');
+
+          prependSpy.mockRestore();
+        });
       });
     });
 
