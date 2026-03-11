@@ -140,7 +140,7 @@ export default class PartnerCards extends LitElement {
             parentKey: filterKey,
             value: getTagValue(tagKey),
             checked: false,
-          })),
+          })).sort((a, b) => a.value.localeCompare(b.value)),
         };
         this.blockData.filters.push(filterObj);
       },
@@ -149,7 +149,11 @@ export default class PartnerCards extends LitElement {
         const filter = caasFilter.innerText.trim().toLowerCase().replace(/ /g, '-');
         const tag = extractFilterData(filter, this.allTags);
         if (tag) {
-          this.blockData.filters.push(tag);
+          const updatedTag = {
+            ...tag,
+            tags: tag.tags.sort((a, b) => a.value.localeCompare(b.value)),
+          };
+          this.blockData.filters.push(updatedTag);
         }
       },
       sort: (cols) => {
