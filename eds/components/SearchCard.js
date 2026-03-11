@@ -53,7 +53,7 @@ class SearchCard extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   onCardBtnClick(e) {
-    e.stopImmediatePropagation();
+    e.stopPropagation();
     if (e.isTrusted) {
       e.preventDefault();
       dispatchCustomEventOnLinkClick(e, e.target.getAttribute('href'), processTrackingLabels(e.target.getAttribute('daa-ll'), config, 30));
