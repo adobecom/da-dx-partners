@@ -136,7 +136,14 @@ async function loadPage() {
   });
   await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
 
+  loadPageToAnchor();
+}
+
+loadPage();
+
+function loadPageToAnchor() {
   const urlHash = window.location.hash;
+
   if (urlHash) {
     const anchorElement = document.querySelector(urlHash);
 
@@ -147,8 +154,6 @@ async function loadPage() {
     }
   }
 }
-
-loadPage();
 
 (async function loadDa() {
   if (!new URL(window.location.href).searchParams.get('dapreview')) return;
