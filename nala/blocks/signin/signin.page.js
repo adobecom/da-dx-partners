@@ -13,7 +13,6 @@ export default class SignInPage {
     this.adobeProfile = page.locator('[data-test-id="unav-profile"]');
     this.adobeGnav = page.locator('[data-test-id="top-app-bar-content"]');
     this.globalFooter = page.getByRole('contentinfo');
-
     this.IMSEmailPage = page.locator('form#EmailForm');
     this.emailField = page.locator('#EmailPage-EmailField');
     this.emailPageContinueButton = page.locator('//button[@data-id="EmailPage-ContinueButton"]');
@@ -21,6 +20,11 @@ export default class SignInPage {
     this.passwordField = page.locator('#PasswordPage-PasswordField');
     this.passwordPageContinueButton = page.locator('//button[@data-id="PasswordPage-ContinueButton"]');
     this.notFound = page.getByRole('heading', { name: 'Not Found' });
+    this.popupCloseButton = page.getByRole('button', { name: 'Close' });
+    this.searchField = page.getByRole('searchbox', { name: 'Search' });
+    this.searchAllResults = page.getByRole('button', { name: 'All', exact: true });
+    this.loader = page.locator('.progress-circle-wrapper');
+    this.cardWrapper = page.locator('.card-wrapper').nth(0);
   }
 
   async signIn(page, partnerLevel) {
@@ -50,5 +54,20 @@ export default class SignInPage {
         + `:"LastName"%2C"level":"${partnerLevel}"%2C"status":"MEMBER"}}`,
       url: page,
     }]);
+  }
+
+  async waitForResultsToSettle() {
+    await this.loader.waitFor({ state: 'hidden', timeout: 30000 });
+  }
+  
+  assetTitleCheck(assetTitle) {
+    return this.page.getByText(assetTitle);
+  }
+
+  async getNumberOfResults() {
+    const text = await this.searchAllResults.textContent();
+    const match = text.match(/\((\d+)\)/);
+    const numberResults = Number(match[1]);
+    return numberResults;
   }
 }
