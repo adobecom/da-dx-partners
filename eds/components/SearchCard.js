@@ -3,6 +3,8 @@ import { formatDate, getLibs } from '../scripts/utils.js';
 import { getConfig, replaceText } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
+import { dispatchCustomEventOnLinkClick } from '../blocks/utils/analyticsUtils.js';
+
 const miloLibs = getLibs();
 const config = getConfig();
 const { html, repeat, LitElement, until, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -49,6 +51,15 @@ class SearchCard extends LitElement {
     return supportedFileTypes.includes(contentType) ? contentType : 'default';
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  onCardBtnClick(e) {
+    e.stopPropagation();
+    if (e.isTrusted) {
+      e.preventDefault();
+      dispatchCustomEventOnLinkClick(e, e.target.getAttribute('href'), processTrackingLabels(e.target.getAttribute('daa-ll'), config, 30));
+    }
+  }
+
   /* eslint-disable indent */
   render() {
     return html`
@@ -61,7 +72,7 @@ class SearchCard extends LitElement {
           </div>
           <div class="card-icons">
             <sp-theme theme="spectrum" color="light" scale="medium">
-              <sp-action-button @click=${(e) => { e.stopPropagation(); if (e.isTrusted) { e.preventDefault(); } }} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}" daa-ll="${processTrackingLabels(this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : '', getConfig(), 30)}"><sp-icon-open-in /></sp-action-button>
+              <sp-action-button @click=${(e) => this.onCardBtnClick(e)} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}" daa-ll="${processTrackingLabels(this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : '', getConfig(), 30)}"><sp-icon-open-in /></sp-action-button>
             </sp-theme>
           </div>
         </div>
