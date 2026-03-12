@@ -135,25 +135,9 @@ async function loadPage() {
     }
   });
   await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
-
-  loadPageToAnchor();
 }
 
 loadPage();
-
-function loadPageToAnchor() {
-  const urlHash = window.location.hash;
-
-  if (urlHash) {
-    const anchorElement = document.querySelector(urlHash);
-
-    if (anchorElement) {
-      setTimeout(() => {
-        window.scrollTo({ top: anchorElement.offsetTop, behavior: 'smooth' });
-      }, 100);
-    }
-  }
-}
 
 (async function loadDa() {
   if (!new URL(window.location.href).searchParams.get('dapreview')) return;

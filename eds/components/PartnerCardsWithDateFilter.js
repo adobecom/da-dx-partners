@@ -26,6 +26,20 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
       const [defaultDateFilter] = this.blockData.dateFilter.tags;
       this.selectedDateFilter = defaultDateFilter;
     }
+
+    this.loadPageToAnchor();
+  }
+
+  loadPageToAnchor() {
+    const urlHash = window.location.hash;
+
+    if (urlHash) {
+      const anchorElement = document.querySelector(urlHash);
+
+      if (anchorElement) {
+        window.scrollTo({ top: anchorElement.offsetTop, behavior: 'smooth' });
+      }
+    }
   }
 
   get dateFilter() {
