@@ -1,4 +1,4 @@
-import { getLibs } from '../scripts/utils.js';
+import { getLibs, loadPageToAnchor } from '../scripts/utils.js';
 import { partnerCardsDateFilterStyles } from './PartnerCardsStyles.js';
 import PartnerCards from './PartnerCards.js';
 
@@ -27,19 +27,7 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
       this.selectedDateFilter = defaultDateFilter;
     }
 
-    this.loadPageToAnchor();
-  }
-
-  loadPageToAnchor() {
-    const urlHash = window.location.hash;
-
-    if (urlHash) {
-      const anchorElement = document.querySelector(urlHash);
-
-      if (anchorElement) {
-        window.scrollTo({ top: anchorElement.offsetTop, behavior: 'smooth' });
-      }
-    }
+    loadPageToAnchor();
   }
 
   get dateFilter() {
