@@ -5,7 +5,7 @@ const miloLibs = getLibs();
 const { createTag } = await import('../utils/utils.js');
 const { decorateBlockBg, decorateBlockText, getBlockSize, decorateTextOverrides } = await import(`${miloLibs}/utils/decorate.js`);
 
-// size: [heading, body, ...detail]
+// size: [heading, body]
 const blockTypeSizes = {
   text: {
     small: ['m', 's', 's'],
@@ -30,7 +30,7 @@ async function handleClick(e, url) {
   e.preventDefault();
 
   const toastMsg = {
-    toastNegative: 'Access granted failed.',
+    toastNegative: 'Unable to grant access.',
     toastPositive: 'Access granted.',
     tryAgain: 'Try again',
   };
@@ -38,14 +38,20 @@ async function handleClick(e, url) {
   try {
     const response = await fetch(url, {
       method: 'GET',
-      // headers: { 'X-Requested-With': 'MiloDxp' },
+      credentials: 'include',
     });
 
-    if (response.ok) {
-      showToast('submit', true, null, toastMsg);
-    } else {
+    if (!response.ok) {
       throw new Error(`HTTP error: ${response.status}`);
     }
+
+    const data = await response.json();
+
+    if (!data?.success) {
+      throw new Error('API returned success=false');
+    }
+
+    showToast('submit', true, null, toastMsg);
   } catch (err) {
     showToast('submit', false, (event) => handleClick(event, url), toastMsg);
   }
