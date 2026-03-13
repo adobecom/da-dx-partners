@@ -30,7 +30,7 @@
     "@babel/eslint-parser": "7.17.0",
     "@babel/preset-env": "^7.25.3",
     "@esm-bundle/chai": "4.3.4-fix.0",
-    "@playwright/test": "^1.42.1",
+    "@playwright/test": "^1.58.2",
     "@web/dev-server-import-maps": "^0.0.6",
     "@web/test-runner": "^0.13.27",
     "@web/test-runner-commands": "0.6.1",
@@ -57,6 +57,6 @@
     "@adobecom/milo": "github:adobecom/milo#main",
     "axios": "^1.13.5",
     "dompurify": "^3.3.0",
-    "playwright": "^1.45.3"
+    "playwright": "^1.58.2"
   }
 }
