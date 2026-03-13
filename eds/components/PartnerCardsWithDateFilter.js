@@ -1,4 +1,4 @@
-import { getLibs } from '../scripts/utils.js';
+import { getLibs, loadPageToAnchor } from '../scripts/utils.js';
 import { partnerCardsDateFilterStyles } from './PartnerCardsStyles.js';
 import PartnerCards from './PartnerCards.js';
 
@@ -26,6 +26,8 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
       const [defaultDateFilter] = this.blockData.dateFilter.tags;
       this.selectedDateFilter = defaultDateFilter;
     }
+
+    loadPageToAnchor();
   }
 
   get dateFilter() {

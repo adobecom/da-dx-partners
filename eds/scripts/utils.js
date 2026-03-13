@@ -563,3 +563,15 @@ export async function invokeAfterImsIsReady(callback) {
   };
   window.addEventListener('dxpImsReady', handler);
 }
+
+export function loadPageToAnchor() {
+  const urlHash = window.location.hash;
+
+  if (urlHash) {
+    const anchorElement = document.querySelector(urlHash);
+
+    if (anchorElement) {
+      window.scrollTo({ top: anchorElement.offsetTop, behavior: 'smooth' });
+    }
+  }
+}
