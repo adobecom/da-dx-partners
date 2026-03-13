@@ -318,4 +318,63 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.jarvisChatPanel.waitFor({ state: 'visible', timeout: 30000 });
     });
   });
+  test(`${features[15].name},${features[15].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[15];
+
+    await test.step('Log in', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.signInButton.click();
+      await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+    await test.step('Check Feedback Dialog', async () => {
+      await smokeTest.feedbackButton.waitFor({ state: 'visible', timeout: 30000 });
+      expect(smokeTest.feedbackButton).toBeVisible();
+      expect(smokeTest.feedbackButton).toBeEnabled();
+      await smokeTest.feedbackButton.click();
+
+      await smokeTest.feedbackTitle.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(smokeTest.feedbackTitle).toBeVisible();
+      await expect(smokeTest.feedbackTitle).toHaveText(data.feedbackTitle);
+
+      await smokeTest.feedbackTextArea.waitFor({ state: 'visible', timeout: 30000 });
+
+      await smokeTest.feedbackTextArea.fill(data.feedbackTextArea);
+      await smokeTest.feedbackTextArea.press('Enter');
+
+      await expect(smokeTest.feedbackSendButton).toBeVisible();
+      await expect(smokeTest.feedbackSendButton).toBeDisabled();
+
+      await smokeTest.feedBackStars3.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.feedBackStars3.click();
+      await expect(smokeTest.feedbackSendButton).toBeEnabled();
+    });
+  });
+  test(`${features[16].name},${features[16].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[16];
+
+    await test.step('Go to page with query parameter', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+    await test.step('Check Feedback Dialog', async () => {
+
+      await smokeTest.feedbackTitle.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(smokeTest.feedbackTitle).toBeVisible();
+      await expect(smokeTest.feedbackTitle).toHaveText(data.feedbackTitle);
+
+      await smokeTest.feedbackTextArea.waitFor({ state: 'visible', timeout: 30000 });
+
+      await smokeTest.feedbackTextArea.fill(data.feedbackTextArea);
+      await smokeTest.feedbackTextArea.press('Enter');
+
+      await expect(smokeTest.feedbackSendButton).toBeVisible();
+      await expect(smokeTest.feedbackSendButton).toBeDisabled();
+
+      await smokeTest.feedBackStars3.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.feedBackStars3.click();
+      await expect(smokeTest.feedbackSendButton).toBeEnabled();
+    });
+  });
 });

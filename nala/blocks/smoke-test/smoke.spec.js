@@ -155,5 +155,26 @@ export default {
       path: '/digitalexperience/',
       // tags: '@da-dx-smoke-test',
     },
+    {
+      tcid: '16',
+      name: '@smoke-test-feedback-mechanism-restricted-page-validation',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: {
+        partnerLevel: 'dxp-platinum:',
+        feedbackTitle: 'Rate this page',
+        feedbackTextArea: 'Automation Test Keywords',
+      },
+    },
+    {
+      tcid: '17',
+      name: '@smoke-test-feedback-mechanism-with-query-parameter-validation',
+      path: '/digitalexperience/?feedback=true',
+      tags: '@da-dx-smoke-test',
+      data: {
+        feedbackTitle: 'Rate this page',
+        feedbackTextArea: 'Automation Test Keywords',
+      },
+    }
   ],
 };
