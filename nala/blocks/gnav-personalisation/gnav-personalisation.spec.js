@@ -16,7 +16,7 @@ export default {
         path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
         tags: '@da-dx-personalisation @regression @anonymous',
         data: {
-            segmentText: 'Partner member :',
+            segmentText: '(NOT) Partner primary',
             partnerData: {
                 partnerPortal: 'DXP',
                 partnerLevel: 'Platinum',
