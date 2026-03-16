@@ -14,8 +14,8 @@ const {
   loadStyle,
   loadLana,
   isLocalNav,
-  decorateLinks,
-  localizeLink,
+  decorateLinksAsync,
+  localizeLinkAsync,
   getFederatedContentRoot,
   getFederatedUrl,
   getFedsPlaceholderConfig,
@@ -522,7 +522,7 @@ export async function fetchAndProcessPlainHtml({
   if (commands?.length) {
     /* c8 ignore next 3 */
     const { handleCommands } = await import('../../../features/personalization/personalization.js');
-    handleCommands(commands, body, true, true);
+    await handleCommands(commands, body, true, true);
   }
   const inlineFrags = [...body.querySelectorAll('a[href*="#_inline"]')];
   if (inlineFrags.length) {
@@ -530,8 +530,8 @@ export async function fetchAndProcessPlainHtml({
     // MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
     const { default: loadInlineFrags } = await import(`${miloLibs}/blocks/fragment/fragment.js`); // MWPW-157751
     // PARTNERS_NAVIGATION END
-    const fragPromises = inlineFrags.map((link) => {
-      link.href = getFederatedUrl(localizeLink(link.href));
+    const fragPromises = inlineFrags.map(async (link) => {
+      link.href = getFederatedUrl(await localizeLinkAsync(link.href));
       return loadInlineFrags(link);
     });
     await Promise.all(fragPromises);
@@ -539,7 +539,7 @@ export async function fetchAndProcessPlainHtml({
 
   // federatePictureSources should only be called after decorating the links.
   if (shouldDecorateLinks) {
-    decorateLinks(body);
+    await decorateLinksAsync(body);
     federatePictureSources({ section: body, forceFederate: path.includes('/federal/') });
   }
 
