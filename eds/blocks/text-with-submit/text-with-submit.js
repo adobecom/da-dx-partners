@@ -1,4 +1,4 @@
-import { getLibs } from '../../scripts/utils.js';
+import { getLibs, prodHosts } from '../../scripts/utils.js';
 import showToast from '../../components/Toast.js';
 
 const miloLibs = getLibs();
@@ -86,10 +86,14 @@ export default async function init(el) {
 
     links.forEach((link) => {
       const url = new URL(link.href);
-      const hasSubmitParam = url.searchParams.get('submit');
 
-      if (hasSubmitParam === 'true') {
+      if (url.searchParams.get('submit') === 'true') {
         url.searchParams.delete('submit');
+
+        const isProd = prodHosts.includes(window.location.host);
+        url.hostname = isProd ? 'partners.adobe.com' : 'partners.stage.adobe.com';
+
+        link.href = url.href;
         link.addEventListener('click', (e) => handleClick(e, url.href));
       }
     });
