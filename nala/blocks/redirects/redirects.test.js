@@ -63,7 +63,6 @@ test.describe('Validate redirects block', () => {
     await test.step('Go to the page', async () => {
         await page.goto(`${baseURL}${path}`);
         await redirectsPage.signInButton.waitFor({ state: 'visible' });
-        await page.pause();
     });
     await test.step('Verify icon links on page', async () => {
         const hrefbenefitsCenterIcon = await redirectsPage.benefitsCenterIcon.getAttribute('href');
