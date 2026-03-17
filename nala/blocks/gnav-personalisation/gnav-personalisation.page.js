@@ -2,9 +2,12 @@ export default class GnavPersonalisationPage {
   constructor(page) {
     this.page = page;
     this.signInButton = page.getByRole('button', { name: 'Sign In' });
-    this.partnerLevelSegment = page.getByRole('main').locator('div').filter({ hasText: 'Partner platinum' }).nth(1)
     this.personalisationButton = page.getByRole('button', { name: 'Personalization' });
     this.gnavDropdown = page.locator('#feds-popup-1');
+  }
+
+  getPartnerLevelSegment(partnerLevelSegmentText) {
+    return this.page.getByRole('main').locator('div').filter({ hasText: `${partnerLevelSegmentText}` }).nth(1)
   }
 
   getSegments(segmentText) {
