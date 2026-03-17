@@ -41,7 +41,6 @@ test.describe('Gnav Personalisation', () => {
     await test.step('Go to the page', async () => {
         await page.goto(`${baseURL}${path}`);
         await gnavPersonalisationPage.signInButton.waitFor({ state: 'visible' });
-        await page.pause();
     });
     await test.step('Set partner_data cookie', async () => {
         await signInPage.addCookie(
@@ -49,13 +48,26 @@ test.describe('Gnav Personalisation', () => {
             data.partnerData.partnerLevel,
             `${baseURL}${path}`,
             context,
+            data.partnerData,
           );
           await page.reload();
           await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Verify segments on page', async () => {
-        await page.pause();
+        await expect(gnavPersonalisationPage.partnerLevelSegment).toBeVisible();
+        await expect(gnavPersonalisationPage.getSegments(data.segmentBussinessSolution)).toBeVisible();
+        await expect(gnavPersonalisationPage.getSegments(data.segemntBussinessTechnology)).toBeVisible();
+        await expect(gnavPersonalisationPage.getSegments(data.segmentBillngAdmin)).toBeVisible();
+        await expect(gnavPersonalisationPage.getSegments(data.segmentAdmin)).toBeVisible();
+        await expect(gnavPersonalisationPage.getSegments(data.segmentDesignationType)).toBeVisible();
+    });
+    await test.step('Verify segments present on Gnav', async () => {
+      await page.pause();
+      await gnavPersonalisationPage.personalisationButton.click();
+      await expect(gnavPersonalisationPage.gnavDropdown).toBeVisible();
+      await expect(gnavPersonalisationPage.getSegmentsGnav(data.gnavSegmentLevel)).toBeVisible();
+      await expect(gnavPersonalisationPage.getSegmentsGnav(data.gnavSegmentAdmin)).toBeVisible();
+      await expect(gnavPersonalisationPage.getSegmentsGnav(data.gnavSegmentDesignation)).toBeVisible();
     });
   });
-  
 });
