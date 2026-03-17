@@ -137,7 +137,7 @@ async function loadPage() {
   });
   await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
 
-  // Run when navigating back/forward (bfcache)
+  // Run when navigating back/forward
   window.addEventListener('pageshow', (e) => {
     loadPageToAnchor();
   });
