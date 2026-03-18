@@ -145,6 +145,15 @@ function preventAgreementModalClose(modal) {
     const closeCta = modal.querySelector('#partner-agreement-modal .dialog-close');
     closeCta.remove();
 
+    // block Milo Escape keydown listener
+    const blockEscapeKey = function (e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }
+    modal.addEventListener('keydown', blockEscapeKey, {capture: true});
+
     preventModalClose(modal);
 }
 
