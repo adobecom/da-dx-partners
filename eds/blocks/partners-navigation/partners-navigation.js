@@ -318,6 +318,7 @@ const decorateSignIn = async ({ rawElem, decoratedElem }) => {
   }
 
   decoratedElem.prepend(signInElem);
+  console.log('after prepend', decoratedElem);
 };
 
 const decorateProfileTrigger = async ({ avatar }) => {
