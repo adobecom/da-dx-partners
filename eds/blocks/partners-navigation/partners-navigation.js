@@ -555,11 +555,13 @@ class Gnav {
     setTimeout(fetchKeyboardNav, CONFIG.delays.keyboardNav);
     // eslint-disable-next-line no-restricted-syntax
     for (const task of tasks) {
+      console.log('in tasks runing', task);
       // eslint-disable-next-line no-await-in-loop
       await yieldToMain();
       // eslint-disable-next-line no-await-in-loop
       await task();
     }
+    console.log('after tasks');
 
     document.addEventListener('click', (e) => closeOnClickOutside(e, this.isLocalNav(), this.elements.navWrapper));
     isDesktop.addEventListener('change', closeAllDropdowns);
@@ -571,6 +573,8 @@ class Gnav {
     performance.mark('Gnav-Visible');
     logPerformance('Gnav-Time-To-Visible', 'Gnav-Start', 'Gnav-Visible');
   };
+
+  console.log('window adobeIMS initialized', window.adobeIMS?.initialized);
 
   ims = async () => (window.adobeIMS?.initialized ? this.imsReady() : loadIms()
     .then(() => this.imsReady())
