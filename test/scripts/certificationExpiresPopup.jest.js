@@ -16,6 +16,7 @@ jest.mock('../../eds/scripts/utils.js', () => ({
   getMetadataContent: jest.fn(),
   isMember: jest.fn(),
   invokeAfterImsIsReady: jest.fn(async (callback) => await callback()), // Immediately invoke callback and await result
+  preventModalClose: jest.fn(),
 }));
 
 jest.mock('../../eds/scripts/portalMessaging.js', () => ({ loadPopupFragment: jest.fn() }));
