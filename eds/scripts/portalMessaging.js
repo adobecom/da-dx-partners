@@ -2,6 +2,7 @@ import {
   getCurrentProgramType,
   getMetadataContent,
   getPartnerCookieValue,
+  preventModalClose,
   CERTIFICATION_POPUP,
   SHOW_NEXT_POPUP,
 } from './utils.js';
@@ -99,6 +100,7 @@ export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
     );
     return false;
   }
+  preventModalClose(modal);
   const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
   await loadArea(modal);
   personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());
