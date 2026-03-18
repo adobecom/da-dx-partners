@@ -575,3 +575,24 @@ export function loadPageToAnchor() {
     }
   }
 }
+
+export function preventModalClose(modal) {
+  // block Milo Escape keydown listener
+  const blockEscapeKey = function (e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  }
+  modal.addEventListener('keydown', blockEscapeKey, {capture: true});
+
+  // prevent closing the modal by clicking outside
+  const curtain = document.querySelector('.modal-curtain, .is-open');
+  const blockClickOutside = (e) => {
+    if (e.target === curtain) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  };
+  curtain.addEventListener('click', blockClickOutside, {capture: true});
+}
