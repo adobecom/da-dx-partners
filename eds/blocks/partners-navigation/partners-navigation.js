@@ -282,7 +282,9 @@ const signIn = (options = {}) => {
 };
 
 const decorateSignIn = async ({ rawElem, decoratedElem }) => {
+  console.log('in decorate sign in, rawElem', rawElem);
   const dropdownElem = rawElem.querySelector(':scope > div:nth-child(2)');
+  console.log('dropdownElem', dropdownElem);
   const signInLabel = await replaceKey('sign-in', getFedsPlaceholderConfig());
   let signInElem;
 
@@ -844,10 +846,13 @@ class Gnav {
     const { rawElem, decoratedElem } = this.blocks.profile;
     if (!rawElem) return;
 
+console.log('window.adobeIMS', window.adobeIMS);
+console.log('window.adobeIMS.isSignedInUser()', window.adobeIMS.isSignedInUser());
     const isSignedInUser = window.adobeIMS.isSignedInUser();
 
     // If user is not signed in, decorate the 'Sign In' element
     if (!isSignedInUser) {
+      console.log('is not signed in user');
       await decorateSignIn({ rawElem, decoratedElem });
       return;
     }
