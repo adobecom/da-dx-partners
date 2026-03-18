@@ -556,6 +556,7 @@ class Gnav {
     // eslint-disable-next-line no-restricted-syntax
     for (const task of tasks) {
       console.log('in tasks runing', task);
+      console.log('window.adobeIMS?.initialized', window.adobeIMS?.initialized);
       // eslint-disable-next-line no-await-in-loop
       await yieldToMain();
       // eslint-disable-next-line no-await-in-loop
@@ -573,8 +574,6 @@ class Gnav {
     performance.mark('Gnav-Visible');
     logPerformance('Gnav-Time-To-Visible', 'Gnav-Start', 'Gnav-Visible');
   };
-
-  console.log('window adobeIMS initialized', window.adobeIMS?.initialized);
 
   ims = async () => (window.adobeIMS?.initialized ? this.imsReady() : loadIms()
     .then(() => this.imsReady())
@@ -833,6 +832,8 @@ class Gnav {
     try {
       // eslint-disable-next-line no-restricted-syntax
       for await (const task of tasks) {
+        console.log('in tasks runing2', task);
+        console.log('window.adobeIMS?.initialized2', window.adobeIMS?.initialized);
         await yieldToMain();
         await task();
       }
