@@ -1,7 +1,7 @@
 export default class GnavPersonalisationPage {
   constructor(page) {
     this.page = page;
-    this.signInButton = page.getByRole('button', { name: 'Sign In' });
+    this.gnav = page.locator('.feds-topnav-wrapper');
     this.personalisationButton = page.getByRole('button', { name: 'Personalization' });
     this.gnavDropdown = page.locator('#feds-popup-1');
   }
