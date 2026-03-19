@@ -39,6 +39,7 @@ export default class Search extends PartnerCards {
     // Tracks order of requests for search and suggestions to use response from last fired request
     this.searchReqCounter = 0;
     this.suggestionReqCounter = 0;
+    this.numOfLoadedCards = 0;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -172,7 +173,6 @@ export default class Search extends PartnerCards {
         this.generateFilters(),
       );
 
-
       if (!response.ok) {
         throw new Error(`Error message: ${response.statusText}`);
       }
@@ -273,6 +273,8 @@ export default class Search extends PartnerCards {
       countCourses: count.courses,
     };
     this.hasResponseData = true;
+    this.handleOnSearchAnalytics();
+    this.numOfLoadedCards = this.cardsCounter;
   }
 
   handleContentType(contentType) {
@@ -472,7 +474,7 @@ export default class Search extends PartnerCards {
             ? html`
               <div class="pagination-wrapper ${this.blockData?.pagination === 'load-more' ? 'pagination-wrapper-load-more' : 'pagination-wrapper-default'}">
                 ${this.pagination}
-                <span class="pagination-total-results">${this.cardsCounter} <span>${this.blockData.localizedText['{{of}}']} ${this.getTotalResults()} ${this.blockData.localizedText['{{results}}']}</span></span>
+                <span class="pagination-total-results">${this.numOfLoadedCards} <span>${this.blockData.localizedText['{{of}}']} ${this.getTotalResults()} ${this.blockData.localizedText['{{results}}']}</span></span>
               </div>
             `
             : ''

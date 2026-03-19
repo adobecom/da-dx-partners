@@ -16,11 +16,12 @@ import {
   preloadResources,
   redirectLoggedinPartner,
   updateNavigation,
+  loadPageToAnchor,
   updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback, SHOW_NEXT_POPUP, PARTNER_AGREEMENT_POPUP
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
-import { bctqBanner } from './portalMessaging.js';
+import { prependContent } from './portalMessaging.js';
 import { showNextPopup } from './showNextPopup.js';
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
@@ -35,6 +36,11 @@ const isProd = prodHosts.includes(window.location.host);
 let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 'ims_client_id_stage' }]`)?.content
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
+const localesDefault = { '': { ietf: 'en-US', tk: 'hah7vzn.css' } };
+//typekits with swap
+const localesSafari = { '': { ietf: 'en-US', tk: 'vti0xwb.css' } };
+const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome');
+
 // Add any config options.
 let CONFIG = {
   codeRoot: '/eds',
@@ -44,9 +50,7 @@ let CONFIG = {
   clientEnv: isProd ? 'prod' : null,
   // geoRouting: 'off',
   // fallbackRouting: 'off',
-  locales: {
-    '': { ietf: 'en-US', tk: 'hah7vzn.css' },
-  },
+  locales: isSafari ? localesSafari : localesDefault,
   jarvis: {
     id: 'spp_default',
     version: '1.0',
@@ -110,7 +114,7 @@ function setUpPage() {
   updateFooter();
 }
 async function loadPage() {
-  await bctqBanner(miloLibs);
+  await prependContent();
   applyPagePersonalization();
   setUpPage();
   redirectLoggedinPartner();
@@ -132,6 +136,11 @@ async function loadPage() {
     }
   });
   await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
+
+  // Run when navigating back/forward
+  window.addEventListener('pageshow', (e) => {
+    loadPageToAnchor();
+  });
 }
 
 loadPage();

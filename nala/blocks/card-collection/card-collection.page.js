@@ -28,7 +28,7 @@ export default class CardCollectionPage {
     this.workFromAnywhere = page.getByRole('checkbox', { name: 'Work from anywhere' });
     this.productFilterPanel = page.getByRole('list').filter({ hasText: 'After Effects Bridge InDesign' });
     this.industryFilter = page.getByRole('button', { name: 'Industry' });
-    this.industryFilterPanel = page.getByRole('list').filter({ hasText: 'Media & Entertainment Retail' });
+    this.industryFilterPanel = page.getByRole('list').filter({ hasText: 'Architecture Gaming' });
     this.signInButton = page.locator('.feds-profile');
     this.checkedFilterButton = page.getByRole('button', { name: 'Media & Entertainment' });
   }
