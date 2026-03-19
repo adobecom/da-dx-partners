@@ -1,0 +1,469 @@
+.text-with-submit-block {
+  --accent-height: 10px;
+
+  position: relative;
+}
+
+.dark .text-with-submit-block,
+.text-with-submit-block.dark {
+  color: #fff;
+}
+
+.text-with-submit-block p,
+.text-with-submit-block [class^="body-"] { margin: var(--spacing-xs) 0; }
+
+.text-with-submit-block [class^="body-"]:only-child { margin: 0; }
+
+.text-with-submit-block [class^="heading"] { margin: 0 0 var(--spacing-xs) 0; }
+
+.text-with-submit-block [class^="detail"] { margin: 0 0 var(--spacing-xxs) 0; }
+
+.text-with-submit-block [class^="detail"] strong { font-weight: unset; } /* bugfix for FF */
+
+.text-with-submit-block .cta-container,
+.text-with-submit-block p.action-area { margin-top: var(--spacing-s); }
+
+.text-with-submit-block div > *:last-child { margin-bottom: 0; }
+
+.text-with-submit-block.unstyled-list :is(ul, ol) {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+.text-with-submit-block.unstyled-list :is(ul, ol)[class^="body-"] > li:not(:first-child) { margin: inherit; }
+
+.grid .text-with-submit-block div > *:last-child { margin-bottom: var(--spacing-s); }
+
+.text-with-submit-block .foreground > div *:first-child { margin-top: 0; }
+
+.text-with-submit-block .background {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  overflow: hidden;
+}
+
+.text-with-submit-block .background > div {
+  height: 100%;
+}
+
+.text-with-submit-block .background img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.text-with-submit-block .foreground {
+  max-width: var(--grid-container-width);
+  margin: 0 auto;
+}
+
+[class*=-up] .text-with-submit-block .foreground {
+  max-width: none;
+  margin: 0;
+}
+
+.text-with-submit-block .action-area {
+  margin-top: var(--spacing-s);
+  display: flex;
+  gap: var(--spacing-s);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.text-with-submit-block .cta-container .action-area {
+  width: 100%;
+}
+
+.text-with-submit-block .title-l {
+  font-size: var(--type-body-m-size);
+  line-height: var(--type-body-m-lh);
+  font-weight: 700;
+  text-transform: none;
+  margin-bottom: var(--spacing-xs);
+}
+
+.text-with-submit-block :is(.lockup-area) {
+  margin-block-end: var(--spacing-m);
+}
+
+/* Alignment */
+.text-with-submit-block.center {
+  text-align: center;
+  align-items: center;
+}
+
+.text-with-submit-block.center .action-area {
+  justify-content: center;
+}
+
+.text-with-submit-block.right {
+  text-align: end;
+  align-items: end;
+}
+
+.text-with-submit-block.right .action-area {
+  justify-content: end;
+}
+
+/* Vertical */
+.vertical.text-with-submit-block .foreground {
+  padding-bottom: var(--spacing-m);
+}
+
+/* Legal */
+.legal.text-with-submit-block {
+  padding: var(--spacing-xl) 0;
+}
+
+.legal.text-with-submit-block .foreground {
+  font-style: italic;
+}
+
+.section[class*='grid-width-'] .text-with-submit-block .foreground {
+  max-width: unset;
+}
+
+.text-with-submit-block.center .foreground > .mobile-up {
+  justify-content: center;
+}
+
+.text-with-submit-block.right .foreground > .mobile-up {
+  justify-content: end;
+}
+
+.text-with-submit-block .foreground > .desktop-up,
+.text-with-submit-block .foreground > .tablet-up {
+  display: none;
+}
+
+/* Text Alignment */
+.section[class*="-up"] .text-with-submit-block {
+  display: flex;
+  align-self: stretch;
+}
+
+.section[class*="-up"] .text-with-submit-block .foreground {
+  display: flex;
+  align-self: stretch;
+  width: 100%;
+}
+
+.section[class*="-up"] .text-with-submit-block:not(.inline) .foreground > div:not(:has(> strong)) {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.section[class*="-up"] .text-with-submit-block [class^="heading"],
+.section[class*="-up"] .text-with-submit-block p:not([class^="detail-"]),
+.section[class*="-up"] .text-with-submit-block [class^="body-"] {
+  margin-bottom: 0;
+}
+
+.section[class*="-up"] .text-with-submit-block .cta-container {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+}
+
+/* Mweb specific */
+@media screen and (max-width: 599px) {
+  .text.text-with-submit-block.left-mobile {
+    text-align: start;
+  }
+
+  .text.text-with-submit-block.center-mobile {
+    text-align: center;
+  }
+
+  .text.text-with-submit-block.left-mobile .action-area,
+  .text.text-with-submit-block.center-mobile .action-area {
+    gap: var(--spacing-xxs);
+  }
+
+  .text.text-with-submit-block.left-mobile .action-area {
+    justify-content: start;
+  }
+
+  .text.text-with-submit-block.center-mobile .action-area {
+    justify-content: center;
+  }
+
+
+
+  .text.text-with-submit-block.left-mobile [class^="heading"],
+  .text.text-with-submit-block.center-mobile [class^="heading"] {
+    margin: 0 0 12px;
+  }
+
+  .text.text-with-submit-block.left-mobile [class^="body-"]:not(.action-area),
+  .text.text-with-submit-block.center-mobile [class^="body-"]:not(.action-area) {
+    margin: 12px 0 var(--spacing-xs) 0;
+  }
+}
+
+/* Tablet up */
+@media screen and (min-width: 600px) {
+  .text-with-submit-block .foreground > .tablet-up,
+  .text-with-submit-block .foreground > .tablet-up.desktop-up {
+    display: block;
+  }
+
+  .text-with-submit-block.center .foreground > .tablet-up {
+    justify-content: center;
+  }
+
+  .text-with-submit-block.right .foreground > .tablet-up {
+    justify-content: end;
+  }
+
+  .text-with-submit-block .foreground > .mobile-up,
+  .text-with-submit-block .foreground > .desktop-up {
+    display: none;
+  }
+}
+
+/* Desktop up */
+@media screen and (min-width: 1200px) {
+  .text-with-submit-block .foreground > .desktop-up,
+  .text-with-submit-block .foreground > .tablet-up.desktop-up {
+    display: block;
+  }
+
+  .text-with-submit-block.center .foreground > .desktop-up {
+    justify-content: center;
+  }
+
+  .text-with-submit-block.right .foreground > .desktop-up {
+    justify-content: end;
+  }
+
+  .text-with-submit-block .foreground > .mobile-up,
+  .text-with-submit-block .foreground > .tablet-up {
+    display: none;
+  }
+}
+
+:root:has(meta[name="theme"][content="max25"]) {
+  .text-with-submit-block [class*="detail-"] {
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .text-with-submit-block [class*="detail-l"] {
+    font-size: 16px;
+  }
+
+  .section:not(.dark) .text-with-submit-block:not(.dark) [class*="detail-"] {
+    color: #5d5d5d;
+  }
+
+  @media (max-width: 1199px) {
+    .text-with-submit-block .title-l {
+      font-size: 16px;
+    }
+  }
+
+  .text-with-submit-block .title-l {
+    margin-bottom: 10px;
+  }
+
+  .text-with-submit-block [class*="heading-"] {
+    font-weight: 900;
+  }
+
+  .section:not(.dark) .text-with-submit-block:not(.dark) [class*="heading-"] {
+    color: var(--color-black);
+  }
+
+  .text-with-submit-block [class*="heading-xxxl"] {
+    font-size: 36px;
+    line-height: 0.98;
+    letter-spacing: -1px;
+  }
+
+  .text-with-submit-block.center [class*="body-"] {
+    max-width: 670px;
+    margin: 0 auto;
+  }
+
+  .section:not(.dark) .text-with-submit-block:not(.dark) [class*="body-"] {
+    color: #575151;
+  }
+
+  .text-with-submit-block [class*="body-xl"] {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .text-with-submit-block .cta-container:only-child {
+    margin-top: 0;
+  }
+
+  .section:has(.carousel.show-2.ups-desktop) + .section .text-with-submit-block .cta-container:only-child .con-button.outline:not(:hover) {
+    background: var(--color-white);
+    border-color: var(--color-white);
+  }
+
+  .text-with-submit-block.ff-max-merch-spacing {
+    padding-top: 46px;
+    padding-bottom: 24px;
+  }
+
+  .text-with-submit-block.ff-max-merch-spacing .detail-m {
+    font-size: 16px;
+  }
+
+  @media (max-width: 599px) {
+    .text-with-submit-block.no-spacing-top-mobile {
+      padding-top: 0;
+    }
+  }
+
+  @media (min-width: 600px) {
+    .text-with-submit-block [class*="heading-xxxl"] {
+      font-size: 72px;
+      letter-spacing: -3px;
+    }
+
+    .text-with-submit-block [class*="body-xl"] {
+      font-size: 24px;
+    }
+
+    .text-with-submit-block [class*="detail-l"] {
+      font-size: 20px;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .text-with-submit-block.ff-max-merch-spacing {
+      padding-top: 160px;
+      padding-bottom: 60px;
+    }
+
+    .text-with-submit-block.ff-max-merch-spacing .detail-m {
+      font-size: 18px;
+    }
+
+    .text-with-submit-block.ff-max-merch-spacing .body-m {
+      font-size: 24px;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 1199px) {
+    .text-with-submit-block.no-spacing-top-tablet {
+      padding-top: 0;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .text-with-submit-block.xxl-spacing-top.no-spacing-top-tablet {
+      padding-top: var(--spacing-xxl);
+    }
+  }
+}
+
+/* Northstar specific */
+:root:has(meta[name="theme"][content="northstar"]) {
+  .section:not(.dark) .text-with-submit-block:not(.dark) :is([class*="heading-"],[class*="body-"]) {
+    color: var(--color-black);
+  }
+
+  .text-with-submit-block [class*="heading-"] {
+    font-family: "Adobe Clean Black", var(--body-font-family);
+    font-weight: 900;
+  }
+
+  .text-with-submit-block .heading-xxxl {
+    font-size: 32px;
+    line-height: 1.05;
+    letter-spacing: -1px;
+  }
+
+  .text-with-submit-block .body-xl {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .text-with-submit-block .cta-container {
+    margin-top: var(--spacing-xs);
+  }
+
+  .text-with-submit-block .con-button {
+    font-size: 17px;
+    line-height: 21px;
+  }
+
+  .dark .text-with-submit-block .con-button {
+    border-radius: 20px;
+    padding: 7px 16.5px 8px;
+  }
+
+  @media (max-width: 599px) {
+    .text-with-submit-block.no-spacing-top-mobile {
+      padding-top: 0;
+    }
+
+    .text-with-submit-block.left-mobile {
+      text-align: start;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 1199px) {
+    .text-with-submit-block .heading-xxxl {
+      font-size: 44px;
+    }
+
+    .text-with-submit-block.left-tablet {
+      text-align: start;
+    }
+  }
+
+  @media (max-width: 1199px) {
+    .text-with-submit-block.xs-spacing-bottom {
+      padding-bottom: 0;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .text-with-submit-block .heading-xxxl {
+      font-size: 96px;
+      line-height: 0.98;
+      letter-spacing: -3px;
+      max-width: 1200px;
+    }
+
+    .text-with-submit-block .body-xl {
+      font-size: 24px;
+      line-height: 1.3;
+      max-width: 840px;
+    }
+
+    .text-with-submit-block :is(.body-xl, .heading-xxxl) {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .text-with-submit-block [class*="body-"] {
+      margin-top: var(--spacing-s);
+    }
+
+    .text-with-submit-block.xxl-spacing-top {
+      padding-top: var(--spacing-xxl);
+    }
+
+    .text-with-submit-block .con-button {
+      font-size: 19px;
+      line-height: 24px;
+    }
+
+    .dark .text-with-submit-block .con-button {
+      padding: 10px 22.5px 12px;
+      border-radius: 40px;
+    }
+  }
+}
