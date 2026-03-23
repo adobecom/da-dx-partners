@@ -20,7 +20,7 @@ export default class SignInPage {
     this.passwordField = page.locator('#PasswordPage-PasswordField');
     this.passwordPageContinueButton = page.locator('//button[@data-id="PasswordPage-ContinueButton"]');
     this.notFound = page.getByRole('heading', { name: 'Not Found' });
-    this.popupCloseButton = page.getByRole('button', { name: 'Close' });
+    this.popupCloseButton = page.locator('.dialog-close');
     this.searchField = page.getByRole('searchbox', { name: 'Search' });
     this.searchAllResults = page.getByRole('button', { name: 'All', exact: true });
     this.loader = page.locator('.progress-circle-wrapper');
