@@ -16,6 +16,7 @@ import {
   preloadResources,
   redirectLoggedinPartner,
   updateNavigation,
+  loadPageToAnchor,
   updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback, SHOW_NEXT_POPUP, PARTNER_AGREEMENT_POPUP
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
@@ -135,6 +136,11 @@ async function loadPage() {
     }
   });
   await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
+
+  // Run when navigating back/forward
+  window.addEventListener('pageshow', (e) => {
+    loadPageToAnchor();
+  });
 }
 
 loadPage();
