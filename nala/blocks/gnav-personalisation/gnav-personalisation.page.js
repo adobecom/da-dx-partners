@@ -17,4 +17,10 @@ export default class GnavPersonalisationPage {
   getSegmentsGnav(segmentText) {
     return this.page.getByRole('link', { name: `${segmentText}` });
   }
+
+  generateDateWithDaysOffset(daysOffset) {
+    const date = new Date();
+    date.setDate(date.getDate() + daysOffset);
+    return date;
+  }
 }
