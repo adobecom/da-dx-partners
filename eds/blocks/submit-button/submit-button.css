@@ -1,0 +1,33 @@
+.submit-button-block {
+  position: relative;
+}
+
+.dark .submit-button-block,
+.submit-button-block.dark {
+  color: #fff;
+}
+
+.submit-button-block .foreground {
+  max-width: var(--grid-container-width);
+  margin: 0 auto;
+}
+
+.submit-button-block .action-area {
+  display: flex;
+  width: 100%;
+}
+
+.submit-button-block.center .action-area {
+  justify-content: center;
+}
+
+.submit-button-block.right .action-area {
+  justify-content: end;
+}
+
+@media (max-width: 599px) {
+  .submit-button-block .action-area .con-button {
+    width: 100%;
+    text-align: center;
+  }
+}
