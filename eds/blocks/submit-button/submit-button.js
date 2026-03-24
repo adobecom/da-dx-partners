@@ -8,8 +8,8 @@ async function handleClick(e, url) {
   e.preventDefault();
 
   const toastMsg = {
-    toastNegative: 'Unable to grant access.',
-    toastPositive: 'Access granted.',
+    toastNegative: 'Unsuccessful request.',
+    toastPositive: 'Successful request.',
     tryAgain: 'Try again',
   };
 
@@ -48,6 +48,7 @@ export default function init(el) {
   const foreground = document.createElement('div');
   foreground.classList.add('foreground');
 
+  // Use <em> to achieve a specific button style
   const em = document.createElement('em');
   em.append(link);
   foreground.append(em);
