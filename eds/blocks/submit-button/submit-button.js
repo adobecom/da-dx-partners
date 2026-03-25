@@ -4,7 +4,9 @@ import showToast from '../../components/Toast.js';
 const miloLibs = getLibs();
 const { decorateButtons } = await import(`${miloLibs}/utils/decorate.js`);
 
-async function handleClick(e, url) {
+async function handleClick(e, link) {
+  if (link.classList.contains('disabled')) return;
+
   e.preventDefault();
 
   const toastMsg = {
@@ -14,10 +16,12 @@ async function handleClick(e, url) {
   };
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(link.href, {
       method: 'GET',
       credentials: 'include',
     });
+
+    link.classList.add('disabled');
 
     if (!response.ok) {
       throw new Error(`HTTP error: ${response.status}`);
@@ -31,7 +35,9 @@ async function handleClick(e, url) {
 
     showToast('submit', true, null, toastMsg);
   } catch (err) {
-    showToast('submit', false, (event) => handleClick(event, url), toastMsg);
+    showToast('submit', false, (event) => handleClick(event, link), toastMsg);
+  } finally {
+    link.classList.remove('disabled');
   }
 }
 
@@ -55,5 +61,5 @@ export default function init(el) {
   decorateButtons(em);
   el.replaceChildren(foreground);
 
-  link.addEventListener('click', (e) => handleClick(e, link.href));
+  link.addEventListener('click', (e) => handleClick(e, link));
 }
