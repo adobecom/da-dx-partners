@@ -31,29 +31,20 @@ import {
   partnerCookieContainsValue,
   getDaysFromRegistration,
   isReturningUser,
+  prodHosts,
 } from '../../eds/scripts/utils.js';
 import {DX_PROGRAM_TYPE} from "../../eds/blocks/utils/dxConstants.js";
 
 describe('Test utils.js', () => {
   beforeEach(() => {
     window = Object.create(window);
-    Object.defineProperty(window, 'location', {
-      value: {
-        pathname: '/digitalexperience/',
-        // eslint-disable-next-line no-return-assign
-        assign: (pathname) => window.location.pathname = pathname,
-        origin: 'https://partners.stage.adobe.com',
-        href: 'https://partners.stage.adobe.com/digitalexperience/',
-      },
-      writable: true,
-    });
   });
   afterEach(() => {
     document.getElementsByTagName('html')[0].innerHTML = '';
   });
   it('Milo libs', () => {
-    window.location.hostname = 'partners.stage.adobe.com';
-    const libs = setLibs('/libs');
+    const location = { origin: 'https://partners.stage.adobe.com' };
+    const libs = setLibs('/libs', location);
     expect(libs).toEqual('https://partners.stage.adobe.com/libs');
   });
   describe('Test update footer and gnav', () => {
@@ -135,7 +126,7 @@ describe('Test utils.js', () => {
     expect(getProgramHomePage(invalidPath)).toEqual('');
   });
   it('Should get current program based on url path', () => {
-    window.location.pathname = '/digitalexperience/';
+    window.history.pushState({}, '', '/digitalexperience/');
     expect(getCurrentProgramType()).toEqual(DX_PROGRAM_TYPE);
   });
   it('Should get correct cookie value for given cookie name', () => {
@@ -199,7 +190,7 @@ describe('Test utils.js', () => {
     expect(redirectLoggedinPartner()).toBeFalsy();
   });
   it('Redirect logged in partner to protected home', () => {
-    window.location.pathname = '/digitalexperience/';
+    const fakeWindow = { location: { assign: jest.fn() } };
     const cookieObjectMember = { DXP: { status: 'MEMBER' } };
     document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
     document.cookie = `partner_info=${JSON.stringify({})}`;
@@ -207,8 +198,9 @@ describe('Test utils.js', () => {
     metaTag.name = 'adobe-target-after-login';
     metaTag.content = '/digitalexperience/home';
     document.head.appendChild(metaTag);
-    redirectLoggedinPartner();
-    expect(window.location.pathname).toEqual(metaTag.content);
+    redirectLoggedinPartner(fakeWindow);
+    const calls = fakeWindow.location.assign.mock.calls;
+    expect(calls[0][0]).toBe(metaTag.content);
   });
   it('Update ims config if user is signed in', () => {
     jest.useFakeTimers();
@@ -248,7 +240,7 @@ describe('Test utils.js', () => {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
     };
-    window.location.pathname = '/de/digitalexperience/';
+    window.history.pushState({}, '', '/de/digitalexperience/');
     const locale = getLocale(locales);
     expect(locale).toStrictEqual({ ietf: 'de-DE', tk: 'hah7vzn.css', prefix: '/de', region: 'de' });
   });
@@ -263,7 +255,7 @@ describe('Test utils.js', () => {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
     };
-    const locale = getLocale(locales);
+    const locale = getLocale(locales, '/digitalexperience/');
     document.body.innerHTML = fs.readFileSync(
       path.resolve(__dirname, './mocks/dx-card-collection.html'),
       'utf8',
@@ -280,19 +272,20 @@ describe('Test utils.js', () => {
     expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&featuredCards=c2608c6f-1727-5d62-8094-a225bdc701stage%2Cc2608c6f-1727-5d62-8094-a225bdc701stage&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
   });
   it('Get caas url prod', () => {
+    const originalProdHosts = [...prodHosts];
+    prodHosts.push(window.location.host);
     document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true}}';
     document.cookie = 'partner_info={"firstName":"DXP Stage"%2C"lastName":"Spain Platinum"%2C"company":"Yugo DXP Stage Platinum Spain"}';
     const locales = {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
       de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
     };
-    const locale = getLocale(locales);
+    const locale = getLocale(locales,'/digitalexperience/');
     document.body.innerHTML = fs.readFileSync(
       path.resolve(__dirname, './mocks/dx-card-collection.html'),
       'utf8',
     );
     const el = document.querySelector('.dx-card-collection');
-    window.location.host = 'partners.adobe.com';
 
     const block = {
       el,
@@ -302,6 +295,8 @@ describe('Test utils.js', () => {
     };
     const caasUrl = getCaasUrl(block);
     expect(caasUrl).toEqual('https://www.adobe.com/chimera-api/collection?originSelection=da-dx-partners&featuredCards=c2608c6f-1727-5d62-8094-a225bdc701c3%2Cc2608c6f-1727-5d62-8094-a225bdc701c5&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
+    prodHosts.length = 0;
+    prodHosts.push(...originalProdHosts);
   });
   it('Preload resources', async () => {
     const locales = {

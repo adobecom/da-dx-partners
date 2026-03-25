@@ -180,10 +180,10 @@ async function loadAgreementMeta(metadataUrl) {
     };
 }
 
-export async function partnerAgreement(miloLibs) {
+export async function partnerAgreement(miloLibs, win = window) {
     const latestAgreementAccepted = getPartnerCookieValue('latestagreementaccepted');
     if (latestAgreementAccepted) {
-      window.dispatchEvent(
+      win.dispatchEvent(
         new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
       );
 
@@ -193,7 +193,7 @@ export async function partnerAgreement(miloLibs) {
     const partnerAgreementMetaPath = getMetadataContent('partner-agreement-meta');
   if (!partnerAgreementMetaPath) {
     console.warn('Partner agreement should be displayed but partner agreement meta path is not authored');
-    window.dispatchEvent(
+    win.dispatchEvent(
       new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
     );
     return false;
@@ -201,7 +201,7 @@ export async function partnerAgreement(miloLibs) {
 
     const agreementMeta = await loadAgreementMeta(partnerAgreementMetaPath);
   if (!agreementMeta) {
-    window.dispatchEvent(
+    win.dispatchEvent(
       new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
     );
     return false;
@@ -209,7 +209,7 @@ export async function partnerAgreement(miloLibs) {
 
     const agreementContent = await handleAgreement('fetch');
   if (!agreementContent) {
-    window.dispatchEvent(
+    win.dispatchEvent(
       new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
     );
     return false;

@@ -61,10 +61,6 @@ describe('Test partnerAgreement.js', () => {
     document.cookie = '';
 
     window = Object.create(window);
-    Object.defineProperty(window, 'location', {
-      value: { pathname: '/digitalexperience/', hostname: 'partners.adobe.com' },
-      writable: true,
-    });
 
     mockCreateTag.mockImplementation((tag, attributes, content) => {
       const el = document.createElement(tag);
@@ -422,13 +418,12 @@ describe('Test partnerAgreement.js', () => {
 
     });
     it('accept success  do not redirects user if there is redirectUrl param but it is not allowed domain', async () => {
-      delete window.location;
-
-      window.location = {
-        ...window.location,
-        href: 'https://partners.stage.adobe.com/digitalexperience/home/?redirectUrl=https://test.nottidwit.domain.com?testparam=test',
-        search: '?redirectUrl=https://test.nottidwit.domain.com?testparam=test',
-        pathname: '/digitalexperience/home/',
+      const fakeWindow = {
+        location: {
+          href: 'https://partners.stage.adobe.com/digitalexperience/home/?redirectUrl=https://test.nottidwit.domain.com?testparam=test',
+          search: '?redirectUrl=https://test.nottidwit.domain.com?testparam=test',
+          pathname: '/digitalexperience/home/',
+        },
       };
       jest.useFakeTimers();
       isMember.mockReturnValue(false);
@@ -445,8 +440,9 @@ describe('Test partnerAgreement.js', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true }) });
       });
 
+      // eslint-disable-next-line global-require
       const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
-      await partnerAgreement('https://test-milo-libs.com');
+      await partnerAgreement('https://test-milo-libs.com', fakeWindow);
 
       const cta = document.querySelector('.agreement-cta');
       cta.click();
@@ -458,8 +454,7 @@ describe('Test partnerAgreement.js', () => {
       jest.advanceTimersByTime(2100);
       // let any post-timeout microtasks flush
       await Promise.resolve();
-      expect(window.location.href).toEqual('https://partners.stage.adobe.com/digitalexperience/home/?redirectUrl=https://test.nottidwit.domain.com?testparam=test');
-
+      expect(fakeWindow.location.href).toEqual('https://partners.stage.adobe.com/digitalexperience/home/?redirectUrl=https://test.nottidwit.domain.com?testparam=test');
     });
 
     it('accept error logs and does not close modal', async () => {
