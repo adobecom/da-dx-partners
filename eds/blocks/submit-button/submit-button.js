@@ -16,12 +16,12 @@ async function handleClick(e, link) {
   };
 
   try {
+    link.classList.add('disabled');
+
     const response = await fetch(link.href, {
       method: 'GET',
       credentials: 'include',
     });
-
-    link.classList.add('disabled');
 
     if (!response.ok) {
       throw new Error(`HTTP error: ${response.status}`);
