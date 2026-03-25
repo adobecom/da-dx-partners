@@ -4,6 +4,7 @@ import gnavPersonalisationSpec from './gnav-personalisation.spec';
 import SignInPage from '../signin/signin.page';
 
 const { features } = gnavPersonalisationSpec;
+const newUserSegments = features.slice(7, 10);
 let gnavPersonalisationPage;
 let signInPage;
 
@@ -235,6 +236,33 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.getSegmentsGnav(data.gnavSegmentSalesAccess)).toBeVisible();
       await expect(gnavPersonalisationPage.getSegmentsGnav(data.designationTypeGnavSegment)).toBeVisible();
       await expect(gnavPersonalisationPage.getSegmentsGnav(data.partnerCaseGnavSegment)).toBeVisible();
+    });
+  });
+  newUserSegments.forEach((features) => {
+    test(`${features.name},${features.tags}`, async ({ page, baseURL, context }) => {
+      const { data, path } = features;
+      await test.step('Go to the page', async () => {
+          await page.goto(`${baseURL}${path}`);
+          await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
+      });
+      await test.step('Set partner_data cookie', async () => {
+        const createdDate = gnavPersonalisationPage
+          .generateDateWithDaysOffset(data.partnerData.anyverseryDate)
+          .getTime()
+          .toString();
+          await signInPage.addCookie(
+              data.partnerData.partnerPortal,
+              data.partnerData.partnerLevel,  
+              `${baseURL}${path}`,
+              context,
+              { ...data.partnerData, createdDate },
+            );
+            await page.reload();
+            await page.waitForLoadState('domcontentloaded');
+      });
+      await test.step('Verify segments on page', async () => {
+        await expect(gnavPersonalisationPage.getSegments(data.partnerSegmentText)).toBeVisible();
+      });
     });
   });
 });
