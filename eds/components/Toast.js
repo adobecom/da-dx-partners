@@ -7,11 +7,11 @@ export default function showToast(variant, success, onTryAgain, config) {
 
   const toast = document.createElement('div');
   toast.className = success
-    ? `spectrum-Toast spectrum-Toast--positive ${variant}-toast`
-    : `spectrum-Toast spectrum-Toast--negative ${variant}-toast`;
+    ? `spectrum-Toast spectrum-Toast--positive ${variant}-toast common-toast`
+    : `spectrum-Toast spectrum-Toast--negative ${variant}-toast common-toast`;
 
   const iconWrapper = document.createElement('span');
-  iconWrapper.className = `${variant}-toast-icon ${variant}-toast-icon-left`;
+  iconWrapper.className = `${variant}-toast-icon common-toast-icon ${variant}-toast-icon-left common-toast-icon-left`;
 
   const iconImg = document.createElement('img');
   iconImg.src = success ? '/eds/img/icons/checkmark.svg' : '/eds/img/icons/alert.svg';
@@ -30,7 +30,7 @@ export default function showToast(variant, success, onTryAgain, config) {
   if (!success) {
     const tryAgainBtn = document.createElement('button');
     tryAgainBtn.type = 'button';
-    tryAgainBtn.className = `${variant}-try-again-cta ${variant}-toast-cta`;
+    tryAgainBtn.className = `${variant}-try-again-cta common-try-again-cta ${variant}-toast-cta common-toast-cta`;
     tryAgainBtn.textContent = config.tryAgain;
     tryAgainBtn.addEventListener('click', onTryAgain);
     content.appendChild(tryAgainBtn);
@@ -43,7 +43,7 @@ export default function showToast(variant, success, onTryAgain, config) {
 
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
-  closeBtn.className = `${variant}-toast-icon ${variant}-toast-cta ${variant}-toast-icon-close`;
+  closeBtn.className = `${variant}-toast-icon common-toast-icon ${variant}-toast-cta common-toast-cta ${variant}-toast-icon-close common-toast-icon-close`;
   closeBtn.innerHTML = '×';
   closeBtn.addEventListener('click', () => toast.remove());
 
@@ -55,13 +55,15 @@ export default function showToast(variant, success, onTryAgain, config) {
 
   document.body.appendChild(toast);
 
+  const toastShowClasses = [`${variant}-toast-show`, 'common-toast-show'];
+
   setTimeout(() => {
-    toast.classList.add(`${variant}-toast-show`);
+    toast.classList.add(...toastShowClasses);
   }, 10);
 
   if (success) {
     setTimeout(() => {
-      toast.classList.remove(`${variant}-toast-show`);
+      toast.classList.remove(...toastShowClasses);
       setTimeout(() => toast.remove(), 300);
     }, 5000);
   }

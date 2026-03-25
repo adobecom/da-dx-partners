@@ -1,7 +1,6 @@
 
 /* Toast Notifications */
-.feedback-toast,
-.submit-toast {
+.common-toast {
   position: fixed;
   bottom: 24px;
   left: 50%;
@@ -20,8 +19,7 @@
   font-family: adobe-clean, helvetica, arial, sans-serif;
 }
 
-.feedback-toast-show,
-.submit-toast-show {
+.common-toast-show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
@@ -38,8 +36,7 @@
 
 /* Tablet - toast */
 @media (max-width: 900px) {
-  .feedback-toast,
-  .submit-toast {
+  .common-toast {
     min-width: calc(100% - 32px);
     max-width: calc(100% - 32px);
   }
@@ -47,8 +44,7 @@
 
 /* Mobile - toast */
 @media (max-width: 600px) {
-  .feedback-toast,
-  .submit-toast {
+  .common-toast {
     bottom: 16px !important;
     left: 50% !important;
     transform: translateX(-50%) translateY(20px) !important;
@@ -59,8 +55,7 @@
     z-index: 99999 !important;
   }
 
-  .feedback-toast.feedback-toast-show,
-  .submit-toast.submit-toast-show {
+  .common-toast.common-toast-show {
     opacity: 1 !important;
     transform: translateX(-50%) translateY(0) !important;
   }
@@ -69,39 +64,33 @@
     font-size: 13px;
   }
 
-  .feedback-try-again-cta,
-  .submit-try-again-cta {
+  .common-try-again-cta {
     font-size: 13px;
   }
 }
 
-.feedback-toast-icon,
-.submit-toast-icon {
+.common-toast-icon {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.feedback-toast-icon-left,
-.submit-toast-icon-left {
+.common-toast-icon-left {
   margin-right: 12px;
 }
 
-.feedback-toast-icon-left svg,
-.submit-toast-icon-left svg {
+.common-toast-icon-left svg {
   width: 18px;
   height: 18px;
   display: block;
 }
 
-.feedback-toast-icon-left svg .fill,
-.submit-toast-icon-left svg .fill {
+.common-toast-icon-left svg .fill {
   fill: white;
 }
 
 /* Toast icon - make it white */
-.feedback-toast-icon-left img,
-.submit-toast-icon-left img {
+.common-toast-icon-left img {
   filter: brightness(0) invert(1);
 }
 
@@ -122,8 +111,7 @@
   font-weight: 400;
 }
 
-.feedback-try-again-cta,
-.submit-try-again-cta {
+.common-try-again-cta {
   background: none;
   border: none;
   color: white;
@@ -138,8 +126,7 @@
   padding-left: 12px;
 }
 
-.feedback-try-again-cta:hover,
-.submit-try-again-cta:hover {
+.common-try-again-cta:hover {
   text-decoration: underline;
 }
 
@@ -149,8 +136,7 @@
   margin-left: 12px;
 }
 
-.feedback-toast-icon-close,
-.submit-toast-icon-close {
+.common-toast-icon-close {
   background: none;
   border: none;
   cursor: pointer;
@@ -166,12 +152,10 @@
   font-weight: 300;
 }
 
-.feedback-toast-icon-close:hover,
-.submit-toast-icon-close:hover {
+.common-toast-icon-close:hover {
   opacity: 0.8;
 }
 
-.feedback-toast-cta,
-.submit-toast-cta {
+.common-toast-cta {
   transition: all 0.2s;
 }
