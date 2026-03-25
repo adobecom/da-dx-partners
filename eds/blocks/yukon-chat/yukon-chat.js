@@ -192,11 +192,11 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
   const { signal } = currentAbortController;
   // Show loading indicator first, right after user message
   const loadingElement = showLoadingMessage(chatHistory, scrollToBottomBtn);
-  let level = 'public';
+  let level = 'partner-level-public';
   if (partnerIsSignedIn()) {
     try {
       const profileData = getPartnerCookieObject(getCurrentProgramType());
-      level = profileData.level.toLowerCase().replace(/\s+/g, '').replace(/[()]/g, '');
+      level = `partner-level-${profileData.level.toLowerCase().replace(/\s+/g, '').replace(/[()]/g, '')}`;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.info('Failed to parse profileData from cookie:', error);
@@ -264,31 +264,24 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
         // eslint-disable-next-line no-continue
         if (!line.trim()) continue;
         try {
-          if (line.startsWith('data: ')) {
-            let jsonStr = line.slice(6).trim();
-
-            if (jsonStr.startsWith('data: ')) {
-              jsonStr = jsonStr.slice(6).trim();
+          // eslint-disable-next-line no-continue
+          if (!line || !line.startsWith('[')) continue;
+          const data = JSON.parse(line);
+          const generatedText = data[0]?.generated_text || '';
+          const source = data[0]?.source || {};
+          if (generatedText) {
+            accumulatedMarkdown += generatedText;
+            if (loadingElement && !messageAdded) {
+              removeLoadingMessage(loadingElement);
+              chatHistory.appendChild(chatMessage);
+              messageAdded = true;
             }
-            // eslint-disable-next-line no-continue
-            if (!jsonStr || !jsonStr.startsWith('[')) continue;
-            const data = JSON.parse(jsonStr);
-            const generatedText = data[0]?.generated_text || '';
-            const source = data[0]?.source || {};
-            if (generatedText) {
-              accumulatedMarkdown += generatedText;
-              if (loadingElement && !messageAdded) {
-                removeLoadingMessage(loadingElement);
-                chatHistory.appendChild(chatMessage);
-                messageAdded = true;
-              }
-              // eslint-disable-next-line no-await-in-loop
-              messageText.innerHTML = await parseMarkdown(accumulatedMarkdown);
-            }
-            if (source && Object.keys(source).length > 0) {
-              if (!sourcesProcessed) {
-                sourcesProcessed = true;
-              }
+            // eslint-disable-next-line no-await-in-loop
+            messageText.innerHTML = await parseMarkdown(accumulatedMarkdown);
+          }
+          if (source && Object.keys(source).length > 0) {
+            if (!sourcesProcessed) {
+              sourcesProcessed = true;
             }
           }
           if (line.startsWith('<!DOCTYPE html') || line.startsWith('<html')) {
