@@ -264,6 +264,12 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
         // eslint-disable-next-line no-continue
         if (!line.trim()) continue;
         try {
+          if (line.startsWith('<!DOCTYPE html') || line.startsWith('<html')) {
+            removeLoadingMessage(loadingElement);
+            showChatError(chatHistory, localizedText['{{server-error}}']);
+            reader.cancel();
+            break;
+          }
           // eslint-disable-next-line no-continue
           if (!line || !line.startsWith('[')) continue;
           const data = JSON.parse(line);
@@ -283,12 +289,6 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
             if (!sourcesProcessed) {
               sourcesProcessed = true;
             }
-          }
-          if (line.startsWith('<!DOCTYPE html') || line.startsWith('<html')) {
-            removeLoadingMessage(loadingElement);
-            showChatError(chatHistory, localizedText['{{server-error}}']);
-            reader.cancel();
-            break;
           }
         } catch (parseError) {
           // eslint-disable-next-line no-console
