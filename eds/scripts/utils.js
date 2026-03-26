@@ -575,3 +575,15 @@ export function loadPageToAnchor() {
     }
   }
 }
+
+export function preventModalClose(modal) {
+  // prevent closing the modal by clicking outside
+  const curtain = document.querySelector('.modal-curtain, .is-open');
+  const blockClickOutside = (e) => {
+    if (e.target === curtain) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  };
+  curtain.addEventListener('click', blockClickOutside, {capture: true});
+}
