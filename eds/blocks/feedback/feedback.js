@@ -4,6 +4,7 @@ import showToast from '../../components/Toast.js';
 
 const miloLibs = getLibs();
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
+const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 
 async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   feedbackButton.classList.add('hidden');
@@ -194,6 +195,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
 }
 
 export default async function init(el) {
+  await loadStyle('/eds/components/Toast.css');
   const formDefinitionUrl = el.querySelector('a[href$="feedback-definition.json"]');
 
   await Promise.all([
