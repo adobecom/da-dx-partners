@@ -46,13 +46,53 @@ export default class SignInPage {
     await expect(pages[0].url()).toContain(expectedLandingPageURL);
   }
 
-  async addCookie(partnerPortal, partnerLevel, page, context) {
+  async addCookie(partnerPortal, partnerLevel, url, context, partnerData) {
     this.context = context;
+    const {
+      accessType,
+      complianceExpiryDate,
+      complianceStatus,
+      createdDate,
+      designationType,
+      isAdmin,
+      email,
+      latestAgreementAccepted,
+      latestAgreementAcceptedVersion,
+      primaryBusiness,
+      primaryContact,
+      primaryJobRole,
+      purchasedPartnerLevel,
+      salesCenterAccess,
+      specialState,
+      status,
+    } = partnerData;
+
+    const cookieData = {
+      [partnerPortal]: {
+        accessType: JSON.parse(accessType),
+        complianceExpiryDate: parseInt(complianceExpiryDate, 10),
+        complianceStatus,
+        createdDate: parseInt(createdDate, 10),
+        designationType: JSON.parse(designationType),
+        email,
+        latestAgreementAccepted: latestAgreementAccepted === 'true',
+        latestAgreementAcceptedVersion,
+        level: partnerLevel,
+        isAdmin: isAdmin,
+        primaryBusiness: JSON.parse(primaryBusiness),
+        primaryContact: primaryContact === 'true',
+        primaryJobRole,
+        purchasedPartnerLevel,
+        salesCenterAccess: salesCenterAccess === 'true',
+        specialState: specialState,
+        status,
+      },
+    };
+    
     await this.context.addCookies([{
       name: 'partner_data',
-      value: `{"${partnerPortal}":{"company":"Company"%2C"firstName":"Name"%2C"lastName"`
-        + `:"LastName"%2C"level":"${partnerLevel}"%2C"status":"MEMBER"}}`,
-      url: page,
+      value: JSON.stringify(cookieData),
+      url,
     }]);
   }
 

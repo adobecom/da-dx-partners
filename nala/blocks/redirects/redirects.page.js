@@ -1,7 +1,8 @@
 export default class RedirectsPage {
   constructor(page) {
     this.page = page;
-    this.signInButton = page.getByRole('button', { name: 'Sign In' });
+    this.signInButton = page.locator('.feds-signIn');
+    this.gnav = page.locator('.feds-topnav-wrapper');
     this.benefitsCenter = page.getByRole('link', { name: 'Benefits Center' });
     this.experienceLeague = page.getByRole('link', { name: 'Experience League' });
     this.menageUser = page.getByRole('link', { name: 'Manage user' });

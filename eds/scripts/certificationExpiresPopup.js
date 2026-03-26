@@ -2,6 +2,7 @@ import {
   getCurrentProgramType,
   getMetadataContent,
   invokeAfterImsIsReady,
+  preventModalClose,
   NEXT_POPUP_PLACEHOLDER,
   SHOW_NEXT_POPUP,
 } from './utils.js';
@@ -176,6 +177,7 @@ async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplaye
     );
     return false;
   }
+  preventModalClose(modal);
   const { loadArea } = await import(`${miloLibs}/utils/utils.js`);
   await loadArea(modal);
   personalizePlaceholders(PERSONALIZATION_PLACEHOLDERS, modal, getCurrentProgramType());

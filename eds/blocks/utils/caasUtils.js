@@ -62,7 +62,7 @@ export function extractFilterData(tagPath, caasTags) {
     value: getTagTitleLocalized(foundTag),
     tags: Object.entries(currentLevel)
       .map(([, value]) => ({
-        key: value.tagID.replace(`${foundTag.tagID}/`, ''),
+        key: value.tagID.replace(`${foundTag.tagID}/`, '').replace('-&-', '-and-'),
         parentKey: foundTag.tagID.replace('caas:', ''),
         checked: false,
         value: getTagTitleLocalized(value),
