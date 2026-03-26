@@ -229,7 +229,7 @@ export default {
       path: '/digitalexperience/drafts/automation/regression/personalization/mocked-personalization',
       tags: '@da-dx-personalisation @regression @anonymous',
       data: {
-          partnerSegmentText: 'Partner-newly-registered:',
+          partnerSegmentText: 'Partner-new-user-segment:',
           partnerData: {
               partnerPortal: 'DXP',
               accessType: '["Billing Admin","Sales Center Admin","Admin"]',
