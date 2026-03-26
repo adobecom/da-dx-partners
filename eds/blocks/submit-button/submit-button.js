@@ -3,6 +3,7 @@ import showToast from '../../components/Toast.js';
 
 const miloLibs = getLibs();
 const { decorateButtons } = await import(`${miloLibs}/utils/decorate.js`);
+const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 
 async function handleClick(e, link) {
   if (link.classList.contains('disabled')) return;
@@ -41,13 +42,15 @@ async function handleClick(e, link) {
   }
 }
 
-export default function init(el) {
+export default async function init(el) {
   const link = el.querySelector('a');
 
   if (!link) {
     el.remove();
     return;
   }
+
+  await loadStyle('/eds/components/Toast.css');
 
   el.classList.add('submit-button-block', 'con-block');
 

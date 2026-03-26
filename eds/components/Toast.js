@@ -1,7 +1,4 @@
-import { loadStyles } from '../blocks/partners-navigation/utilities/utilities.js';
-
 export default function showToast(variant, success, onTryAgain, config) {
-  loadStyles('/eds/components/Toast.css');
   const existingToast = document.querySelector(`.${variant}-toast`);
   if (existingToast) existingToast.remove();
 
