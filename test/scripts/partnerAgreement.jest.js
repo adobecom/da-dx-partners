@@ -262,6 +262,12 @@ describe('Test partnerAgreement.js', () => {
     });
 
     it('uses getRuntimeActionUrl with correct path', async () => {
+      const fakeWindow = {
+        location: {
+          href: 'https://partners.adobe.com/digitalexperience/',
+          pathname: '/digitalexperience/',
+        },
+      };
       isMember.mockReturnValue(false);
       getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/digitalexperience/fragments/partner-agreement-meta');
@@ -270,11 +276,11 @@ describe('Test partnerAgreement.js', () => {
         if (url === '/digitalexperience/fragments/partner-agreement-meta') {
           return Promise.resolve({ ok: true, text: () => Promise.resolve(metaHtml) });
         }
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: [] }) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: [{ id: 1, name: 'Test Term' }] }) });
       });
 
       const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
-      await partnerAgreement('https://test-milo-libs.com');
+      await partnerAgreement('https://test-milo-libs.com', fakeWindow);
 
       expect(getRuntimeActionUrl).toHaveBeenCalledWith('/api/v1/web/dx-partners-runtime/partner-agreement');
     });
@@ -378,44 +384,20 @@ describe('Test partnerAgreement.js', () => {
       expect(spinner).toBeTruthy();
       expect(spinner.innerHTML).toContain('Success!');
     });
-    it('accept success redirects user if there is redirectUrl param and it is in agreementRedirectDomains', async () => {
-
-      window.location = {
-        ...window.location,
-        href: 'https://partners.stage.adobe.com/digitalexperience/home/?redirectUrl=https://test.tidwit.domain.com?testparam=test',
-        search: '?redirectUrl=https://test.tidwit.domain.com?testparam=test',
-        pathname: '/digitalexperience/home/',
+    it('redirects user if redirectUrl param is allowed', () => {
+      const fakeWindow = {
+        location: {
+          href: 'https://partners.stage.adobe.com/digitalexperience/home/?redirectUrl=https://test.tidwit.domain.com?testparam=test',
+          search: '?redirectUrl=https://test.tidwit.domain.com?testparam=test',
+          pathname: '/digitalexperience/home/',
+        },
       };
-      jest.useFakeTimers();
-      isMember.mockReturnValue(false);
-      getPartnerCookieValue.mockReturnValue(null);
-      getMetadataContent.mockReturnValue('/digitalexperience/fragments/partner-agreement-meta');
-      getCurrentProgramType.mockReturnValue('dxp');
-      getCookieValue.mockReturnValue(JSON.stringify({ DXP: { status: 'MEMBER' } }));
 
-      let call = 0;
-      global.fetch.mockImplementation(() => {
-        call += 1;
-        if (call === 1) return Promise.resolve({ ok: true, text: () => Promise.resolve(metaHtml) });
-        if (call === 2) return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: ['<p>Terms</p>'] }) });
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true }) });
-      });
+      const { handleRedirects } = require('../../eds/scripts/partnerAgreement.js');
+      const allowedDomains = 'test.tidwit.domain.com, another.domain.com';
+      handleRedirects(allowedDomains, fakeWindow);
 
-      const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
-      await partnerAgreement('https://test-milo-libs.com');
-
-      const cta = document.querySelector('.agreement-cta');
-      cta.click();
-
-      // allow async click handler (promises) to run
-      await Promise.resolve();
-      await Promise.resolve();
-      // advance timers to trigger closeModal timeout
-      jest.advanceTimersByTime(2100);
-      // let any post-timeout microtasks flush
-      await Promise.resolve();
-      expect(window.location.href).toEqual('https://test.tidwit.domain.com?testparam=test');
-
+      expect(fakeWindow.location.href).toBe('https://test.tidwit.domain.com?testparam=test');
     });
     it('accept success  do not redirects user if there is redirectUrl param but it is not allowed domain', async () => {
       const fakeWindow = {

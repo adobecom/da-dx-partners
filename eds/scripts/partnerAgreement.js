@@ -14,10 +14,10 @@ const SPINNER_ANIMATION = `<sp-theme system="light" color="light" scale="medium"
 
 let agreementModal;
 
-function handleRedirects(agreementRedirectDomains) {
+export function handleRedirects(agreementRedirectDomains, win = window) {
   if (!agreementRedirectDomains) return;
   const allowedDomains = agreementRedirectDomains.split(',').map(url => url.trim().toLowerCase());
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(win.location.search);
   const redirectUrl = params.get('redirectUrl');
   if (!redirectUrl) return;
 
@@ -31,7 +31,7 @@ function handleRedirects(agreementRedirectDomains) {
   }
 
   if (allowedDomains.includes(redirectDomain)) {
-    window.location.href = redirectUrl;
+    win.location.href = redirectUrl;
   }
 }
 async function acceptAgreement(agreementTextContainer, successMessage, errorMessage, agreementRedirectDomains, spinner, closeModalCallback) {
