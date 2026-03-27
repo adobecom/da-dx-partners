@@ -239,6 +239,7 @@ test.describe('Search Page', () => {
       await expect(searchPage.assetTitlePreview).toBeVisible();
       await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
       await expect(searchPage.downloadPPTButton).toBeHidden();
+      await expect(searchPage.accessToViewOrDownloadText).toBeVisible();
 
       // asset date
       await expect(searchPage.assetDate).toBeVisible();
