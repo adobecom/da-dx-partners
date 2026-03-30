@@ -209,7 +209,7 @@ describe('yukon-chat block', () => {
   describe('Send flow', () => {
     it('should open modal, call fetch, and render AI response', async () => {
       const encoder = new TextEncoder();
-      const chunk = encoder.encode('data: [{"generated_text":"Hello from Yukon"}]\n');
+      const chunk = encoder.encode('[{"generated_text":"Hello from Yukon"}]\n');
 
       fetchStub.callsFake(async (url) => {
         const urlStr = typeof url === 'string' ? url : url.toString();
@@ -491,7 +491,7 @@ describe('yukon-chat block', () => {
     it('should render multiple links with target="_blank" in AI responses', async () => {
       const encoder = new TextEncoder();
       const responseWithLinks = 'Visit [Adobe](https://adobe.com) and [Partners Portal](https://partners.adobe.com).';
-      const chunk = encoder.encode(`data: [{"generated_text":"${responseWithLinks}"}]\n`);
+      const chunk = encoder.encode(`[{"generated_text":"${responseWithLinks}"}]\n`);
 
       fetchStub.callsFake(async () => ({
         ok: true,
