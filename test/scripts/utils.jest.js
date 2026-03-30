@@ -44,7 +44,11 @@ describe('Test utils.js', () => {
     document.getElementsByTagName('html')[0].innerHTML = '';
   });
   it('Milo libs', () => {
-    const location = { origin: 'https://partners.stage.adobe.com' };
+    const location = {
+      origin: 'https://partners.stage.adobe.com',
+      hostname: 'partners.stage.adobe.com',
+      search: ''
+    };
     const libs = setLibs('/libs', location);
     expect(libs).toEqual('https://partners.stage.adobe.com/libs');
   });
