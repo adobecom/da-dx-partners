@@ -40,6 +40,7 @@ jest.mock('../../eds/scripts/utils.js', () => ({
   PORTAL_MESSAGING_POPUP: 'dxp:portalMessaging',
   CERTIFICATION_POPUP: 'dxp:certificationExpires',
   SHOW_NEXT_POPUP: 'dxp:showNextPopup',
+  preventModalClose: jest.fn(),
 }));
 
 global.fetch = jest.fn();

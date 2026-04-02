@@ -37,8 +37,14 @@ export default class SearchPage {
     this.loader = page.locator('.progress-circle-wrapper');
     this.clearAll = page.getByRole('button', { name: 'Clear all' });
     this.oneTrustBanner = page.getByRole('button', { name: 'Enable all' });
-    this.journeyPhaseFilterPanel = page.getByRole('list').filter({ hasText: 'Discover Explore Evaluate Use' });
-    this.functionalityFilterPanel = page.getByRole('list').filter({ hasText: 'Data Activation Analysis &' });
+    this.journeyPhaseFilterPanel = page.locator('div.filter.expanded', {
+      has: page.locator('.filter-header[aria-label="Journey Phase"]')
+    }).locator('.filter-list');
+    this.functionalityFilterPanel = page.locator('div.filter.expanded', {
+      has: page.locator('.filter-header[aria-label="Functionality"]')
+    })
+    .locator('.filter-list');;
+    this.accessToViewOrDownloadText = page.getByText('Access to view or download');
   }
 
   async getCardTitle() {

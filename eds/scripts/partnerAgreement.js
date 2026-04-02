@@ -3,7 +3,10 @@ import {
   getCookieValue,
   getCurrentProgramType,
   getMetadataContent,
-  getPartnerCookieValue, PORTAL_MESSAGING_POPUP, PARTNER_LOGIN_QUERY, SHOW_NEXT_POPUP,
+  getPartnerCookieValue,
+  preventModalClose,
+  PORTAL_MESSAGING_POPUP,
+  SHOW_NEXT_POPUP,
 } from "./utils.js";
 
 const RT_PARTNER_AGREEMENT_PATH = '/api/v1/web/dx-partners-runtime/partner-agreement';
@@ -137,29 +140,21 @@ async function handleAgreement(action) {
     }
 }
 
-function preventModalClose(modal) {
+function preventAgreementModalClose(modal) {
     // remove Milo close button
     const closeCta = modal.querySelector('#partner-agreement-modal .dialog-close');
     closeCta.remove();
 
     // block Milo Escape keydown listener
     const blockEscapeKey = function (e) {
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-        }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
     }
     modal.addEventListener('keydown', blockEscapeKey, {capture: true});
 
-    // prevent closing the modal by clicking outside
-    const curtain = document.querySelector('.modal-curtain, .is-open');
-    const blockClickOutside = (e) => {
-        if (e.target === curtain) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-        }
-    };
-    curtain.addEventListener('click', blockClickOutside, {capture: true});
+    preventModalClose(modal);
 }
 
 async function loadAgreementMeta(metadataUrl) {
@@ -222,6 +217,6 @@ export async function partnerAgreement(miloLibs) {
         null,
         {class: 'commerce-frame', id: 'partner-agreement-modal', content, closeEvent: 'close-partner-agreement-modal'},
     );
-    preventModalClose(agreementModal);
+    preventAgreementModalClose(agreementModal);
     return true;
 }
