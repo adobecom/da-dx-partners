@@ -141,7 +141,7 @@ export default class PartnerCards extends LitElement {
             value: getTagValue(tagKey),
             checked: false,
             paramValue: tagKey.includes('-&-') ? tagKey.replace('-&-', '-and-') : null,
-          })).sort((a, b) => a.value.localeCompare(b.value)),
+          })).sort((a, b) => a?.value?.localeCompare(b?.value)),
         };
         this.blockData.filters.push(filterObj);
       },
