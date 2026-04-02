@@ -347,7 +347,6 @@
   overflow: hidden;
 }
 
-.dialog-modal,
 #yukon-chat-modal {
   display: flex !important;
   flex-direction: column;
