@@ -141,7 +141,12 @@ export default class PartnerCards extends LitElement {
             value: getTagValue(tagKey),
             checked: false,
             paramValue: tagKey.includes('-&-') ? tagKey.replace('-&-', '-and-') : null,
-          })).sort((a, b) => a.value.localeCompare(b.value)),
+          })).filter((a) => {
+            if (!a.value) {
+              console.log('Tag not valid', a);
+            }
+            return a.value;
+          }).sort((a, b) => a.value.localeCompare(b.value)),
         };
         this.blockData.filters.push(filterObj);
       },
@@ -152,7 +157,12 @@ export default class PartnerCards extends LitElement {
         if (tag) {
           const updatedTag = {
             ...tag,
-            tags: tag.tags.sort((a, b) => a.value.localeCompare(b.value)),
+            tags: tag.tags.filter((a) => {
+              if (!a.value) {
+                console.log('Tag not valid', a);
+              }
+              return a.value;
+            }).sort((a, b) => a.value.localeCompare(b.value)),
           };
           this.blockData.filters.push(updatedTag);
         }
