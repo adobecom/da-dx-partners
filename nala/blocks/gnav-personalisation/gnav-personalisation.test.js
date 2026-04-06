@@ -265,4 +265,38 @@ test.describe('Gnav Personalisation', () => {
       });
     });
   });
+  test(`${features[10].name},${features[10].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[10];
+    await test.step('Go to the page', async () => {
+        await page.goto(`${baseURL}${path}`);
+        await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
+    });
+    await test.step('Set partner_data cookie', async () => {
+      const createdDate = gnavPersonalisationPage
+        .generateDateWithDaysOffset(data.partnerData.anyverseryDate)
+        .getTime()
+        .toString();
+        await signInPage.addCookie(
+            data.partnerData.partnerPortal,
+            data.partnerData.partnerLevel,  
+            `${baseURL}${path}`,
+            context,
+            { ...data.partnerData, createdDate },
+          );
+          await page.reload();
+          await page.waitForLoadState('domcontentloaded');
+    });
+    await test.step('Verify segments present on Gnav', async () => {
+      const handshakeHref = await gnavPersonalisationPage.handshakeIcon.getAttribute('href');
+      expect(handshakeHref).toContain(data.handshakeIconLink);
+      const globeHref = await gnavPersonalisationPage.globeIcon.getAttribute('href');
+      expect(globeHref).toContain(data.globeIconLink);
+      const searchHref = await gnavPersonalisationPage.searchIcon.getAttribute('href');
+      expect(searchHref).toContain(data.searchIconLink);
+      const menageUserHref = await gnavPersonalisationPage.menageUserIcon.getAttribute('href');
+      expect(menageUserHref).toContain(data.menageUserIconLink);
+      const homeHref = await gnavPersonalisationPage.homeIcon.getAttribute('href');
+      expect(homeHref).toContain(data.homeIconLink);
+    });
+  });
 });
