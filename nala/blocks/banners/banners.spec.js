@@ -5,7 +5,7 @@ export default {
       tcid: '1',
       name: '@banners-platinum-user-anyversery-date-in-next90-days',
       path: '/digitalexperience/drafts/automation/regression/public-page',
-      tags: '@da-dx-banners @regression @circleCi',
+      tags: '@da-dx-banners @regression @anonymous',
       data: {
         partnerData: {
             partnerPortal: 'DXP',
