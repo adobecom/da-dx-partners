@@ -44,21 +44,21 @@ describe('dx-card-collection block', () => {
     expect(component).to.exist;
 
     const partnerNewsWrapper = document.querySelector('.dx-card-collection-wrapper');
-    expect(partnerNewsWrapper.shadowRoot).to.exist;
-    const partnerCardsCollection = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards-collection');
+    expect(partnerNewsWrapper).to.exist;
+    const partnerCardsCollection = partnerNewsWrapper.querySelector('.partner-cards-collection');
     expect(partnerCardsCollection).to.exist;
     expect(partnerCardsCollection.innerHTML).to.include('single-partner-card');
     const firstCard = partnerCardsCollection.querySelector('.card-wrapper');
-    expect(firstCard.shadowRoot).to.exist;
-    const searchBarWrapper = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards-sidebar .search-wrapper');
-    expect(searchBarWrapper.shadowRoot).to.exist;
+    expect(firstCard).to.exist;
+    const searchBarWrapper = partnerNewsWrapper.querySelector('.partner-cards-sidebar .search-wrapper');
+    expect(searchBarWrapper).to.exist;
     const spectrumSearch = searchBarWrapper.querySelector('#search');
-    expect(spectrumSearch.shadowRoot).to.exist;
-    const paginationWrapper = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards-content .pagination-wrapper');
+    expect(spectrumSearch).to.exist;
+    const paginationWrapper = partnerNewsWrapper.querySelector('.partner-cards-content .pagination-wrapper');
     expect(paginationWrapper).to.not.exist;
-    const loadMoreBtn = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards-content .pagination-wrapper .load-more-btn');
+    const loadMoreBtn = partnerNewsWrapper.querySelector('.partner-cards-content .pagination-wrapper .load-more-btn');
     expect(loadMoreBtn).to.not.exist;
-    const sortWrapper = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards-content .sort-wrapper');
+    const sortWrapper = partnerNewsWrapper.querySelector('.partner-cards-content .sort-wrapper');
     expect(sortWrapper).to.exist;
     const firstSortItem = sortWrapper.querySelector('.sort-list .sort-item');
     expect(firstSortItem).to.exist;
@@ -66,12 +66,12 @@ describe('dx-card-collection block', () => {
     return { partnerNewsWrapper };
   };
 
-  it('should have shadow root and render partner cards for mobile', async function () {
+  it('should render partner cards for mobile', async function () {
     const { partnerNewsWrapper } = await setupAndCommonTest(500);
 
-    const filtersBtn = partnerNewsWrapper.shadowRoot.querySelector('.filters-btn-mobile');
+    const filtersBtn = partnerNewsWrapper.querySelector('.filters-btn-mobile');
     expect(filtersBtn).to.exist;
-    const filtersWrapper = partnerNewsWrapper.shadowRoot.querySelector('.all-filters-wrapper-mobile');
+    const filtersWrapper = partnerNewsWrapper.querySelector('.all-filters-wrapper-mobile');
     expect(filtersWrapper).to.exist;
     const firstFilter = filtersWrapper.querySelector('.filter-wrapper-mobile');
     expect(firstFilter).to.exist;
@@ -79,7 +79,7 @@ describe('dx-card-collection block', () => {
 
   it('should remove expanded class when clicking mobile filter backdrop', async () => {
     const { partnerNewsWrapper } = await setupAndCommonTest(500);
-    const filtersWrapper = partnerNewsWrapper.shadowRoot.querySelector('.all-filters-wrapper-mobile');
+    const filtersWrapper = partnerNewsWrapper.querySelector('.all-filters-wrapper-mobile');
     const filterWrapperMobile = filtersWrapper.querySelector('.filter-wrapper-mobile');
     expect(filterWrapperMobile).to.exist;
 
@@ -94,10 +94,10 @@ describe('dx-card-collection block', () => {
     expect(filterWrapperMobile.classList.contains('expanded')).to.be.false;
   });
 
-  it('should have shadow root and render partner cards for desktop', async function () {
+  it('should render partner cards for desktop', async function () {
     const { partnerNewsWrapper } = await setupAndCommonTest(1500);
 
-    const sidebarFiltersWrapper = partnerNewsWrapper.shadowRoot.querySelector('.sidebar-filters-wrapper');
+    const sidebarFiltersWrapper = partnerNewsWrapper.querySelector('.sidebar-filters-wrapper');
     expect(sidebarFiltersWrapper).to.exist;
     const firstFilter = sidebarFiltersWrapper.querySelector('.filter');
     expect(firstFilter).to.exist;
@@ -117,12 +117,12 @@ describe('dx-card-collection block', () => {
 
     const { partnerNewsWrapper } = await setupAndCommonTest(1200);
 
-    expect(partnerNewsWrapper.shadowRoot).to.exist;
-    const partnerCardsCollection = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards-collection');
+    expect(partnerNewsWrapper).to.exist;
+    const partnerCardsCollection = partnerNewsWrapper.querySelector('.partner-cards-collection');
     expect(partnerCardsCollection).to.exist;
     expect(partnerCardsCollection.innerHTML).to.include('single-partner-card');
     const firstCard = partnerCardsCollection.querySelector('.card-wrapper.single-partner-card--half-height');
-    expect(firstCard.shadowRoot).to.exist;
+    expect(firstCard).to.exist;
   });
 
   it('should render filter info box when configured for desktop', async function () {
@@ -171,7 +171,7 @@ describe('dx-card-collection block', () => {
 
     const { partnerNewsWrapper } = await setupAndCommonTest(1500);
 
-    const infoBox = partnerNewsWrapper.shadowRoot.querySelector('.sidebar-info-box');
+    const infoBox = partnerNewsWrapper.querySelector('.sidebar-info-box');
     expect(infoBox).to.exist;
     const title = infoBox.querySelector('.title');
     expect(title.textContent).to.equal('Info Box Title');
@@ -187,17 +187,17 @@ describe('dx-card-collection block', () => {
     expect(component).to.exist;
 
     const partnerNewsWrapper = document.querySelector('.dx-card-collection-wrapper');
-    expect(partnerNewsWrapper.shadowRoot).to.exist;
+    expect(partnerNewsWrapper).to.exist;
 
     expect(partnerNewsWrapper.getAttribute('daa-lh')).to.equal('Card Collection');
 
-    const partnerCards = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards');
+    const partnerCards = partnerNewsWrapper.querySelector('.partner-cards');
     expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: No Filters | Search Query: None');
 
     const firstCard = partnerCards.querySelector('.card-wrapper');
     expect(firstCard.getAttribute('daa-lh')).to.equal(`Card 1 | ${cards[0].contentArea.title} | ${cards[0].id}`);
 
-    const singlePartnerCardBtn = firstCard.shadowRoot.querySelector('.card-btn');
+    const singlePartnerCardBtn = firstCard.querySelector('.card-btn');
     expect(singlePartnerCardBtn.getAttribute('daa-ll')).to.equal(singlePartnerCardBtn.textContent);
   });
 
@@ -223,9 +223,9 @@ describe('dx-card-collection block', () => {
     expect(component).to.exist;
 
     const partnerNewsWrapper = document.querySelector('.dx-card-collection-wrapper');
-    expect(partnerNewsWrapper.shadowRoot).to.exist;
+    expect(partnerNewsWrapper).to.exist;
 
-    const partnerCards = partnerNewsWrapper.shadowRoot.querySelector('.partner-cards');
+    const partnerCards = partnerNewsWrapper.querySelector('.partner-cards');
     expect(partnerCards).to.exist;
     expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: Event Session | Search Query: Adobe');
   });
@@ -519,7 +519,7 @@ describe('dx-card-collection block', () => {
     });
 
     it('should calculate scroll position accounting for gnav height', () => {
-      const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
+      const partnerCardsHeader = component.querySelector('.partner-cards-header');
       const mockRect = { top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
       sinon.stub(partnerCardsHeader, 'getBoundingClientRect').returns(mockRect);
 
@@ -538,7 +538,7 @@ describe('dx-card-collection block', () => {
       // Remove the mock header
       mockHeader.parentNode.removeChild(mockHeader);
 
-      const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
+      const partnerCardsHeader = component.querySelector('.partner-cards-header');
       const mockRect = { top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
       sinon.stub(partnerCardsHeader, 'getBoundingClientRect').returns(mockRect);
 
@@ -556,8 +556,8 @@ describe('dx-card-collection block', () => {
       const componentRect = { top: 100, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
       sinon.stub(component, 'getBoundingClientRect').returns(componentRect);
       
-      // Remove the header from shadow DOM
-      const partnerCardsHeader = component.shadowRoot.querySelector('.partner-cards-header');
+      // Remove the header
+      const partnerCardsHeader = component.querySelector('.partner-cards-header');
       if (partnerCardsHeader) {
         partnerCardsHeader.remove();
       }

@@ -1,15 +1,11 @@
 import { getLibs, loadPageToAnchor } from '../scripts/utils.js';
-import { partnerCardsDateFilterStyles } from './PartnerCardsStyles.js';
 import PartnerCards from './PartnerCards.js';
 
 const miloLibs = getLibs();
-const { html, css, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const { html, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
 
 export default class PartnerCardsWithDateFilter extends PartnerCards {
-  static styles = [
-    PartnerCards.styles,
-    css`${partnerCardsDateFilterStyles}`,
-  ];
+  createRenderRoot() { return this; }
 
   static properties = {
     ...PartnerCards.properties,

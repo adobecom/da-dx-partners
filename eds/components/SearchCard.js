@@ -1,4 +1,3 @@
-import searchCardStyles from './SearchCardStyles.js';
 import { formatDate, getLibs } from '../scripts/utils.js';
 import { getConfig, replaceText } from '../blocks/utils/utils.js';
 
@@ -11,13 +10,13 @@ const { html, repeat, LitElement, until, unsafeHTML } = await import(`${miloLibs
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 class SearchCard extends LitElement {
+  createRenderRoot() { return this; }
+
   static properties = {
     data: { type: Object },
     localizedText: { type: Object },
     ietf: { type: String },
   };
-
-  static styles = searchCardStyles;
 
   get cardTags() {
     const tags = this.data.arbitrary;
