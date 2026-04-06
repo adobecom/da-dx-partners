@@ -1,0 +1,57 @@
+/* Scoped to the custom element (light DOM); mirrors former Lit shadow encapsulation. */
+
+single-partner-card-half-height {
+  display: block;
+  width: 100%;
+}
+
+single-partner-card-half-height .single-partner-card--half-height {
+  height: 208px;
+  text-decoration: none;
+  min-height: 208px;
+  max-height: 208px;
+  background-color: #323232;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: cover;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+single-partner-card-half-height .single-partner-card--half-height::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent linear-gradient(180deg, rgb(0 0 0 / 10%) 15%, rgb(0 0 0 / 55%) 85%) 0 0 no-repeat;
+  border-radius: 4px;
+}
+
+single-partner-card-half-height * {
+  box-sizing: border-box;
+}
+
+single-partner-card-half-height .card-title {
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.375rem;
+  word-break: break-word;
+  max-height: 2.75rem;
+  margin: 0 0 7px;
+  display: box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  z-index: 1;
+}
+
+single-partner-card-half-height .card-title-wrapper {
+  padding: 8px 24px 32px;
+  color: #fff;
+  z-index: 1;
+}

@@ -8,6 +8,8 @@ import { dispatchCustomEventOnLinkClick } from '../blocks/utils/analyticsUtils.j
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
+const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+await loadStyle('/eds/components/SinglePartnerCardHalfHeight.css');
 
 class SinglePartnerCardHalfHeight extends LitElement {
   createRenderRoot() { return this; }
