@@ -203,12 +203,9 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
     }
   }
   try {
-    const tags = [level].filter((tag) => tag && tag !== '').join(',');
-
     const origin = prodHosts.includes(window.location.host) ? 'https://partners.adobe.com' : 'https://partners.stage.adobe.com';
     const url = new URL(`${origin}/services/gravity/yukonAIAssistant`);
     url.searchParams.append('question', question);
-    url.searchParams.append('tags', tags);
     url.searchParams.append('requestId', requestId);
     url.searchParams.append('yukonProfile', configs.yukonProfile);
 
