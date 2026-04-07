@@ -3,7 +3,7 @@
 }
 
 .single-partner-card,
-.single-partner-card-half-height { /*noticed that not used*/
+single-partner-card-half-height .single-partner-card--half-height {
   display: flex;
   flex-direction: column;
   background-color: #fff;
