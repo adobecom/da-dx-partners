@@ -92,7 +92,7 @@ single-partner-card-half-height .single-partner-card--half-height .card-title {
   word-break: break-word;
   max-height: 2.75rem;
   margin: 0 0 7px;
-  display: box;
+  display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
   -webkit-line-clamp: 2;
@@ -117,7 +117,7 @@ single-partner-card-half-height .single-partner-card--half-height .card-title-wr
   word-break: break-word;
   margin: 0 0 14px;
   max-height: 3.9375rem;
-  display: box;
+  display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
   -webkit-line-clamp: 3;
