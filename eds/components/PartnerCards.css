@@ -3,7 +3,13 @@
 .partner-cards span,
 .partner-cards button,
 .partner-cards li,
-.partner-cards input {
+.partner-cards input,
+.all-filters-wrapper-mobile h3,
+.all-filters-wrapper-mobile p,
+.all-filters-wrapper-mobile span,
+.all-filters-wrapper-mobile button,
+.all-filters-wrapper-mobile li,
+.all-filters-wrapper-mobile input {
   margin: 0;
   font-family: adobe-clean, "Segoe UI", Roboto, sans-serif;
 }
@@ -381,7 +387,6 @@
   width: 18px;
   height: 18px;
   margin-right: 8px;
-  /*background-color: #fff;*/
   background: url("/eds/img/icons/filters.svg") no-repeat 0 0;
 }
 
@@ -733,7 +738,6 @@
   text-align: left;
   text-transform: capitalize;
   text-decoration: none;
-  /*margin: 0;*/
 }
 
 .filter-wrapper-mobile .filter-header-selected-tags-mobile {

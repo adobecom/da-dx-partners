@@ -1,3 +1,13 @@
+.search-box-wrapper h3,
+.search-box-wrapper p,
+.search-box-wrapper span,
+.search-box-wrapper button,
+.search-box-wrapper li,
+.search-box-wrapper input {
+  margin: 0;
+  font-family: adobe-clean, "Segoe UI", Roboto, sans-serif;
+}
+
 .search-box-wrapper * {
   box-sizing: border-box;
 }
