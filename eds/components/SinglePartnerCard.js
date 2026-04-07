@@ -1,4 +1,3 @@
-import { singlePartnerCardStyles } from './PartnerCardsStyles.js';
 import { formatDate, getLibs } from '../scripts/utils.js';
 import { getConfig, transformCardUrl } from '../blocks/utils/utils.js';
 
@@ -11,6 +10,8 @@ const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 class SinglePartnerCard extends LitElement {
+  createRenderRoot() { return this; }
+
   static properties = {
     data: { type: Object },
     ietf: { type: String },
@@ -23,8 +24,6 @@ class SinglePartnerCard extends LitElement {
       this.footerBtnLabel = processTrackingLabels(this.data.footer[0]?.right[0]?.text, getConfig(), 30);
     }
   }
-
-  static styles = singlePartnerCardStyles;
 
   render() {
     return html`

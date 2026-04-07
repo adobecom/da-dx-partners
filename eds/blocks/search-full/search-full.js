@@ -13,6 +13,10 @@ export default async function init(el) {
   const miloLibs = getLibs();
   const config = getConfig();
 
+  const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+  loadStyle('/eds/components/PartnerCards.css');
+  loadStyle('/eds/components/SearchCard.css');
+
   const sectionIndex = el.parentNode.getAttribute('data-idx');
 
   const localizedText = {
@@ -77,7 +81,7 @@ export default async function init(el) {
   app.className = 'search-cards-wrapper';
   app.blockData = blockData;
   app.setAttribute('data-idx', sectionIndex);
-  app.setAttribute('daa-lh', 'Search Cards Section')
+  app.setAttribute('daa-lh', 'Search Cards Section');
   el.replaceWith(app);
 
   await deps;

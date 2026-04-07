@@ -1,16 +1,11 @@
 import { CAAS_TAGS_URL, getLibs, prodHosts } from '../scripts/utils.js';
-import {
-  partnerCardsStyles,
-  partnerCardsLoadMoreStyles,
-  partnerCardsPaginationStyles,
-} from './PartnerCardsStyles.js';
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
 import { dispatchCustomEventOnSearch } from '../blocks/utils/analyticsUtils.js';
 
 const miloLibs = getLibs();
-const { html, LitElement, css, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const { html, LitElement, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 export default class PartnerCards extends LitElement {
@@ -20,14 +15,7 @@ export default class PartnerCards extends LitElement {
 
   static caasUrl;
 
-  static styles = [
-    partnerCardsStyles,
-    partnerCardsLoadMoreStyles,
-    partnerCardsPaginationStyles,
-    css`#search {
-      width: 100%;
-    }`,
-  ];
+  createRenderRoot() { return this; }
 
   static properties = {
     blockData: { type: Object },
@@ -637,7 +625,7 @@ export default class PartnerCards extends LitElement {
   }
 
   toggleSort() {
-    const element = this.shadowRoot.querySelector('.sort-list');
+    const element = this.querySelector('.sort-list');
     element.classList.toggle('expanded');
   }
 
@@ -647,12 +635,12 @@ export default class PartnerCards extends LitElement {
   }
 
   openFiltersMobile() {
-    const element = this.shadowRoot.querySelector('.all-filters-wrapper-mobile');
+    const element = this.querySelector('.all-filters-wrapper-mobile');
     element.classList.add('open');
   }
 
   closeFiltersMobile() {
-    const element = this.shadowRoot.querySelector('.all-filters-wrapper-mobile');
+    const element = this.querySelector('.all-filters-wrapper-mobile');
     element.classList.remove('open');
   }
 
@@ -909,7 +897,7 @@ export default class PartnerCards extends LitElement {
   }
 
   scrollToTopOfCardCollection() {
-    const partnerCardsHeader = this.shadowRoot.querySelector('.partner-cards-header');
+    const partnerCardsHeader = this.querySelector('.partner-cards-header');
     const targetElement = partnerCardsHeader || this;
     const gnavHeight = document.querySelector('header')?.offsetHeight || 0;
     const targetRect = targetElement.getBoundingClientRect();

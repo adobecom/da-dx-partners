@@ -1,4 +1,3 @@
-import { singlePartnerCardStyles } from './PartnerCardsStyles.js';
 import { getLibs } from '../scripts/utils.js';
 import { getConfig, transformCardUrl } from '../blocks/utils/utils.js';
 
@@ -11,12 +10,12 @@ const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 class SinglePartnerCardHalfHeight extends LitElement {
+  createRenderRoot() { return this; }
+
   static properties = {
     data: { type: Object },
     design: { type: String },
   };
-
-  static styles = singlePartnerCardStyles;
 
   constructor() {
     super();
