@@ -192,16 +192,6 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
   const { signal } = currentAbortController;
   // Show loading indicator first, right after user message
   const loadingElement = showLoadingMessage(chatHistory, scrollToBottomBtn);
-  let level = 'partner-level-public';
-  if (partnerIsSignedIn()) {
-    try {
-      const profileData = getPartnerCookieObject(getCurrentProgramType());
-      level = `partner-level-${profileData.level.toLowerCase().replace(/\s+/g, '').replace(/[()]/g, '')}`;
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.info('Failed to parse profileData from cookie:', error);
-    }
-  }
   try {
     const origin = prodHosts.includes(window.location.host) ? 'https://partners.adobe.com' : 'https://partners.stage.adobe.com';
     const url = new URL(`${origin}/services/gravity/yukonAIAssistant`);
