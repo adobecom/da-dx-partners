@@ -13,6 +13,11 @@
   margin: 0;
 }
 
+.partner-cards button,
+.all-filters-wrapper-mobile button {
+  font-family: inherit;
+}
+
 .partner-cards,
 .partner-cards *,
 .all-filters-wrapper-mobile,
