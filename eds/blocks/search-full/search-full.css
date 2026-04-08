@@ -7,6 +7,10 @@
   margin: 0;
 }
 
+.search-box-wrapper button {
+  font-family: 'Adobe Clean', adobe-clean, 'Trebuchet MS', sans-serif;
+}
+
 .search-box-wrapper * {
   box-sizing: border-box;
 }
