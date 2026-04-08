@@ -4,6 +4,11 @@ export default class GnavPersonalisationPage {
     this.gnav = page.locator('.feds-topnav-wrapper');
     this.personalisationButton = page.getByRole('button', { name: 'Personalization' });
     this.gnavDropdown = page.locator('#feds-popup-1');
+    this.handshakeIcon = page.getByRole('link', { name: 'Image' }).first();
+    this.globeIcon = page.getByRole('link', { name: 'Image' }).nth(1);
+    this.searchIcon = page.getByRole('link', { name: 'Image' }).nth(2);
+    this.menageUserIcon = page.getByRole('link', { name: 'Image' }).nth(3);
+    this.homeIcon = page.getByRole('link', { name: 'Image' }).nth(4);
   }
 
   getPartnerLevelSegment(partnerLevelSegmentText) {
