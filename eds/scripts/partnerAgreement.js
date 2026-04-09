@@ -17,10 +17,10 @@ const SPINNER_ANIMATION = `<sp-theme system="light" color="light" scale="medium"
 
 let agreementModal;
 
-function handleRedirects(agreementRedirectDomains) {
+export function handleRedirects(agreementRedirectDomains, win = window) {
   if (!agreementRedirectDomains) return;
   const allowedDomains = agreementRedirectDomains.split(',').map(url => url.trim().toLowerCase());
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(win.location.search);
   const redirectUrl = params.get('redirectUrl');
   if (!redirectUrl) return;
 
@@ -34,7 +34,7 @@ function handleRedirects(agreementRedirectDomains) {
   }
 
   if (allowedDomains.includes(redirectDomain)) {
-    window.location.href = redirectUrl;
+    win.location.href = redirectUrl;
   }
 }
 async function acceptAgreement(agreementTextContainer, successMessage, errorMessage, agreementRedirectDomains, spinner, closeModalCallback) {
@@ -175,10 +175,10 @@ async function loadAgreementMeta(metadataUrl) {
     };
 }
 
-export async function partnerAgreement(miloLibs) {
+export async function partnerAgreement(miloLibs, win = window) {
     const latestAgreementAccepted = getPartnerCookieValue('latestagreementaccepted');
     if (latestAgreementAccepted) {
-      window.dispatchEvent(
+      win.dispatchEvent(
         new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
       );
 
@@ -188,7 +188,7 @@ export async function partnerAgreement(miloLibs) {
     const partnerAgreementMetaPath = getMetadataContent('partner-agreement-meta');
   if (!partnerAgreementMetaPath) {
     console.warn('Partner agreement should be displayed but partner agreement meta path is not authored');
-    window.dispatchEvent(
+    win.dispatchEvent(
       new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
     );
     return false;
@@ -196,7 +196,7 @@ export async function partnerAgreement(miloLibs) {
 
     const agreementMeta = await loadAgreementMeta(partnerAgreementMetaPath);
   if (!agreementMeta) {
-    window.dispatchEvent(
+    win.dispatchEvent(
       new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
     );
     return false;
@@ -204,7 +204,7 @@ export async function partnerAgreement(miloLibs) {
 
     const agreementContent = await handleAgreement('fetch');
   if (!agreementContent) {
-    window.dispatchEvent(
+    win.dispatchEvent(
       new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),
     );
     return false;
