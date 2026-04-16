@@ -1,10 +1,10 @@
-import { getCaasUrl, getLibs } from "../../scripts/utils.js";
-import { getConfig, populateLocalizedTextFromListItems, replaceText } from "../utils/utils.js";
-import DXCardCollection from "./DXCardCollection.js";
+import { getCaasUrl, getLibs } from '../../scripts/utils.js';
+import { getConfig, populateLocalizedTextFromListItems, replaceText } from '../utils/utils.js';
+import DXCardCollection from './DXCardCollection.js';
 
 function declareDXCardCollection() {
   if (customElements.get('dx-card-collection')) return;
-  customElements.define('dx-card-collection', DXCardCollection)
+  customElements.define('dx-card-collection', DXCardCollection);
 }
 
 async function localizationPromises(localizedText, config) {
@@ -19,6 +19,11 @@ export default async function init(el) {
 
   const miloLibs = getLibs();
   const config = getConfig();
+
+  const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+  loadStyle('/eds/components/PartnerCards.css');
+  loadStyle('/eds/components/PartnerCardsDateFilter.css');
+  loadStyle('/eds/components/SinglePartnerCard.css');
 
   const sectionIndex = el.parentNode.getAttribute('data-idx');
 
@@ -88,10 +93,8 @@ export default async function init(el) {
   const block = {
     el,
     name: 'dx-card-collection',
-    ietf: config.locale.ietf
-  }
-
-
+    ietf: config.locale.ietf,
+  };
 
   const rows = Array.from(el.children);
   let dateFilterValue = '';
@@ -100,11 +103,10 @@ export default async function init(el) {
     const cols = Array.from(row.children);
     const rowTitle = cols[0].innerText.trim().toLowerCase().replace(/ /g, '-');
 
-    if (rowTitle === "date-filter") {
+    if (rowTitle === 'date-filter') {
       dateFilterValue = cols[1]?.innerText.trim();
     }
   });
-
 
   let dateFilter = null;
   if (dateFilterValue === 'past') {
@@ -120,7 +122,7 @@ export default async function init(el) {
     cardsPerPage: 12,
     pagination: 'default',
     caasUrl: getCaasUrl(block),
-  }
+  };
 
   const app = document.createElement('dx-card-collection');
   app.className = 'content dx-card-collection-wrapper';
