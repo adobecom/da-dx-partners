@@ -31,36 +31,25 @@ describe('Test rewrite links', () => {
   beforeEach(() => {
     getConfig.mockReturnValue({ env: { name: 'stage' }, codeRoot: 'https://stage--da-dx-partners--adobecom.aem.page/edsdme' });
     partnerIsSignedIn.mockReturnValue({ 'partner name': { company: 'test' } });
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: {
-        pathname: '/cn/test-path',
-        href: 'http://example.com/cn/test-path',
-        assign: jest.fn(),
-        reload: jest.fn(),
-      },
-    });
+    window.history.pushState({}, '', '/cn/test-path');
   });
   afterEach(() => {
     jest.clearAllMocks(); // Clear mocks after each test
   });
 
-  test('should  update partners prod link when on non prod', () => {
+  test('should update partners prod link when on non prod', () => {
     rewriteLinks(document);
     const links = document.querySelectorAll('a');
     expect(links[0].href).toBe('https://partners.stage.adobe.com/');
   });
 
-  test(
-    'should update partners prod domain when not logged in when on stage,',
-    () => {
-      partnerIsSignedIn.mockReturnValue(null);
+  test('should update partners prod domain when not logged in when on stage,', () => {
+    partnerIsSignedIn.mockReturnValue(null);
 
-      rewriteLinks(document);
-      const links = document.querySelectorAll('a');
-      expect(links[0].href).toBe('https://partners.stage.adobe.com/');
-    },
-  );
+    rewriteLinks(document);
+    const links = document.querySelectorAll('a');
+    expect(links[0].href).toBe('https://partners.stage.adobe.com/');
+  });
 
   test('should update SPP prod link when on non prod', () => {
     rewriteLinks(document);
