@@ -229,7 +229,7 @@ export default {
       path: '/digitalexperience/drafts/automation/regression/personalization/mocked-personalization',
       tags: '@da-dx-personalisation @regression @anonymous',
       data: {
-          partnerSegmentText: 'Partner-newly-registered:',
+          partnerSegmentText: 'Partner-new-user-segment:',
           partnerData: {
               partnerPortal: 'DXP',
               accessType: '["Billing Admin","Sales Center Admin","Admin"]',
@@ -306,6 +306,38 @@ export default {
               partnerLevel: 'Platinum',
             },
         }
+    },
+    {
+      tcid: '11',
+      name: '@gnav-icons-test-validation',
+      path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
+      tags: '@da-dx-personalisation @regression @anonymous',
+      data: {
+        partnerData: {
+          partnerPortal: 'DXP',
+          accessType: '["Billing Admin","Sales Center Admin","Admin"]',
+          complianceExpiryDate: '1829174400000',
+          complianceStatus: 'Completed',
+          createdDate: '1766151816000',
+          designationType: '["Legal and Compliance"]',
+          email: 'yugo-test+dx-stage-platinum@adobetest.com',
+          latestAgreementAccepted: 'true',
+          latestAgreementAcceptedVersion: 'Feb 6, 2026',
+          primaryBusiness: '["Solution"]',
+          primaryContact: 'true',
+          primaryJobRole: 'Product Management',
+          purchasedPartnerLevel: 'Platinum',
+          salesCenterAccess: 'true',
+          specialState: 'normal',
+          status: 'MEMBER',
+          partnerLevel: 'Platinum',
+        },
+        handshakeIconLink: '/digitalexperience/m/salescenter/',
+        globeIconLink: '/s/directory/solution',
+        searchIconLink: '/digitalexperience/home/search/',
+        menageUserIconLink: '/digitalexperience/home/manage-user',
+        homeIconLink: '/digitalexperience/home/',
+      },
     },
   ],
 };

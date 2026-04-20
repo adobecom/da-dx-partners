@@ -18,11 +18,10 @@
 .yc-block-header {
   color: var(--yc-header-color);
   font-weight: bold;
-  width: 100%;
-  text-align: right;
+  text-align: left;
   font-size: 22px;
   line-height: 29px;
-
+  white-space: nowrap;
 }
 .yukon-chat-block {
   display: flex;
@@ -48,7 +47,7 @@
   box-sizing: border-box;
   top: var(--feds-height-nav);
   max-width: calc(768px - 4px);
-  width: 100%;
+  width: -webkit-fill-available;
 }
 
 .yc-input-field {
@@ -214,6 +213,17 @@
   max-height: 35vh;
 }
 
+/* Single-line placeholder; real input keeps pre-wrap / wrapping from the rule above */
+#yc-input-field:placeholder-shown {
+  white-space: nowrap;
+  word-wrap: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+}
+
 .yc-textarea-grow-wrap textarea:disabled {
   overflow: hidden;
   height: 28px;
@@ -282,8 +292,8 @@
   pointer-events: none;
 }
 
-/* Modal Input Wrapper - Fixed at bottom */
-.dialog-modal .modal-input-wrapper {
+/* Modal input strip — Yukon chat modal only (avoid overriding other Milo modals) */
+#yukon-chat-modal .modal-input-wrapper {
   position: absolute;
   bottom: 0;
   align-self: center;
@@ -296,8 +306,8 @@
   padding-right: 16px;
 }
 
-@media (min-width: 1024px)  {
-  .dialog-modal .modal-input-wrapper {
+@media (min-width: 1024px) {
+  #yukon-chat-modal .modal-input-wrapper {
     padding-left: 15%;
     padding-right: 15%;
   }
@@ -320,8 +330,7 @@
 }
 
 /* Dialog Modal */
-.dialog-modal,
-.dialog-modal#yukon-chat-modal {
+#yukon-chat-modal.dialog-modal {
   position: fixed;
   top: var(--feds-height-nav);
   left: 0;
@@ -338,7 +347,6 @@
   overflow: hidden;
 }
 
-.dialog-modal,
 #yukon-chat-modal {
   display: flex !important;
   flex-direction: column;
@@ -349,11 +357,11 @@
   overflow: hidden;
 }
 
-.dialog-modal.opening {
+#yukon-chat-modal.dialog-modal.opening {
   animation: 500ms ease-in-out slide-up;
 }
 
-.dialog-modal.closing {
+#yukon-chat-modal.dialog-modal.closing {
   animation: 500ms ease-in-out slide-down;
   bottom: -100vh;
 }
@@ -381,11 +389,15 @@
 }
 
 @media (max-width: 768px) {
-  .dialog-modal {
+  #yukon-chat-modal.dialog-modal {
     width: 90%;
     height: 100vh;
     max-height: 100vh;
     min-height: 300px;
+  }
+
+  #yukon-chat-modal .modal-input-wrapper {
+    width: 90%;
   }
 
   .dialog-modal .modal-input-wrapper {
@@ -398,17 +410,15 @@
     padding-left: 0;
   }
 
-  .yc-textarea-grow-wrap textarea:placeholder-shown {
+  #yc-input-field:placeholder-shown {
     padding: 0;
     line-height: 28px;
     height: 28px;
-    white-space: nowrap;
-    overflow: hidden;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
-  .dialog-modal {
+  #yukon-chat-modal.dialog-modal {
     max-width: 800px;
     width: 88%;
   }
