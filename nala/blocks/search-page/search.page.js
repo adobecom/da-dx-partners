@@ -39,6 +39,7 @@ export default class SearchPage {
     this.oneTrustBanner = page.getByRole('button', { name: 'Enable all' });
     this.journeyPhaseFilterPanel = page.getByRole('list').filter({ hasText: 'Discover Explore Evaluate Use' });
     this.functionalityFilterPanel = page.getByRole('list').filter({ hasText: 'Data Activation Analysis &' });
+    this.restrictedMessageBox = page.locator('.text-block.con-block');
   }
 
   async getCardTitle() {
@@ -133,5 +134,80 @@ export default class SearchPage {
 
   async waitForResultsToSettle() {
     await this.loader.waitFor({ state: 'hidden', timeout: 30000 });
+  }
+
+  async verifyAssetDetails(input) {
+    const {
+      assetTitle,
+      assetDateValue,
+      assetSummaryValue,
+      assetTypeValue,
+      assetTagsValue,
+      assetSizeValue,
+    } = input;
+
+    // Title
+    await expect(this.assetTitlePreview).toBeVisible();
+    await expect(this.assetTitlePreview.locator('p'))
+      .toHaveText(assetTitle, { timeout: 30000 });
+    await expect(this.downloadPPTButton).toBeHidden();
+    // Date
+    if (assetDateValue !== undefined) {
+      const assetDate = (await this.assetDate.textContent())
+        .replace('Date: ', '')
+        .trim();
+      await expect(assetDate).toContain(assetDateValue);
+    }
+    // Summary
+    if (assetSummaryValue !== undefined) {
+      const assetSummary = (await this.assetSummary.textContent())
+        .replace('Summary: ', '')
+        .trim();
+      await expect(assetSummary).toBe(assetSummaryValue);
+    } else {
+      await expect(this.assetSummary).toBeVisible();
+    }
+    // Type
+    if (assetTypeValue !== undefined) {
+      const assetType = (await this.assetType.textContent())
+        .replace('Type: ', '')
+        .trim();
+      await expect(assetType).toBe(assetTypeValue);
+    }
+    // Tags
+    if (assetTagsValue !== undefined) {
+      const tagsText = await this.assetTags.textContent();
+      const tags = tagsText
+        .replace('Tags: ', '')
+        .trim()
+        .toLowerCase();
+      for (const tag of assetTagsValue) {
+        await expect(tags).toContain(tag.toLowerCase());
+      }
+    }
+    // Size
+    if (assetSizeValue !== undefined) {
+      const size = (await this.assetSize.textContent())
+        .replace('Size: ', '')
+        .trim();
+      await expect(size).toContain(assetSizeValue);
+    }
+  }
+
+  async verifyPreviewMessage(data) {
+    const message = this.restrictedMessageBox.filter({
+      hasText: data.textBlock
+    });
+    await expect(message).toBeVisible();
+    await expect(message).toContainText(data.textBlock);
+    await expect(message.locator('a')).toHaveText(data.link[0].text);
+  }
+
+  async clickLinkFromMessage(messageText, linkText) {
+    const message = this.restrictedMessageBox.filter({
+      hasText: messageText
+    });
+    const link = message.locator('a', { hasText: linkText });
+    await link.click();
   }
 }

@@ -14,7 +14,7 @@ export default {
         cardTags: ['px', 'explore', 'Session Type', 'data activation', 'content velocity', 'bacom'],
         cardButtonLink: 'https://partners.stage.adobe.com/digitalexperience/preview/qatest/asset-preview/Asset%20preview%20Public%20PDF%20Regular.pdf.html',
         silverAssetTitle: 'Silver only page for testing search Automation',
-        trainingLink:'https://learningmanager.adobe.com/'
+        trainingLink: 'https://learningmanager.adobe.com/',
       },
     },
     {
@@ -31,7 +31,7 @@ export default {
         assetTitle4: 'Asset preview Public ZIP Netstorage Automation',
         silverAsset: 'Silver only page for testing search Automation',
       },
-    }, 
+    },
     {
       tcid: '3',
       name: '@asset-preview-public-non-logged-in-user-validation',
@@ -49,7 +49,7 @@ export default {
         assetSize: 'Size: ',
         assetSizeValue: '451.7 KB',
         assetUrl: '/digitalexperience-assets/qatest/asset-preview/Asset%20preview%20Public%20PDF%20Regular.pdf',
-      }
+      },
     },
     {
       tcid: '4',
@@ -73,7 +73,7 @@ export default {
         searchAllAssetsPath: '/digitalexperience/home/search/',
         goldAssetLink: '/digitalexperience/preview/netstorage-assets/spp/gold/as/asset_preview_goldmp4netstorage.mp4.html',
         asssetPreviewTitle: 'Asset detail: Asset preview Gold MP4 Netstorage Automation  (Video)',
-      }
+      },
     },
     {
       tcid: '5',
@@ -141,7 +141,7 @@ export default {
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
-        trainingLink:'https://learningmanager.adobe.com/'
+        trainingLink: 'https://learningmanager.adobe.com/',
       },
     },
     {
@@ -158,6 +158,38 @@ export default {
         assetTitle4: 'Asset preview Public ZIP Netstorage Automation',
         silverAsset: 'Silver only page for testing search Automation',
       },
-    }, 
+    },
+    {
+      tcid: '11',
+      name: '@restricted-asset-preview-message-non-signed-in-user',
+      path: '/digitalexperience-assets/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx  ',
+      tags: '@restricted-asset @da-dx-search-page @regression @circleCi',
+      data: {
+        textBlock: 'Access to view or download this asset is restricted to registered partners. Login or register now.',
+        link: [{ text: 'register now', url: 'https://partners.stage.adobe.com/digitalexperience/s/registration' }],
+      },
+    },
+    {
+      tcid: '12',
+      name: '@restricted-asset-preview-message-community-level',
+      path: '/digitalexperience-assets/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx  ',
+      tags: '@restricted-asset @da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-community:',
+        textBlock: 'Access to view this asset is restricted by your partnership level. Upgrade to Silver now.',
+        link: [{ text: 'Upgrade to Silver now', url: 'https://pp-staging.adobe.com/silver-membership.html' }],
+      },
+    },
+    {
+      tcid: '13',
+      name: '@restricted-asset-preview-message-gold-level',
+      path: '/digitalexperience-assets/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx  ',
+      tags: '@restricted-asset @da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-gold:',
+        textBlock: 'Access to view this asset is restricted by your partnership level. Learn about options to uplevel now',
+        link: [{ text: 'uplevel now', url: ' https://partners.stage.adobe.com/digitalexperience/articles/support/benefits-center#upleveling' }],
+      },
+    },
   ],
 };
