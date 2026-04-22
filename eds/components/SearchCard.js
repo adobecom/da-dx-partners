@@ -67,9 +67,7 @@ class SearchCard extends LitElement {
             <span class="card-title">${this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : ''}</span>
           </div>
           <div class="card-icons">
-              <a class="card-btn" @click=${(e) => this.onCardBtnClick(e)} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}" daa-ll="${processTrackingLabels(this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : '', getConfig(), 30)}">
-                <sp-icon-open-in class="open-in-icon" />
-              </a>
+              <a class="card-btn" @click=${(e) => this.onCardBtnClick(e)} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}" daa-ll="${processTrackingLabels(this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : '', getConfig(), 30)}"><sp-icon-open-in /></a>
           </div>
         </div>
 
