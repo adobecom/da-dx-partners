@@ -53,10 +53,7 @@ class SearchCard extends LitElement {
   // eslint-disable-next-line class-methods-use-this
   onCardBtnClick(e) {
     e.stopPropagation();
-    if (e.isTrusted) {
-      e.preventDefault();
-      dispatchCustomEventOnLinkClick(e, e.target.getAttribute('href'), processTrackingLabels(e.target.getAttribute('daa-ll'), config, 30));
-    }
+    dispatchCustomEventOnLinkClick(e, e.target.getAttribute('href'), processTrackingLabels(e.target.getAttribute('daa-ll'), config, 30));
   }
 
   /* eslint-disable indent */
@@ -70,9 +67,9 @@ class SearchCard extends LitElement {
             <span class="card-title">${this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : ''}</span>
           </div>
           <div class="card-icons">
-            <sp-theme theme="spectrum" color="light" scale="medium">
-              <sp-action-button @click=${(e) => this.onCardBtnClick(e)} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}" daa-ll="${processTrackingLabels(this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : '', getConfig(), 30)}"><sp-icon-open-in /></sp-action-button>
-            </sp-theme>
+              <a class="card-btn" @click=${(e) => this.onCardBtnClick(e)} href="${this.data.contentArea?.url}" target="_blank" aria-label="${this.localizedText['{{open-in}}']}" daa-ll="${processTrackingLabels(this.data.contentArea?.title !== 'card-metadata' ? this.data.contentArea?.title : '', getConfig(), 30)}">
+                <sp-icon-open-in class="open-in-icon" />
+              </a>
           </div>
         </div>
 
