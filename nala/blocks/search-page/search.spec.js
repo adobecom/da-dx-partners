@@ -191,5 +191,15 @@ export default {
         link: [{ text: 'uplevel now', url: ' https://partners.stage.adobe.com/digitalexperience/articles/support/benefits-center#upleveling' }],
       },
     },
+    {
+      tcid: '14',
+      name: '@asset-special-character-filters',
+      path: '/digitalexperience/drafts/automation/regression/search-page?filters=yes&industries=caas:industry/automotive-and-mobility&content-type=caas:content-type/plans-and-pricing&journey-phase=caas:journey-phase/acquisition&topic=caas:topic/invoices ',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-platinum:',
+        cardTitle: 'MAPP Asset with -and- tags',
+      },
+    },
   ],
 };

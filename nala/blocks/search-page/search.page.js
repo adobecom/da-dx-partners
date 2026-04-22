@@ -40,6 +40,10 @@ export default class SearchPage {
     this.journeyPhaseFilterPanel = page.getByRole('list').filter({ hasText: 'Discover Explore Evaluate Use' });
     this.functionalityFilterPanel = page.getByRole('list').filter({ hasText: 'Data Activation Analysis &' });
     this.restrictedMessageBox = page.locator('.text-block.con-block');
+    this.industriesHeader = page.locator('.filter', { has: page.getByRole('button', { name: 'Industries' }) });
+    this.contentTypeHeader = page.locator('.filter', { has: page.getByRole('button', { name: 'Content Type' }) });
+    this.topicHeader = page.locator('.filter', { has: page.getByRole('button', { name: 'Topic' }) });
+    this.journeyPhaseHeader = page.locator('.filter', { has: page.getByRole('button', { name: 'Journey Phase' }) });
   }
 
   async getCardTitle() {
@@ -209,5 +213,13 @@ export default class SearchPage {
     });
     const link = message.locator('a', { hasText: linkText });
     await link.click();
+  }
+
+  getFilterCount(filterName) {
+    return this.page
+      .locator('.filter', {
+        has: this.page.getByRole('button', { name: filterName })
+      })
+      .locator('.filter-selected-tags-count-btn');
   }
 }

@@ -409,4 +409,31 @@ test.describe('Search Page', () => {
       await expect(page).toHaveURL(data.link[0].url);
     });
   });
+
+  test(`${features[13].name},${features[13].tags}`, async ({ page }) => {
+    const { data } = features[13];
+
+    await test.step('Go to search page', async () => {
+      await page.goto(`${features[13].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Verify selected filters', async () => {
+      const filters = ['Industries', 'Content Type', 'Topic', 'Journey Phase'];
+
+      for (const name of filters) {
+        const filter = searchPage.getFilterCount(name);
+        await expect(filter).toBeVisible();
+        await expect(filter).toHaveText('1');
+      }
+    });
+
+    await test.step('Verify asset', async () => {
+      await expect(searchPage.getCardByTitle(data.cardTitle)).toBeVisible();
+      await expect(searchPage.getCardByTitle(data.cardTitle)).toContainText(data.cardTitle);
+    });
+  });
 });
