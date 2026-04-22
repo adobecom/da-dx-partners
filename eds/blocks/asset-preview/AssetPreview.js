@@ -58,7 +58,7 @@ export default class AssetPreview extends LitElement {
     return document.querySelector('video');
   }
 
-  togglePlay() {
+  playVideo() {
     if (this._video) {
       const videoContainer = this._video.closest('.asset-preview-block-video');
       window.scrollTo({ top: videoContainer.offsetTop, behavior: 'smooth' });
@@ -225,7 +225,7 @@ export default class AssetPreview extends LitElement {
                 ` : ''}
 
                 ${this.isVideo ? html`
-                  <button @click="${() => this.togglePlay()}" class="filled" ?disabled="${this.isVideoLoading}">
+                  <button @click="${() => this.playVideo()}" class="filled" ?disabled="${this.isVideoLoading}">
                     <span>${this.blockData.localizedText['{{Watch Video}}']}</span>
                   </button>
                 ` : ''}
