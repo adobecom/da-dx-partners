@@ -61,7 +61,9 @@ export default class AssetPreview extends LitElement {
   playVideo() {
     if (this._video) {
       const videoContainer = this._video.closest('.asset-preview-block-video');
-      window.scrollTo({ top: videoContainer.offsetTop, behavior: 'smooth' });
+      if (videoContainer) {
+        window.scrollTo({ top: videoContainer.offsetTop, behavior: 'smooth' });
+      }
       this._video.play();
     }
   }
