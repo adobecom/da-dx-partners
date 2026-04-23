@@ -42,6 +42,7 @@ export default async function init(el) {
     '{{Download Word}}': 'Download Word',
     '{{Download Excel}}': 'Download Excel',
     '{{Download File}}': 'Download File',
+    '{{Watch Video}}': 'Watch Video',
   };
   populateLocalizedTextFromListItems(el, localizedText);
 
