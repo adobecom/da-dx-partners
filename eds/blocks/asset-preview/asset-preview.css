@@ -111,9 +111,15 @@
     color: var(--asset-preview-black);
   }
 
-  .asset-preview-block-actions button.outline:hover {
+  .asset-preview-block-actions button.outline:hover,
+  .asset-preview-block-actions button.filled:disabled:hover {
     background-color: var(--asset-preview-black);
     color: var(--asset-preview-white);
+  }
+
+  .asset-preview-block-actions button.filled:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 
   .asset-preview-block-actions button a {
@@ -140,69 +146,10 @@
     background-color: var(--asset-preview-black);
   }
 
-  .asset-preview-block-video .video-container.video-holder .pause-play-wrapper {
-    position: absolute;
-    bottom: 2%;
-    right: 2%;
-    margin: 0;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    z-index: 3;
-    padding: 3px;
-    cursor: pointer;
-    display: flex;
-    width: fit-content;
-    cursor: pointer;
-  }
-
-  .asset-preview-block-video .video-container.video-holder .pause-play-wrapper .offset-filler {
-    display: inherit;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: inherit;
-    background: var(--color-gray-800);
-  }
-  
-  :is(.asset-preview-block-video .video-container .pause-play-wrapper, .asset-preview-block-video .aside.split.split-left .split-image) img.accessibility-control,
-  .asset-preview-block-video .brick.split.row.media-right .foreground .brick-media img.accessibility-control {
-    width: inherit;
-    height: inherit;
-    margin: 0;
-  }
-
-  .asset-preview-block-video .video-container.video-holder .pause-play-wrapper .accessibility-control {
-    width: inherit;
-    height: inherit;
-    margin: 0;
-  }
-
   @media screen and (max-width: 600px) {
    .asset-preview-block-details {
       flex-direction: column;
     }
-
-    .asset-preview-block-video .pause-play-wrapper {
-      left: 2%;
-    }
-  }
-
-  .asset-preview-block-video .play-icon {
-    display: block;
-  }
-
-  .asset-preview-block-video .pause-icon {
-    display: none;
-  }
-
-  .asset-preview-block-video .is-playing .play-icon {
-    display: none;
-  }
-
-  .asset-preview-block-video .is-playing .pause-icon {
-    display: block;
   }
 
   /* Video loading overlay styles */

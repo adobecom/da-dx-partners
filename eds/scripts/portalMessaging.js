@@ -116,6 +116,15 @@ async function loadBannerContent(bannerType) {
     return;
   }
 
+  if (bannerType === 'global-banner' && bannerFragmentPath.trim().toUpperCase() === 'NONE') {
+    return;
+  }
+
+  if (!bannerFragmentPath.startsWith('/')) {
+    console.warn(`Invalid ${bannerType} path: ${bannerFragmentPath}`);
+    return;
+  }
+
   const bannerContent = await loadPopupFragment(bannerFragmentPath);
   if (!bannerContent) {
     console.warn(`Popup fragment for ${bannerFragmentPath} not found`);

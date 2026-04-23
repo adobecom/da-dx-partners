@@ -58,16 +58,11 @@ export default class AssetPreview extends LitElement {
     return document.querySelector('video');
   }
 
-  togglePlay() {
-    // eslint-disable-next-line no-underscore-dangle
-    if (this._video && this._video.paused) {
-      // eslint-disable-next-line no-underscore-dangle
+  playVideo() {
+    if (this._video) {
+      const videoContainer = this._video.closest('.asset-preview-block-video');
+      window.scrollTo({ top: videoContainer.offsetTop, behavior: 'smooth' });
       this._video.play();
-      // eslint-disable-next-line no-underscore-dangle
-    } else if (this._video) {
-      // eslint-disable-next-line no-underscore-dangle
-      this._video.pause();
-      // this.isVideoPlaying = false;
     }
   }
 
@@ -229,7 +224,13 @@ export default class AssetPreview extends LitElement {
                   <button class="filled"><a  download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
                 ` : ''}
 
-              ${this.backButtonUrl ? html`<a
+                ${this.isVideo ? html`
+                  <button @click="${() => this.playVideo()}" class="filled" ?disabled="${this.isVideoLoading}">
+                    <span>${this.blockData.localizedText['{{Watch Video}}']}</span>
+                  </button>
+                ` : ''}
+                
+                ${this.backButtonUrl ? html`<a
                 class="link" href="${this.backButtonUrl}" daa-ll="${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
               </div>` : ''}
             </div>
@@ -259,18 +260,12 @@ export default class AssetPreview extends LitElement {
               loop="" 
               data-video-source="${this.getDownloadUrl()}"
               oncontextmenu="return false;"
+              controls
+              controlsList="nodownload"
             >
               <source src="${this.getDownloadUrl()}" type="${this.fileType}">
               <source src="${this.getDownloadUrl()}" type="video/mp4">
             </video>
-            ${!this.isVideoLoading ? html`
-              <a @click="${() => this.togglePlay()}" class="pause-play-wrapper" title="Pause motion 3" aria-label="Pause motion 3 " role="button" tabindex="0" aria-pressed="true" video-index="3" daa-ll="Pause motion-1--">
-                <div class="${this.isVideoPlaying ? 'is-playing' : ''} offset-filler">
-                  <img class="accessibility-control pause-icon" alt="Pause motion" src="https://milo.adobe.com/federal/assets/svgs/accessibility-pause.svg">
-                  <img class="accessibility-control play-icon" alt="Play motion" src="https://milo.adobe.com/federal/assets/svgs/accessibility-play.svg">
-                </div>
-              </a>
-            ` : ''}
           </div>
         </div>`
     : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset data not found}}']}</div>`}

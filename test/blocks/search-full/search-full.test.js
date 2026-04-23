@@ -1709,7 +1709,7 @@ describe('SearchCard Unit Tests', () => {
       const firstCard = searchCardsWrapper.querySelector('search-card');
       expect(firstCard.getAttribute('daa-lh')).to.equal(`Search Card 1 | ${cards[0].contentArea.title}`);
 
-      const singlePartnerCardBtn = firstCard.querySelector('sp-action-button');
+      const singlePartnerCardBtn = firstCard.querySelector('.card-btn');
       expect(singlePartnerCardBtn.getAttribute('daa-ll')).to.equal(cards[0].contentArea.title);
     });
   });
