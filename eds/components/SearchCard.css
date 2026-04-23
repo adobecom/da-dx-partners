@@ -51,9 +51,26 @@
   overflow-wrap: anywhere;
 }
 
-.card-header .card-icons {
+.search-card .card-header .card-icons {
   z-index: 1;
   flex-shrink: 0;
+}
+
+.search-card .card-header .card-icons .card-btn {
+  color: #222;
+  border: 1px solid #b1b1b1;
+  display: flex;
+  border-radius: 4px;
+  padding: 6px 11px;
+}
+
+.search-card .card-header .card-icons .card-btn:hover {
+  background: #e6e6e6;
+}
+
+.search-card .card-header .card-icons .card-btn sp-icon-open-in {
+  width: 18px;
+  height: 18px;
 }
 
 .search-card .card-content {
