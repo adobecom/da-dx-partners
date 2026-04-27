@@ -1,8 +1,82 @@
 /* eslint import/no-relative-packages: 0 */
 /* eslint-disable no-async-promise-executor */
 import { applyGnavPersonalization } from '../../scripts/personalization.js';
-import {
+import { getLibs } from '../../scripts/utils.js';// MWPW-157751
+import { rewriteLinks } from '../../scripts/rewriteLinks.js';
+import { PERSONALIZATION_MARKER } from '../../scripts/personalizationConfigDX.js';
+
+const miloLibs = getLibs();
+
+const {
+  getConfig,
+  getMetadata,
+  loadIms,
+  loadStyle,
+  loadLana,
+  decorateLinksAsync,
+  loadScript,
+  getGnavSource,
+  getFederatedUrl,
+  getFedsPlaceholderConfig,
+  shouldBlockFreeTrialLinks,
+  getLingoRegion,
+  lingoActive,
+} = await import(`${miloLibs}/utils/utils.js`);
+
+const cssPromise = (async () => {
+  const { codeRoot, theme } = getConfig();
+  const url = `${miloLibs || codeRoot}/blocks/global-navigation/`;
+  const loadStylePromise = (u) => new Promise((resolve, reject) => {
+    loadStyle(u, (e) => {
+      if (e === 'error') return reject(u);
+      return resolve();
+    });
+  });
+  try {
+    await loadStylePromise(`${url}base.css`);
+    if (theme === 'dark') await loadStylePromise(`${url}dark-nav.css`);
+  } catch (e) {
+    const gnavSource = getMetadata('gnav-source');
+    if (!window.lana?.log) loadLana();
+    window.lana.log(`GNAV: Error in loadStyles | gnav-source: ${gnavSource} | href: ${window.location.href} | error loading style: ${e}`, {
+      clientId: 'feds-milo',
+      sampleRate: 1,
+      tags: 'utilities',
+      severity: 'error',
+    });
+  }
+})();
+
+const plainHTMLPromise = (async () => {
+  const source = await getGnavSource();
+  const [url] = source.split('#');
+  let federatedURL = getFederatedUrl(url);
+  const mepGnav = getConfig()?.mep?.inBlock?.['global-navigation'];
+  const mepFragment = mepGnav?.fragments?.[federatedURL];
+  if (mepFragment?.action === 'replace') {
+    federatedURL = mepFragment.content;
+  }
+  const res = await fetch(federatedURL.replace(/(\.html$|$)/, '.plain.html'));
+  return res;
+})();
+
+const asideJsPromise = getMetadata('gnav-promo-source') ? import('./features/aside/aside.js') : null;
+
+const breadCrumbsJsPromise = document.querySelector('header')?.classList.contains('has-breadcrumbs') ? import('./features/breadcrumbs/breadcrumbs.js') : null;
+
+const [utilities, placeholders, merch, { processTrackingLabels }] = await Promise.all([
+  import('./utilities/utilities.js'),
+  import(`${miloLibs}/features/placeholders.js`),
+  import(`${miloLibs}/blocks/merch/merch.js`),
+  import(`${miloLibs}/martech/attributes.js`),
+]);
+
+const { replaceKey, replaceKeyArray } = placeholders;
+const { getMiloLocaleSettings, isMasGeoDetectionEnabled } = merch;
+
+const {
   closeAllDropdowns,
+  createErrorPopup,
   fetchAndProcessPlainHtml,
   getActiveLink,
   getExperienceName,
@@ -12,6 +86,7 @@ import {
   isTangentToViewport,
   lanaLog,
   loadDecorateMenu,
+  rootPath,
   loadStyles,
   logErrorFor,
   selectors,
@@ -39,74 +114,10 @@ import {
   addA11YMobileDropdowns,
   removeA11YMobileDropdowns,
   getUnavWidthCSS,
-} from './utilities/utilities.js';
-// PARTNERS_NAVIGATION START
-// MWPW-157751 - Text is visible through Gnav when scrolling on mobile view
-import { getLibs } from '../../scripts/utils.js';// MWPW-157751
-import { rewriteLinks } from '../../scripts/rewriteLinks.js';
-import { PERSONALIZATION_MARKER } from '../../scripts/personalizationConfigDX.js';
-
-const miloLibs = getLibs();
-const {
-  getConfig,
-  getMetadata,
-  loadIms,
-  decorateLinks,
-  loadScript,
-  getGnavSource,
-  getFederatedUrl,
-  getFedsPlaceholderConfig,
-  shouldBlockFreeTrialLinks,
-  loadLana,
-  loadStyle,
-} = await import(`${miloLibs}/utils/utils.js`);
-const { replaceKey, replaceKeyArray } = await import(`${miloLibs}/features/placeholders.js`);
-// PARTNERS_NAVIGATION END
-
-const { getMiloLocaleSettings } = await import(`${miloLibs}/blocks/merch/merch.js`);
-
-(async () => {
-  const { codeRoot, theme } = getConfig();
-  const url = `${miloLibs || codeRoot}/blocks/global-navigation/`;
-  const loadStylePromise = (u) => new Promise((resolve, reject) => {
-    loadStyle(u, (e) => {
-      if (e === 'error') return reject(u);
-      return resolve();
-    });
-  });
-  try {
-    await loadStylePromise(`${url}base.css`);
-    if (theme === 'dark') await loadStylePromise(`${url}dark-nav.css`);
-  } catch (e) {
-    const gnavSource = getMetadata('gnav-source');
-    if (!window.lana?.log) loadLana();
-    window.lana.log(`GNAV: Error in loadStyles | gnav-source: ${gnavSource} | href: ${window.location.href} | error loading style: ${e}`, {
-      clientId: 'feds-milo',
-      sampleRate: 1,
-      tags: 'utilities',
-      errorType: 'info',
-    });
-  }
-})();
-
-const plainHTMLPromise = (async () => {
-  const source = await getGnavSource();
-  const [url] = source.split('#');
-  let federatedURL = getFederatedUrl(url);
-  const mepGnav = getConfig()?.mep?.inBlock?.['global-navigation'];
-  const mepFragment = mepGnav?.fragments?.[federatedURL];
-  if (mepFragment?.action === 'replace') {
-    federatedURL = mepFragment.content;
-  }
-  const res = await fetch(federatedURL.replace(/(\.html$|$)/, '.plain.html'));
-  return res;
-})();
-
-const asideJsPromise = getMetadata('gnav-promo-source') ? import('./features/aside/aside.js') : null;
-
-const breadCrumbsJsPromise = document.querySelector('header')?.classList.contains('has-breadcrumbs') ? import('./features/breadcrumbs/breadcrumbs.js') : null;
-
-const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
+  setupKeyboardNav,
+  KEYBOARD_DELAY,
+  isSmallScreen,
+} = utilities;
 
 const SIGNIN_CONTEXT = getConfig()?.signInContext;
 
@@ -128,11 +139,7 @@ export function getAnalyticsValue(str, index) {
 }
 
 export function decorateCta({ elem, type = 'primaryCta', index } = {}) {
-  if (shouldBlockFreeTrialLinks({
-    button: elem,
-    localePrefix: getConfig()?.locale?.prefix,
-    parent: elem.parentElement,
-  })) return null;
+  if (shouldBlockFreeTrialLinks(elem)) return null;
   const modifier = type === 'secondaryCta' ? 'secondary' : 'primary';
 
   const clone = elem.cloneNode(true);
@@ -172,12 +179,102 @@ const getMessageEventListener = () => {
   };
 };
 
+const handleSignIn = async () => {
+  const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`);
+  const details = document.createElement('div');
+  details.className = 'feds-signin-modal-content';
+
+  const { env } = getConfig();
+  const lib = `https://auth-light.identity${env.name === 'prod' ? '' : '-stage'}.adobe.com/sentry/wrapper.js`;
+  await loadScript(lib);
+
+  const sentry = document.createElement('susi-sentry-light');
+  if (env.name !== 'prod') sentry.stage = true;
+  sentry.variant = 'standard';
+
+  // Map to SUSI authParams cleanly
+  const { locale, imsClientId, imsScope } = getConfig();
+  const lingoRegion = lingoActive() ? await getLingoRegion() : null;
+
+  let redirectUri = SIGNIN_CONTEXT.redirect_uri || window.location.href;
+  try {
+    const url = new URL(redirectUri);
+    url.searchParams.set('from_ims', 'true');
+    redirectUri = url.toString();
+  } catch (e) {
+    // Fallback if URL parsing fails
+  }
+
+  sentry.authParams = {
+    client_id: imsClientId || SIGNIN_CONTEXT.client_id,
+    scope: imsScope || SIGNIN_CONTEXT.scope || 'AdobeID,openid,gnav',
+    response_type: 'token',
+    redirect_uri: redirectUri,
+    locale: lingoRegion?.ietf || locale?.ietf || 'en-US',
+  };
+
+  const dctxId = getMetadata('susi-light-dctx-id');
+  if (dctxId) sentry.authParams.dctx_id = dctxId;
+
+  sentry.config = { consentProfile: 'free' };
+  sentry.popup = true;
+
+  sentry.addEventListener('on-token', () => {
+    window.location.reload();
+  });
+
+  sentry.addEventListener('on-error', (e) => {
+    window.lana?.log('GNav Sign-In Modal: SUSI Light Error: ', e);
+  });
+
+  // Basic styling to ensure it fits in modal
+  details.innerHTML = `
+    <style>
+      .feds-signin-modal-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 48px 0px;
+      }
+      #signin-modal {
+        width: 400px;
+        border-radius: 16px;
+        display: flex;
+        justify-content: center;
+      }
+      #signin-modal .dialog-close {
+        display: block;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
+        background-color: transparent;
+      }
+      susi-sentry-light {
+        width: 100%;
+      }
+    </style>
+  `;
+
+  details.append(sentry);
+
+  return getModal(null, { content: details, id: 'signin-modal' });
+};
+
+const getSignInCtaStyle = () => {
+  const isPrimary = (
+    getMetadata('signin-cta-style') === 'primary'
+    || getConfig()?.unav?.profile?.signInCtaStyle === 'primary'
+  );
+  return isPrimary ? 'primary' : 'secondary';
+};
+
 export const CONFIG = {
   icons: isDarkMode() ? darkIcons : icons,
   delays: {
     mainNavDropdowns: 800,
     loadDelayed: 3000,
-    keyboardNav: 8000,
+    keyboardNav: KEYBOARD_DELAY,
   },
   features: [
     'gnav-brand',
@@ -192,10 +289,8 @@ export const CONFIG = {
       profile: {
         name: 'profile',
         attributes: {
-          isSignUpRequired: false,
-          messageEventListener: getMessageEventListener(),
-          componentLoaderConfig: {
-            config: {
+          accountMenuContext: {
+            sharedContextConfig: {
               enableLocalSection: true,
               enableProfileSwitcher: true,
               miniAppContext: {
@@ -203,16 +298,27 @@ export const CONFIG = {
                   trace: () => {},
                   debug: () => {},
                   info: () => {},
-                  warn: (e) => lanaLog({ message: 'Profile Menu warning', e, tags: 'universalnav,warn' }),
-                  error: (e) => lanaLog({ message: 'Profile Menu error', e, tags: 'universalnav', errorType: 'e' }),
+                  warn: (e) => lanaLog({ message: 'Profile Menu warning', e, tags: 'universalnav', severity: 'warning' }),
+                  error: (e) => lanaLog({ message: 'Profile Menu error', e, tags: 'universalnav', severity: 'error' }),
                 },
               },
+              complexConfig: getConfig().unav?.profile?.complexConfig || null,
               ...getConfig().unav?.profile?.config,
             },
+            messageEventListener: getMessageEventListener(),
           },
-          complexConfig: getConfig().unav?.profile?.complexConfig || null,
+          // UNav 1.5: Support for primary/secondary signIn CTA style
+          // Setting signInCtaStyle = 'primary' makes signIn CTA primary and signUp secondary
+          signInCtaStyle: getSignInCtaStyle(),
+          isSignUpRequired: false,
           callbacks: {
-            onSignIn: () => { window.adobeIMS?.signIn(SIGNIN_CONTEXT); },
+            onSignIn: () => {
+              if (getConfig().useSusiModal) {
+                handleSignIn();
+              } else {
+                window.adobeIMS?.signIn(SIGNIN_CONTEXT);
+              }
+            },
             onSignUp: () => { window.adobeIMS?.signIn(SIGNIN_CONTEXT); },
           },
         },
@@ -275,7 +381,7 @@ export const LANGMAP = {
 // signIn, decorateSignIn and decorateProfileTrigger can be removed if IMS takes over the profile
 const signIn = (options = {}) => {
   if (typeof window.adobeIMS?.signIn !== 'function') {
-    lanaLog({ message: 'IMS signIn method not available', tags: 'gnav,warn' });
+    lanaLog({ message: 'IMS signIn method not available', tags: 'gnav', severity: 'warning' });
     return;
   }
   window.adobeIMS.signIn(options);
@@ -311,7 +417,7 @@ const decorateSignIn = async ({ rawElem, decoratedElem }) => {
         signIn(SIGNIN_CONTEXT);
       });
     } else {
-      lanaLog({ message: 'Sign in link not found in dropdown.', tags: 'gnav,warn' });
+      lanaLog({ message: 'Sign in link not found in dropdown.', tags: 'gnav', severity: 'warning' });
     }
 
     decoratedElem.append(dropdownElem);
@@ -341,15 +447,6 @@ const decorateProfileTrigger = async ({ avatar }) => {
   `;
 
   return buttonElem;
-};
-
-let keyboardNav;
-const setupKeyboardNav = async (newMobileWithLnav) => {
-  keyboardNav = keyboardNav || new Promise(async (resolve) => {
-    const { default: KeyboardNavigation } = await import('./utilities/keyboard/index.js');
-    const instance = new KeyboardNavigation(newMobileWithLnav);
-    resolve(instance);
-  });
 };
 
 const getBrandImage = (image, brandImageOnly) => {
@@ -433,11 +530,6 @@ export const closeGnavOptions = () => {
   enableMobileScroll();
   setMenuState();
 };
-
-const convertToPascalCase = (str) => str
-  ?.split('-')
-  .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-  .join(' ');
 class Gnav {
   constructor({ content, block, newMobileNav } = {}) {
     this.content = content;
@@ -464,7 +556,7 @@ class Gnav {
         iconKey: iconKey[0]?.trim(),
         mobileIconKey: iconKey[1]?.trim(),
         iconLink: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('href'),
-        target: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('target')
+        target: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('target'),
       });
     });
     // PARTNERS_NAVIGATION END
@@ -550,19 +642,20 @@ class Gnav {
     this.block.addEventListener('keydown', fetchKeyboardNav);
     setTimeout(this.loadDelayed, CONFIG.delays.loadDelayed);
     setTimeout(fetchKeyboardNav, CONFIG.delays.keyboardNav);
-    // eslint-disable-next-line no-restricted-syntax
     for (const task of tasks) {
-      // eslint-disable-next-line no-await-in-loop
       await yieldToMain();
-      // eslint-disable-next-line no-await-in-loop
       await task();
     }
 
     document.addEventListener('click', (e) => closeOnClickOutside(e, this.isLocalNav(), this.elements.navWrapper));
     isDesktop.addEventListener('change', closeAllDropdowns);
+    if (document.querySelector('.feds-promo-aside-wrapper')) {
+      isSmallScreen.addEventListener('change', this.updateGnavTop);
+    }
   }, 'Error in global navigation init', 'gnav', 'e');
 
-  revealGnav = () => {
+  revealGnav = async () => {
+    await cssPromise;
     this.block.classList.remove('gnav-hide');
     this.block.classList.add('ready');
     performance.mark('Gnav-Visible');
@@ -576,11 +669,13 @@ class Gnav {
         window.addEventListener('onImsLibInstance', () => this.imsReady());
         return;
       }
-      lanaLog({ message: 'GNAV: Error with IMS', e, tags: 'gnav', errorType: 'i' });
+      lanaLog({ message: 'GNAV: Error with IMS', e, tags: 'gnav', errorType: 'i', severity: 'error' });
     }));
 
   decorateProductEntryCTA = () => {
-    const button = this.content.querySelector('.product-entry-cta a');
+    const buttons = this.content.querySelectorAll('.product-entry-cta a');
+    const button = buttons[window.adobeIMS.isSignedInUser() && buttons.length > 1 ? 1 : 0];
+
     if (!button) return null;
     const cta = decorateCta({ elem: button, type: this.getMainNavItemType(button) });
     cta.closest('.feds-cta-wrapper').classList.add('feds-product-entry-cta');
@@ -588,7 +683,7 @@ class Gnav {
   };
 
   decorateTopNav = () => {
-    const { searchEnabled, selfIntegrateUnav, desktopAppsCta = false } = getConfig();
+    const { searchEnabled, selfIntegrateUnav, desktopAppsCta = false, whatsNew } = getConfig();
     const isMiniGnav = this.isMiniGnav();
     this.elements.mobileToggle = this.decorateToggle();
     this.elements.topnav = toFragment`
@@ -599,9 +694,10 @@ class Gnav {
         </div>
         ${searchEnabled === 'on' && isMiniGnav ? toFragment`<div class="feds-client-search"></div>` : ''}
         ${this.elements.navWrapper}
-        ${getMetadata('product-entry-cta')?.toLowerCase() === 'on' ? this.decorateProductEntryCTA() : ''}
+        ${getMetadata('product-entry-cta')?.toLowerCase() === 'on' ? toFragment`<div class="feds-product-entry-cta-placeholder"></div>` : ''}
         ${searchEnabled === 'on' && !isMiniGnav ? toFragment`<div class="feds-client-search"></div>` : ''}
         ${isMiniGnav && desktopAppsCta ? toFragment`<div class="feds-client-desktop-apps"></div>` : ''}
+        ${whatsNew === 'on' ? toFragment`<div class="feds-client-whatsnew"></div>` : ''}
         ${this.useUniversalNav ? this.blocks.universalNav : ''}
         ${selfIntegrateUnav ? toFragment`<div class="feds-client-unav"></div>` : ''}
         ${(!this.useUniversalNav && this.blocks.profile.rawElem) ? this.blocks.profile.decoratedElem : ''}
@@ -614,7 +710,7 @@ class Gnav {
     if (!this.isLocalNav()) {
       const localNavWrapper = document.querySelector('.feds-localnav');
       if (localNavWrapper) {
-        lanaLog({ message: 'Gnav Localnav was removed, potential CLS', tags: 'gnav-localnav,warn' });
+        lanaLog({ message: 'Gnav Localnav was removed, potential CLS', tags: 'gnav-localnav', severity: 'warning' });
         localNavWrapper.remove();
       }
       return;
@@ -622,7 +718,7 @@ class Gnav {
     const localNavItems = this.elements.navWrapper.querySelector('.feds-nav').querySelectorAll('.feds-navItem:not(.feds-navItem--section, .feds-navItem--mobile-only)');
     const firstElem = localNavItems?.[0]?.querySelector('a, button') || localNavItems?.[0];
     if (!firstElem) {
-      lanaLog({ message: 'GNAV: Incorrect authoring of localnav found.', tags: 'gnav', errorType: 'i' });
+      lanaLog({ message: 'GNAV: Incorrect authoring of localnav found.', tags: 'gnav', errorType: 'i', severity: 'error' });
       return;
     }
     const [title, navTitle = ''] = this.getOriginalTitle(firstElem);
@@ -632,6 +728,7 @@ class Gnav {
         message: 'GNAV: Localnav does not include \'localnav\' in its name.',
         tags: 'gnav',
         errorType: 'i',
+        severity: 'warning',
       });
       localNav = toFragment`<div class="feds-localnav"/>`;
       this.block.after(localNav);
@@ -643,7 +740,7 @@ class Gnav {
     const localNavBtn = toFragment`<button class="feds-navLink--hoverCaret feds-localnav-title" aria-haspopup="true" aria-expanded="false" daa-ll="${title}_localNav|open"></button>`;
     const localNavCurtain = toFragment` <div class="feds-localnav-curtain"></div>`;
     // Skip keyboard navigation on localnav items if it is closed
-    localNav.append(localNavBtn, localNavCurtain, toFragment` <div class="feds-localnav-items" role="list"></div>`, toFragment`<a href="#" class="feds-sr-only feds-localnav-exit">.</a>`);
+    localNav.replaceChildren(localNavBtn, localNavCurtain, toFragment` <div class="feds-localnav-items" role="list"></div>`, toFragment`<a href="#" class="feds-sr-only feds-localnav-exit">.</a>`);
 
     const itemWrapper = localNav.querySelector('.feds-localnav-items');
     const localNavTitle = document.querySelector('.feds-localnav-title');
@@ -682,7 +779,9 @@ class Gnav {
       localNav.querySelector('.feds-localnav-title').setAttribute('daa-ll', `${title}_localNav|${isActive ? 'close' : 'open'}`);
     });
 
-    localNav.querySelector('.feds-navItem--active')?.addEventListener('click', closeAllDropdowns);
+    localNav.querySelector('.feds-navItem--active')?.addEventListener('click', (elem) => {
+      if (!elem.currentTarget.querySelector('.feds-popup')) closeAllDropdowns();
+    });
 
     const curtain = localNav.querySelector('.feds-localnav-curtain');
     curtain.addEventListener('click', (e) => {
@@ -732,7 +831,7 @@ class Gnav {
       </div>
       `;
 
-    this.block.append(
+    this.block.replaceChildren(
       this.elements.curtain,
       this.elements.topnavWrapper,
     );
@@ -792,7 +891,7 @@ class Gnav {
             { default: Search },
           ] = await Promise.all([
             import('./features/search/gnav-search.js'),
-            loadStyles('/eds/blocks/partners-navigation/features/search/gnav-search.css'),
+            loadStyles(rootPath('features/search/gnav-search.css')),
           ]);
           this.Search = Search;
         }
@@ -810,7 +909,7 @@ class Gnav {
 
         resolve();
       } catch (e) {
-        lanaLog({ message: 'GNAV: Error within loadDelayed', e, tags: 'gnav,warn' });
+        lanaLog({ message: 'GNAV: Error within loadDelayed', e, tags: 'gnav', severity: 'error' });
         resolve();
       }
     });
@@ -820,11 +919,12 @@ class Gnav {
 
   imsReady = async () => {
     if (!window.adobeIMS.isSignedInUser() || !this.useUniversalNav) setUserProfile({});
-
-    const tasks = [this.useUniversalNav ? this.decorateUniversalNav : this.decorateProfile];
+    const tasks = [
+      this.useUniversalNav ? this.decorateUniversalNav : this.decorateProfile,
+      this.setUpProductCTA,
+    ];
 
     try {
-      // eslint-disable-next-line no-restricted-syntax
       for await (const task of tasks) {
         await yieldToMain();
         await task();
@@ -835,7 +935,20 @@ class Gnav {
         tags: 'gnav',
         errorType: 'i',
         message: `GNAV: issues within imsReady - ${this.useUniversalNav ? 'decorateUniversalNav' : 'decorateProfile'}`,
+        severity: 'error',
       });
+    }
+  };
+
+  setUpProductCTA = async () => {
+    const placeholder = this.elements.topnav.querySelector('.feds-product-entry-cta-placeholder');
+    if (!placeholder) return;
+
+    const productCta = this.decorateProductEntryCTA();
+    if (productCta) {
+      placeholder.replaceWith(productCta);
+    } else {
+      placeholder.remove();
     }
   };
 
@@ -863,6 +976,7 @@ class Gnav {
         e: `${profileData.statusText} url: ${profileData.url}`,
         tags: 'gnav',
         errorType: 'i',
+        severity: 'error',
       });
       return;
     }
@@ -907,22 +1021,27 @@ class Gnav {
       this.blocks.universalNav?.style.setProperty('min-width', width);
     }
     const config = getConfig();
-    const locale = getUniversalNavLocale(config.locale);
+    const lingoRegion = lingoActive() ? await getLingoRegion() : null;
+    const locale = lingoRegion?.ietf
+      ? lingoRegion.ietf.replace('-', '_')
+      : getUniversalNavLocale(config.locale);
     const environment = config.env.name === 'prod' ? 'prod' : 'stage';
     const visitorGuid = window.alloy ? await window.alloy('getIdentity')
       .then((data) => data?.identity?.ECID).catch(() => undefined) : undefined;
-    const experienceName = getExperienceName();
 
     const getDevice = () => {
       const agent = navigator.userAgent;
-      // eslint-disable-next-line no-restricted-syntax
       for (const [os, osName] of Object.entries(osMap)) {
         if (agent.includes(os)) return osName;
       }
       return 'linux';
     };
 
-    const unavVersion = new URLSearchParams(window.location.search).get('unavVersion') || '1.4';
+    let unavVersion = new URLSearchParams(window.location.search).get('unavVersion');
+    // If versions follow a predictable format (digit.digit), validate using a regex
+    if (!/^\d+(\.\d+)?$/.test(unavVersion)) {
+      unavVersion = '1.5';
+    }
     await Promise.all([
       loadScript(`https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.js`),
       loadStyles(`https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.css`, true),
@@ -946,68 +1065,18 @@ class Gnav {
       return children;
     };
 
-    const onAnalyticsEvent = (data) => {
-      if (!data) return;
-      if (!data.event) data.event = { type: data.type, subtype: data.subtype };
-      if (!data.source) data.source = { name: data.workflow?.toLowerCase().trim() };
-
-      const getInteraction = () => {
-        const {
-          event: { type, subtype } = {},
-          source: { name } = {},
-          content: { name: contentName } = {},
-        } = data;
-
-        switch (`${name}|${type}|${subtype}${contentName ? `|${contentName}` : ''}`) {
-          case 'profile|click|sign-in':
-            return `Sign In|gnav|${experienceName}|unav`;
-          case 'profile|render|component':
-            return `Account|gnav|${experienceName}|unav`;
-          case 'profile|click|account':
-            return `View Account|gnav|${experienceName}|unav`;
-          case 'profile|click|sign-out':
-            return `Sign Out|gnav|${experienceName}|unav`;
-          case 'app-switcher|render|component':
-            return 'AppLauncher.appIconToggle';
-          case `app-switcher|click|app|${contentName}`:
-            return `AppLauncher.appClick.${convertToPascalCase(contentName)}`;
-          case 'app-switcher|click|footer|adobe-home':
-            return 'AppLauncher.adobe.com';
-          case 'app-switcher|click|footer|all-apps':
-            return 'AppLauncher.allapps';
-          case 'app-switcher|click|footer|adobe-dot-com':
-            return 'AppLauncher.adobe.com';
-          case 'app-switcher|click|footer|see-all-apps':
-            return 'AppLauncher.allapps';
-          case 'unc|click|icon':
-            return 'Open Notifications panel';
-          case 'unc|click|link':
-            return 'Open Notification';
-          case 'unc|click|markRead':
-            return 'Mark Notification as read';
-          case 'unc|click|dismiss':
-            return 'Dismiss Notifications';
-          case 'unc|click|markUnread':
-            return 'Mark Notification as unread';
-          default:
-            return null;
-        }
-      };
-      const interaction = getInteraction();
-
-      if (!interaction) return;
-      // eslint-disable-next-line no-underscore-dangle
-      window._satellite?.track('event', {
-        xdm: {},
-        data: { web: { webInteraction: { name: interaction } } },
-      });
-    };
+    let countryCode = getMiloLocaleSettings(getConfig().locale)?.country || 'US';
+    if (isMasGeoDetectionEnabled?.()) {
+      const base = getConfig().miloLibs || getConfig().codeRoot;
+      const { getValidatedMarket } = await import(`${base}/utils/market.js`);
+      countryCode = (await getValidatedMarket() || countryCode).toUpperCase();
+    }
 
     const getConfiguration = () => ({
       target: this.blocks.universalNav,
       env: environment,
       locale,
-      countryCode: getMiloLocaleSettings(getConfig().locale)?.country || 'US',
+      countryCode,
       imsClientId: window.adobeid?.client_id,
       theme: isDarkMode() ? 'dark' : 'light',
       analyticsContext: {
@@ -1019,7 +1088,6 @@ class Gnav {
           os_version: navigator.platform,
         },
         event: { visitor_guid: visitorGuid },
-        onAnalyticsEvent,
       },
       children: getChildren(),
       isSectionDividerRequired: getConfig()?.unav?.showSectionDivider,
@@ -1072,8 +1140,7 @@ class Gnav {
     const [
       webappPrompt,
     ] = await Promise.all([
-      // eslint-disable-next-line import/no-unresolved
-      import('../../features/webapp-prompt/webapp-prompt.js'),
+      import(`${base}/features/webapp-prompt/webapp-prompt.js`),
       loadStyles(`${base}/features/webapp-prompt/webapp-prompt.css`),
     ]);
 
@@ -1255,10 +1322,10 @@ class Gnav {
     const localNav = document.querySelector('.feds-localnav');
 
     document.querySelector('.feds-promo-aside-wrapper').style.height = promoHeight;
-    header.style.top = promoHeight;
+    header.style.top = isSmallScreen.matches ? 0 : promoHeight;
     if (!isDesktop.matches && localNav) {
       header.style.top = 0;
-      localNav.style.top = promoHeight;
+      localNav.style.top = isSmallScreen.matches ? 0 : promoHeight;
     }
     if (!isDesktop.matches) this.updatePopupPosition();
   };
@@ -1269,7 +1336,7 @@ class Gnav {
     const promoPath = getMetadata('gnav-promo-source');
     const fedsPromoWrapper = document.querySelector('.feds-promo-aside-wrapper');
 
-    if (!promoPath || !asideJsPromise) {
+    if (!promoPath || !asideJsPromise || !fedsPromoWrapper) {
       fedsPromoWrapper?.remove();
       this.block.classList.remove('has-promo');
       return this.elements.aside;
@@ -1282,7 +1349,7 @@ class Gnav {
     fedsPromoWrapper.append(this.elements.aside);
 
     if (this.elements.aside.clientHeight > fedsPromoWrapper.clientHeight) {
-      lanaLog({ message: 'Promo height is more than expected, potential CLS', tags: 'gnav-promo', errorType: 'i' });
+      lanaLog({ message: 'Promo height is more than expected, potential CLS', tags: 'gnav-promo', errorType: 'i', severity: 'warning' });
     }
     this.updateGnavTop();
     this.promoResizeObserver?.disconnect();
@@ -1314,24 +1381,21 @@ class Gnav {
       <div class="feds-nav-wrapper" id="feds-nav-wrapper">
         ${breadcrumbs}
         ${isDesktop.matches ? '' : this.decorateSearch()}
-        ${this.decorateShortcutIcons(true)}
         ${this.elements.mainNav}
-        ${this.decorateShortcutIcons(false)}
         ${isDesktop.matches ? this.decorateSearch() : ''}
       </div>
     `;
 
     // Get all main menu items, but exclude any that are nested inside other features
-    const items = [...this.content.querySelectorAll('h2, p:only-child > strong > a, p:only-child > em > a')]
+    const items = [...this.content.querySelectorAll('h2, p:only-child > strong > a, p:only-child > em > a, p:only-child > a.merch')]
       .filter((item) => CONFIG.features.every((feature) => !item.closest(`.${feature}`)));
 
     // Save number of items to decide whether a hamburger menu is required
     this.mainNavItemCount = items.length;
 
-    // eslint-disable-next-line no-restricted-syntax
     for await (const [index, item] of items.entries()) {
       await yieldToMain();
-      const mainNavItem = this.decorateMainNavItem(item, index);
+      const mainNavItem = await this.decorateMainNavItem(item, index);
       if (mainNavItem) {
         this.elements.mainNav.appendChild(mainNavItem);
       }
@@ -1368,34 +1432,51 @@ class Gnav {
     if (!popup) return;
     const hasPromo = this.block.classList.contains('has-promo');
     const promoHeight = this.elements.aside?.clientHeight;
+    const languageBanner = document.querySelector('.language-banner');
+    const languageBannerHeight = languageBanner?.offsetHeight || 0;
 
-    if (!this.isLocalNav()) {
-      if (hasPromo) popup.style.top = `calc(0px - var(--feds-height-nav) - ${promoHeight}px)`;
-      return;
-    }
+    const isLocalNav = this.isLocalNav();
     const yOffset = window.scrollY || Math.abs(parseInt(document.body.style.top, 10)) || 0;
+
+    // Handle initial positioning for non-local nav (promo + visible language banner)
+    if (!isLocalNav && (hasPromo || languageBanner)) {
+      const langBannerNewHeight = languageBanner ? Math.max(0, languageBannerHeight - yOffset) : 0;
+      const totalOffsetHeight = (hasPromo ? promoHeight : 0) + langBannerNewHeight;
+      popup.style.top = `calc(0px - var(--feds-height-nav) - ${totalOffsetHeight}px)`;
+      if (isSmallScreen) return;
+    }
     const navOffset = hasPromo ? `var(--feds-height-nav) - ${promoHeight}px` : 'var(--feds-height-nav)';
     popup.removeAttribute('style');
-    popup.style.top = `calc(${yOffset}px - ${navOffset} - 2px)`;
+    if (isLocalNav) {
+      const langBannerOffset = languageBanner ? languageBannerHeight : 0;
+      popup.style.top = `calc(${yOffset}px - ${navOffset} - ${langBannerOffset}px - 2px)`;
+    }
     const { isPresent, isSticky, height } = getBranchBannerInfo();
     if (isPresent) {
       const delta = yOffset - height;
       if (isSticky) {
         popup.style.height = `calc(100dvh - ${height}px + 2px)`;
       } else {
-        popup.style.top = `calc(0px - var(--feds-height-nav) + ${Math.max(delta, 0)}px - 2px)`;
+        popup.style.top = `calc(0px - var(--feds-height-nav) + ${!isLocalNav ? 0 : Math.max(delta, 0)}px - 2px)`;
         popup.style.height = `calc(100dvh + ${Math.min(delta, 0)}px + 2px)`;
       }
     }
   };
 
-  decorateMainNavItem = (item, index) => {
+  decorateMainNavItem = async (item, index) => {
     performance.mark(`Decorate-MainNav-Item-${index}-Start`);
     const itemType = this.getMainNavItemType(item);
 
     const itemHasActiveLink = ['syncDropdownTrigger', 'link'].includes(itemType)
       && getActiveLink(item.closest('div')) instanceof HTMLElement;
     const activeModifier = itemHasActiveLink ? ` ${selectors.activeNavItem.slice(1)}` : '';
+
+    const getDropdownMetadata = (elem) => Object.fromEntries(
+      [...(elem?.querySelectorAll(':scope > div') || [])].map((row) => {
+        const [key, val] = [...row.querySelectorAll(':scope > div')].map((d) => d.textContent.trim());
+        return [key, val];
+      }).filter(([k]) => k),
+    );
 
     const makeTabActive = (popup) => {
       if (popup.classList.contains('loading')) return;
@@ -1506,6 +1587,14 @@ class Gnav {
               updatePopupPosition: this.updatePopupPosition,
             });
             if (popup.closest('section.feds-dropdown--active')) makeTabActive(popup);
+          } catch (e) {
+            const errorDiv = await createErrorPopup();
+            const loadingElement = template.querySelector('.feds-popup');
+            const topBar = loadingElement.querySelector('.top-bar');
+            const closeIcon = document.querySelector('.feds-popup .close-icon');
+            if (loadingElement) loadingElement.replaceWith(errorDiv);
+            if (closeIcon) errorDiv.append(closeIcon);
+            if (topBar) errorDiv.prepend(topBar);
           } finally {
             if (this.isLocalNav()) {
               decorateLocalNavItems(item, template);
@@ -1532,6 +1621,10 @@ class Gnav {
             enableMobileScroll();
             if (isDesktop.matches) {
               newPopup.innerHTML = desktopMegaMenuHTML ?? loadingDesktopMegaMenuHTML;
+              if (newPopup.classList.contains('error')) {
+                const errorDiv = await createErrorPopup();
+                if (newPopup) newPopup.replaceWith(errorDiv);
+              }
               this.block.classList.remove('new-nav');
               disableAriaHidden();
               removeA11YMobileDropdowns();
@@ -1561,10 +1654,11 @@ class Gnav {
     };
 
     // Decorate item based on its type
-    const returnValue = (() => {
+    const returnValue = await (async () => {
       switch (itemType) {
         case 'syncDropdownTrigger':
         case 'asyncDropdownTrigger': {
+          if (shouldBlockFreeTrialLinks(item)) return null;
           const dropdownTrigger = toFragment`<button
             class="feds-navLink feds-navLink--hoverCaret"
             aria-expanded="false"
@@ -1578,8 +1672,13 @@ class Gnav {
           const tag = isSectionMenu ? 'section' : 'div';
           const sectionModifier = isSectionMenu ? ' feds-navItem--section' : '';
           const sectionDaaLh = isSectionMenu ? ` daa-lh='${getAnalyticsValue(item.textContent)}'` : '';
+          const metadataEl = item.parentElement?.querySelector('.gnav-dropdown-metadata');
+          const metadata = getDropdownMetadata(metadataEl);
+          metadataEl?.remove();
+          const fullWidthModifier = metadata['full-width']?.toLowerCase() === 'true' ? ' full-width' : '';
+
           const triggerTemplate = toFragment`
-            <${tag} role="listitem" class="feds-navItem${sectionModifier}${activeModifier}" ${sectionDaaLh}>
+            <${tag} role="listitem" class="feds-navItem${sectionModifier}${activeModifier}${fullWidthModifier}" ${sectionDaaLh}>
               ${dropdownTrigger}
             </${tag}>`;
 
@@ -1615,12 +1714,16 @@ class Gnav {
           item.parentElement.replaceWith(item);
 
           return addMepHighlightAndTargetId(toFragment`<div class="feds-navItem feds-navItem--centered" role="listitem">
-              ${decorateCta({ elem: item, type: itemType, index: index + 1 })}
+              ${decorateCta({ elem: item.classList.contains('merch') ? await (await import(`${miloLibs}/blocks/merch/merch.js`)).default(item) : item, type: itemType, index: index + 1 })}
             </div>`, item);
         case 'link': {
           let customLinkModifier = '';
           let removeCustomLink = false;
-          const linkElem = item.querySelector('a');
+          let linkElem = item.querySelector('a');
+          if (shouldBlockFreeTrialLinks(linkElem)) return null;
+          if (linkElem.classList.contains('merch')) {
+            linkElem = await (await import(`${miloLibs}/blocks/merch/merch.js`)).default(linkElem);
+          }
           const customLinksSection = item.closest('.link-group');
           linkElem.className = 'feds-navLink';
           linkElem.setAttribute('daa-ll', getAnalyticsValue(linkElem.textContent, index + 1));
@@ -1653,10 +1756,24 @@ class Gnav {
             </div>`;
           return removeCustomLink ? '' : addMepHighlightAndTargetId(linkTemplate, item);
         }
-        case 'text':
+        case 'text': {
+          let isBlack = false;
+          const isMerch = item.classList.contains('merch');
+          // Check for (black) in text content
+          if (isMerch && (item.textContent.match(/\(black\)$/i) || item.innerText.match(/\(black\)$/i))) {
+            isBlack = true;
+            // Remove (black) from the text content so merch.default sees the clean text
+            item.textContent = item.textContent.replace(/\s*\(black\)$/i, '');
+          }
+          const content = isMerch ? await (await import(`${miloLibs}/blocks/merch/merch.js`)).default(item) : item.textContent;
+          if (isBlack && content instanceof HTMLElement) {
+            content.classList.add('feds-navLink--black');
+          }
+
           return addMepHighlightAndTargetId(toFragment`<div class="feds-navItem feds-navItem--centered">
-              ${item.textContent}
+              ${content}
             </div>`, item);
+        }
         default:
           /* c8 ignore next 3 */
           return addMepHighlightAndTargetId(toFragment`<div class="feds-navItem feds-navItem--centered">
@@ -1674,7 +1791,7 @@ class Gnav {
     if (this.elements.breadcrumbsWrapper) return this.elements.breadcrumbsWrapper;
     const breadcrumbsElem = this.block.querySelector('.breadcrumbs');
     // Breadcrumbs are not initially part of the nav, need to decorate the links
-    if (breadcrumbsElem) decorateLinks(breadcrumbsElem);
+    if (breadcrumbsElem) await decorateLinksAsync(breadcrumbsElem);
     if (!breadCrumbsJsPromise) return null;
     const { default: createBreadcrumbs } = await breadCrumbsJsPromise;
     this.elements.breadcrumbsWrapper = await createBreadcrumbs(breadcrumbsElem);
@@ -1728,6 +1845,7 @@ export default async function init(block) {
     error.tags = 'gnav';
     error.url = url;
     error.errorType = 'e';
+    error.severity = 'error';
     lanaLog({ message: error.message, ...error });
     throw error;
   }
