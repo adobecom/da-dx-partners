@@ -29,33 +29,33 @@ test.describe('Search Page', () => {
       await searchPage.searchField.press('Enter');
       await searchPage.waitForResultsToSettle();
       await searchPage.searchAllResults.waitFor({ state: 'visible' });
-      const numberResults = await searchPage.getNumberOfResults();
-      await expect(numberResults).toBeGreaterThanOrEqual(6);
+      await expect.poll(
+        async () => await searchPage.getNumberOfResults(),
+        { timeout: 15000 }
+      ).toBeGreaterThanOrEqual(6);
     });
     await test.step('Asset Card Content Validation', async () => {
       const card = searchPage.getCardByTitle(data.cardTitle);
       await searchPage.clickCard(card);
-
-      const cardDate = searchPage.getCardDateLocator(card);
-      await expect(cardDate).toBeVisible();
-      const dateText = await cardDate.textContent();
-      expect(dateText).toContain(data.cardDate);
-
-      const cardSize = searchPage.getCardSizeLocator(card);
-      await expect(cardSize).toBeVisible();
-      const sizeText = await cardSize.textContent();
-      expect(sizeText).toContain(data.cardSize);
-      await card.scrollIntoViewIfNeeded();
-
+      await page.waitForLoadState('domcontentloaded');
       await searchPage.waitForCardToExpand(card);
+
       const expandedCard = searchPage.getExpandedCard().first();
       await expect(expandedCard).toBeVisible();
+    
+      const cardDate = searchPage.getCardDateLocator(expandedCard);
+      await expect(cardDate).toBeVisible();
+      await expect(cardDate).toContainText(data.cardDate);
+    
+      const cardSize = searchPage.getCardSizeLocator(expandedCard);
+      await expect(cardSize).toBeVisible();
+      await expect(cardSize).toContainText(data.cardSize);
+    
       for (const tagText of data.cardTags) {
         const tag = expandedCard.locator(`text=${tagText}`);
         await expect(tag).toBeVisible();
       }
-
-      await searchPage.verifyCardButtonLink(card, data.cardButtonLink);
+      await searchPage.verifyCardButtonLink(expandedCard, data.cardButtonLink);
     });
 
     await test.step('Check Silver Asset', async () => {
