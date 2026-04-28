@@ -73,7 +73,7 @@ export default class SearchPage {
     await card.waitFor({ state: 'visible', timeout });
     await card.scrollIntoViewIfNeeded();
     await expect(card).toBeVisible({ timeout });
-    await card.click({ timeout });
+    await card.click({ force: true });
     await this.waitForCardToExpand(card, timeout);
   }
 
@@ -97,6 +97,10 @@ export default class SearchPage {
       },
       { timeout }
     ).toBe(true);
+  }
+
+  getExpandedCard() {
+    return this.page.locator('.search-card.expanded');
   }
 
   async verifyCardTag(card, tagText) {

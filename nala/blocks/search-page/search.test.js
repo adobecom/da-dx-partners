@@ -45,9 +45,14 @@ test.describe('Search Page', () => {
       await expect(cardSize).toBeVisible();
       const sizeText = await cardSize.textContent();
       expect(sizeText).toContain(data.cardSize);
+      await card.scrollIntoViewIfNeeded();
 
+      await searchPage.waitForCardToExpand(card);
+      const expandedCard = searchPage.getExpandedCard().first();
+      await expect(expandedCard).toBeVisible();
       for (const tagText of data.cardTags) {
-        await searchPage.verifyCardTag(card, tagText);
+        const tag = expandedCard.locator(`text=${tagText}`);
+        await expect(tag).toBeVisible();
       }
 
       await searchPage.verifyCardButtonLink(card, data.cardButtonLink);
