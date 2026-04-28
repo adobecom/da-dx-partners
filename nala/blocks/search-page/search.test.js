@@ -73,19 +73,32 @@ test.describe('Search Page', () => {
     await test.step('Search for asset', async () => {
       await searchPage.searchField.fill(data.searchKeyword);
       await searchPage.searchField.press('Enter');
-      await searchPage.waitForResultsToSettle();
-      const numberResults = await searchPage.getNumberOfResults();
-      await expect(numberResults).toBeGreaterThanOrEqual(4);
+      const initialResults = await signInPage.getNumberOfResults();
+      await expect.poll(
+        async () => await signInPage.getNumberOfResults(),
+        { timeout: 15000 },
+      ).not.toBe(initialResults);
+
+      await expect.poll(
+        async () => await signInPage.getNumberOfResults(),
+        { timeout: 15000 },
+      ).toBe(4);
     });
     await test.step('Check Filter Journey Phase Explore', async () => {
       await searchPage.journeyPhaseFilter.click();
       await searchPage.journeyPhaseFilterPanel.waitFor({ state: 'visible', timeout: 30000 });
+      const initialTitle = await searchPage.getCardTitle(); 
       await searchPage.exploreCheckBox.click();
       await expect(searchPage.exploreCheckBox).toBeChecked();
-      await searchPage.waitForResultsToSettle();
 
-      const firstCardTitle = await searchPage.getCardTitle();
-      await expect(firstCardTitle).toBe(data.assetTitle1);
+      await expect.poll(
+        async () => await searchPage.getCardTitle(),
+        { timeout: 15000 }
+      ).not.toBe(initialTitle);
+      await expect.poll(
+        async () => await searchPage.getCardTitle(),
+        { timeout: 15000 }
+      ).toBe(data.assetTitle1);
     });
     await test.step('Check Filter Journey Phase Discover', async () => {
       await searchPage.discoverCheckBox.click();

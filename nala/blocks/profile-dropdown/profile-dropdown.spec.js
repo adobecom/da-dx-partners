@@ -32,8 +32,8 @@ export default {
       tags: '@da-dx-profile-dropdown @regression @circleCi',
       data: {
         partnerLevel: 'cpp-distributor-india:',
-        profileName: 'Yugo Stage CPP Distributor APAC India',
-        profileEmail: 'yugo-stage-c…@yopmail.com',
+        profileName: 'DONOT USE Yugo Stage Distributor India APAC',
+        profileEmail: 'yugo-test+cp…@adobetest.com',
         manageCompanyAccountLink: '/digitalexperience/home/',
         signOutLink: '/digitalexperience/',
       },
