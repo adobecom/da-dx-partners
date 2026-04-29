@@ -87,4 +87,55 @@ test.describe('Validate profile dropdown block', () => {
       await expect(page.url()).toContain(features[2].data.signOutLink);
     });
   });
+  // @dxp-404-page-profile-dropdown-validation
+  test(`${features[3].name},${features[3].tags}`, async ({ page }) => {
+    let secondPage;
+    let secondProfileDropdownPage;
+
+    await test.step('Go to profile dropdown page', async () => {
+      await page.goto(`${features[3].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${features[3].data.partnerLevel}`);
+      await profileDropdownPage.profileDropdownButton.waitFor({
+        state: 'visible',
+        timeout: 10000,
+      });
+    });
+    await test.step('Open 404 page and verify profile dropdown', async () => {
+      secondPage = await page.context().newPage();
+      await secondPage.goto(`${features[3].pathSecondTab}`);
+      await secondPage.waitForLoadState('domcontentloaded');
+      secondProfileDropdownPage = new ProfileDropdownPage(secondPage);
+
+      await secondProfileDropdownPage.profileDropdown.click();
+      await expect(secondProfileDropdownPage.profileIcon).toBeVisible();
+      await expect(secondProfileDropdownPage.profileName).toHaveText(features[3].data.profileName);
+      await expect(secondProfileDropdownPage.profileEmail).toContainText(features[3].data.profileEmail);
+      await expect(secondProfileDropdownPage.profileJob).toBeVisible();
+      await expect(secondProfileDropdownPage.profileJob).toHaveText(features[3].data.profileJob);
+      await expect(secondProfileDropdownPage.partnerLevelDropdown).toBeVisible();
+      await expect(secondProfileDropdownPage.partnerLevelDropdown).toHaveText(
+        features[3].data.partnerLevelDropdown
+      );
+      await expect(secondProfileDropdownPage.updateProfile).toBeVisible();
+      await expect(secondProfileDropdownPage.updateProfile).toHaveAttribute(
+        'href',
+        features[3].data.updateProfileLink
+      );
+      await expect(secondProfileDropdownPage.manageCompanyAccount).toBeVisible();
+      await expect(secondProfileDropdownPage.manageCompanyAccount).toHaveAttribute(
+        'href',
+        features[3].data.manageCompanyAccountLink
+      );
+    });
+    await test.step('Verify sign out redirection', async () => {
+      await expect(secondProfileDropdownPage.signOut).toBeVisible();
+      await secondProfileDropdownPage.signOut.click();
+      await secondPage.waitForLoadState('domcontentloaded');
+      await expect(secondPage).toHaveURL(
+        new RegExp(features[3].data.signOutLink)
+      );
+    });
+  });
 });
