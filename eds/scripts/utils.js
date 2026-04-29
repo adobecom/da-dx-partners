@@ -9,6 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+import moment from '../libs/deps/moment-timezone.min.js';
 import {DX_COMPLIANCE_STATUS, DX_PROGRAM_TYPE, DX_SPECIAL_STATE} from "../blocks/utils/dxConstants.js";
 
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
@@ -58,19 +59,30 @@ export const prodHosts = [
  * Note: This file should have no self-invoking functions.
  * ------------------------------------------------------------
  */
-export function formatDate(cardDate, locale = 'en-US') {
+export function formatDate(cardDate, locale = 'en-US', isEventCard = false) {
   if (!cardDate) return;
 
   const dateObject = new Date(cardDate);
-  const options = {
+
+  const formattedDate = dateObject.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  };
+  });
 
-  const formattedDate = dateObject.toLocaleString(locale, options);
   // eslint-disable-next-line consistent-return
-  return formattedDate;
+  if (!isEventCard) return formattedDate;
+
+  const formattedTime = dateObject.toLocaleTimeString(locale, {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+
+  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const formattedLocalTimeZone = moment.tz(dateObject, userTimeZone).zoneAbbr() || '';
+
+  // eslint-disable-next-line consistent-return
+  return `${formattedDate} | ${formattedTime} ${formattedLocalTimeZone}`;
 }
 
 export function getLocale(locales, pathname = window.location.pathname) {
