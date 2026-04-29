@@ -35,33 +35,33 @@ test.describe('Search Page', () => {
       ).toBeGreaterThanOrEqual(6);
     });
     await test.step('Asset Card Content Validation', async () => {
-      const card = searchPage.getCardByTitle(data.cardTitle);
-      await searchPage.clickCard(card);
+      await expect(async () => {
+        const card = searchPage.getCardByTitle(data.cardTitle);
+        await searchPage.clickCard(card);
+        await page.waitForLoadState('domcontentloaded');
+        const expanded = await card.evaluate(el =>
+          el.classList.contains('expanded')
+        );
 
-      const expandedCard = searchPage.getExpandedCardByTitle
-        ? searchPage.getExpandedCardByTitle(data.cardTitle)
-        : card;
+        expect(expanded).toBe(true);
+      }).toPass({ timeout: 30000 });
+      const expandedCard = searchPage
+        .getExpandedCard()
+        .filter({ hasText: data.cardTitle })
+        .first();
       await expect(expandedCard).toBeVisible({ timeout: 30000 });
 
       const cardDate = searchPage.getCardDateLocator(expandedCard);
-      if (searchPage.waitForCardDateReady) {
-        await searchPage.waitForCardDateReady(expandedCard, 30000);
-      } else {
-        await cardDate.scrollIntoViewIfNeeded().catch(() => {});
-        await expect
-          .poll(async () => cardDate.isVisible(), { timeout: 30000, intervals: [100, 250, 500] })
-          .toBeTruthy();
-      }
       await expect(cardDate).toContainText(data.cardDate);
 
       const cardSize = searchPage.getCardSizeLocator(expandedCard);
-      await expect(cardSize).toBeVisible({ timeout: 30000 });
       await expect(cardSize).toContainText(data.cardSize);
 
       for (const tagText of data.cardTags) {
         const tag = searchPage.getCardTagByText(expandedCard, tagText);
         await expect(tag).toBeVisible({ timeout: 30000 });
       }
+
       await searchPage.verifyCardButtonLink(expandedCard, data.cardButtonLink);
     });
 
