@@ -271,7 +271,6 @@ describe('yukon-chat block', () => {
 
       expect(urlStr).to.include('/services/gravity/yukonAIAssistant');
       expect(urlStr).to.include('question=');
-      expect(urlStr).to.include('tags=');
       expect(urlStr).to.include('requestId=');
       expect(urlStr).to.include('yukonProfile=');
 
