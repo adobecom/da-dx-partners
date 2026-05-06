@@ -12,7 +12,7 @@ test.describe('Search Page', () => {
     searchPage = new SearchPage(page);
     signInPage = new SignInPage(page);
   });
-  test(`${features[0].name},${features[0].tags}`, async ({ page, browserName, context }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ page }) => {
     const { data } = features[0];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[0].path}`);
@@ -95,7 +95,7 @@ test.describe('Search Page', () => {
       const cardTitle2 = await searchPage.getCardTitle();
       await expect(cardTitle2).toBe(data.assetTitle2);
     });
-    await test.step('Check Filter Functionality Analysis & Insights', async () => { 
+    await test.step('Check Filter Functionality Analysis & Insights', async () => {
       await searchPage.functionalityFilter.click();
       await searchPage.functionalityFilterPanel.waitFor({ state: 'visible', timeout: 30000 });
       await searchPage.analysisInsgightCheckBox.click();
@@ -120,43 +120,18 @@ test.describe('Search Page', () => {
       await expect(cardDate).toBeVisible({ timeout: 15000 });
     });
   });
-  test(`${features[2].name},${features[2].tags}`, async ({ page, context }) => {
+  test(`${features[2].name},${features[2].tags}`, async ({ page }) => {
     const { data } = features[2];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[2].path}`);
       await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Verify asset details', async () => {
-      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
-      // asset date
-      await expect(searchPage.assetDate).toBeVisible();
-      const assetDate = await searchPage.assetDate.textContent();
-      const dateValue = assetDate.replace('Date: ', '').trim();
-      await expect(dateValue).toContain(data.assetDateValue);
-      // asset summary
-      await expect(searchPage.assetSummary).toBeVisible();
-      // asset type
-      await expect(searchPage.assetType).toBeVisible();
-      const assetType = await searchPage.assetType.textContent();
-      const typeValue = assetType.replace('Type: ', '').trim();
-      await expect(typeValue).toBe(data.assetTypeValue);
-      // asset tags
-      await expect(searchPage.assetTags).toBeVisible();
-      const assetTags = await searchPage.assetTags.textContent();
-      const tagsValue = assetTags.replace('Tags: ', '').trim().toLowerCase();
-      for (const tag of data.assetTagsValue) {
-        await expect(tagsValue).toContain(tag.toLowerCase());
-      }
-      // asset size
-      await expect(searchPage.assetSize).toBeVisible();
-      const assetSize = await searchPage.assetSize.textContent();
-      const sizeValue = assetSize.replace('Size: ', '').trim();
-      await expect(sizeValue).toContain(data.assetSizeValue);
+      await searchPage.verifyAssetDetails(data);
     });
 
     await test.step('View Asset', async () => {
-
-      const [newTab] = await Promise.all([
+    const [newTab] = await Promise.all([
         page.waitForEvent('popup'),
         searchPage.viewAssetButton.click(),
       ]);
@@ -169,42 +144,14 @@ test.describe('Search Page', () => {
       await searchPage.downloadAssetButton.isVisible();
     });
   });
-  test(`${features[3].name},${features[3].tags}`, async ({ page, context }) => {
+  test(`${features[3].name},${features[3].tags}`, async ({ page }) => {
     const { data } = features[3];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[3].path}`);
       await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Verify asset details', async () => {
-      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
-      // asset date
-      await expect(searchPage.assetDate).toBeVisible();
-      const assetDate = await searchPage.assetDate.textContent();
-      const dateValue = assetDate.replace('Date: ', '').trim();
-      await expect(dateValue).toContain(data.assetDateValue);
-      // asset summary
-      await expect(searchPage.assetSummary).toBeVisible();
-      const assetSummary = await searchPage.assetSummary.textContent();
-      const summaryValue = assetSummary.replace('Summary: ', '').trim();
-      await expect(summaryValue).toBe(data.assetSummaryValue);
-      // asset type
-      await expect(searchPage.assetType).toBeVisible();
-      const assetType = await searchPage.assetType.textContent();
-      const typeValue = assetType.replace('Type: ', '').trim();
-      await expect(typeValue).toBe(data.assetTypeValue);
-      // asset tags
-      await expect(searchPage.assetTags).toBeVisible();
-      const assetTags = await searchPage.assetTags.textContent();
-      const tagsValue = assetTags.replace('Tags: ', '').trim().toLowerCase();
-      for (const tag of data.assetTagsValue) {
-        await expect(tagsValue).toContain(tag.toLowerCase());
-      }
-      // asset size
-      await expect(searchPage.assetSize).toBeVisible();
-      const assetSize = await searchPage.assetSize.textContent();
-      const sizeValue = assetSize.replace('Size: ', '').trim();
-      await expect(sizeValue).toContain(data.assetSizeValue);
-
+      await searchPage.verifyAssetDetails(data);
       await expect(searchPage.downloadAssetButton).toBeHidden();
     });
     await test.step('Logged in user asset validation', async () => {
@@ -236,35 +183,7 @@ test.describe('Search Page', () => {
       await page.waitForLoadState('domcontentloaded');
     });
     await test.step('Verify asset details without login', async () => {
-      await expect(searchPage.assetTitlePreview).toBeVisible();
-      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
-      await expect(searchPage.downloadPPTButton).toBeHidden();
-      await expect(searchPage.accessToViewOrDownloadText).toBeVisible();
-
-      // asset date
-      await expect(searchPage.assetDate).toBeVisible();
-      const assetDate = await searchPage.assetDate.textContent();
-      const dateValue = assetDate.replace('Date: ', '').trim();
-      await expect(dateValue).toContain(data.assetDateValue);
-      // asset summary
-      await expect(searchPage.assetSummary).toBeVisible();
-      // asset type
-      await expect(searchPage.assetType).toBeVisible();
-      const assetType = await searchPage.assetType.textContent();
-      const typeValue = assetType.replace('Type: ', '').trim();
-      await expect(typeValue).toBe(data.assetTypeValue);
-      // asset tags
-      await expect(searchPage.assetTags).toBeVisible();
-      const assetTags = await searchPage.assetTags.textContent();
-      const tagsValue = assetTags.replace('Tags: ', '').trim().toLowerCase();
-      for (const tag of data.assetTagsValue) {
-        await expect(tagsValue).toContain(tag.toLowerCase());
-      }
-      // asset size
-      await expect(searchPage.assetSize).toBeVisible();
-      const assetSize = await searchPage.assetSize.textContent();
-      const sizeValue = assetSize.replace('Size: ', '').trim();
-      await expect(sizeValue).toContain(data.assetSizeValue);
+      await searchPage.verifyAssetDetails(data);
     });
     await test.step('Logged in user asset validation', async () => {
       await signInPage.signInButton.click();
@@ -285,38 +204,7 @@ test.describe('Search Page', () => {
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
     await test.step('Verify asset details without login', async () => {
-      await expect(searchPage.assetTitlePreview).toBeVisible();
-      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
-      await expect(searchPage.downloadPPTButton).toBeHidden();
-
-      // asset date
-      await expect(searchPage.assetDate).toBeVisible();
-      const assetDate = await searchPage.assetDate.textContent();
-      const dateValue = assetDate.replace('Date: ', '').trim();
-      await expect(dateValue).toContain(data.assetDateValue);
-      // asset summary
-      await expect(searchPage.assetSummary).toBeVisible();
-      const assetSummary = await searchPage.assetSummary.textContent();
-      const summaryValue = assetSummary.replace('Summary: ', '').trim();
-      await expect(summaryValue).toBe(data.assetSummaryValue);
-      // asset type
-      await expect(searchPage.assetType).toBeVisible();
-      const assetType = await searchPage.assetType.textContent();
-      const typeValue = assetType.replace('Type: ', '').trim();
-      await expect(typeValue).toBe(data.assetTypeValue);
-      // asset tags
-      await expect(searchPage.assetTags).toBeVisible();
-      const assetTags = await searchPage.assetTags.textContent();
-      const tagsValue = assetTags.replace('Tags: ', '').trim().toLowerCase();
-      for (const tag of data.assetTagsValue) {
-        await expect(tagsValue).toContain(tag.toLowerCase());
-      }
-      // asset size
-      await expect(searchPage.assetSize).toBeVisible();
-      const assetSize = await searchPage.assetSize.textContent();
-      const sizeValue = assetSize.replace('Size: ', '').trim();
-      await expect(sizeValue).toContain(data.assetSizeValue);
-
+      await searchPage.verifyAssetDetails(data);
       await expect(searchPage.downloadZIPButton).toBeVisible();
     });
   });
@@ -330,40 +218,10 @@ test.describe('Search Page', () => {
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
     await test.step('Verify asset details without login', async () => {
-      await expect(searchPage.assetTitlePreview).toBeVisible();
-      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
-      await expect(searchPage.downloadPPTButton).toBeHidden();
-
-      // asset date
-      await expect(searchPage.assetDate).toBeVisible();
-      const assetDate = await searchPage.assetDate.textContent();
-      const dateValue = assetDate.replace('Date: ', '').trim();
-      await expect(dateValue).toContain(data.assetDateValue);
-      // asset summary
-      await expect(searchPage.assetSummary).toBeVisible();
-      const assetSummary = await searchPage.assetSummary.textContent();
-      const summaryValue = assetSummary.replace('Summary: ', '').trim();
-      await expect(summaryValue).toBe(data.assetSummaryValue);
-      // asset type
-      await expect(searchPage.assetType).toBeVisible();
-      const assetType = await searchPage.assetType.textContent();
-      const typeValue = assetType.replace('Type: ', '').trim();
-      await expect(typeValue).toBe(data.assetTypeValue);
-      // asset tags
-      await expect(searchPage.assetTags).toBeVisible();
-      const assetTags = await searchPage.assetTags.textContent();
-      const tagsValue = assetTags.replace('Tags: ', '').trim().toLowerCase();
-      for (const tag of data.assetTagsValue) {
-        await expect(tagsValue).toContain(tag.toLowerCase());
-      }
-      // asset size
-      await expect(searchPage.assetSize).toBeVisible();
-      const assetSize = await searchPage.assetSize.textContent();
-      const sizeValue = assetSize.replace('Size: ', '').trim();
-      await expect(sizeValue).toContain(data.assetSizeValue);
+      await searchPage.verifyAssetDetails(data);
     });
   });
-  test (`${features[7].name},${features[7].tags}`, async ({ page }) => {
+  test(`${features[7].name},${features[7].tags}`, async ({ page }) => {
     const { data } = features[7];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[7].path}`);
@@ -373,37 +231,7 @@ test.describe('Search Page', () => {
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
     await test.step('Verify asset details', async () => {
-      await expect(searchPage.assetTitlePreview).toBeVisible();
-      await expect(searchPage.assetTitlePreview.locator('p')).toHaveText(data.assetTitle, { timeout: 15000 });
-      await expect(searchPage.downloadPPTButton).toBeHidden();
-
-      // asset date
-      await expect(searchPage.assetDate).toBeVisible();
-      const assetDate = await searchPage.assetDate.textContent();
-      const dateValue = assetDate.replace('Date: ', '').trim();
-      await expect(dateValue).toContain(data.assetDateValue);
-      // asset summary
-      await expect(searchPage.assetSummary).toBeVisible();
-      const assetSummary = await searchPage.assetSummary.textContent();
-      const summaryValue = assetSummary.replace('Summary: ', '').trim();
-      await expect(summaryValue).toBe(data.assetSummaryValue);
-      // asset type
-      await expect(searchPage.assetType).toBeVisible();
-      const assetType = await searchPage.assetType.textContent();
-      const typeValue = assetType.replace('Type: ', '').trim();
-      await expect(typeValue).toBe(data.assetTypeValue);
-      // asset tags
-      await expect(searchPage.assetTags).toBeVisible();
-      const assetTags = await searchPage.assetTags.textContent();
-      const tagsValue = assetTags.replace('Tags: ', '').trim().toLowerCase();
-      for (const tag of data.assetTagsValue) {
-        await expect(tagsValue).toContain(tag.toLowerCase());
-      }
-      // asset size
-      await expect(searchPage.assetSize).toBeVisible();
-      const assetSize = await searchPage.assetSize.textContent();
-      const sizeValue = assetSize.replace('Size: ', '').trim();
-      await expect(sizeValue).toContain(data.assetSizeValue);
+      await searchPage.verifyAssetDetails(data);
     });
   });
   test(`${features[8].name},${features[8].tags}`, async ({ page, context }) => {
@@ -494,6 +322,118 @@ test.describe('Search Page', () => {
       await searchPage.waitForNumberOfResults(4);
       const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
+    });
+  });
+
+  test(`${features[10].name},${features[10].tags}`, async ({ page, context }) => {
+    const { data } = features[10];
+    const sharedData = features.find(f => f.tcid === '8')?.data;
+
+    await test.step('Go to search page', async () => {
+      await page.goto(`${features[10].path}`);
+      await page.waitForLoadState('domcontentloaded');
+    });
+
+    await test.step('Check asset details', async () => {
+      await searchPage.verifyAssetDetails(sharedData);
+    });
+
+    await test.step('Verify asset restricted preview message', async () => {
+      await searchPage.verifyPreviewMessage(data)
+    });
+
+    await test.step('Verify register link', async () => {
+      const [newPage] = await Promise.all([
+        context.waitForEvent('page'),
+        searchPage.clickLinkFromMessage(data.textBlock, data.link[0].text)
+      ]);
+      await newPage.waitForLoadState();
+      await expect(newPage).toHaveURL(data.link[0].url);
+    });
+  });
+
+  test(`${features[11].name},${features[11].tags}`, async ({ page }) => {
+    const { data } = features[11];
+    const sharedData = features.find(f => f.tcid === '8')?.data;
+
+    await test.step('Go to search page', async () => {
+      await page.goto(`${features[11].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Check asset details', async () => {
+      await searchPage.verifyAssetDetails(sharedData);
+    });
+
+    await test.step('Verify asset restricted preview message', async () => {
+      await searchPage.verifyPreviewMessage(data)
+    });
+
+    await test.step('Verify silver-membership link', async () => {
+      await expect(
+        searchPage.restrictedMessageBox
+          .locator('a', { hasText: data.link[0].text })
+      ).toHaveAttribute('href', data.link[0].url);
+    });
+  });
+
+  test(`${features[12].name},${features[12].tags}`, async ({ page }) => {
+    const { data } = features[12];
+    const sharedData = features.find(f => f.tcid === '8')?.data;
+
+    await test.step('Go to search page', async () => {
+      await page.goto(`${features[12].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Check asset details', async () => {
+      await searchPage.verifyAssetDetails(sharedData);
+    });
+
+    await test.step('Verify asset restricted preview message', async () => {
+      await searchPage.verifyPreviewMessage(data)
+    });
+
+    await test.step('Verify upleveling link', async () => {
+      await searchPage.clickLinkFromMessage(
+        data.textBlock,
+        data.link[0].text
+      );
+      await page.waitForURL(data.link[0].url);
+      await expect(page).toHaveURL(data.link[0].url);
+    });
+  });
+
+  test(`${features[13].name},${features[13].tags}`, async ({ page }) => {
+    const { data } = features[13];
+
+    await test.step('Go to search page', async () => {
+      await page.goto(`${features[13].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Verify selected filters', async () => {
+      const filters = ['Industries', 'Content Type', 'Topic', 'Journey Phase'];
+
+      for (const name of filters) {
+        const filter = searchPage.getFilterCount(name);
+        await expect(filter).toBeVisible();
+        await expect(filter).toHaveText('1');
+      }
+    });
+
+    await test.step('Verify asset', async () => {
+      await expect(searchPage.getCardByTitle(data.cardTitle)).toBeVisible();
+      await expect(searchPage.getCardByTitle(data.cardTitle)).toContainText(data.cardTitle);
     });
   });
 });
