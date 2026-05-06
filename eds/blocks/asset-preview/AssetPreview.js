@@ -14,6 +14,7 @@ import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
 export default class AssetPreview extends LitElement {
   static properties = {
@@ -34,6 +35,7 @@ export default class AssetPreview extends LitElement {
     isLoading: { type: Boolean, reflect: true },
     isVideoLoading: { type: Boolean, reflect: true },
     assetPartnerLevel: { type: Array },
+    pdfRendition: { type: String },
   };
 
   constructor() {
@@ -47,6 +49,7 @@ export default class AssetPreview extends LitElement {
     this.isLoading = true;
     this.isVideoLoading = false;
     this.assetPartnerLevel = [];
+    this.pdfRendition = '';
   }
     createRenderRoot() {
     return this;
@@ -89,6 +92,36 @@ export default class AssetPreview extends LitElement {
     }
   }
 
+  updated(changedProperties) {
+    if (changedProperties.has('pdfRendition') && this.pdfRendition) {
+      this.loadPdfViewer();
+    }
+  }
+
+  //just for testing
+  get pdfViewerLink() {
+    if (this.webinarPresentation) return this.getWebinarPresentationDownloadUrl();
+
+    const fileType = this.getFileTypeFromTag()?.toLowerCase();
+    if (fileType === 'pdf') return this.url;
+    return '';
+  }
+
+  async loadPdfViewer() {
+    try {
+      const { default: initPdfViewer } = await import('../../components/PdfViewer.js');
+      await initPdfViewer({
+        url: this.pdfRendition,
+        fileName: `${this.title}.pdf`,
+        divId: PDF_RENDER_DIV_ID,
+        pdfEmbedMode: this.blockData.pdfEmbedMode
+      });
+    } catch (e) {
+      console.log(`PDF viewer failed to load, falling back to preview image: ${e.message}`);
+      this.pdfRendition = '';
+    }
+  }
+
   addDynamicKeyForLocalization(key) {
     const localizationKey = `{{${key}}}`;
     if (!this.blockData.localizedText[localizationKey]) {
@@ -97,7 +130,7 @@ export default class AssetPreview extends LitElement {
   }
 
   setBlockData() {
-    this.fragment =  document.querySelector('.fragment');
+    this.fragment = document.querySelector('.fragment');
     this.blockData = { ...this.blockData };
 
     const blockDataActions = {
@@ -109,6 +142,10 @@ export default class AssetPreview extends LitElement {
         const [backButtonLabelEl] = cols;
         this.blockData.backButtonLabel = backButtonLabelEl.innerText.trim();
         this.addDynamicKeyForLocalization(this.blockData.backButtonLabel);
+      },
+      'pdf-embed-mode': (cols) => {
+        const [pdfEmbedModeEl] = cols;
+        this.blockData.pdfEmbedMode = pdfEmbedModeEl.innerText.trim().toLowerCase().replace(/ /g, '-');
       },
     };
     const rows = Array.from(this.blockData.tableData);
@@ -151,6 +188,8 @@ export default class AssetPreview extends LitElement {
     this.url = DOMPurify.sanitize(assetMetadata.url);
     this.webinarPresentation = DOMPurify.sanitize(assetMetadata.webinarPresentation);
     this.previewImage = DOMPurify.sanitize(assetMetadata.previewImage);
+    this.pdfRendition = DOMPurify.sanitize(assetMetadata.pdfRendition) || this.pdfViewerLink;
+    this.blockData.pdfEmbedMode = DOMPurify.sanitize(this.blockData.pdfEmbedMode) || 'full-window';
     this.backButtonUrl = DOMPurify.sanitize(this.blockData.backButtonUrl);
     this.backButtonLabel = DOMPurify.sanitize(this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL);
     this.tags = assetMetadata.tags
@@ -234,12 +273,13 @@ export default class AssetPreview extends LitElement {
               </div>` : ''}
             </div>
             <div class="asset-preview-block-details-right">
-                    <img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>
+              ${this.pdfRendition && !this.isRestrictedAssetForUser()
+                ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
+                : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`
+              }
             </div>
          </div>
-         
 
-  
         ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
         <div class="asset-preview-block-video">
           <div class="video-container video-holder">
