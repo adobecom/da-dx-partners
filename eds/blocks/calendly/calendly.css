@@ -1,0 +1,8 @@
+.calendly {
+  width: 100%;
+}
+
+.calendly .calendly-embed {
+  width: 100%;
+  min-height: 700px;
+}
