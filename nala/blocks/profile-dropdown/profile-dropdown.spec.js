@@ -38,5 +38,22 @@ export default {
         signOutLink: '/digitalexperience/',
       },
     },
+    {
+      tcid: '4',
+      name: '@dxp-404-page-profile-dropdown-validation',
+      path: '/digitalexperience/',
+      pathSecondTab: '/digitalexperience/home/1234',
+      tags: '@da-dx-profile-dropdown @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-platinum:',
+        profileName: 'DONOT USE Yugo DX Stage Platinum New',
+        profileEmail: 'yugo-test+dx…@adobetest.com',
+        partnerLevelDropdown: 'Platinum',
+        profileJob: 'Product Management',
+        updateProfileLink: 'https://partners.stage.adobe.com/digitalexperience/home/manage-user',
+        manageCompanyAccountLink: 'https://partners.stage.adobe.com/digitalexperience/home/manage-company',
+        signOutLink: '/digitalexperience/',
+      },
+    },
   ],
 };
