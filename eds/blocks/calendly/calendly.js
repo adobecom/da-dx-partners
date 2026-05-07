@@ -15,28 +15,13 @@ function loadCalendlyScript() {
   return calendlyScriptPromise;
 }
 
-function getSchedulingLinkFromRow(row) {
-  const columns = Array.from(row.children);
-  if (columns.length < 2) return '';
-
-  const key = columns[0].textContent.trim().toLowerCase().replace(/\s+/g, '-');
-  if (key !== 'scheduling-link') return '';
-
+function getPropertyName(columns) {
+  return columns[0].textContent.trim().toLowerCase().replace(/\s+/g, '-');
+}
+function getLinkValue(columns) {
   const authoredAnchor = columns[1].querySelector('a[href]');
   if (authoredAnchor) return authoredAnchor.href;
-
   return columns[1].textContent.trim();
-}
-
-function getCalendlyLink(el) {
-  const rows = Array.from(el.children);
-  const authoredRowLink = rows
-    .map((row) => getSchedulingLinkFromRow(row))
-    .find((value) => value);
-
-  if (authoredRowLink) return authoredRowLink;
-
-  return el.querySelector('a[href*="calendly.com"]')?.href;
 }
 
 function initCalendly(link, parentElement) {
@@ -46,9 +31,18 @@ function initCalendly(link, parentElement) {
     resize: true,
   });
 }
-
+function setBlockData(tableRows) {
+  const blockData = { schedulingLink: '' };
+  Array.from(tableRows).forEach((row) => {
+    const columns = row.children;
+    if (getPropertyName(columns) === 'scheduling-link') {
+      blockData.schedulingLink = getLinkValue(columns);
+    }
+  });
+  return blockData;
+}
 export default async function init(el) {
-  const calendlyLink = getCalendlyLink(el);
+  const { schedulingLink } = setBlockData(el.children);
   const calendlyEmbed = document.createElement('div');
   calendlyEmbed.className = 'calendly-embed';
   calendlyEmbed.setAttribute('style', 'min-width:320px;height:700px;');
@@ -58,7 +52,7 @@ export default async function init(el) {
 
   try {
     await loadCalendlyScript();
-    initCalendly(calendlyLink, calendlyEmbed);
+    initCalendly(schedulingLink, calendlyEmbed);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('Calendly widget failed to load', e);
