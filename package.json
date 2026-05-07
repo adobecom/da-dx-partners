@@ -56,7 +56,7 @@
   "dependencies": {
     "@adobecom/milo": "github:adobecom/milo#main",
     "dompurify": "^3.4.0",
-    "axios": "^1.15.0",
+    "axios": "^1.15.2",
     "playwright": "^1.58.2"
   }
 }
