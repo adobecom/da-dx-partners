@@ -23,7 +23,7 @@ const PDF_EMBED_ADD_CONFIG = {
   showFullScreenViewButton: false,
 };
 
-const loadSdk = () => new Promise((resolve, reject) => {
+export const loadSdk = () => new Promise((resolve, reject) => {
   if (window.AdobeDC?.View) {
     resolve();
     return;
@@ -51,13 +51,12 @@ const loadSdk = () => new Promise((resolve, reject) => {
 export const getPdfConfig = () => {
   //The client ids are specific to the origin (no wildcards), so the stage **pdfViewerClientId** only works for **main--milo--adobecom.aem.page**.
   const config = getConfig();
-  let clientId = config.env.consumer?.pdfViewerClientId || config.pdfViewerClientId;
-  return { clientId };
+  return config.env?.consumer?.pdfViewerClientId || config.pdfViewerClientId;
 };
 
 const initPdfViewer = async ({ url, fileName, divId, pdfEmbedMode = 'full-window' }) => {
   await loadStyle('/eds/components/PdfViewer.css');
-  const { clientId } = getPdfConfig();
+  const clientId = getPdfConfig();
 
   const embedMode = PDF_EMBED_MODE_CONFIG[pdfEmbedMode] ? pdfEmbedMode : 'full-window';
   const pdfEmbedConfig = PDF_EMBED_MODE_CONFIG[embedMode];
