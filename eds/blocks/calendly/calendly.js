@@ -1,6 +1,3 @@
-
-const DEFAULT_CALENDLY_LINK = 'https://calendly.com/d/ctvd-7ht-t6d/kd-adobe-digital-experience-partner-program-onboarding?hide_gdpr_banner=1';
-
 let calendlyScriptPromise;
 
 function loadCalendlyScript() {
@@ -14,7 +11,6 @@ function loadCalendlyScript() {
     script.onerror = reject;
     document.head.append(script);
   });
-  // addStyle('https://assets.calendly.com/assets/external/widget.css');
 
   return calendlyScriptPromise;
 }
@@ -40,8 +36,7 @@ function getCalendlyLink(el) {
 
   if (authoredRowLink) return authoredRowLink;
 
-  const authoredAnchorLink = el.querySelector('a[href*="calendly.com"]')?.href;
-  return authoredAnchorLink || DEFAULT_CALENDLY_LINK;
+  return el.querySelector('a[href*="calendly.com"]')?.href;
 }
 
 function initCalendly(link, parentElement) {
