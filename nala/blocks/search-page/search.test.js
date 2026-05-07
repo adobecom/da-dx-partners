@@ -29,28 +29,40 @@ test.describe('Search Page', () => {
       await searchPage.searchField.press('Enter');
       await searchPage.waitForResultsToSettle();
       await searchPage.searchAllResults.waitFor({ state: 'visible' });
-      const numberResults = await searchPage.getNumberOfResults();
-      await expect(numberResults).toBeGreaterThanOrEqual(6);
+      await expect.poll(
+        async () => await searchPage.getNumberOfResults(),
+        { timeout: 15000 }
+      ).toBeGreaterThanOrEqual(6);
     });
     await test.step('Asset Card Content Validation', async () => {
-      const card = searchPage.getCardByTitle(data.cardTitle);
-      await searchPage.clickCard(card);
+      await expect(async () => {
+        const card = searchPage.getCardByTitle(data.cardTitle);
+        await searchPage.clickCard(card);
+        await page.waitForLoadState('domcontentloaded');
+        const expanded = await card.evaluate(el =>
+          el.classList.contains('expanded')
+        );
 
-      const cardDate = searchPage.getCardDateLocator(card);
-      await expect(cardDate).toBeVisible();
-      const dateText = await cardDate.textContent();
-      expect(dateText).toContain(data.cardDate);
+        expect(expanded).toBe(true);
+      }).toPass({ timeout: 30000 });
+      const expandedCard = searchPage
+        .getExpandedCard()
+        .filter({ hasText: data.cardTitle })
+        .first();
+      await expect(expandedCard).toBeVisible({ timeout: 30000 });
 
-      const cardSize = searchPage.getCardSizeLocator(card);
-      await expect(cardSize).toBeVisible();
-      const sizeText = await cardSize.textContent();
-      expect(sizeText).toContain(data.cardSize);
+      const cardDate = searchPage.getCardDateLocator(expandedCard);
+      await expect(cardDate).toContainText(data.cardDate);
+
+      const cardSize = searchPage.getCardSizeLocator(expandedCard);
+      await expect(cardSize).toContainText(data.cardSize);
 
       for (const tagText of data.cardTags) {
-        await searchPage.verifyCardTag(card, tagText);
+        const tag = searchPage.getCardTagByText(expandedCard, tagText);
+        await expect(tag).toBeVisible({ timeout: 30000 });
       }
 
-      await searchPage.verifyCardButtonLink(card, data.cardButtonLink);
+      await searchPage.verifyCardButtonLink(expandedCard, data.cardButtonLink);
     });
 
     await test.step('Check Silver Asset', async () => {
@@ -73,19 +85,32 @@ test.describe('Search Page', () => {
     await test.step('Search for asset', async () => {
       await searchPage.searchField.fill(data.searchKeyword);
       await searchPage.searchField.press('Enter');
-      await searchPage.waitForResultsToSettle();
-      const numberResults = await searchPage.getNumberOfResults();
-      await expect(numberResults).toBeGreaterThanOrEqual(4);
+      const initialResults = await signInPage.getNumberOfResults();
+      await expect.poll(
+        async () => await signInPage.getNumberOfResults(),
+        { timeout: 15000 },
+      ).not.toBe(initialResults);
+
+      await expect.poll(
+        async () => await signInPage.getNumberOfResults(),
+        { timeout: 15000 },
+      ).toBe(4);
     });
     await test.step('Check Filter Journey Phase Explore', async () => {
       await searchPage.journeyPhaseFilter.click();
       await searchPage.journeyPhaseFilterPanel.waitFor({ state: 'visible', timeout: 30000 });
+      const initialTitle = await searchPage.getCardTitle(); 
       await searchPage.exploreCheckBox.click();
       await expect(searchPage.exploreCheckBox).toBeChecked();
-      await searchPage.waitForResultsToSettle();
 
-      const firstCardTitle = await searchPage.getCardTitle();
-      await expect(firstCardTitle).toBe(data.assetTitle1);
+      await expect.poll(
+        async () => await searchPage.getCardTitle(),
+        { timeout: 15000 }
+      ).not.toBe(initialTitle);
+      await expect.poll(
+        async () => await searchPage.getCardTitle(),
+        { timeout: 15000 }
+      ).toBe(data.assetTitle1);
     });
     await test.step('Check Filter Journey Phase Discover', async () => {
       await searchPage.discoverCheckBox.click();

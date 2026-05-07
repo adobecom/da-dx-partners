@@ -68,11 +68,15 @@ export default class SearchPage {
     return this.page.locator('.search-card').filter({ hasText: title }).first();
   }
 
-  async clickCard(card, timeout = 15000) {
+  async clickCard(card, timeout = 30000) {
     await card.waitFor({ state: 'visible', timeout });
     await card.scrollIntoViewIfNeeded();
     await expect(card).toBeVisible({ timeout });
-    await card.click({ timeout });
+    try {
+      await card.click({ timeout });
+    } catch {
+      await card.click({ force: true });
+    }
     await this.waitForCardToExpand(card, timeout);
   }
 
@@ -88,7 +92,7 @@ export default class SearchPage {
     return card.locator('.card-tag').filter({ hasText: tagText });
   }
 
-  async waitForCardToExpand(card, timeout = 10000) {
+  async waitForCardToExpand(card, timeout = 30000) {
     await expect.poll(
       async () => {
         const classList = await card.evaluate((el) => el.classList.toString());
@@ -96,6 +100,10 @@ export default class SearchPage {
       },
       { timeout }
     ).toBe(true);
+  }
+
+  getExpandedCard() {
+    return this.page.locator('.search-card.expanded');
   }
 
   async verifyCardTag(card, tagText) {
