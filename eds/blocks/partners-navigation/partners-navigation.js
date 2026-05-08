@@ -1381,7 +1381,9 @@ class Gnav {
       <div class="feds-nav-wrapper" id="feds-nav-wrapper">
         ${breadcrumbs}
         ${isDesktop.matches ? '' : this.decorateSearch()}
+        ${this.decorateShortcutIcons(true)}
         ${this.elements.mainNav}
+        ${this.decorateShortcutIcons(false)}
         ${isDesktop.matches ? this.decorateSearch() : ''}
       </div>
     `;
