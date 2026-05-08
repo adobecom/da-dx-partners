@@ -58,6 +58,7 @@
   /* MWPW-157753 - Make profile picture, firstName, lastName and email unclickable */
   pointer-events: none;
   /* PARTNERS_NAVIGATION END */
+  border-radius: 50%;
 }
 
 .feds-profile-details {

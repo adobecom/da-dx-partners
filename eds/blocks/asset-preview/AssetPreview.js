@@ -23,7 +23,6 @@ export default class AssetPreview extends LitElement {
     description: { type: String },
     fileType: { type: String },
     url: { type: String },
-    thumbnailUrl: { type: String },
     tags: { type: Array },
     allAssetTags: { type: Array },
     ctaText: { type: String },
@@ -151,7 +150,7 @@ export default class AssetPreview extends LitElement {
     this.fileType = DOMPurify.sanitize(assetMetadata.fileType);
     this.url = DOMPurify.sanitize(assetMetadata.url);
     this.webinarPresentation = DOMPurify.sanitize(assetMetadata.webinarPresentation);
-    this.previewImage = DOMPurify.sanitize(assetMetadata.previewImage || assetMetadata.thumbnailUrl);
+    this.previewImage = DOMPurify.sanitize(assetMetadata.previewImage);
     this.backButtonUrl = DOMPurify.sanitize(this.blockData.backButtonUrl);
     this.backButtonLabel = DOMPurify.sanitize(this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL);
     this.tags = assetMetadata.tags
