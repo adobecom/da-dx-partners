@@ -1381,9 +1381,12 @@ class Gnav {
       <div class="feds-nav-wrapper" id="feds-nav-wrapper">
         ${breadcrumbs}
         ${isDesktop.matches ? '' : this.decorateSearch()}
+        <!-- PARTNERS_NAVIGATION START -->
+        <!-- MWPW-168681 - GNAV Links & Authorable Icons -->
         ${this.decorateShortcutIcons(true)}
         ${this.elements.mainNav}
         ${this.decorateShortcutIcons(false)}
+        <!-- PARTNERS_NAVIGATION END -->
         ${isDesktop.matches ? this.decorateSearch() : ''}
       </div>
     `;
