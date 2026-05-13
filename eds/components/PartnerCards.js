@@ -951,13 +951,19 @@ export default class PartnerCards extends LitElement {
   // eslint-disable-next-line class-methods-use-this
   getSlider() {}
 
+  get filtersLabel() {
+    return Object.keys(this.selectedFilters).length > 0
+      ? Object.values(this.selectedFilters).flat().map((item) => item.value).join(', ')
+      : 'No Filters';
+  }
+
   /* eslint-disable indent */
   render() {
     return html`
       ${this.fetchedData
         ? html`
           <div class="partner-cards ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled': ''}"
-            daa-lh="Card Collection | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
+            daa-lh="Card Collection | Filters: ${processTrackingLabels(this.filtersLabel)} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
           >
           ${this.blockData.filtersPanel === 'disable'
             ? ''
