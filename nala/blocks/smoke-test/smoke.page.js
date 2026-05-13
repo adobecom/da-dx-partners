@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 export default class SmokeTest {
   constructor(page) {
     this.page = page;
@@ -46,6 +48,7 @@ export default class SmokeTest {
     this.jarvisChatPanel = page.frameLocator('iframe[title="Adobe Virtual Assistant"]').getByText("We're here to help.");
     this.searchCardsCollection = page.locator('.partner-cards-collection');
     this.cardCollectionSortButton = page.getByRole('button', { name: 'date: newest' });
+    this.globalFooter = page.locator('.global-footer');
   }
 
   async smokeSignIn(page, baseURL, partnerLevel) {
@@ -74,6 +77,21 @@ export default class SmokeTest {
 
   async verifyIfFooterIsPresent() {
     return await this.footer.isVisible();
+  }
+
+  async verifyFooterSocialMediaIcons(data) {
+    const root = this.globalFooter;
+    const pairs = [
+      ['facebook', data.facebookLink],
+      ['instagram', data.instagramLink],
+      ['linkedin', data.linkedinLink],
+      ['twitter', data.twitterLink],
+    ];
+    for (const [label, href] of pairs) {
+      const link = root.locator(`a.feds-social-link[aria-label="${label}"]`);
+      await expect(link).toBeVisible();
+      await expect(link).toHaveAttribute('href', href);
+    }
   }
 
   async getResultsCount() {
