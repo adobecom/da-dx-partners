@@ -9,6 +9,8 @@ const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
+const EVENT_TAG_HASH = '37mr/jgm9';
+
 class SinglePartnerCard extends LitElement {
   createRenderRoot() { return this; }
 
@@ -25,6 +27,10 @@ class SinglePartnerCard extends LitElement {
     }
   }
 
+  get isEventCard() {
+    return this.data.tags?.some(tag => tag?.id === EVENT_TAG_HASH) ?? false;
+  }
+
   render() {
     return html`
       <div class="single-partner-card">
@@ -36,7 +42,7 @@ class SinglePartnerCard extends LitElement {
             <p class="card-description">${unsafeHTML(DOMPurify.sanitize(this.data.contentArea?.description))}</p>
           </div>
           <div class="card-footer">
-            <span class="card-date">${formatDate(this.data.cardDate, this.ietf)}</span>
+            <span class="card-date">${formatDate(this.data.cardDate, this.ietf, this.isEventCard)}</span>
             <a @click=${(e) => dispatchCustomEventOnLinkClick(e, e.target.href, this.footerBtnLabel)} class="card-btn" daa-ll="${this.footerBtnLabel}" href="${transformCardUrl(this.data.contentArea?.url)}" target="_blank" rel="nooopener noreferrer">${this.data.footer[0]?.right[0]?.text}</a>
           </div>
         </div>
