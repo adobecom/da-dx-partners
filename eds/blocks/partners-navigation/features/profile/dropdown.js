@@ -72,7 +72,10 @@ class ProfileDropdown {
     this.decoratedElem = decoratedElem;
     this.sections = sections;
     this.openOnInit = openOnInit;
+    // PARTNERS_NAVIGATION START
+    // MWPW-180485 - Implement Profile Dropdown
     this.localMenu = rawElem.querySelector('p')?.parentElement;
+    // PARTNERS_NAVIGATION END
     logErrorFor(this.init.bind(this), 'ProfileDropdown.init()', 'gnav-profile', 'e');
   }
 
@@ -180,11 +183,14 @@ class ProfileDropdown {
   }
 
   decorateLocalMenu() {
+    // PARTNERS_NAVIGATION START
+    // MWPW-180485 - Implement Profile Dropdown
     if (this.localMenu) {
       this.localMenu.classList.add('feds-local-menu');
     }
 
     return this.localMenu;
+    // PARTNERS_NAVIGATION END
   }
 
   decorateSignOut() {
