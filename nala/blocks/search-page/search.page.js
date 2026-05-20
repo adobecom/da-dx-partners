@@ -7,9 +7,12 @@ export default class SearchPage {
     this.searchAllResults = page.getByRole('button', { name: 'All', exact: true });
     this.mostRelevant = page.getByRole('button', { name: 'most relevant' });
     this.mostRecent = page.getByRole('button', { name: 'most recent' });
+    this.card = page.locator('.search-card');
     this.cardTilte = page.locator('.card-title').nth(0);
     this.cardDate = page.locator('.card-date');
     this.cardSize = page.locator('.card-size');
+    this.cardDescription = page.locator('.card-description');
+    this.fileIcon = page.locator('.file-icon');
     this.clearSearch = page.getByRole('button', { name: 'Reset' });
     this.trainingButton = page.getByRole('button', { name: 'Trainings' });
     this.trainingPreviewButton = page.locator('.card-icons').nth(0);
@@ -44,6 +47,7 @@ export default class SearchPage {
     this.contentTypeHeader = page.locator('.filter', { has: page.getByRole('button', { name: 'Content Type' }) });
     this.topicHeader = page.locator('.filter', { has: page.getByRole('button', { name: 'Topic' }) });
     this.journeyPhaseHeader = page.locator('.filter', { has: page.getByRole('button', { name: 'Journey Phase' }) });
+    this.errorHeading = page.locator('.heading-xxl');
   }
 
   async getCardTitle() {

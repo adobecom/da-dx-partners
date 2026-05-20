@@ -9,7 +9,7 @@ const { features } = eventsSpec;
 const goldAndPlatinumAccess = features.slice(2, 4);
 
 test.describe('Validate events block', () => {
-  test.beforeEach(async ({ page, browserName, baseURL, context }) => {
+  test.beforeEach(async ({ page }) => {
     eventsPage = new EventsPage(page);
     signInPage = new SignInPage(page);
   });
@@ -18,7 +18,7 @@ test.describe('Validate events block', () => {
     const { data } = features[0];
     await test.step('Go to events page', async () => {
       await page.goto(`${features[0].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
 
     await test.step('Verify public card title', async () => {
@@ -36,7 +36,7 @@ test.describe('Validate events block', () => {
     const { data } = features[1];
     await test.step('Go to events page', async () => {
       await page.goto(`${features[1].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
@@ -60,7 +60,7 @@ test.describe('Validate events block', () => {
       const { data } = feature;
       await test.step('Go to events page', async () => {
         await page.goto(`${feature.path}`);
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
         await signInPage.signInButton.click();
         await signInPage.signIn(page, `${data.partnerLevel}`);
         await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
