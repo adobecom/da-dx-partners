@@ -1,0 +1,63 @@
+import { getLibs, invokeAfterImsIsReady, getPartnerCookieValue, getMetadataContent } from '../../scripts/utils.js';
+import { getPartnershipData } from '../utils/partnershipDataService.js';
+import { replaceDirectText } from '../../scripts/personalization.js';
+
+const miloLibs = getLibs();
+
+const LEVEL_MAP = { silver: 'gold', gold: 'platinum' };
+
+const isFullyCompleted = (obj, fields) => fields.every((field) => obj?.[field]?.percentage === 100);
+
+export function getTargetLevel(data) {
+  const currentLevel = data.level?.toLowerCase();
+
+  if (currentLevel !== 'silver' && currentLevel !== 'gold') return null;
+
+  // eslint-disable-next-line max-len
+  const solutionItem = (data.solution || []).find((item) => item.level?.toLowerCase() === currentLevel);
+  const solutionValid = isFullyCompleted(solutionItem, ['credentials', 'customerDeployments', 'specializations']);
+
+  if (!solutionValid) {
+    // eslint-disable-next-line max-len
+    const technologyItem = (data.technology || []).find((item) => item.level?.toLowerCase() === currentLevel);
+    const technologyValid = isFullyCompleted(technologyItem, ['credentials', 'customerDeployments', 'solutions']);
+    if (!technologyValid) return null;
+  }
+
+  return LEVEL_MAP[currentLevel];
+}
+
+export default async function init(el) {
+  const { parentNode, nextSibling } = el;
+  el.remove();
+
+  const metaEnabled = getMetadataContent('uplevel-banner')?.toLowerCase();
+  if (metaEnabled === 'none') return;
+
+  invokeAfterImsIsReady(async () => {
+    try {
+      const data = await getPartnershipData();
+      const targetLevel = getTargetLevel(data);
+      if (!targetLevel) return;
+
+      const heading = el.querySelector('h1, h2, h3, h4, h5, h6');
+      if (heading) {
+        if (heading.textContent.includes('$accountName')) {
+          const accountName = getPartnerCookieValue('accountname');
+          if (accountName) replaceDirectText(heading, '$accountName', accountName);
+        }
+        replaceDirectText(heading, '$eligibleLevel', targetLevel);
+      }
+
+      el.classList.add('notification');
+      const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+      loadStyle(`${miloLibs}/blocks/notification/notification.css`);
+      const { default: initNotification } = await import(`${miloLibs}/blocks/notification/notification.js`);
+      await initNotification(el);
+
+      parentNode.insertBefore(el, nextSibling);
+    } catch (e) {
+      console.error('[uplevel-banner] error', e);
+    }
+  });
+}
