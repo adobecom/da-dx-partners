@@ -1,4 +1,4 @@
-import { getLibs, invokeAfterImsIsReady, getPartnerCookieValue, getMetadataContent } from '../../scripts/utils.js';
+import { getLibs, invokeAfterImsIsReady, getMetadataContent } from '../../scripts/utils.js';
 import { getPartnershipData } from '../utils/partnershipDataService.js';
 import { replaceDirectText } from '../../scripts/personalization.js';
 
@@ -40,13 +40,8 @@ export default async function init(el) {
       const targetLevel = getTargetLevel(data);
       if (!targetLevel) return;
 
-      const heading = el.querySelector('h1, h2, h3, h4, h5, h6');
-      if (heading) {
-        if (heading.textContent.includes('$accountName')) {
-          const accountName = getPartnerCookieValue('accountname');
-          if (accountName) replaceDirectText(heading, '$accountName', accountName);
-        }
-        replaceDirectText(heading, '$eligibleLevel', targetLevel);
+      if (el.textContent.includes('$eligibleLevel')) {
+        [...el.querySelectorAll('*')].forEach((node) => replaceDirectText(node, '$eligibleLevel', targetLevel));
       }
 
       el.classList.add('notification');

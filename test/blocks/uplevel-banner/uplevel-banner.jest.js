@@ -8,7 +8,6 @@ import fs from 'fs';
 jest.mock('../../../eds/scripts/utils.js', () => ({
   getLibs: () => '/libs',
   invokeAfterImsIsReady: (cb) => cb(),
-  getPartnerCookieValue: jest.fn(() => ''),
   getMetadataContent: (name) => global.document.querySelector(`meta[name="${name}"]`)?.content ?? null,
 }));
 
@@ -172,34 +171,15 @@ describe('uplevel-banner init', () => {
     expect(document.body.contains(el)).toBe(false);
   });
 
-  it('replaces $accountName and $eligibleLevel placeholders in the heading', async () => {
-    const { getPartnerCookieValue } = require('../../../eds/scripts/utils.js');
-    getPartnerCookieValue.mockReturnValue('Acme');
-
+  it('replaces $eligibleLevel placeholder and leaves $accountName for personalization', async () => {
     const el = document.querySelector('.uplevel-banner');
     await init(el);
     await flushPromises();
 
     const text = el.querySelector('h3').textContent;
-    expect(text).toContain('Acme');
     expect(text).toContain('platinum');
-    expect(text).not.toContain('$accountName');
     expect(text).not.toContain('$eligibleLevel');
-  });
-
-  it('skips $accountName replacement when not authored', async () => {
-    document.body.innerHTML = fs.readFileSync(
-      path.resolve(__dirname, './mocks/body-no-account-name.html'),
-      'utf8',
-    );
-
-    const { getPartnerCookieValue } = require('../../../eds/scripts/utils.js');
-
-    const el = document.querySelector('.uplevel-banner');
-    await init(el);
-    await flushPromises();
-
-    expect(getPartnerCookieValue).not.toHaveBeenCalled();
+    expect(text).toContain('$accountName');
   });
 
   it('logs an error when API call fails', async () => {

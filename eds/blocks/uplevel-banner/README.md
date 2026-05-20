@@ -21,6 +21,6 @@ Fetches from the Track Partnership API via `partnershipDataService.js` (shared w
 | uplevel-banner (ribbon, center, dark) | |
 |---|---|
 | `#a934bf` | Background colour |
-| `$accountName is eligible to move up to the $eligibleLevel...` `<em>[Join now link]</em>` | Heading with placeholders and inline CTA |
+| `$accountName is eligible to move up to the $eligibleLevel...` `<em>[Join now link]</em>` | Heading with placeholders and inline CTA. `$eligibleLevel` is replaced by this block; `$accountName` is handled by personalization. |
 
 The banner is enabled by default, if authored on the page. Add `uplevel-banner = none` to metadata-sitewide to suppress it.
