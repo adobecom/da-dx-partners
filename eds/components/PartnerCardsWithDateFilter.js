@@ -23,9 +23,6 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
       this.selectedDateFilter = defaultDateFilter;
     }
 
-    // Two awaits: one for fetchData(), one for the update handleActions() queues
-    // synchronously after the base class calls this method.
-    await this.updateComplete;
     await this.updateComplete;
 
     const childCards = [...this.querySelectorAll('single-partner-card, single-partner-card-half-height')];
