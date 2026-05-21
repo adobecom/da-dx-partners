@@ -377,4 +377,44 @@ test.describe('Validate Partner Directory pages', () => {
       await expect(smokeTest.feedbackSendButton).toBeEnabled();
     });
   });
+  test(`${features[17].name},${features[17].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[17];
+
+    await test.step('Go to page with query parameter', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+    await test.step('Verify Footer Public Page', async () => {
+      await smokeTest.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(smokeTest.globalFooter).toBeVisible();
+      await smokeTest.verifyFooterSocialMediaIcons(data);
+    });
+    await test.step('Verify Footer Protected Page', async () => {
+      await smokeTest.signInButton.click();
+      await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(smokeTest.globalFooter).toBeVisible();
+      await smokeTest.verifyFooterSocialMediaIcons(data);
+    });
+  });
+  test(`${features[18].name},${features[18].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[18];
+
+    await test.step('Verify Footer on 404 page', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(smokeTest.globalFooter).toBeVisible();
+      await smokeTest.verifyFooterSocialMediaIcons(data);
+    });
+    await test.step('Verify Footer React Include Page', async () => {
+      await page.goto(`${baseURL}${data.reactIncludePage}`);
+      await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(smokeTest.globalFooter).toBeVisible();
+      await smokeTest.verifyFooterSocialMediaIcons(data);
+    });
+  });
 });

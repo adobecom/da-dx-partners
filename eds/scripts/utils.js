@@ -58,19 +58,28 @@ export const prodHosts = [
  * Note: This file should have no self-invoking functions.
  * ------------------------------------------------------------
  */
-export function formatDate(cardDate, locale = 'en-US') {
+export function formatDate(cardDate, locale = 'en-US', isEventCard = false) {
   if (!cardDate) return;
 
   const dateObject = new Date(cardDate);
-  const options = {
+
+  const formattedDate = dateObject.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  };
+  });
 
-  const formattedDate = dateObject.toLocaleString(locale, options);
   // eslint-disable-next-line consistent-return
-  return formattedDate;
+  if (!isEventCard) return formattedDate;
+
+  const formattedTime = dateObject.toLocaleTimeString(locale, {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
+
+  // eslint-disable-next-line consistent-return
+  return `${formattedDate} | ${formattedTime}`;
 }
 
 export function getLocale(locales, pathname = window.location.pathname) {
