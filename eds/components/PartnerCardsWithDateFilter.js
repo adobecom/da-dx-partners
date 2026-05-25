@@ -1,4 +1,4 @@
-import { getLibs, loadPageToAnchor } from '../scripts/utils.js';
+import { getLibs } from '../scripts/utils.js';
 import PartnerCards from './PartnerCards.js';
 
 const miloLibs = getLibs();
@@ -17,24 +17,11 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
     this.selectedDateFilter = {};
   }
 
-  async additionalFirstUpdated() {
+  additionalFirstUpdated() {
     if (this.blockData.dateFilter) {
       const [defaultDateFilter] = this.blockData.dateFilter.tags;
       this.selectedDateFilter = defaultDateFilter;
     }
-
-    await this.updateComplete;
-
-    const childCards = [...this.querySelectorAll('single-partner-card, single-partner-card-half-height')];
-    await Promise.all(childCards.map((card) => card.updateComplete));
-
-    if (document.readyState !== 'complete') {
-      await new Promise((resolve) => { window.addEventListener('load', resolve, { once: true }); });
-    }
-
-    if (document.fonts) await document.fonts.ready;
-    await new Promise((resolve) => { requestAnimationFrame(() => requestAnimationFrame(resolve)); });
-    loadPageToAnchor();
   }
 
   get dateFilter() {
