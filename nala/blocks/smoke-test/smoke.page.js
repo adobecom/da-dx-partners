@@ -49,6 +49,7 @@ export default class SmokeTest {
     this.searchCardsCollection = page.locator('.partner-cards-collection');
     this.cardCollectionSortButton = page.getByRole('button', { name: 'date: newest' });
     this.globalFooter = page.locator('.global-footer');
+    this.signOutButton = page.getByRole('link', { name: 'Sign Out' });
   }
 
   async smokeSignIn(page, baseURL, partnerLevel) {
@@ -112,5 +113,12 @@ export default class SmokeTest {
     await this.searchField.type(keyword, { delay: 80 });
     await this.page.waitForTimeout(5000);
     await this.page.keyboard.press('Enter');
+  }
+
+  async signOut() {
+    await this.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    await this.profileIconButton.click();
+    await this.signOutButton.waitFor({ state: 'visible', timeout: 10000 });
+    await this.signOutButton.click();
   }
 }

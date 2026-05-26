@@ -203,5 +203,15 @@ export default {
         reactIncludePage: '/digitalexperience/home/manage-user',
       },
     },
+    {
+      tcid: '20',
+      name: '@smoke-test-signout-redirect',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: {
+        partnerLevel: 'dxp-community:',
+        homeUrl: '/digitalexperience/home/',
+      },
+    },
   ],
 };
