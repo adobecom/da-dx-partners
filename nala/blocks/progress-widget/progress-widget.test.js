@@ -14,21 +14,30 @@ test.describe('Partnership Progress Widget', () => {
     signInPage = new SignInPage(page);
   });
 
-  test(`${features[0].name},${features[0].tags}`, async ({ page }) => {
-    const { data } = features[0];
-    await test.step('Go to page', async () => {
-      await page.goto(`${features[0].path}`);
-      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
-      await signInPage.signInButton.click();
-    });
-    await test.step('Sign in as Silver user', async () => {
-      await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
-    });
-    await test.step('Verify progress widget for Silver user', async () => {
-      await progressWidgetPage.progressWidget.waitFor({ state: 'visible', timeout: 30000 });
-      await progressWidgetPage.verifySolutionAndTechnologyTables();
-      await progressWidgetPage.verifyProgressionLevel(data.progressionLevel);
+  const testCases = [features[0], features[2]];
+  testCases.forEach((feature) => {
+    test(`${feature.name},${feature.tags}`, async ({ page }) => {
+      const { data, path } = feature;
+
+      await test.step('Go to page', async () => {
+        await page.goto(path);
+        await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+        await signInPage.signInButton.click();
+      });
+
+      await test.step(`Sign in as ${data.progressionLevel} user`, async () => {
+        await signInPage.signIn(page, data.partnerLevel);
+        await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      });
+
+      await test.step(
+        `Verify progress widget for ${data.progressionLevel} user`,
+        async () => {
+          await progressWidgetPage.progressWidget.waitFor({ state: 'visible', timeout: 30000 });
+          await progressWidgetPage.verifySolutionAndTechnologyTables();
+          await progressWidgetPage.verifyProgressionLevel(data.progressionLevel);
+        },
+      );
     });
   });
 
@@ -51,24 +60,6 @@ test.describe('Partnership Progress Widget', () => {
     });
   });
 
-  test(`${features[2].name},${features[2].tags}`, async ({ page }) => {
-    const { data } = features[2];
-    await test.step('Go to page', async () => {
-      await page.goto(`${features[0].path}`);
-      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
-      await signInPage.signInButton.click();
-    });
-    await test.step('Sign in as Platinum user', async () => {
-      await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
-    });
-    await test.step('Verify progress widget for Platinum user', async () => {
-      await progressWidgetPage.progressWidget.waitFor({ state: 'visible', timeout: 30000 });
-      await progressWidgetPage.verifySolutionAndTechnologyTables();
-      await progressWidgetPage.verifyProgressionLevel(data.progressionLevel);
-    });
-  });
-
   test(`${features[3].name},${features[3].tags}`, async ({ page }) => {
     const { data } = features[3];
     await test.step('Go to page', async () => {
@@ -84,4 +75,4 @@ test.describe('Partnership Progress Widget', () => {
       await expect(progressWidgetPage.progressWidget).not.toBeVisible();
     });
   });
-})
+});
