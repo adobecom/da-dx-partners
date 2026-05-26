@@ -248,7 +248,7 @@ export default class PartnerCards extends LitElement {
     if (window.location.hash) {
       await this.updateComplete;
 
-      const childCards = [...this.querySelectorAll('single-partner-card, single-partner-card-half-height')];
+      const childCards = [...this.querySelectorAll('single-partner-card, single-partner-card-half-height, search-card')];
       await Promise.all(childCards.map((card) => card.updateComplete));
 
       if (document.readyState !== 'complete') {
