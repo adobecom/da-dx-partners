@@ -36,6 +36,18 @@ export default {
         notVisibleCardTitle: 'Platinum Level Event QA',
         visibleCardTitle: 'Gold Level Event QA',
       }
-  },
+    },
+    {
+      tcid: '5',
+      name: '@events-sessions-test-on-public-page',
+      path: '/digitalexperience/drafts/automation/regression/events/attendees-events',
+      tags: '@da-dx-events @regression @circleCi',
+      data: { 
+        sessionOne: 'QA Content, 2 sessions in future, one displayed',
+        sessionOneDaysFromToday: 28,
+        sessionTwo: 'QA Content, one session in future displayed',
+        sessionTwoDaysFromToday: 10,
+      }
+    },
   ],
 };

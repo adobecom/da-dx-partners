@@ -6,6 +6,7 @@ export default class EventsPage {
     this.cardsResults = page.locator('.partner-cards-cards-results strong');
     this.productFilter = page.getByLabel('Products');
     this.filterRegion = page.getByRole('button', { name: 'Region' });
+    this.partnerCradCollection = page.locator('.partner-cards-collection ');
   }
 
   async verifyPublicCardTitle(cardTitle) {
@@ -14,6 +15,25 @@ export default class EventsPage {
       .filter({ hasText: cardTitle });
   
     await expect(cardTitleLocator).toHaveText(cardTitle);
+  }
+
+  async verifyCardDateDaysFromToday(cardTitle, daysFromToday) {
+    const card = this.page.locator('.single-partner-card').filter({
+      has: this.page.locator('.card-title', { hasText: cardTitle }),
+    });
+    const dateText = (await card.locator('.card-date').textContent()).trim();
+    const datePart = dateText.split('|')[0].trim();
+    const displayed = new Date(datePart);
+    displayed.setHours(0, 0, 0, 0);
+
+    const expected = new Date();
+    expected.setHours(0, 0, 0, 0);
+    expected.setDate(expected.getDate() + daysFromToday);
+
+    expect(
+      displayed.getTime(),
+      `Card date "${datePart}" should be ${daysFromToday} days from today (${expected.toDateString()})`,
+    ).toBe(expected.getTime());
   }
 
   async verifyCardNotVisible(cardTitle) {
