@@ -63,26 +63,26 @@ describe('asset-preview block', () => {
 describe('AssetPreview - updated()', () => {
   afterEach(() => sinon.restore());
 
-  it('calls loadPdfViewer when pdfRendition changes to a truthy value', () => {
+  it('calls loadPdfViewer when pdfPreviewUrl changes to a truthy value', () => {
     const el = makeInstance();
     const stub = sinon.stub(el, 'loadPdfViewer');
-    el.pdfRendition = 'https://example.com/file.pdf';
-    el.updated(new Map([['pdfRendition', '']]));
+    el.pdfPreviewUrl = 'https://example.com/file.pdf';
+    el.updated(new Map([['pdfPreviewUrl', '']]));
     expect(stub.calledOnce).to.be.true;
   });
 
-  it('does not call loadPdfViewer when pdfRendition is empty', () => {
+  it('does not call loadPdfViewer when pdfPreviewUrl is empty', () => {
     const el = makeInstance();
     const stub = sinon.stub(el, 'loadPdfViewer');
-    el.pdfRendition = '';
-    el.updated(new Map([['pdfRendition', 'old-value']]));
+    el.pdfPreviewUrl = '';
+    el.updated(new Map([['pdfPreviewUrl', 'old-value']]));
     expect(stub.called).to.be.false;
   });
 
-  it('does not call loadPdfViewer when pdfRendition is not in changedProperties', () => {
+  it('does not call loadPdfViewer when pdfPreviewUrl is not in changedProperties', () => {
     const el = makeInstance();
     const stub = sinon.stub(el, 'loadPdfViewer');
-    el.pdfRendition = 'https://example.com/file.pdf';
+    el.pdfPreviewUrl = 'https://example.com/file.pdf';
     el.updated(new Map([['title', '']]));
     expect(stub.called).to.be.false;
   });
@@ -91,79 +91,59 @@ describe('AssetPreview - updated()', () => {
 describe('AssetPreview - loadPdfViewer()', () => {
   afterEach(() => sinon.restore());
 
-  it('resets pdfRendition to empty string on error', async () => {
+  it('resets pdfPreviewUrl to empty string on error', async () => {
     const el = makeInstance();
-    el.pdfRendition = 'https://example.com/file.pdf';
+    el.pdfPreviewUrl = 'https://example.com/file.pdf';
     el.title = 'Test Asset';
-    window.AdobeDC = { View: class { constructor() { throw new Error('mock sdk error'); } } };
+    sinon.stub(window, 'fetch').rejects(new Error('mock sdk error'));
 
     await el.loadPdfViewer();
 
-    expect(el.pdfRendition).to.equal('');
-    delete window.AdobeDC;
+    expect(el.pdfPreviewUrl).to.equal('');
   });
 
   it('logs error message on failure', async () => {
     const el = makeInstance();
-    el.pdfRendition = 'https://example.com/file.pdf';
+    el.pdfPreviewUrl = 'https://example.com/file.pdf';
     el.title = 'Test Asset';
-    window.AdobeDC = { View: class { constructor() { throw new Error('sdk failed'); } } };
+    sinon.stub(window, 'fetch').rejects(new Error('sdk failed'));
     const consoleStub = sinon.stub(console, 'log');
 
     await el.loadPdfViewer();
 
     expect(consoleStub.calledWithMatch('PDF viewer failed to load')).to.be.true;
-    delete window.AdobeDC;
   });
 });
 
-describe('AssetPreview - setBlockData() pdf-embed-mode', () => {
-  beforeEach(async () => {
-    document.body.innerHTML = await readFile({ path: './mocks/body.html' });
-  });
-
-  afterEach(() => {
-    sinon.restore();
-    document.body.innerHTML = '';
-  });
-
-  it('reads pdf-embed-mode from table row and sets it on blockData', () => {
-    const el = makeInstance();
-    el.blockData.tableData = document.querySelector('.asset-preview').children;
-    el.setBlockData();
-    expect(el.blockData.pdfEmbedMode).to.equal('sized-container');
-  });
-});
-
-describe('AssetPreview - setData() pdfRendition', () => {
+describe('AssetPreview - setData() pdfPreviewUrl', () => {
   afterEach(() => sinon.restore());
 
-  it('sets pdfRendition from assetMetadata', async () => {
+  it('sets pdfPreviewUrl from assetMetadata', async () => {
     const el = makeInstance();
     sinon.stub(el, 'loadPdfViewer');
     await el.setData({
       title: 'Test',
       url: 'https://example.com/file.pdf',
-      pdfRendition: 'https://example.com/rendition.pdf',
+      pdfPreviewUrl: 'https://example.com/rendition.pdf',
       tags: [],
     });
-    expect(el.pdfRendition).to.equal('https://example.com/rendition.pdf');
+    expect(el.pdfPreviewUrl).to.equal('https://example.com/rendition.pdf');
   });
 
-  it('falls back to pdfViewerLink when pdfRendition is absent from metadata', async () => {
+  it('falls back to pdfViewerLink when pdfPreviewUrl is absent from metadata', async () => {
     const el = makeInstance();
     sinon.stub(el, 'loadPdfViewer');
     sinon.stub(el, 'getTagsDisplayValues').returns([]);
     sinon.stub(el, 'getTagChildTagsObjects')
-      .onFirstCall().returns([])  // audienceTags
-      .onSecondCall().returns([{ tagId: 'caas:file-format/pdf', title: 'PDF' }]);  // fileFormatTags
+      .onFirstCall().returns([])
+      .onSecondCall().returns([{ tagId: 'caas:file-format/pdf', title: 'PDF' }]);
     el.url = 'https://example.com/file.pdf';
     await el.setData({
       title: 'Test',
       url: 'https://example.com/file.pdf',
       tags: ['caas:file-format/pdf'],
     });
-    expect(el.pdfRendition).to.equal('https://example.com/file.pdf');
+    expect(el.pdfPreviewUrl).to.equal('https://example.com/file.pdf');
   });
 
   it('defaults pdfEmbedMode to sized-container when not set', async () => {
