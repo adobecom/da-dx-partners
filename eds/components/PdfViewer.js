@@ -6,7 +6,7 @@ const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 const API_SOURCE_URL = 'https://documentservices.adobe.com/view-sdk/viewer.js';
 
 const PDF_EMBED_MODE_CONFIG = {
-  'full-window': { embedMode: 'FULL_WINDOW', defaultViewMode: 'FIT_WIDTH' },
+  // 'full-window': { embedMode: 'FULL_WINDOW', defaultViewMode: 'FIT_WIDTH' }, // TODO: Re-enable once the PDF viewer team's search bug is fixed
   'sized-container': { embedMode: 'SIZED_CONTAINER' },
   'in-line': { embedMode: 'IN_LINE' },
 };
@@ -54,11 +54,11 @@ export const getPdfConfig = () => {
   return config.env?.consumer?.pdfViewerClientId || config.pdfViewerClientId;
 };
 
-const initPdfViewer = async ({ url, fileName, divId, pdfEmbedMode = 'full-window' }) => {
+const initPdfViewer = async ({ url, fileName, divId, pdfEmbedMode = 'sized-container' }) => {
   await loadStyle('/eds/components/PdfViewer.css');
   const clientId = getPdfConfig();
 
-  const embedMode = PDF_EMBED_MODE_CONFIG[pdfEmbedMode] ? pdfEmbedMode : 'full-window';
+  const embedMode = PDF_EMBED_MODE_CONFIG[pdfEmbedMode] ? pdfEmbedMode : 'sized-container';
   const pdfEmbedConfig = PDF_EMBED_MODE_CONFIG[embedMode];
 
   const initViewer = () => {

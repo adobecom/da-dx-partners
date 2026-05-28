@@ -94,7 +94,9 @@ export default class AssetPreview extends LitElement {
 
   updated(changedProperties) {
     if (changedProperties.has('pdfRendition') && this.pdfRendition) {
-      this.loadPdfViewer();
+      if (!this.isRestrictedAssetForUser()) {
+        this.loadPdfViewer();
+      }
     }
   }
 
@@ -103,18 +105,29 @@ export default class AssetPreview extends LitElement {
     if (this.webinarPresentation) return this.getWebinarPresentationDownloadUrl();
 
     const fileType = this.getFileTypeFromTag()?.toLowerCase();
-    if (fileType === 'pdf') return this.url;
+    if (fileType === 'pdf') {
+      return this.url;
+    }
     return '';
   }
 
   async loadPdfViewer() {
     try {
+      // Check if the PDF URL is reachable first
+      const res = await fetch(this.pdfRendition, { method: 'HEAD' });
+      const contentType = res.headers.get('Content-Type');
+
+      if (!res.ok || !contentType?.includes('application/pdf')) {
+        this.pdfRendition = '';
+        return;
+      }
+
       const { default: initPdfViewer } = await import('../../components/PdfViewer.js');
       await initPdfViewer({
         url: this.pdfRendition,
         fileName: `${this.title}.pdf`,
         divId: PDF_RENDER_DIV_ID,
-        pdfEmbedMode: this.blockData.pdfEmbedMode
+        pdfEmbedMode: this.blockData.pdfEmbedMode,
       });
     } catch (e) {
       console.log(`PDF viewer failed to load, falling back to preview image: ${e.message}`);
@@ -188,8 +201,7 @@ export default class AssetPreview extends LitElement {
     this.url = DOMPurify.sanitize(assetMetadata.url);
     this.webinarPresentation = DOMPurify.sanitize(assetMetadata.webinarPresentation);
     this.previewImage = DOMPurify.sanitize(assetMetadata.previewImage);
-    this.pdfRendition = DOMPurify.sanitize(assetMetadata.pdfRendition) || this.pdfViewerLink;
-    this.blockData.pdfEmbedMode = DOMPurify.sanitize(this.blockData.pdfEmbedMode) || 'full-window';
+    this.blockData.pdfEmbedMode = DOMPurify.sanitize(this.blockData.pdfEmbedMode) || 'sized-container';
     this.backButtonUrl = DOMPurify.sanitize(this.blockData.backButtonUrl);
     this.backButtonLabel = DOMPurify.sanitize(this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL);
     this.tags = assetMetadata.tags
@@ -210,6 +222,7 @@ export default class AssetPreview extends LitElement {
     })();
     this.audienceTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:audience') : [];
     this.fileFormatTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:file-format') : [];
+    this.pdfRendition = DOMPurify.sanitize(assetMetadata.pdfRendition) || this.pdfViewerLink;
     this.isVideo = this.fileFormatTags && this.fileFormatTags.length && this.fileFormatTags[0].tagId === 'caas:file-format/video';
     if (!assetMetadata.title || !assetMetadata.url) {
       this.assetHasData = false;

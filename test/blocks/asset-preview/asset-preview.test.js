@@ -153,21 +153,24 @@ describe('AssetPreview - setData() pdfRendition', () => {
   it('falls back to pdfViewerLink when pdfRendition is absent from metadata', async () => {
     const el = makeInstance();
     sinon.stub(el, 'loadPdfViewer');
-    el.fileFormatTags = [{ tagId: 'caas:file-format/pdf', title: 'PDF' }];
+    sinon.stub(el, 'getTagsDisplayValues').returns([]);
+    sinon.stub(el, 'getTagChildTagsObjects')
+      .onFirstCall().returns([])  // audienceTags
+      .onSecondCall().returns([{ tagId: 'caas:file-format/pdf', title: 'PDF' }]);  // fileFormatTags
     el.url = 'https://example.com/file.pdf';
     await el.setData({
       title: 'Test',
       url: 'https://example.com/file.pdf',
-      tags: [],
+      tags: ['caas:file-format/pdf'],
     });
     expect(el.pdfRendition).to.equal('https://example.com/file.pdf');
   });
 
-  it('defaults pdfEmbedMode to full-window when not set', async () => {
+  it('defaults pdfEmbedMode to sized-container when not set', async () => {
     const el = makeInstance();
     sinon.stub(el, 'loadPdfViewer');
     await el.setData({ title: 'Test', url: 'https://example.com/file.pdf', tags: [] });
-    expect(el.blockData.pdfEmbedMode).to.equal('full-window');
+    expect(el.blockData.pdfEmbedMode).to.equal('sized-container');
   });
 
   it('keeps existing pdfEmbedMode when already set in blockData', async () => {
