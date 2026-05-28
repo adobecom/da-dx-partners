@@ -29,37 +29,36 @@ jest.mock('/libs/utils/utils.js', () => ({ loadStyle: jest.fn() }), { virtual: t
 jest.mock('/libs/blocks/notification/notification.js', () => ({ __esModule: true, default: jest.fn() }), { virtual: true });
 
 function makeApiData({ level = 'Gold', solutionPct = 100, technologyPct = 100 } = {}) {
-  const norm = level.toLowerCase();
-  const next = norm === 'silver' ? 'gold' : 'platinum';
+  const next = level.toLowerCase() === 'silver' ? 'gold' : 'platinum';
   return {
     billingContact: [{ firstName: 'Jane', lastName: 'Doe' }],
     level,
     solution: [
       {
-        level: next,
-        credentials: { total: 0, required: 30, percentage: solutionPct },
-        customerDeployments: { total: 0, required: 10, percentage: solutionPct },
-        specializations: { total: 0, required: 1, percentage: solutionPct },
+        level: 'gold',
+        credentials: { total: 0, required: 30, percentage: next === 'gold' ? solutionPct : 0 },
+        customerDeployments: { total: 0, required: 10, percentage: next === 'gold' ? solutionPct : 0 },
+        specializations: { total: 0, required: 1, percentage: next === 'gold' ? solutionPct : 0 },
       },
       {
-        level: norm === 'silver' ? 'platinum' : 'silver',
-        credentials: { total: 0, required: 100, percentage: 0 },
-        customerDeployments: { total: 0, required: 20, percentage: 0 },
-        specializations: { total: 0, required: 5, percentage: 0 },
+        level: 'platinum',
+        credentials: { total: 0, required: 100, percentage: next === 'platinum' ? solutionPct : 0 },
+        customerDeployments: { total: 0, required: 20, percentage: next === 'platinum' ? solutionPct : 0 },
+        specializations: { total: 0, required: 5, percentage: next === 'platinum' ? solutionPct : 0 },
       },
     ],
     technology: [
       {
-        level: next,
-        credentials: { total: 0, required: 2, percentage: technologyPct },
-        customerDeployments: { total: 0, required: 2, percentage: technologyPct },
-        solutions: { total: 0, required: 1, percentage: technologyPct },
+        level: 'gold',
+        credentials: { total: 0, required: 2, percentage: next === 'gold' ? technologyPct : 0 },
+        customerDeployments: { total: 0, required: 2, percentage: next === 'gold' ? technologyPct : 0 },
+        solutions: { total: 0, required: 1, percentage: next === 'gold' ? technologyPct : 0 },
       },
       {
-        level: norm === 'silver' ? 'platinum' : 'silver',
-        credentials: { total: 0, required: 4, percentage: 0 },
-        customerDeployments: { total: 0, required: 3, percentage: 0 },
-        solutions: { total: 0, required: 1, percentage: 0 },
+        level: 'platinum',
+        credentials: { total: 0, required: 4, percentage: next === 'platinum' ? technologyPct : 0 },
+        customerDeployments: { total: 0, required: 3, percentage: next === 'platinum' ? technologyPct : 0 },
+        solutions: { total: 0, required: 1, percentage: next === 'platinum' ? technologyPct : 0 },
       },
     ],
   };
