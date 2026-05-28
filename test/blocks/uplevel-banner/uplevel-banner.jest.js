@@ -7,7 +7,7 @@ import fs from 'fs';
 
 jest.mock('../../../eds/scripts/utils.js', () => ({
   getLibs: () => '/libs',
-  invokeAfterImsIsReady: (cb) => cb(),
+  invokeAfterImsIsReady: async (cb) => cb(),
   getMetadataContent: (name) => global.document.querySelector(`meta[name="${name}"]`)?.content ?? null,
 }));
 
@@ -36,13 +36,13 @@ function makeApiData({ level = 'Gold', solutionPct = 100, technologyPct = 100 } 
     level,
     solution: [
       {
-        level: norm,
+        level: next,
         credentials: { total: 0, required: 30, percentage: solutionPct },
         customerDeployments: { total: 0, required: 10, percentage: solutionPct },
         specializations: { total: 0, required: 1, percentage: solutionPct },
       },
       {
-        level: next,
+        level: norm === 'silver' ? 'platinum' : 'silver',
         credentials: { total: 0, required: 100, percentage: 0 },
         customerDeployments: { total: 0, required: 20, percentage: 0 },
         specializations: { total: 0, required: 5, percentage: 0 },
@@ -50,13 +50,13 @@ function makeApiData({ level = 'Gold', solutionPct = 100, technologyPct = 100 } 
     ],
     technology: [
       {
-        level: norm,
+        level: next,
         credentials: { total: 0, required: 2, percentage: technologyPct },
         customerDeployments: { total: 0, required: 2, percentage: technologyPct },
         solutions: { total: 0, required: 1, percentage: technologyPct },
       },
       {
-        level: next,
+        level: norm === 'silver' ? 'platinum' : 'silver',
         credentials: { total: 0, required: 4, percentage: 0 },
         customerDeployments: { total: 0, required: 3, percentage: 0 },
         solutions: { total: 0, required: 1, percentage: 0 },
