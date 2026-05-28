@@ -16,7 +16,7 @@ function makeInstance() {
     pdfEmbedMode: '',
   };
   el.fileFormatTags = [];
-  el.pdfRendition = '';
+  el.pdfPreviewUrl = '';
   el.url = '';
   el.webinarPresentation = '';
   return el;
