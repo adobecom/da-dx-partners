@@ -103,7 +103,7 @@ async function replaceCompanyLogo(elements) {
     elements.forEach(el => el.remove());
   }
 }
-function replaceDirectText(node, search, replace) {
+export function replaceDirectText(node, search, replace) {
   node.childNodes.forEach((child) => {
     if (child.nodeType === Node.TEXT_NODE) {
       child.nodeValue = child.nodeValue.replaceAll(search, replace);
