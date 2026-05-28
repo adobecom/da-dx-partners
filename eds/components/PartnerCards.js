@@ -1,4 +1,4 @@
-import { CAAS_TAGS_URL, getLibs, prodHosts } from '../scripts/utils.js';
+import { CAAS_TAGS_URL, getLibs, prodHosts, loadPageToAnchor } from '../scripts/utils.js';
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
@@ -244,6 +244,21 @@ export default class PartnerCards extends LitElement {
     this.additionalFirstUpdated();
     this.initUrlSearchParams();
     this.handleActions();
+
+    if (window.location.hash) {
+      await this.updateComplete;
+
+      const childCards = [...this.querySelectorAll('single-partner-card, single-partner-card-half-height, search-card')];
+      await Promise.all(childCards.map((card) => card.updateComplete));
+
+      if (document.readyState !== 'complete') {
+        await new Promise((resolve) => { window.addEventListener('load', resolve, { once: true }); });
+      }
+
+      if (document.fonts) await document.fonts.ready;
+      await new Promise((resolve) => { requestAnimationFrame(() => requestAnimationFrame(resolve)); });
+      loadPageToAnchor();
+    }
   }
 
   // gets text content from node,
@@ -951,13 +966,19 @@ export default class PartnerCards extends LitElement {
   // eslint-disable-next-line class-methods-use-this
   getSlider() {}
 
+  get filtersLabel() {
+    return Object.keys(this.selectedFilters).length > 0
+      ? Object.values(this.selectedFilters).flat().map((item) => item.value).join(', ')
+      : 'No Filters';
+  }
+
   /* eslint-disable indent */
   render() {
     return html`
       ${this.fetchedData
         ? html`
           <div class="partner-cards ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled': ''}"
-            daa-lh="Card Collection | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
+            daa-lh="Card Collection | Filters: ${processTrackingLabels(this.filtersLabel)} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
           >
           ${this.blockData.filtersPanel === 'disable'
             ? ''

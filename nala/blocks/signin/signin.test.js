@@ -37,7 +37,7 @@ test.describe('MAPP sign in flow', () => {
 
     await test.step('Sign in', async () => {
       await signInPage.signIn(page, `${features[0].data.partnerLevel}`);
-      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 })
+      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
 
@@ -278,7 +278,7 @@ test.describe('MAPP sign in flow', () => {
       await signInPage.signIn(page, `${features[17].data.partnerLevel}`);
       await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
-      });
+    });
 
     await test.step('Verify error message', async () => {
       await page.waitForLoadState('networkidle');
@@ -295,19 +295,27 @@ test.describe('MAPP sign in flow', () => {
       await test.step('Go to public home page', async () => {
         await page.goto(`${baseURL}${feature.path}`);
       });
-  
+
       await test.step('Sign in', async () => {
         await signInPage.signIn(page, `${feature.data.partnerLevel}`);
         await signInPage.popupCloseButton.waitFor({ state: 'visible', timeout: 30000 });
         await signInPage.popupCloseButton.click();
       });
+
       await test.step('Verify assets visibility', async () => {
         await signInPage.searchField.fill(data.searchKeyword);
+        const initialResults = await signInPage.getNumberOfResults();
         await signInPage.searchField.press('Enter');
-        await signInPage.waitForResultsToSettle();
-        await signInPage.cardWrapper.waitFor({ state: 'visible', timeout: 30000 });
-        const numberResults = await signInPage.getNumberOfResults();
-        await expect(numberResults).toEqual(4);
+
+        await expect.poll(
+          async () => await signInPage.getNumberOfResults(),
+          { timeout: 15000 },
+        ).not.toBe(initialResults);
+
+        await expect.poll(
+          async () => await signInPage.getNumberOfResults(),
+          { timeout: 15000 },
+        ).toBe(4);
 
         await expect(signInPage.assetTitleCheck(data.assetTitle1)).toBeVisible();
         await expect(signInPage.assetTitleCheck(data.assetTitle2)).toBeVisible();

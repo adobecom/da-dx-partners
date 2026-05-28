@@ -1,7 +1,7 @@
 import {getLibs, getPartnerCookieValue, invokeAfterImsIsReady} from '../../scripts/utils.js';
 import { partnershipProgressStyles } from './PartnershipProgressStyles.js';
-import { getConfig } from '../utils/utils.js';
 import {DX_PARTNER_LEVEL, DX_PRIMARY_BUSINESS} from "../utils/dxConstants.js";
+import { getPartnershipData } from '../utils/partnershipDataService.js';
 
 const miloLibs = getLibs();
 const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -13,8 +13,6 @@ const LEVEL_ORDER = [
     DX_PARTNER_LEVEL.GOLD.toLowerCase(),
     DX_PARTNER_LEVEL.PLATINUM.toLowerCase(),
 ];
-const PARTNERSHIP_PROGRESS_API =
-    'https://partner-registration-stage.adobe.io/api/v1/dxp/partner/membership/level-requirements';
 
 function getTargetLevel(currentLevel) {
   const norm = String(currentLevel).toLowerCase();
@@ -54,33 +52,9 @@ export default class PartnershipProgress extends LitElement {
   }
 
   async fetchData() {
-    let url = PARTNERSHIP_PROGRESS_API;
-    const { env } = getConfig();
-    if (env.name === 'prod') {
-      url = url.replace('-stage', '');
-    }
-
     this.loading = true;
-
     try {
-      const token = window.adobeIMS?.getAccessToken?.().token;
-      if (!token) {
-        throw new Error('Missing IMS access token');
-      }
-
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'X-Api-Key': token,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Failed to load data: ${res.status}`);
-      }
-
-      const json = await res.json();
-      this.data = json;
+      this.data = await getPartnershipData();
     } catch (e) {
       console.error('[partnership-progress] fetch error', e);
     } finally {

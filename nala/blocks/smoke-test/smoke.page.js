@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 export default class SmokeTest {
   constructor(page) {
     this.page = page;
@@ -46,6 +48,8 @@ export default class SmokeTest {
     this.jarvisChatPanel = page.frameLocator('iframe[title="Adobe Virtual Assistant"]').getByText("We're here to help.");
     this.searchCardsCollection = page.locator('.partner-cards-collection');
     this.cardCollectionSortButton = page.getByRole('button', { name: 'date: newest' });
+    this.globalFooter = page.locator('.global-footer');
+    this.signOutButton = page.getByRole('link', { name: 'Sign Out' });
   }
 
   async smokeSignIn(page, baseURL, partnerLevel) {
@@ -76,6 +80,21 @@ export default class SmokeTest {
     return await this.footer.isVisible();
   }
 
+  async verifyFooterSocialMediaIcons(data) {
+    const root = this.globalFooter;
+    const pairs = [
+      ['facebook', data.facebookLink],
+      ['instagram', data.instagramLink],
+      ['linkedin', data.linkedinLink],
+      ['twitter', data.twitterLink],
+    ];
+    for (const [label, href] of pairs) {
+      const link = root.locator(`a.feds-social-link[aria-label="${label}"]`);
+      await expect(link).toBeVisible();
+      await expect(link).toHaveAttribute('href', href);
+    }
+  }
+
   async getResultsCount() {
     const text = await this.searchAllResults.textContent();
     const match = text?.match(/\((\d+)\)/);
@@ -94,5 +113,12 @@ export default class SmokeTest {
     await this.searchField.type(keyword, { delay: 80 });
     await this.page.waitForTimeout(5000);
     await this.page.keyboard.press('Enter');
+  }
+
+  async signOut() {
+    await this.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    await this.profileIconButton.click();
+    await this.signOutButton.waitFor({ state: 'visible', timeout: 10000 });
+    await this.signOutButton.click();
   }
 }

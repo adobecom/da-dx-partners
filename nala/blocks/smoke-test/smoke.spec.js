@@ -175,6 +175,43 @@ export default {
         feedbackTitle: 'Rate this page',
         feedbackTextArea: 'Automation Test Keywords',
       },
-    }
+    },
+    {
+      tcid: '18',
+      name: '@smoke-test-footer-validation-public-and-protected-pages',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: {
+        partnerLevel: 'dxp-platinum:',
+        facebookLink: 'https://www.facebook.com/adobe',
+        instagramLink: 'https://www.instagram.com/adobe/',
+        linkedinLink: 'https://www.linkedin.com/company/adobe-partners/',
+        twitterLink: 'https://twitter.com/AdobePartner',
+      },
+    },
+    {
+      tcid: '19',
+      name: '@smoke-test-footer-validation-404-and-react-include-pages',
+      path: '/digitalexperience/home-page',
+      tags: '@da-dx-smoke-test',
+      data: {
+        partnerLevel: 'dxp-platinum:',
+        facebookLink: 'https://www.facebook.com/adobe',
+        instagramLink: 'https://www.instagram.com/adobe/',
+        linkedinLink: 'https://www.linkedin.com/company/adobe-partners/',
+        twitterLink: 'https://twitter.com/AdobePartner',
+        reactIncludePage: '/digitalexperience/home/manage-user',
+      },
+    },
+    {
+      tcid: '20',
+      name: '@smoke-test-signout-redirect',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: {
+        partnerLevel: 'dxp-community:',
+        homeUrl: '/digitalexperience/home/',
+      },
+    },
   ],
 };
