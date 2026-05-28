@@ -13,18 +13,20 @@ export function getTargetLevel(data) {
 
   if (currentLevel !== 'silver' && currentLevel !== 'gold') return null;
 
+  const targetLevel = LEVEL_MAP[currentLevel];
+
   // eslint-disable-next-line max-len
-  const solutionItem = (data.solution || []).find((item) => item.level?.toLowerCase() === currentLevel);
+  const solutionItem = (data.solution || []).find((item) => item.level?.toLowerCase() === targetLevel);
   const solutionValid = isFullyCompleted(solutionItem, ['credentials', 'customerDeployments', 'specializations']);
 
   if (!solutionValid) {
     // eslint-disable-next-line max-len
-    const technologyItem = (data.technology || []).find((item) => item.level?.toLowerCase() === currentLevel);
+    const technologyItem = (data.technology || []).find((item) => item.level?.toLowerCase() === targetLevel);
     const technologyValid = isFullyCompleted(technologyItem, ['credentials', 'customerDeployments', 'solutions']);
     if (!technologyValid) return null;
   }
 
-  return LEVEL_MAP[currentLevel];
+  return targetLevel;
 }
 
 export default async function init(el) {
