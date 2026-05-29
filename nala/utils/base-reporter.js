@@ -1,8 +1,7 @@
-
 // Playwright will include ANSI color characters and regex from below
 // https://github.com/microsoft/playwright/issues/13522
 // https://github.com/chalk/ansi-regex/blob/main/index.js#L3
-
+/* eslint-disable no-console */
 const pattern = [
   '[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)',
   '(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]))',
@@ -30,12 +29,13 @@ export default class BaseReporter {
   onBegin(config, suite) {
     this.config = config;
     this.rootSuite = suite;
-
   }
 
   async onTestEnd(test, result) {
     const { title, retries, _projectId } = test;
-    const { name, tags, url, browser, env, branch, repo} = this.parseTestTitle(title, _projectId);
+    const {
+      name, tags, url, browser, env, branch, repo,
+    } = this.parseTestTitle(title, _projectId);
     const {
       status,
       duration,
@@ -65,25 +65,24 @@ export default class BaseReporter {
       retry,
     });
     if (status === 'passed') {
-      this.passedTests++;
+      this.passedTests += 1;
     } else if (failedStatus.includes(status)) {
-      this.failedTests++;
+      this.failedTests += 1;
     } else if (status === 'skipped') {
-      this.skippedTests++;
+      this.skippedTests += 1;
     }
   }
 
   async onEnd() {
-    //this.printPersistingOption();
-    //await this.persistData();
-    const summary = this.printResultSummary();
-    const resultSummary = { summary };
+    // this.printPersistingOption();
+    // await this.persistData();
+    this.printResultSummary();
 
     if (process.env.SLACK_WH) {
       try {
-              console.log('----success to publish result to slack channel----');
-//         await sendSlackMessage(process.env.SLACK_WH, resultSummary);
-      } catch (error){
+        console.log('----success to publish result to slack channel----');
+        //         await sendSlackMessage(process.env.SLACK_WH, resultSummary);
+      } catch (error) {
         console.log('----Failed to publish result to slack channel----');
       }
     }
@@ -94,9 +93,10 @@ export default class BaseReporter {
     const passPercentage = ((this.passedTests / totalTests) * 100).toFixed(2);
     const failPercentage = ((this.failedTests / totalTests) * 100).toFixed(2);
     const miloLibs = process.env.MILO_LIBS || '';
-    const prBranchUrl = process.env.PR_BRANCH_LIVE_URL ? (process.env.PR_BRANCH_LIVE_URL + miloLibs) : undefined;
+    const prBranchUrl = process.env.PR_BRANCH_LIVE_URL
+      ? (process.env.PR_BRANCH_LIVE_URL + miloLibs) : undefined;
     const projectBaseUrl = this.config.projects[0].use.baseURL;
-    const envURL = prBranchUrl ? prBranchUrl : projectBaseUrl;
+    const envURL = prBranchUrl || projectBaseUrl;
 
     let exeEnv = 'Local Environment';
     let runUrl = 'Local Environment';
@@ -158,9 +158,9 @@ export default class BaseReporter {
 
     const titleParts = title.split('@');
     const name = titleParts[1].trim();
-    const tags = titleParts.slice(2).map(tag => tag.trim());
+    const tags = titleParts.slice(2).map((tag) => tag.trim());
 
-    const projectConfig = this.config.projects.find(project => project.name === projectId);
+    const projectConfig = this.config.projects.find((project) => project.name === projectId);
 
     // Get baseURL from project config
     if (projectConfig?.use?.baseURL) {
@@ -184,7 +184,9 @@ export default class BaseReporter {
       [branch, repo] = branchAndRepo.split('--');
     }
 
-    return { name, tags, url, browser, env, branch, repo};
+    return {
+      name, tags, url, browser, env, branch, repo,
+    };
   }
 
   // eslint-disable-next-line class-methods-use-this, no-empty-function
@@ -198,7 +200,7 @@ export default class BaseReporter {
     } else {
       console.log('Not persisting data');
     }
-    //this.branch1 = process.env.GITHUB_REF_NAME ?? 'local';
+    // this.branch1 = process.env.GITHUB_REF_NAME ?? 'local';
     this.branch = process.env.LOCAL_TEST_LIVE_URL;
   }
 

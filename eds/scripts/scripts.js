@@ -17,12 +17,17 @@ import {
   redirectLoggedinPartner,
   updateNavigation,
   loadPageToAnchor,
-  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback, SHOW_NEXT_POPUP, PARTNER_AGREEMENT_POPUP
+  updateFooter,
+  updateIMSConfig,
+  PARTNER_LOGIN_QUERY,
+  setFeedback,
+  SHOW_NEXT_POPUP,
+  PARTNER_AGREEMENT_POPUP,
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
 import { prependContent } from './portalMessaging.js';
-import { showNextPopup } from './showNextPopup.js';
+import showNextPopup from './showNextPopup.js';
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -33,16 +38,16 @@ const LIBS = '/libs';
 
 const isProd = prodHosts.includes(window.location.host);
 // required for react-include component: react-app may need different ims client ids.
-let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 'ims_client_id_stage' }]`)?.content
+let imsClientId = document.querySelector(`meta[name=${isProd ? 'ims_client_id' : 'ims_client_id_stage'}]`)?.content;
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
 const localesDefault = { '': { ietf: 'en-US', tk: 'hah7vzn.css' } };
-//typekits with swap
+// typekits with swap
 const localesSafari = { '': { ietf: 'en-US', tk: 'vti0xwb.css' } };
 const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome');
 
 // Add any config options.
-let CONFIG = {
+const CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
   useDotHtml: false,
@@ -138,7 +143,7 @@ async function loadPage() {
   await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
 
   // Run when navigating back/forward
-  window.addEventListener('pageshow', (e) => {
+  window.addEventListener('pageshow', () => {
     loadPageToAnchor();
   });
 }

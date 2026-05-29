@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 import { expect } from '@playwright/test';
 
 const fs = require('fs');
 // eslint-disable-next-line import/no-extraneous-dependencies
-//const yaml = require('js-yaml');
+// const yaml = require('js-yaml');
 const { request } = require('@playwright/test');
 
 /**
@@ -206,7 +207,7 @@ exports.WebUtil = class WebUtil {
    * @param {string} filePath
   */
   static async loadTestData(dataFilePath) {
-    return dataFilePath.includes('.yml') ? yaml.load(fs.readFileSync(dataFilePath, 'utf8')) : JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
+    return JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
   }
 
   /**
@@ -260,7 +261,7 @@ exports.WebUtil = class WebUtil {
  * @returns {string} - A string formatted as 'gnav|<project>|nopzn|nopzn'.
  */
   // eslint-disable-next-line class-methods-use-this
-  async getGnavDaalh(project = milo) {
+  async getGnavDaalh(project = 'milo') {
     return `gnav|${project}|nopzn|nopzn`;
   }
 
@@ -272,7 +273,7 @@ exports.WebUtil = class WebUtil {
  * @returns {string} - A string formatted as 'gnav|<project>|<pznExpName>|<pznFileName>'.
  */
   // eslint-disable-next-line class-methods-use-this, default-param-last
-  async getPznGnavDaalh(project = milo, pznExpName, pznFileName) {
+  async getPznGnavDaalh(project = 'milo', pznExpName, pznFileName) {
     const slicedExpName = pznExpName.slice(0, 15);
     const slicedFileName = pznFileName.slice(0, 15);
     return `gnav|${project}|${slicedExpName}|${slicedFileName}`;
@@ -331,7 +332,7 @@ exports.WebUtil = class WebUtil {
  * @returns {string} - A string formatted as '<cleanedLinkText>-<counter>--<cleanedLastHeaderText>'.
  */
   // eslint-disable-next-line class-methods-use-this
-  async getLinkDaall(linkText, counter, lastHeaderText, pzn = false) {
+  async getLinkDaall(linkText, counter, lastHeaderText, _pzn = false) {
     const cleanAndSliceText = (text) => text
       ?.replace(/[^\w\s]+/g, ' ')
       .replace(/\s+/g, ' ')

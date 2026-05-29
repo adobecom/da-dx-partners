@@ -135,12 +135,10 @@ async function loadBannerContent(bannerType) {
 }
 
 export async function getBctqBanner() {
-  let bannerType;
   if (PERSONALIZATION_CONDITIONS['partner-bctq-expiring-90d']) {
-    bannerType = 'bctq-banner';
-    return loadBannerContent(bannerType);
+    return loadBannerContent('bctq-banner');
   }
-  if (!bannerType) return null;
+  return null;
 }
 
 export async function getGlobalBanner() {

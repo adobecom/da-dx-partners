@@ -30,8 +30,8 @@ test.describe('Search Page', () => {
       await searchPage.waitForResultsToSettle();
       await searchPage.searchAllResults.waitFor({ state: 'visible' });
       await expect.poll(
-        async () => await searchPage.getNumberOfResults(),
-        { timeout: 15000 }
+        async () => searchPage.getNumberOfResults(),
+        { timeout: 15000 },
       ).toBeGreaterThanOrEqual(6);
     });
     await test.step('Asset Card Content Validation', async () => {
@@ -39,9 +39,7 @@ test.describe('Search Page', () => {
         const card = searchPage.getCardByTitle(data.cardTitle);
         await searchPage.clickCard(card);
         await page.waitForLoadState('domcontentloaded');
-        const expanded = await card.evaluate(el =>
-          el.classList.contains('expanded')
-        );
+        const expanded = await card.evaluate((el) => el.classList.contains('expanded'));
 
         expect(expanded).toBe(true);
       }).toPass({ timeout: 30000 });
@@ -66,11 +64,11 @@ test.describe('Search Page', () => {
     });
 
     await test.step('Check Silver Asset', async () => {
-        await searchPage.clearSearch.click();
-        await searchPage.searchField.fill(data.silverAssetTitle);
-        await searchPage.searchField.press('Enter');
-        const firstCardTitle = await searchPage.getCardTitle();
-        await expect(firstCardTitle).not.toBe(data.silverAssetTitle);
+      await searchPage.clearSearch.click();
+      await searchPage.searchField.fill(data.silverAssetTitle);
+      await searchPage.searchField.press('Enter');
+      const firstCardTitle = await searchPage.getCardTitle();
+      await expect(firstCardTitle).not.toBe(data.silverAssetTitle);
     });
   });
   test(`${features[1].name},${features[1].tags}`, async ({ page }) => {
@@ -87,27 +85,28 @@ test.describe('Search Page', () => {
       await searchPage.searchField.press('Enter');
       const initialResults = await signInPage.getNumberOfResults();
       await expect.poll(
-        async () => await signInPage.getNumberOfResults(),
+        async () => signInPage.getNumberOfResults(),
         { timeout: 15000 },
       ).not.toBe(initialResults);
 
       await expect.poll(
-        async () => await signInPage.getNumberOfResults(),
+        async () => signInPage.getNumberOfResults(),
         { timeout: 15000 },
       ).toBe(4);
     });
     await test.step('Check Filter Journey Phase Explore', async () => {
+      const initialTitle = await searchPage.getCardTitle();
       await searchPage.journeyPhaseFilter.click();
       await searchPage.exploreCheckBox.click();
       await expect(searchPage.exploreCheckBox).toBeChecked();
 
       await expect.poll(
-        async () => await searchPage.getCardTitle(),
-        { timeout: 15000 }
+        async () => searchPage.getCardTitle(),
+        { timeout: 15000 },
       ).not.toBe(initialTitle);
       await expect.poll(
-        async () => await searchPage.getCardTitle(),
-        { timeout: 15000 }
+        async () => searchPage.getCardTitle(),
+        { timeout: 15000 },
       ).toBe(data.assetTitle1);
     });
     await test.step('Check Filter Journey Phase Discover', async () => {
@@ -153,7 +152,7 @@ test.describe('Search Page', () => {
     });
 
     await test.step('View Asset', async () => {
-    const [newTab] = await Promise.all([
+      const [newTab] = await Promise.all([
         page.waitForEvent('popup'),
         searchPage.viewAssetButton.click(),
       ]);
@@ -181,7 +180,7 @@ test.describe('Search Page', () => {
       await signInPage.signIn(page, `${data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
 
-      await expect(searchPage.downloadImageButton).toBeVisible(); 
+      await expect(searchPage.downloadImageButton).toBeVisible();
     });
     await test.step('Search All Assets', async () => {
       await searchPage.searchAllAssetsButton.click();
@@ -268,10 +267,10 @@ test.describe('Search Page', () => {
     await test.step('Check Training', async () => {
       await searchPage.trainingButton.click();
       await page.waitForTimeout(5000);
-      
+
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        searchPage.trainingPreviewButton.click()
+        searchPage.trainingPreviewButton.click(),
       ]);
 
       await newPage.waitForURL((url) => url.toString().includes(data.trainingLink), { timeout: 30000 });
@@ -281,7 +280,7 @@ test.describe('Search Page', () => {
       await newPage.close();
     });
   });
-  test(`${features[9].name},${features[9].tags}`, async ({ page, browserName }) => {
+  test(`${features[9].name},${features[9].tags}`, async ({ page }) => {
     const { data } = features[9];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[9].path}`);
@@ -299,7 +298,7 @@ test.describe('Search Page', () => {
       const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
     });
-    await test.step('Check Filter Busines Solution', async () => { 
+    await test.step('Check Filter Busines Solution', async () => {
       await searchPage.functionalityFilter.click();
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       await searchPage.analysisInsgightCheckBox.click();
@@ -349,7 +348,7 @@ test.describe('Search Page', () => {
 
   test(`${features[10].name},${features[10].tags}`, async ({ page, context }) => {
     const { data } = features[10];
-    const sharedData = features.find(f => f.tcid === '8')?.data;
+    const sharedData = features.find((f) => f.tcid === '8')?.data;
 
     await test.step('Go to search page', async () => {
       await page.goto(`${features[10].path}`);
@@ -361,13 +360,13 @@ test.describe('Search Page', () => {
     });
 
     await test.step('Verify asset restricted preview message', async () => {
-      await searchPage.verifyPreviewMessage(data)
+      await searchPage.verifyPreviewMessage(data);
     });
 
     await test.step('Verify register link', async () => {
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        searchPage.clickLinkFromMessage(data.textBlock, data.link[0].text)
+        searchPage.clickLinkFromMessage(data.textBlock, data.link[0].text),
       ]);
       await newPage.waitForLoadState();
       await expect(newPage).toHaveURL(data.link[0].url);
@@ -376,7 +375,7 @@ test.describe('Search Page', () => {
 
   test(`${features[11].name},${features[11].tags}`, async ({ page }) => {
     const { data } = features[11];
-    const sharedData = features.find(f => f.tcid === '8')?.data;
+    const sharedData = features.find((f) => f.tcid === '8')?.data;
 
     await test.step('Go to search page', async () => {
       await page.goto(`${features[11].path}`);
@@ -391,20 +390,20 @@ test.describe('Search Page', () => {
     });
 
     await test.step('Verify asset restricted preview message', async () => {
-      await searchPage.verifyPreviewMessage(data)
+      await searchPage.verifyPreviewMessage(data);
     });
 
     await test.step('Verify silver-membership link', async () => {
       await expect(
         searchPage.restrictedMessageBox
-          .locator('a', { hasText: data.link[0].text })
+          .locator('a', { hasText: data.link[0].text }),
       ).toHaveAttribute('href', data.link[0].url);
     });
   });
 
   test(`${features[12].name},${features[12].tags}`, async ({ page }) => {
     const { data } = features[12];
-    const sharedData = features.find(f => f.tcid === '8')?.data;
+    const sharedData = features.find((f) => f.tcid === '8')?.data;
 
     await test.step('Go to search page', async () => {
       await page.goto(`${features[12].path}`);
@@ -419,13 +418,13 @@ test.describe('Search Page', () => {
     });
 
     await test.step('Verify asset restricted preview message', async () => {
-      await searchPage.verifyPreviewMessage(data)
+      await searchPage.verifyPreviewMessage(data);
     });
 
     await test.step('Verify upleveling link', async () => {
       await searchPage.clickLinkFromMessage(
         data.textBlock,
-        data.link[0].text
+        data.link[0].text,
       );
       await page.waitForURL(data.link[0].url);
       await expect(page).toHaveURL(data.link[0].url);

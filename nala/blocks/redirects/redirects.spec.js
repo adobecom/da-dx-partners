@@ -12,7 +12,7 @@ export default {
         menageUserLink: 'https://partners.stage.adobe.com/digitalexperience/home/manage-user',
         demoLink: 'https://demo-stage.adobe.com/',
         adobeLink: 'https://stage.adobe.com/',
-      }
+      },
     },
     {
       tcid: '2',

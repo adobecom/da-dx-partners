@@ -1,7 +1,7 @@
 import {
   isMember,
   getNodesByXPath,
-  getPartnerCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration, getLibs
+  getPartnerCookieObject, getCurrentProgramType, getDaysUntilComplianceExpiration,
 } from './utils.js';
 import {
   PERSONALIZATION_PLACEHOLDERS,
@@ -10,10 +10,8 @@ import {
   PERSONALIZATION_CONDITIONS,
   PROFILE_PERSONALIZATION_ACTIONS, LEVEL_CONDITION, NEGATION_PREFIX,
 } from './personalizationConfigDX.js';
-import {
-  PERSONALIZATION_HIDE,
-} from './personalizationUtils.js';
-import {DX_PROGRAM_TYPE} from "../blocks/utils/dxConstants.js";
+import { PERSONALIZATION_HIDE } from './personalizationUtils.js';
+import { DX_PROGRAM_TYPE } from '../blocks/utils/dxConstants.js';
 
 const imgSelector = 'img.feds-profile-img';
 
@@ -55,7 +53,7 @@ async function replaceProfileImage(elements) {
     });
   } catch (error) {
     console.warn('Failed to replace profile image placeholders:', error);
-    elements.forEach(el => el.remove());
+    elements.forEach((el) => el.remove());
   }
 }
 
@@ -78,7 +76,7 @@ async function replaceCompanyLogo(elements) {
     const companyLogoUrl = programData?.companyLogoUrl;
 
     if (!companyLogoUrl) {
-      elements.forEach(el => el.remove());
+      elements.forEach((el) => el.remove());
       return;
     }
 
@@ -100,7 +98,7 @@ async function replaceCompanyLogo(elements) {
     });
   } catch (error) {
     console.warn('Failed to replace company logo placeholders:', error);
-    elements.forEach(el => el.remove());
+    elements.forEach((el) => el.remove());
   }
 }
 function replaceDirectText(node, search, replace) {
@@ -110,7 +108,7 @@ function replaceDirectText(node, search, replace) {
     }
   });
 }
-export function personalizePlaceholders(placeholders, context = document, programType, addClass = false) {
+export function personalizePlaceholders(placeholders, context, programType, addClass = false) {
   const sortedEntries = Object.entries(placeholders).sort((a, b) => b[0].length - a[0].length);
   sortedEntries.forEach(([key, value]) => {
     const elements = getNodesByXPath(value, context);
@@ -172,7 +170,7 @@ function shouldHide(conditions, conditionsConfig = PERSONALIZATION_CONDITIONS) {
 
   const matchesOtherConditions = otherConditions.every((condition) => {
     const baseCondition = getBaseConditionName(condition);
-    let value = conditionsConfig[baseCondition];
+    const value = conditionsConfig[baseCondition];
     return isNegatedCondition(condition) ? !value : value;
   });
 
@@ -286,6 +284,7 @@ export function shouldHideLinkGroup(elem) {
     const conditions = Object.values(elem.classList);
     return shouldHide(conditions, PERSONALIZATION_CONDITIONS);
   }
+  return false;
 }
 
 function personalizeProfile(gnav) {
@@ -297,7 +296,8 @@ function personalizeProfile(gnav) {
 export function applyGnavPersonalization(gnav) {
   if (!isMember()) return gnav;
   const importedGnav = document.importNode(gnav, true);
-  personalizeMainNav(importedGnav);  // not sure if this actually is needed: at this point gnav does not contain loaded fragments
+  // not sure if this actually is needed: at this point gnav does not contain loaded fragments
+  personalizeMainNav(importedGnav);
   personalizeProfile(importedGnav);
   return importedGnav;
 }

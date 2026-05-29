@@ -15,7 +15,7 @@ jest.mock('../../eds/scripts/utils.js', () => ({
   getCurrentProgramType: jest.fn(() => 'dxp'),
   getMetadataContent: jest.fn(),
   isMember: jest.fn(),
-  invokeAfterImsIsReady: jest.fn(async (callback) => await callback()), // Immediately invoke callback and await result
+  invokeAfterImsIsReady: jest.fn((callback) => callback()), // Immediately invoke callback and await result
   preventModalClose: jest.fn(),
 }));
 
@@ -54,7 +54,6 @@ describe('Test certificationExpiresPopup.js', () => {
   let getCurrentProgramType;
   let getMetadataContent;
   let isMember;
-  let invokeAfterImsIsReady;
   let loadPopupFragment;
   let isProd;
   let rewriteLinks;
@@ -87,7 +86,7 @@ describe('Test certificationExpiresPopup.js', () => {
   beforeEach(() => {
     jest.resetModules();
     jest.clearAllMocks();
-    
+
     // Reset global mocks
     if (global.fetch && global.fetch.mockReset) global.fetch.mockReset();
     mockGetItem.mockReset();
@@ -113,7 +112,6 @@ describe('Test certificationExpiresPopup.js', () => {
     getCurrentProgramType = utilsModule.getCurrentProgramType;
     getMetadataContent = utilsModule.getMetadataContent;
     isMember = utilsModule.isMember;
-    invokeAfterImsIsReady = utilsModule.invokeAfterImsIsReady;
 
     const portalMessagingModule = require('../../eds/scripts/portalMessaging.js');
     loadPopupFragment = portalMessagingModule.loadPopupFragment;
@@ -127,7 +125,7 @@ describe('Test certificationExpiresPopup.js', () => {
     const personalizationModule = require('../../eds/scripts/personalization.js');
     personalizePage = personalizationModule.personalizePage;
     personalizePlaceholders = personalizationModule.personalizePlaceholders;
-    
+
     // Set default return values
     getCurrentProgramType.mockReturnValue('dxp');
     isProd.mockReturnValue(false);
@@ -192,17 +190,17 @@ describe('Test certificationExpiresPopup.js', () => {
     it('should use production URL when isProd returns true', async () => {
       // Must reset modules to re-evaluate the partnerDirectoryUrl constant
       jest.resetModules();
-      
+
       // Re-setup mocks after reset
       const utilsModule = require('../../eds/scripts/utils.js');
       const blockUtilsModule = require('../../eds/blocks/utils/utils.js');
       utilsModule.getCurrentProgramType.mockReturnValue('dxp');
       utilsModule.isMember.mockReturnValue(true);
       blockUtilsModule.isProd.mockReturnValue(true);
-      
+
       global.fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ credentials: []}),
+        json: () => Promise.resolve({ credentials: [] }),
       });
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -222,17 +220,17 @@ describe('Test certificationExpiresPopup.js', () => {
     it('should use stage URL when isProd returns false', async () => {
       // Must reset modules to re-evaluate the partnerDirectoryUrl constant
       jest.resetModules();
-      
+
       // Re-setup mocks after reset
       const utilsModule = require('../../eds/scripts/utils.js');
       const blockUtilsModule = require('../../eds/blocks/utils/utils.js');
       utilsModule.getCurrentProgramType.mockReturnValue('dxp');
       utilsModule.isMember.mockReturnValue(true);
       blockUtilsModule.isProd.mockReturnValue(false);
-      
+
       global.fetch.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ credentials: []}),
+        json: () => Promise.resolve({ credentials: [] }),
       });
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -286,9 +284,9 @@ describe('Test certificationExpiresPopup.js', () => {
       global.fetch.mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({
-            credentials: [
-              { expirationDate: toDDMMYYYY(futureDate) },
-           ],
+          credentials: [
+            { expirationDate: toDDMMYYYY(futureDate) },
+          ],
         }),
       });
 
@@ -303,9 +301,9 @@ describe('Test certificationExpiresPopup.js', () => {
       global.fetch.mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({
-            credentials: [
-              { expirationDate: toDDMMYYYY(pastDate) },
-            ],
+          credentials: [
+            { expirationDate: toDDMMYYYY(pastDate) },
+          ],
         }),
       });
 
@@ -322,9 +320,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
         global.fetch.mockResolvedValue({
           ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
+          json: () => Promise.resolve({ credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -339,9 +335,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
         global.fetch.mockResolvedValue({
           ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
+          json: () => Promise.resolve({ credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -357,8 +351,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
         global.fetch.mockResolvedValue({
           ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],}),
+          json: () => Promise.resolve({ credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -375,9 +368,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
         global.fetch.mockResolvedValue({
           ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
+          json: () => Promise.resolve({ credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -394,7 +385,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
         global.fetch.mockResolvedValue({
           ok: true,
-          json: () => Promise.resolve({credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
+          json: () => Promise.resolve({ credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -411,9 +402,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
         global.fetch.mockResolvedValue({
           ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
+          json: () => Promise.resolve({ credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -430,9 +419,7 @@ describe('Test certificationExpiresPopup.js', () => {
 
         global.fetch.mockResolvedValue({
           ok: true,
-          json: () => Promise.resolve({
-            credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }],
-          }),
+          json: () => Promise.resolve({ credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
         });
 
         const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -452,11 +439,11 @@ describe('Test certificationExpiresPopup.js', () => {
         global.fetch.mockResolvedValue({
           ok: true,
           json: () => Promise.resolve({
-              credentials: [
-                { expirationDate: toDDMMYYYY(expiration1) },
-                { expirationDate: toDDMMYYYY(expiration2) },
-                { expirationDate: toDDMMYYYY(expiration3) },
-              ],
+            credentials: [
+              { expirationDate: toDDMMYYYY(expiration1) },
+              { expirationDate: toDDMMYYYY(expiration2) },
+              { expirationDate: toDDMMYYYY(expiration3) },
+            ],
           }),
         });
 
@@ -476,11 +463,11 @@ describe('Test certificationExpiresPopup.js', () => {
         global.fetch.mockResolvedValue({
           ok: true,
           json: () => Promise.resolve({
-              credentials: [
-                { expirationDate: toDDMMYYYY(expiration1) },
-                { expirationDate: toDDMMYYYY(expiration2) },
-                { expirationDate: toDDMMYYYY(expiration3) },
-              ],
+            credentials: [
+              { expirationDate: toDDMMYYYY(expiration1) },
+              { expirationDate: toDDMMYYYY(expiration2) },
+              { expirationDate: toDDMMYYYY(expiration3) },
+            ],
           }),
         });
 
@@ -500,10 +487,10 @@ describe('Test certificationExpiresPopup.js', () => {
         global.fetch.mockResolvedValue({
           ok: true,
           json: () => Promise.resolve({
-              credentials: [
-                { expirationDate: toDDMMYYYY(expiration1) },
-                { expirationDate: toDDMMYYYY(expiration2) },
-              ],
+            credentials: [
+              { expirationDate: toDDMMYYYY(expiration1) },
+              { expirationDate: toDDMMYYYY(expiration2) },
+            ],
           }),
         });
 
@@ -522,9 +509,9 @@ describe('Test certificationExpiresPopup.js', () => {
       global.fetch.mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({
-            credentials: [
-              { expirationDate: toDDMMYYYY(expirationDate) },
-            ],
+          credentials: [
+            { expirationDate: toDDMMYYYY(expirationDate) },
+          ],
         }),
       });
     });

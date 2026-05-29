@@ -12,11 +12,11 @@ export default class GnavPersonalisationPage {
   }
 
   getPartnerLevelSegment(partnerLevelSegmentText) {
-    return this.page.getByRole('main').locator('div').filter({ hasText: `${partnerLevelSegmentText}` }).nth(1)
+    return this.page.getByRole('main').locator('div').filter({ hasText: `${partnerLevelSegmentText}` }).nth(1);
   }
 
   getSegments(segmentText) {
-    return this.page.locator('div').filter({ hasText: `${segmentText}` }).nth(1)
+    return this.page.locator('div').filter({ hasText: `${segmentText}` }).nth(1);
   }
 
   getSegmentsGnav(segmentText) {
