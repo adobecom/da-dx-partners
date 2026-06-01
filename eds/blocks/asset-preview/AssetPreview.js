@@ -100,16 +100,6 @@ export default class AssetPreview extends LitElement {
     }
   }
 
-  get pdfViewerLink() {
-    if (this.webinarPresentation) return this.getWebinarPresentationDownloadUrl();
-
-    const fileType = this.getFileTypeFromTag()?.toLowerCase();
-    if (fileType === 'pdf') {
-      return this.url;
-    }
-    return '';
-  }
-
   async loadPdfViewer() {
     try {
       // Check if the PDF URL is reachable first
@@ -221,7 +211,7 @@ export default class AssetPreview extends LitElement {
     })();
     this.audienceTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:audience') : [];
     this.fileFormatTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:file-format') : [];
-    this.pdfPreviewUrl = DOMPurify.sanitize(assetMetadata.pdfPreviewUrl) || this.pdfViewerLink;
+    this.pdfPreviewUrl = DOMPurify.sanitize(assetMetadata.pdfPreviewUrl);
     this.isVideo = this.fileFormatTags && this.fileFormatTags.length && this.fileFormatTags[0].tagId === 'caas:file-format/video';
     if (!assetMetadata.title || !assetMetadata.url) {
       this.assetHasData = false;
