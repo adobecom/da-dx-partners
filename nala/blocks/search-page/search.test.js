@@ -254,6 +254,7 @@ test.describe('Search Page', () => {
     });
     await test.step('Verify asset details', async () => {
       await searchPage.verifyAssetDetails(data);
+      await expect(searchPage.downloadAssetButton).not.toBeVisible();
     });
   });
   test(`${features[8].name},${features[8].tags}`, async ({ page, context }) => {
