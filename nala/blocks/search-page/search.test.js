@@ -6,6 +6,7 @@ import SignInPage from '../signin/signin.page.js';
 const { features } = searchSpec;
 let searchPage;
 let signInPage;
+const thumbnailCases = features.slice(18, 22);
 
 test.describe('Search Page', () => {
   test.beforeEach(async ({ page }) => {
@@ -548,6 +549,19 @@ test.describe('Search Page', () => {
       await expect(searchPage.cardDescription.first()).toBeVisible();
       await expect(searchPage.cardDescription.first()).toContainText(data.cardSummaryValue);
       await expect(searchPage.fileIcon.first()).toHaveCSS('background-image', data.cardIcon);
+    });
+  });
+
+  thumbnailCases.forEach((feature) => {
+    test(`${feature.name},${feature.tags}`, async ({ page }) => {
+      const { data } = feature;
+      await test.step('Go to asset preview page', async () => {
+        await page.goto(feature.path);
+        await page.waitForLoadState('domcontentloaded');
+      });
+      await test.step('Verify asset preview thumbnail image src', async () => {
+        await searchPage.verifyImageThumbnail(data.imageThumbnail);
+      });
     });
   });
 });

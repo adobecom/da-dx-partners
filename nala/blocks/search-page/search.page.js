@@ -25,6 +25,7 @@ export default class SearchPage {
     this.b2bCheckBox = page.getByRole('checkbox', { name: 'B2B Orchestration' });
     this.crossFunctionalCheckBox = page.getByRole('checkbox', { name: 'Cross-functional Collaboration' });
     this.assetTitlePreview = page.locator('.asset-preview-block-header');
+    this.assetPreviewImage = page.locator('.asset-preview-block-details-right img');
     this.assetDate = page.locator('p').filter({ hasText: 'Date:' });
     this.assetSummary = page.locator('p').filter({ hasText: 'Summary:' });
     this.assetType = page.locator('p').filter({ hasText: 'Type:' });
@@ -233,5 +234,11 @@ export default class SearchPage {
         has: this.page.getByRole('button', { name: filterName })
       })
       .locator('.filter-selected-tags-count-btn');
+  }
+
+  async verifyImageThumbnail(expectedThumbnailPath) {
+    await expect(this.assetPreviewImage).toBeVisible({ timeout: 30000 });
+    const src = await this.assetPreviewImage.getAttribute('src');
+    expect(src).toContain(expectedThumbnailPath);
   }
 }

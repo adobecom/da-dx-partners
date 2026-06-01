@@ -241,5 +241,41 @@ export default {
         cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg\")',
       },
     },
+    {
+      tcid: '19',
+      name: '@netstorage-asset-thumbnail-uploaded',
+      path: '/digitalexperience/preview/netstorage-assets/restricted/te/test.jpg.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        imageThumbnail: '/thumbnail.png',
+      },
+    },
+    {
+      tcid: '20',
+      name: '@netstorage-asset-default-image-displayed',
+      path: '/digitalexperience/preview/netstorage-assets/restricted/qa/qaAssetTestpdf.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        imageThumbnail: '/sample-pdf.png',
+      },
+    },
+    {
+      tcid: '21',
+      name: '@regular-asset-aem-rendition-displayed',
+      path: '/digitalexperience/preview/qa-test/public/automation-regression-restricted-asset-message/qaAssetTestpdf.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        imageThumbnail: '/renditions/cq5dam.web.1280.1280.jpeg',
+      },
+    },
+    {
+      tcid: '22',
+      name: '@regular-asset-aem-rendition-deleted-custom-image-displayed',
+      path: '/digitalexperience/preview/qa-test/public/automation-regression-restricted-asset-message/qaAssetTest.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        imageThumbnail: '/renditions/custom-thumbnail.jpg',
+      },
+    },
   ],
 };
