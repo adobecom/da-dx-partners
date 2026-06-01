@@ -101,8 +101,6 @@ export default class AssetPreview extends LitElement {
   }
 
   get pdfViewerLink() {
-    if (this.webinarPresentation) return this.getWebinarPresentationDownloadUrl();
-
     const fileType = this.getFileTypeFromTag()?.toLowerCase();
     if (fileType === 'pdf') {
       return this.url;
