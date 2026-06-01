@@ -531,5 +531,96 @@ describe('yukon-chat block', () => {
         expect(link.getAttribute('target')).to.equal('_blank');
       });
     })
+
+    it('should render modal disclaimer below the input field container', async () => {
+      const encoder = new TextEncoder();
+      const chunk = encoder.encode('[{"generated_text":"Hi"}]\n');
+      fetchStub.callsFake(async (url) => {
+        const urlStr = typeof url === 'string' ? url : url.toString();
+        if (urlStr.includes('placeholders.json')) {
+          return { ok: true, json: async () => ({ data: [] }) };
+        }
+        if (urlStr.includes('yukonAIAssistant')) {
+          return {
+            ok: true,
+            status: 200,
+            body: new ReadableStream({
+              start(controller) {
+                controller.enqueue(chunk);
+                controller.close();
+              },
+            }),
+          };
+        }
+        return { ok: false, status: 404 };
+      });
+
+      const block = document.querySelector('.yukon-chat');
+      await init(block);
+
+      const textarea = document.querySelector('#yc-input-field');
+      const sendButton = document.querySelector('.yc-input-field-button');
+      textarea.value = 'Hello';
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      sendButton.click();
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((r) => setTimeout(r, 50));
+
+      const inputWrapper = document.querySelector('#yukon-chat-modal .modal-input-wrapper');
+      expect(inputWrapper).to.exist;
+
+      const disclaimer = inputWrapper.querySelector('.modal-disclaimer');
+      expect(disclaimer).to.exist;
+      expect(disclaimer.textContent).to.equal('This is a disclaimer.');
+
+      const inputFieldContainer = inputWrapper.querySelector('.yc-input-field-container');
+      expect(inputFieldContainer).to.exist;
+      const children = Array.from(inputWrapper.children);
+      expect(children.indexOf(inputFieldContainer)).to.be.lessThan(children.indexOf(disclaimer));
+    });
+
+    it('should not render modal disclaimer when config is absent', async () => {
+      const encoder = new TextEncoder();
+      const chunk = encoder.encode('[{"generated_text":"Hi"}]\n');
+      fetchStub.callsFake(async (url) => {
+        const urlStr = typeof url === 'string' ? url : url.toString();
+        if (urlStr.includes('placeholders.json')) {
+          return { ok: true, json: async () => ({ data: [] }) };
+        }
+        if (urlStr.includes('yukonAIAssistant')) {
+          return {
+            ok: true,
+            status: 200,
+            body: new ReadableStream({
+              start(controller) {
+                controller.enqueue(chunk);
+                controller.close();
+              },
+            }),
+          };
+        }
+        return { ok: false, status: 404 };
+      });
+
+      const block = document.querySelector('.yukon-chat');
+      const disclaimerRow = Array.from(block.children).find((row) => {
+        const [keyDiv] = row.querySelectorAll(':scope > div');
+        return keyDiv?.textContent.trim() === 'modal-disclaimer';
+      });
+      if (disclaimerRow) disclaimerRow.remove();
+
+      await init(block);
+
+      const textarea = document.querySelector('#yc-input-field');
+      const sendButton = document.querySelector('.yc-input-field-button');
+      textarea.value = 'Hello';
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      sendButton.click();
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((r) => setTimeout(r, 50));
+
+      const disclaimer = document.querySelector('#yukon-chat-modal .modal-disclaimer');
+      expect(disclaimer).to.not.exist;
+    });
   });
 });

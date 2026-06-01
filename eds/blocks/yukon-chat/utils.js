@@ -72,6 +72,7 @@ export async function parseMarkdown(markdown) {
 }
 
 export function extractAuthoredConfigs(configs, elementChildren) {
+  Object.keys(configs).forEach((key) => delete configs[key]);
   const rows = Array.from(elementChildren);
   rows.forEach((row) => {
     const divs = row.querySelectorAll('div');
