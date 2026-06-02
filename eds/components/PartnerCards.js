@@ -714,7 +714,7 @@ export default class PartnerCards extends LitElement {
   handleSearch(event) {
     this.searchTerm = event.target.value;
     if (this.searchTerm) {
-      this.urlSearchParams.set('term', this.searchTerm.toLowerCase());
+      this.urlSearchParams.set('term', this.searchTerm);
     } else {
       this.urlSearchParams.delete('term');
     }
