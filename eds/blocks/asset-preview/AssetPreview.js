@@ -147,7 +147,7 @@ export default class AssetPreview extends LitElement {
       },
       'pdf-embed-mode': (cols) => {
         const [pdfEmbedModeEl] = cols;
-        this.blockData.pdfEmbedMode = pdfEmbedModeEl.innerText.trim().toLowerCase().replace(/ /g, '-');
+        this.blockData.pdfEmbedMode = pdfEmbedModeEl?.innerText.trim().toLowerCase().replace(/ /g, '-');
       },
     };
     const rows = Array.from(this.blockData.tableData);
