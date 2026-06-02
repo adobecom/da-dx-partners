@@ -130,19 +130,19 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
     expect(el.pdfPreviewUrl).to.equal('https://example.com/rendition.pdf');
   });
 
-  it('defaults pdfEmbedMode to sized-container when not set', async () => {
+  it('defaults pdfEmbedMode to full-window when not set', async () => {
     const el = makeInstance();
     sinon.stub(el, 'loadPdfViewer');
     await el.setData({ title: 'Test', url: 'https://example.com/file.pdf', tags: [] });
-    expect(el.blockData.pdfEmbedMode).to.equal('sized-container');
+    expect(el.blockData.pdfEmbedMode).to.equal('full-window');
   });
 
   it('keeps existing pdfEmbedMode when already set in blockData', async () => {
     const el = makeInstance();
-    el.blockData.pdfEmbedMode = 'sized-container';
+    el.blockData.pdfEmbedMode = 'full-window';
     sinon.stub(el, 'loadPdfViewer');
     await el.setData({ title: 'Test', url: 'https://example.com/file.pdf', tags: [] });
-    expect(el.blockData.pdfEmbedMode).to.equal('sized-container');
+    expect(el.blockData.pdfEmbedMode).to.equal('full-window');
   });
 });
 
