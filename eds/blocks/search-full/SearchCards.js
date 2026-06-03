@@ -84,8 +84,8 @@ export default class Search extends PartnerCards {
         this._searchInput?.focus();
       }
 
-      // eslint-disable-next-line no-plusplus
-      this.suggestionReqCounter ++;
+      // eslint-disable-next-line no-plusplus, space-unary-ops
+      this.suggestionReqCounter++;
       const reqId = this.suggestionReqCounter;
       const suggestions = await this.getSuggestions();
       if (this.suggestionReqCounter > reqId) {
@@ -226,7 +226,6 @@ export default class Search extends PartnerCards {
       this.hasResponseData = !!apiData.cards;
       return apiData;
     } catch (error) {
-      // eslint-disable-next-line no-console
       // eslint-disable-next-line no-console
       console.error('There was a problem with your fetch operation:', error);
       return null;

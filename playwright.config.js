@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle, indent */
 import { devices } from '@playwright/test';
 
 // const envs = require('./envs/envs.js');
@@ -48,16 +49,15 @@ const config = {
   projects: [
     {
       name: 'da-dx-partners-live-chromium',
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         bypassCSP: true,
       },
       launchOptions: { args: ['--disable-web-security', '--disable-gpu'] },
     },
-
     {
       name: 'da-dx-partners-live-firefox',
-      use: { 
+      use: {
         ...devices['Desktop Firefox'],
         bypassCSP: true,
         // Ensure each test gets a fresh context
@@ -70,7 +70,7 @@ const config = {
       launchOptions: {
         args: [
           '--disable-web-security',
-          '--private', 
+          '--private',
           '--no-first-run',
           '--no-default-browser-check',
         ],
@@ -81,25 +81,24 @@ const config = {
         }
       },
     },
-//     {
-//       name: 'da-dx-partners-live-webkit',
-//       use: {
-//         ...devices['Desktop Safari'],
-//         ignoreHTTPSErrors: true,
-//       },
-//       bypassCSP: true,
-//     },
+    //     {
+    //       name: 'da-dx-partners-live-webkit',
+    //       use: {
+    //         ...devices['Desktop Safari'],
+    //         ignoreHTTPSErrors: true,
+    //       },
+    //       bypassCSP: true,
+    //     },
     /* Test Against Mobile View ports */
-//     {
-//       name: 'mobile-chrome-pixel5',
-//       use: { ...devices['Pixel 5'] },
-//     },
-//     {
-//       name: 'mobile-safari-iPhone12',
-//       use: { ...devices['iPhone 12'] },
-//     },
+    //     {
+    //       name: 'mobile-chrome-pixel5',
+    //       use: { ...devices['Pixel 5'] },
+    //     },
+    //     {
+    //       name: 'mobile-safari-iPhone12',
+    //       use: { ...devices['iPhone 12'] },
+    //     },
   ],
 };
 
 export default config;
-

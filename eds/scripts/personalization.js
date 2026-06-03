@@ -52,6 +52,7 @@ async function replaceProfileImage(elements) {
       el.appendChild(picture);
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.warn('Failed to replace profile image placeholders:', error);
     elements.forEach((el) => el.remove());
   }
@@ -97,6 +98,7 @@ async function replaceCompanyLogo(elements) {
       el.appendChild(picture);
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.warn('Failed to replace company logo placeholders:', error);
     elements.forEach((el) => el.remove());
   }

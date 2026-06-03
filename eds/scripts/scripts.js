@@ -134,6 +134,7 @@ async function loadPage() {
   rewriteLinks(document.querySelector('main') ?? document);
   window.addEventListener(SHOW_NEXT_POPUP, async (e) => {
     if ('detail' in e) {
+      // eslint-disable-next-line no-console
       console.log('CustomEvent data:', e.detail?.next);
       await showNextPopup(miloLibs, imsClientId, e.detail?.next);
     } else {

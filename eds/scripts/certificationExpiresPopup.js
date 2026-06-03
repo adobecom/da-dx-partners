@@ -1,3 +1,4 @@
+/* eslint-disable no-console, import/prefer-default-export */
 import {
   getCurrentProgramType,
   getMetadataContent,

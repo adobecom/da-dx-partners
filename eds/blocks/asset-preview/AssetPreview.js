@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this, no-underscore-dangle, no-console, indent */
 import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
@@ -274,7 +275,7 @@ export default class AssetPreview extends LitElement {
             </video>
           </div>
         </div>`
-    : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset data not found}}']}</div>`}
+          : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset data not found}}']}</div>`}
     `;
   }
 

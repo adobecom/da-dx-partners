@@ -1,3 +1,4 @@
+/* eslint-disable no-console, func-names */
 import { getConfig, getRuntimeActionUrl } from '../blocks/utils/utils.js';
 import {
   getCookieValue,

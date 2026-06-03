@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow, prefer-const, space-infix-ops, keyword-spacing, quotes, space-before-blocks, no-param-reassign, max-len, space-in-parens */
 import { getLocale, prodHosts, setLibs } from '../../scripts/utils.js';
 import { RT_SEARCH_ACTION_PATH } from './dxConstants.js';
 
@@ -73,7 +74,7 @@ export async function localizationPromises(localizedText, config) {
 
 export function getRuntimeActionUrl(action) {
   const isProd = prodHosts.includes(window.location.host);
-  let domain = isProd ? 'https://io-partners-dx.adobe.com': 'https://io-partners-dx.stage.adobe.com';
+  let domain = isProd ? 'https://io-partners-dx.adobe.com' : 'https://io-partners-dx.stage.adobe.com';
   return new URL(
     `${domain}${action}`,
   );
@@ -114,12 +115,12 @@ export function transformCardUrl(url) {
     return '';
   }
   const isProd = prodHosts.includes(window.location.host);
-  if(url.startsWith("/")){
+  if (url.startsWith("/")) {
     url = `https://${PARTNERS_STAGE_DOMAIN}${url}`;
   }
   const newUrl = new URL(url);
   newUrl.protocol = window.location.protocol;
-  if(!newUrl.host || newUrl.host === PARTNERS_PREVIEW_DOMAIN || newUrl.host === PARTNERS_STAGE_DOMAIN|| newUrl.host === PARTNERS_PROD_DOMAIN ) {
+  if (!newUrl.host || newUrl.host === PARTNERS_PREVIEW_DOMAIN || newUrl.host === PARTNERS_STAGE_DOMAIN || newUrl.host === PARTNERS_PROD_DOMAIN) {
     newUrl.host = isProd ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
   }
   return newUrl;

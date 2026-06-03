@@ -1,3 +1,4 @@
+/* stylelint-disable value-no-vendor-prefix */
 .search-card * {
   box-sizing: border-box;
 }
@@ -74,7 +75,7 @@
 }
 
 .search-card .card-content {
-  display:none;
+  display: none;
 }
 
 .search-card.expanded .card-content {
