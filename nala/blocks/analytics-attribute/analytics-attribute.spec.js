@@ -6,7 +6,7 @@ export default {
       tcid: '1',
       name: '@analytics-attribute-card-collection',
       path: '/digitalexperience/events/upcoming',
-      tags: '@da-dx-analytics-attribute @regression @circleCi @anonymous',
+      tags: '@da-dx-analytics-attribute @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
         searchKeyWord: 'Adobe',
