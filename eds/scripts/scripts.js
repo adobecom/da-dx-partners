@@ -56,6 +56,7 @@ const CONFIG = {
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   locales: isSafari ? localesSafari : localesDefault,
+  pdfViewerClientId: '3b6559c26f1e478a99e97ffe3da634bb',
   jarvis: {
     id: 'spp_default',
     version: '1.0',
@@ -64,10 +65,13 @@ const CONFIG = {
   local: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
   stage: {
     edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e',
-    marTechUrl:
-      'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-f10da6991680-staging.min.js',
+    marTechUrl: 'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-f10da6991680-staging.min.js',
+    pdfViewerClientId: 'a393b24431f4441da82113085aafe95f',
   },
-  prod: { marTechUrl: 'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-78b077e5ada7.min.js' },
+  prod: {
+    marTechUrl: 'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-78b077e5ada7.min.js',
+    pdfViewerClientId: '3b6559c26f1e478a99e97ffe3da634bb',
+  },
 };
 
 (function removePartnerLoginQuery() {
