@@ -1,3 +1,4 @@
+/* eslint-disable max-len, spaced-comment */
 import { getConfig } from '../blocks/utils/utils.js';
 import { getLibs } from '../scripts/utils.js';
 

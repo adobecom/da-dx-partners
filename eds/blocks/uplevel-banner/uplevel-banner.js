@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { getLibs, invokeAfterImsIsReady, getMetadataContent } from '../../scripts/utils.js';
 import { getPartnershipData } from '../utils/partnershipDataService.js';
 import { replaceDirectText } from '../../scripts/personalization.js';
