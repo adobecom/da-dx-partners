@@ -58,7 +58,7 @@ describe('showNextPopup', () => {
 
     isMember = utilsModule.isMember;
     partnerAgreement = partnerAgreementModule.partnerAgreement;
-    showNextPopup = showNextPopupModule.showNextPopup;
+    showNextPopup = showNextPopupModule.default;
     PARTNER_AGREEMENT_POPUP = utilsModule.PARTNER_AGREEMENT_POPUP;
     PORTAL_MESSAGING_POPUP = utilsModule.PORTAL_MESSAGING_POPUP;
     CERTIFICATION_POPUP = utilsModule.CERTIFICATION_POPUP;
