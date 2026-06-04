@@ -71,4 +71,19 @@ test.describe('Validate events block', () => {
       });
     });
   });
+  // @events-sessions-test-on-public-page
+  test(`${features[4].name},${features[4].tags}`, async ({ page }) => {
+    const { data } = features[4];
+    await test.step('Go to events page', async () => {
+      await page.goto(`${features[4].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await eventsPage.partnerCradCollection.waitFor({ state: 'visible', timeout: 30000 });
+    });
+    await test.step('Verify sessions', async () => {
+      await eventsPage.verifyPublicCardTitle(data.sessionOne);
+      await eventsPage.verifyCardDateDaysFromToday(data.sessionOne, data.sessionOneDaysFromToday);
+      await eventsPage.verifyPublicCardTitle(data.sessionTwo);
+      await eventsPage.verifyCardDateDaysFromToday(data.sessionTwo, data.sessionTwoDaysFromToday);
+    });
+  });
 });

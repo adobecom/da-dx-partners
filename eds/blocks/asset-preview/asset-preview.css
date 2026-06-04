@@ -1,7 +1,7 @@
 :root {
   --asset-preview-black : #2C2C2C;
   --asset-preview-white : #FFFFFF;
-  --asset-preview-blue : #274DEA;  
+  --asset-preview-blue : #274DEA;
 }
 .asset-preview-block-container {
     display: flex;
@@ -146,9 +146,13 @@
     background-color: var(--asset-preview-black);
   }
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 899px) {
    .asset-preview-block-details {
       flex-direction: column;
+    }
+
+    .asset-preview-block-details-right {
+      width: 100%;
     }
   }
 

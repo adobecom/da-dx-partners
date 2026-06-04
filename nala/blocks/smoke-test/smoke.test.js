@@ -417,4 +417,24 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.verifyFooterSocialMediaIcons(data);
     });
   });
+  test(`${features[19].name},${features[19].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[19];
+
+    await test.step('Go to home page and Log in', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.signInButton.click();
+      await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+
+      await page.waitForURL(new RegExp(`${data.homeUrl}#?$`), { timeout: 30000 });
+      await expect(page).toHaveURL(new RegExp(`${data.homeUrl}#?$`));
+    });
+
+    await test.step('Log out and verify redirect page', async () => {
+      await smokeTest.signOut();
+      await page.waitForURL(new RegExp(`${path}#?$`), { timeout: 30000 });
+      await expect(page).toHaveURL(new RegExp(`${path}#?$`));
+    });
+  });
 });
