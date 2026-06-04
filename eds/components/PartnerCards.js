@@ -1,9 +1,9 @@
-/* global DOMPurify */
 import { CAAS_TAGS_URL, getLibs, prodHosts, loadPageToAnchor } from '../scripts/utils.js';
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
 import { dispatchCustomEventOnSearch } from '../blocks/utils/analyticsUtils.js';
+import DOMPurify from '../libs/deps/purify-wrapper.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);

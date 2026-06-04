@@ -1,4 +1,3 @@
-/* eslint-disable indent, no-trailing-spaces, no-multiple-empty-lines, eol-last */
 export default class AnalyticsAttributesPage {
   constructor(page) {
     this.page = page;

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { getLibs } from '../../scripts/utils.js';
 import PartnerCards from '../../components/PartnerCards.js';
 import '../../components/SearchCard.js';
@@ -42,17 +43,14 @@ export default class Search extends PartnerCards {
     // we will fetch data in handleActions which is called on each user action
   }
 
-  // eslint-disable-next-line no-underscore-dangle
   get _typeaheadDialog() {
     return this.querySelector('dialog#typeahead');
   }
 
-  // eslint-disable-next-line no-underscore-dangle
   get _searchInput() {
     return this.querySelector('#search');
   }
 
-  // eslint-disable-next-line no-underscore-dangle
   get _dialog() {
     return this.querySelector('.suggestion-dialog');
   }
@@ -78,13 +76,11 @@ export default class Search extends PartnerCards {
       }
       if (!this.isTypeaheadOpen) {
         this.isTypeaheadOpen = true;
-        // eslint-disable-next-line no-underscore-dangle
         this._typeaheadDialog.show();
-        // eslint-disable-next-line no-underscore-dangle
         this._searchInput?.focus();
       }
 
-      // eslint-disable-next-line no-plusplus, space-unary-ops
+      // eslint-disable-next-line no-plusplus
       this.suggestionReqCounter++;
       const reqId = this.suggestionReqCounter;
       const suggestions = await this.getSuggestions();
@@ -107,11 +103,8 @@ export default class Search extends PartnerCards {
 
   closeTypeahead(value) {
     this.isTypeaheadOpen = false;
-    // eslint-disable-next-line no-underscore-dangle
     this._typeaheadDialog.close(value);
-    // eslint-disable-next-line no-underscore-dangle
     if (value !== SEE_ALL) {
-      // eslint-disable-next-line no-underscore-dangle
       this.searchTerm = this._typeaheadDialog.returnValue;
     }
     this.handleSearch();
@@ -328,9 +321,7 @@ export default class Search extends PartnerCards {
 
   handleClickOutside(event) {
     if (!this.isTypeaheadOpen) return;
-    // eslint-disable-next-line no-underscore-dangle
     const dialog = this._dialog.getBoundingClientRect();
-    // eslint-disable-next-line no-underscore-dangle
     const searchInput = this._searchInput.getBoundingClientRect();
     const isInDialog = (
       event.clientX >= dialog.left
@@ -346,7 +337,6 @@ export default class Search extends PartnerCards {
     );
 
     if (!isInDialog && !isInSearch) {
-      // eslint-disable-next-line no-underscore-dangle
       this.closeTypeahead(SEE_ALL);
     }
   }

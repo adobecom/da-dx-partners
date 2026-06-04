@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { getLibs, invokeAfterImsIsReady, getMetadataContent } from '../../scripts/utils.js';
 import { getPartnershipData } from '../utils/partnershipDataService.js';
 import { replaceDirectText } from '../../scripts/personalization.js';
@@ -55,6 +54,7 @@ export default async function init(el) {
 
       parentNode.insertBefore(el, nextSibling);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('[uplevel-banner] error', e);
     }
   });

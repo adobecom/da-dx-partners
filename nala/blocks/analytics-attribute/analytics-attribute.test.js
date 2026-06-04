@@ -1,4 +1,3 @@
-/* eslint-disable indent, eol-last */
 import { test, expect } from '@playwright/test';
 import AnalyticsAttributesPage from './analytics-attribute.page.js';
 import analyticsAttributesSpec from './analytics-attribute.spec.js';

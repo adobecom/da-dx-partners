@@ -1,4 +1,3 @@
-/* eslint-disable object-curly-spacing, indent */
 import { getLibs, getPartnerCookieValue, invokeAfterImsIsReady } from '../../scripts/utils.js';
 import { partnershipProgressStyles } from './PartnershipProgressStyles.js';
 import { DX_PARTNER_LEVEL, DX_PRIMARY_BUSINESS } from '../utils/dxConstants.js';
@@ -138,11 +137,11 @@ export default class PartnershipProgress extends LitElement {
 
         <div class="partnership-progress-rows">
           ${this.renderMetricRow(
-      specializationsMetric && programData.specializations
-        ? this.blockData.localizedText['{{Specializations}}']
-        : this.blockData.localizedText['{{Exchange Marketplace listings}}'],
-      specializationsMetric,
-    )}
+    specializationsMetric && programData.specializations
+      ? this.blockData.localizedText['{{Specializations}}']
+      : this.blockData.localizedText['{{Exchange Marketplace listings}}'],
+    specializationsMetric,
+  )}
           ${this.renderMetricRow(this.blockData.localizedText['{{Credentials}}'], credentialsMetric)}
           ${this.renderMetricRow(this.blockData.localizedText['{{Active Customer Deployments}}'], deploymentsMetric)}
         </div>

@@ -1,4 +1,4 @@
-/* eslint-disable no-console, func-names */
+/* eslint-disable no-console */
 import { getConfig, getRuntimeActionUrl } from '../blocks/utils/utils.js';
 import {
   getCookieValue,
@@ -152,6 +152,7 @@ function preventAgreementModalClose(modal) {
   closeCta.remove();
 
   // block Milo Escape keydown listener
+  // eslint-disable-next-line func-names
   const blockEscapeKey = function (e) {
     if (e.key === 'Escape') {
       e.preventDefault();

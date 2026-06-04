@@ -1,4 +1,3 @@
-/* eslint-disable indent, eol-last, semi */
 export default {
   FeatureName: 'DX Analytics Attribute',
   features: [
@@ -31,4 +30,4 @@ export default {
       },
     },
   ],
-}
+};

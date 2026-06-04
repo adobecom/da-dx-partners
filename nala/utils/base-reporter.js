@@ -65,11 +65,11 @@ export default class BaseReporter {
       retry,
     });
     if (status === 'passed') {
-      this.passedTests += 1;
+      this.passedTests++;
     } else if (failedStatus.includes(status)) {
-      this.failedTests += 1;
+      this.failedTests++;
     } else if (status === 'skipped') {
-      this.skippedTests += 1;
+      this.skippedTests++;
     }
   }
 

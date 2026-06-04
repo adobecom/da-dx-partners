@@ -1,4 +1,3 @@
-/* eslint-disable max-len, spaced-comment */
 import { getConfig } from '../blocks/utils/utils.js';
 import { getLibs } from '../scripts/utils.js';
 
@@ -7,7 +6,8 @@ const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 const API_SOURCE_URL = 'https://documentservices.adobe.com/view-sdk/viewer.js';
 
 const PDF_EMBED_MODE_CONFIG = {
-  // 'full-window': { embedMode: 'FULL_WINDOW', defaultViewMode: 'FIT_WIDTH' }, // TODO: Re-enable once the PDF viewer team's search bug is fixed
+  // 'full-window': { embedMode: 'FULL_WINDOW', defaultViewMode: 'FIT_WIDTH' },
+  // TODO: Re-enable once the PDF viewer team's search bug is fixed
   'sized-container': { embedMode: 'SIZED_CONTAINER' },
   'in-line': { embedMode: 'IN_LINE' },
 };
@@ -50,7 +50,8 @@ export const loadSdk = () => new Promise((resolve, reject) => {
 });
 
 export const getPdfConfig = () => {
-  //The client ids are specific to the origin (no wildcards), so the stage **pdfViewerClientId** only works for **main--milo--adobecom.aem.page**.
+  // The client ids are specific to the origin (no wildcards),
+  // so the stage **pdfViewerClientId** only works for **main--milo--adobecom.aem.page**.
   const config = getConfig();
   return config.env?.consumer?.pdfViewerClientId || config.pdfViewerClientId;
 };

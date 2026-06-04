@@ -1,4 +1,3 @@
-/* eslint-disable no-console, import/prefer-default-export */
 import {
   getCurrentProgramType,
   getMetadataContent,
@@ -128,7 +127,9 @@ async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplaye
       );
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error.message);
+    // eslint-disable-next-line no-console
     console.warn('certification popup skipped');
   }
   if (!shoulDisplayCertificationModal) {
@@ -141,6 +142,7 @@ async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplaye
   const CERTIFICATION_META = 'certification-modal';
   const certificationFragmentPath = getMetadataContent(CERTIFICATION_META);
   if (!certificationFragmentPath) {
+    // eslint-disable-next-line no-console
     console.warn(`${CERTIFICATION_META} should be displayed but popup fragment path is not found`);
     window.dispatchEvent(
       new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
@@ -150,6 +152,7 @@ async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplaye
 
   const popupContent = await loadPopupFragment(certificationFragmentPath, 'certification modal');
   if (!popupContent) {
+    // eslint-disable-next-line no-console
     console.warn(`Popup fragment for ${certificationFragmentPath} not found`);
     window.dispatchEvent(
       new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: NEXT_POPUP_PLACEHOLDER } }),
@@ -187,7 +190,7 @@ async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplaye
   return true;
 }
 
-export function certificationExpiresPopup(
+export default function certificationExpiresPopup(
   miloLibs,
   portalMessagingOpen,
   partnerAgreementDisplayed,

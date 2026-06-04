@@ -1,4 +1,4 @@
-/* eslint-disable class-methods-use-this, no-underscore-dangle, no-console, indent */
+/* eslint-disable no-underscore-dangle */
 import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
@@ -57,13 +57,12 @@ export default class AssetPreview extends LitElement {
     return this;
   }
 
-  // eslint-disable-next-line no-underscore-dangle
+  // eslint-disable-next-line class-methods-use-this
   get _video() {
     return document.querySelector('video');
   }
 
   playVideo() {
-    // eslint-disable-next-line no-underscore-dangle
     if (this._video) {
       const videoContainer = this._video.closest('.asset-preview-block-video');
       window.scrollTo({ top: videoContainer.offsetTop, behavior: 'smooth' });
@@ -122,6 +121,7 @@ export default class AssetPreview extends LitElement {
         pdfEmbedMode: this.blockData.pdfEmbedMode,
       });
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(`PDF viewer failed to load, falling back to preview image: ${e.message}`);
       this.pdfPreviewUrl = '';
     }
@@ -245,6 +245,7 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   _handleImgError = (e) => {
+    // eslint-disable-next-line no-console
     console.log('error', e);
     const img = e.currentTarget;
     img.src = transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH);
@@ -284,9 +285,9 @@ export default class AssetPreview extends LitElement {
             </div>
             <div class="asset-preview-block-details-right">
               ${this.pdfPreviewUrl && !this.isRestrictedAssetForUser()
-                ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
-                : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`
-              }
+    ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
+    : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`
+}
             </div>
          </div>
 
@@ -317,7 +318,7 @@ export default class AssetPreview extends LitElement {
             </video>
           </div>
         </div>`
-          : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset data not found}}']}</div>`}
+    : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset data not found}}']}</div>`}
     `;
   }
 

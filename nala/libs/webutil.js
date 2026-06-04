@@ -1,9 +1,8 @@
-/* eslint-disable no-console */
 import { expect } from '@playwright/test';
 
 const fs = require('fs');
 // eslint-disable-next-line import/no-extraneous-dependencies
-// const yaml = require('js-yaml');
+const yaml = require('js-yaml');
 const { request } = require('@playwright/test');
 
 /**
@@ -40,6 +39,7 @@ exports.WebUtil = class WebUtil {
     try {
       return await this.locator.evaluate((e) => e.offsetWidth > 0 && e.offsetHeight > 0);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(`Error checking if element is displayed for locator: ${locator.toString()}`, e);
       return false;
     }
@@ -103,6 +103,7 @@ exports.WebUtil = class WebUtil {
         try {
           await expect(this.locator).toHaveCSS(property, expectedValue);
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error(`CSS property ${property} not found:`, error);
           result = false;
         }
@@ -129,6 +130,7 @@ exports.WebUtil = class WebUtil {
           try {
             await expect(await this.locator).toHaveClass(classes.join(' '));
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Attribute class not found:', error);
             result = false;
           }
@@ -136,6 +138,7 @@ exports.WebUtil = class WebUtil {
           try {
             await expect(await this.locator).toHaveAttribute(property, expectedValue);
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error(`Attribute ${property} not found:`, error);
             result = false;
           }
@@ -161,6 +164,7 @@ exports.WebUtil = class WebUtil {
       const shouldStop = (position) => (dir === 'down' ? position > scrollHeight() : position < 0);
       const increment = dir === 'down' ? 100 : -100;
       const delayTime = spd === 'slow' ? 30 : 5;
+      // eslint-disable-next-line no-console
       console.error(start, shouldStop(start), increment);
       for (let i = start; !shouldStop(i); i += increment) {
         window.scrollTo(0, i);
@@ -197,6 +201,7 @@ exports.WebUtil = class WebUtil {
 
       return inViewport;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error verifying modal veiwport:', error);
       return false;
     }
@@ -207,7 +212,7 @@ exports.WebUtil = class WebUtil {
    * @param {string} filePath
   */
   static async loadTestData(dataFilePath) {
-    return JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
+    return dataFilePath.includes('.yml') ? yaml.load(fs.readFileSync(dataFilePath, 'utf8')) : JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
   }
 
   /**

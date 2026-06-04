@@ -110,7 +110,9 @@ export function replaceDirectText(node, search, replace) {
     }
   });
 }
-export function personalizePlaceholders(placeholders, context, programType, addClass = false) {
+
+// eslint-disable-next-line max-len, default-param-last
+export function personalizePlaceholders(placeholders, context = document, programType, addClass = false) {
   const sortedEntries = Object.entries(placeholders).sort((a, b) => b[0].length - a[0].length);
   sortedEntries.forEach(([key, value]) => {
     const elements = getNodesByXPath(value, context);
