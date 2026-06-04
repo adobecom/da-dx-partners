@@ -190,7 +190,8 @@ async function showPopup(miloLibs, portalMessagingOpen, partnerAgreementDisplaye
   return true;
 }
 
-export default function certificationExpiresPopup(
+// eslint-disable-next-line import/prefer-default-export
+export function certificationExpiresPopup(
   miloLibs,
   portalMessagingOpen,
   partnerAgreementDisplayed,

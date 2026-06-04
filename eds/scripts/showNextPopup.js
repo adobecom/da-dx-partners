@@ -1,5 +1,5 @@
 import { portalMessaging } from './portalMessaging.js';
-import certificationExpiresPopup from './certificationExpiresPopup.js';
+import { certificationExpiresPopup } from './certificationExpiresPopup.js';
 import { CERTIFICATION_POPUP, isMember, PARTNER_AGREEMENT_POPUP, PORTAL_MESSAGING_POPUP } from './utils.js';
 import { partnerAgreement } from './partnerAgreement.js';
 
