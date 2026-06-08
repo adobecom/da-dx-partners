@@ -66,7 +66,7 @@ describe('dx-card-collection block', () => {
     return { partnerNewsWrapper };
   };
 
-  it('should render partner cards for mobile', async function () {
+  it('should render partner cards for mobile', async () => {
     const { partnerNewsWrapper } = await setupAndCommonTest(500);
 
     const filtersBtn = partnerNewsWrapper.querySelector('.filters-btn-mobile');
@@ -94,7 +94,7 @@ describe('dx-card-collection block', () => {
     expect(filterWrapperMobile.classList.contains('expanded')).to.be.false;
   });
 
-  it('should render partner cards for desktop', async function () {
+  it('should render partner cards for desktop', async () => {
     const { partnerNewsWrapper } = await setupAndCommonTest(1500);
 
     const sidebarFiltersWrapper = partnerNewsWrapper.querySelector('.sidebar-filters-wrapper');
@@ -102,7 +102,7 @@ describe('dx-card-collection block', () => {
     const firstFilter = sidebarFiltersWrapper.querySelector('.filter');
     expect(firstFilter).to.exist;
   });
-  it('should render partner cards with design property set to half height card', async function () {
+  it('should render partner cards with design property set to half height card', async () => {
     PartnerCards.prototype.firstUpdated.restore();
 
     sinon.stub(PartnerCards.prototype, 'firstUpdated').callsFake(async function () {
@@ -125,7 +125,7 @@ describe('dx-card-collection block', () => {
     expect(firstCard).to.exist;
   });
 
-  it('should render filter info box when configured for desktop', async function () {
+  it('should render filter info box when configured for desktop', async () => {
     PartnerCards.prototype.firstUpdated.restore();
     PartnerCards.prototype.fetchTags.restore();
 
@@ -178,7 +178,7 @@ describe('dx-card-collection block', () => {
     expect(infoBox.innerHTML).to.include('<strong>Test</strong>');
   });
 
-  it('should contain card collection analytics attributes', async function () {
+  it('should contain card collection analytics attributes', async () => {
     const block = document.querySelector('.dx-card-collection');
     expect(block).to.exist;
 
@@ -201,7 +201,7 @@ describe('dx-card-collection block', () => {
     expect(singlePartnerCardBtn.getAttribute('daa-ll')).to.equal(singlePartnerCardBtn.textContent);
   });
 
-  it('should contain card collection analytics attributes with filtering and search', async function () {
+  it('should contain card collection analytics attributes with filtering and search', async () => {
     const block = document.querySelector('.dx-card-collection');
     expect(block).to.exist;
     PartnerCards.prototype.firstUpdated.restore();
@@ -215,7 +215,7 @@ describe('dx-card-collection block', () => {
       this.allTags = tags;
       this.selectedSortOrder = { key: 'newest', value: 'Newest' };
       this.searchTerm = 'Adobe';
-      this.selectedFilters = {'content-type': { checked: true, hash: "37mr/hvv", key: "event-session", parentKey: "content-type", value: "Event Session"}}
+      this.selectedFilters = { 'content-type': { checked: true, hash: '37mr/hvv', key: 'event-session', parentKey: 'content-type', value: 'Event Session' } };
     });
 
     const component = await init(block);
@@ -230,7 +230,7 @@ describe('dx-card-collection block', () => {
     expect(partnerCards.getAttribute('daa-lh')).to.equal('Card Collection | Filters: Event Session | Search Query: Adobe');
   });
 
-  it('should initialize with past date filter when date-filter is set to past', async function () {
+  it('should initialize with past date filter when date-filter is set to past', async () => {
     document.body.innerHTML = `
       <div class="dx-card-collection">
         <div>
@@ -251,7 +251,7 @@ describe('dx-card-collection block', () => {
     expect(component.blockData.dateFilter.tags[3].key).to.equal('last-90-days');
   });
 
-  it('should initialize with future date filter when date-filter is set to future', async function () {
+  it('should initialize with future date filter when date-filter is set to future', async () => {
     document.body.innerHTML = `
       <div class="dx-card-collection">
         <div>
@@ -272,7 +272,7 @@ describe('dx-card-collection block', () => {
     expect(component.blockData.dateFilter.tags[3].key).to.equal('next-90-days');
   });
 
-  it('should not initialize date filter when date-filter row is not authored', async function () {
+  it('should not initialize date filter when date-filter row is not authored', async () => {
     document.body.innerHTML = `
       <div class="dx-card-collection">
         <div>
@@ -318,8 +318,8 @@ describe('dx-card-collection block', () => {
       component.cards = [...mockCards];
       component.selectedDateFilter = { key: 'next-month' };
       component.handleDateFilterAction();
-      
-      const filteredIds = component.cards.map(card => card.id);
+
+      const filteredIds = component.cards.map((card) => card.id);
       expect(filteredIds).to.include('2');
       expect(filteredIds).to.not.include('3');
     });
@@ -329,11 +329,11 @@ describe('dx-card-collection block', () => {
       component.cards = [
         { id: 'jan-next-year', cardDate: new Date(currentYear + 1, 0, 15).toISOString() },
       ];
-      
+
       const clock = sinon.useFakeTimers(new Date(currentYear, 11, 15).getTime());
       component.selectedDateFilter = { key: 'next-month' };
       component.handleDateFilterAction();
-      
+
       expect(component.cards.length).to.equal(1);
       expect(component.cards[0].id).to.equal('jan-next-year');
       clock.restore();
@@ -343,8 +343,8 @@ describe('dx-card-collection block', () => {
       component.cards = [...mockCards];
       component.selectedDateFilter = { key: 'previous-month' };
       component.handleDateFilterAction();
-      
-      const filteredIds = component.cards.map(card => card.id);
+
+      const filteredIds = component.cards.map((card) => card.id);
       expect(filteredIds).to.include('3');
       expect(filteredIds).to.not.include('2');
     });
@@ -354,11 +354,11 @@ describe('dx-card-collection block', () => {
       component.cards = [
         { id: 'dec-last-year', cardDate: new Date(currentYear - 1, 11, 15).toISOString() },
       ];
-      
+
       const clock = sinon.useFakeTimers(new Date(currentYear, 0, 15).getTime());
       component.selectedDateFilter = { key: 'previous-month' };
       component.handleDateFilterAction();
-      
+
       expect(component.cards.length).to.equal(1);
       expect(component.cards[0].id).to.equal('dec-last-year');
       clock.restore();
@@ -368,8 +368,8 @@ describe('dx-card-collection block', () => {
       component.cards = [...mockCards];
       component.selectedDateFilter = { key: 'next-90-days' };
       component.handleDateFilterAction();
-      
-      const filteredIds = component.cards.map(card => card.id);
+
+      const filteredIds = component.cards.map((card) => card.id);
       expect(filteredIds).to.include('4');
       expect(filteredIds).to.not.include('5');
     });
@@ -381,11 +381,11 @@ describe('dx-card-collection block', () => {
         { id: 'at-90', cardDate: new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString() },
         { id: 'beyond-90', cardDate: new Date(today.getTime() + 91 * 24 * 60 * 60 * 1000).toISOString() },
       ];
-      
+
       component.selectedDateFilter = { key: 'next-90-days' };
       component.handleDateFilterAction();
-      
-      const filteredIds = component.cards.map(card => card.id);
+
+      const filteredIds = component.cards.map((card) => card.id);
       expect(filteredIds).to.include('within-90');
       expect(filteredIds).to.include('at-90');
     });
@@ -394,15 +394,15 @@ describe('dx-card-collection block', () => {
       component.cards = [...mockCards];
       component.selectedDateFilter = { key: 'current-month' };
       component.handleDateFilterAction();
-      
-      const filteredIds = component.cards.map(card => card.id);
+
+      const filteredIds = component.cards.map((card) => card.id);
       expect(filteredIds).to.include('1');
       expect(filteredIds).to.not.include('2');
       expect(filteredIds).to.not.include('3');
     });
   });
 
-  it('should handle clear all filters when dateFilter is not present', async function () {
+  it('should handle clear all filters when dateFilter is not present', async () => {
     document.body.innerHTML = `
       <div class="dx-card-collection">
         <div>
@@ -442,7 +442,7 @@ describe('dx-card-collection block', () => {
       mockHeader = document.createElement('header');
       Object.defineProperty(mockHeader, 'offsetHeight', {
         configurable: true,
-        value: 80
+        value: 80,
       });
       document.body.appendChild(mockHeader);
 
@@ -452,7 +452,7 @@ describe('dx-card-collection block', () => {
       // Stub window.scrollY
       Object.defineProperty(window, 'scrollY', {
         configurable: true,
-        value: 500
+        value: 500,
       });
 
       const block = document.querySelector('.dx-card-collection');
@@ -520,7 +520,9 @@ describe('dx-card-collection block', () => {
 
     it('should calculate scroll position accounting for gnav height', () => {
       const partnerCardsHeader = component.querySelector('.partner-cards-header');
-      const mockRect = { top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      const mockRect = {
+        top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0,
+      };
       sinon.stub(partnerCardsHeader, 'getBoundingClientRect').returns(mockRect);
 
       component.handleNextPage();
@@ -539,7 +541,9 @@ describe('dx-card-collection block', () => {
       mockHeader.parentNode.removeChild(mockHeader);
 
       const partnerCardsHeader = component.querySelector('.partner-cards-header');
-      const mockRect = { top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      const mockRect = {
+        top: 200, left: 0, right: 0, bottom: 0, width: 0, height: 0,
+      };
       sinon.stub(partnerCardsHeader, 'getBoundingClientRect').returns(mockRect);
 
       component.handleNextPage();
@@ -553,9 +557,11 @@ describe('dx-card-collection block', () => {
     });
 
     it('should fallback to component itself if partner-cards-header not found', () => {
-      const componentRect = { top: 100, left: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      const componentRect = {
+        top: 100, left: 0, right: 0, bottom: 0, width: 0, height: 0,
+      };
       sinon.stub(component, 'getBoundingClientRect').returns(componentRect);
-      
+
       // Remove the header
       const partnerCardsHeader = component.querySelector('.partner-cards-header');
       if (partnerCardsHeader) {
@@ -575,18 +581,18 @@ describe('dx-card-collection block', () => {
 
     it('should update pagination counter and scroll when navigating pages', () => {
       expect(component.paginationCounter).to.equal(1);
-      
+
       component.handleNextPage();
-      
+
       expect(component.paginationCounter).to.equal(2);
       expect(windowScrollToStub.calledOnce).to.be.true;
     });
 
     it('should not change pagination counter if scroll conditions not met', () => {
       component.paginationCounter = 1;
-      
+
       component.handlePrevPage();
-      
+
       expect(component.paginationCounter).to.equal(1);
       expect(windowScrollToStub.called).to.be.false;
     });

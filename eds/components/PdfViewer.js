@@ -49,7 +49,8 @@ export const loadSdk = () => new Promise((resolve, reject) => {
 });
 
 export const getPdfConfig = () => {
-  //The client ids are specific to the origin (no wildcards), so the stage **pdfViewerClientId** only works for **main--milo--adobecom.aem.page**.
+  // The client ids are specific to the origin (no wildcards),
+  // so the stage **pdfViewerClientId** only works for **main--milo--adobecom.aem.page**.
   const config = getConfig();
   return config.env?.consumer?.pdfViewerClientId || config.pdfViewerClientId;
 };

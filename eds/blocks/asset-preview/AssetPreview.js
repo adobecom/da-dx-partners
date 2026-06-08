@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
@@ -51,11 +52,12 @@ export default class AssetPreview extends LitElement {
     this.assetPartnerLevel = [];
     this.pdfPreviewUrl = '';
   }
-    createRenderRoot() {
+
+  createRenderRoot() {
     return this;
   }
 
-  // eslint-disable-next-line no-underscore-dangle
+  // eslint-disable-next-line class-methods-use-this
   get _video() {
     return document.querySelector('video');
   }
@@ -119,6 +121,7 @@ export default class AssetPreview extends LitElement {
         pdfEmbedMode: this.blockData.pdfEmbedMode,
       });
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(`PDF viewer failed to load, falling back to preview image: ${e.message}`);
       this.pdfPreviewUrl = '';
     }
@@ -160,7 +163,7 @@ export default class AssetPreview extends LitElement {
   }
 
   async getAssetMetadata() {
-  // for domain we use what is in  window.location.href
+    // for domain we use what is in  window.location.href
     // (this assumes that on cards we have partners.stage.adobe.com or partners.adobe.com
     // on prod caas index we would have only have prod assets, so asset metadata
     // would always be found on prod
@@ -177,6 +180,7 @@ export default class AssetPreview extends LitElement {
         }
       });
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(`Error on fetch of asset ${mappedAssetUrl} :`, e);
     }
     this.isLoading = false;
@@ -185,20 +189,24 @@ export default class AssetPreview extends LitElement {
   async setData(assetMetadata) {
     this.title = DOMPurify.sanitize(assetMetadata.title);
     document.title = DOMPurify.sanitize(assetMetadata.title);
-    this.summary = DOMPurify.sanitize(assetMetadata.summary) || DOMPurify.sanitize(assetMetadata.description);
+    this.summary = DOMPurify.sanitize(assetMetadata.summary)
+      || DOMPurify.sanitize(assetMetadata.description);
     this.fileType = DOMPurify.sanitize(assetMetadata.fileType);
     this.url = DOMPurify.sanitize(assetMetadata.url);
     this.webinarPresentation = DOMPurify.sanitize(assetMetadata.webinarPresentation);
     this.previewImage = DOMPurify.sanitize(assetMetadata.previewImage);
     this.blockData.pdfEmbedMode = DOMPurify.sanitize(this.blockData.pdfEmbedMode) || 'full-window';
     this.backButtonUrl = DOMPurify.sanitize(this.blockData.backButtonUrl);
-    this.backButtonLabel = DOMPurify.sanitize(this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL);
+    this.backButtonLabel = DOMPurify.sanitize(
+      this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL,
+    );
     this.tags = assetMetadata.tags
       ? this.getTagsDisplayValues(this.allCaaSTags, assetMetadata.tags) : [];
     this.allAssetTags = assetMetadata.tags;
     this.ctaText = DOMPurify.sanitize(assetMetadata.ctaText);
     this.size = DOMPurify.sanitize(this.getSizeInMb(assetMetadata.size));
-    this.assetPartnerLevel = assetMetadata.partnerLevel?.map((level) => DOMPurify.sanitize(level.toLowerCase()));
+    this.assetPartnerLevel = assetMetadata.partnerLevel
+      ?.map((level) => DOMPurify.sanitize(level.toLowerCase()));
     this.createdDate = (() => {
       if (!assetMetadata.createdDate) return '';
 
@@ -223,7 +231,7 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   getRealAssetUrl() {
-    const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH).replace('.html','/_jcr_content/metadata.assetmetadata.json');
+    const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH).replace('.html', '/_jcr_content/metadata.assetmetadata.json');
     try {
       const url = new URL(assetMetadataPath);
       const isProd = prodHosts.includes(window.location.host);
@@ -237,6 +245,7 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   _handleImgError = (e) => {
+    // eslint-disable-next-line no-console
     console.log('error', e);
     const img = e.currentTarget;
     img.src = transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH);
@@ -269,16 +278,16 @@ export default class AssetPreview extends LitElement {
                     <span>${this.blockData.localizedText['{{Watch Video}}']}</span>
                   </button>
                 ` : ''}
-                
+
                 ${this.backButtonUrl ? html`<a
                 class="link" href="${this.backButtonUrl}" daa-ll="${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
               </div>` : ''}
             </div>
             <div class="asset-preview-block-details-right">
               ${this.pdfPreviewUrl && !this.isRestrictedAssetForUser()
-                ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
-                : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`
-              }
+    ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
+    : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`
+}
             </div>
          </div>
 
@@ -290,15 +299,15 @@ export default class AssetPreview extends LitElement {
                 <div class="video-loading-spinner"></div>
               </div>
             ` : ''}
-            <video 
-              preload="auto" 
-              @play="${() => { this.isVideoPlaying = true; }}" 
+            <video
+              preload="auto"
+              @play="${() => { this.isVideoPlaying = true; }}"
               @pause="${() => { this.isVideoPlaying = false; }}"
               @loadstart="${() => { this.isVideoLoading = true; }}"
               @canplay="${() => { this.isVideoLoading = false; }}"
               @error="${() => { this.isVideoLoading = false; }}"
-              playsinline="" 
-              loop="" 
+              playsinline=""
+              loop=""
               data-video-source="${this.getDownloadUrl()}"
               oncontextmenu="return false;"
               controls
@@ -359,7 +368,10 @@ export default class AssetPreview extends LitElement {
     filteredTags.forEach((tag) => {
       const tagObject = this.findTagByPath(this.allCaaSTags.namespaces.caas.tags, tag)
         || { tagId: tag, title: tag };
-      tagsArray.push({ tagId: DOMPurify.sanitize(tag), title: DOMPurify.sanitize(tagObject.title) });
+      tagsArray.push({
+        tagId: DOMPurify.sanitize(tag),
+        title: DOMPurify.sanitize(tagObject.title),
+      });
     });
     return tagsArray;
   }

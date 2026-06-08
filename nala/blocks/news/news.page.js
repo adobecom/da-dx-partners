@@ -44,6 +44,6 @@ export default class NewsPage {
   }
 
   async clickPageNumButton(pageNum) {
-      await this.page.locator(`button[aria-label="Page ${pageNum}"]`).click();
-    }
+    await this.page.locator(`button[aria-label="Page ${pageNum}"]`).click();
+  }
 }

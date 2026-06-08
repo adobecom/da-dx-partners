@@ -13,14 +13,12 @@ export default class EventsPage {
     const cardTitleLocator = this.page
       .locator('.card-title')
       .filter({ hasText: cardTitle });
-  
+
     await expect(cardTitleLocator).toHaveText(cardTitle);
   }
 
   async verifyCardDateDaysFromToday(cardTitle, daysFromToday) {
-    const card = this.page.locator('.single-partner-card').filter({
-      has: this.page.locator('.card-title', { hasText: cardTitle }),
-    });
+    const card = this.page.locator('.single-partner-card').filter({ has: this.page.locator('.card-title', { hasText: cardTitle }) });
     const dateText = (await card.locator('.card-date').textContent()).trim();
     const datePart = dateText.split('|')[0].trim();
     const displayed = new Date(datePart);
@@ -38,7 +36,7 @@ export default class EventsPage {
 
   async verifyCardNotVisible(cardTitle) {
     const allCardTitles = await this.page.locator('.card-title').allTextContents();
-    const cardExists = allCardTitles.some(title => title.trim() === cardTitle);
+    const cardExists = allCardTitles.some((title) => title.trim() === cardTitle);
     await expect(cardExists).toBe(false);
   }
 
@@ -47,6 +45,7 @@ export default class EventsPage {
     const firstResultAfterFilter = parseInt(results.match(/\d+/)[0], 10);
     return firstResultAfterFilter;
   }
+
   filterCheckbox(role, name) {
     return this.page.getByRole(role, { name, exact: true });
   }

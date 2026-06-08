@@ -21,7 +21,7 @@ export default class SearchPage {
     this.discoverCheckBox = page.getByRole('checkbox', { name: 'Discover' });
     this.functionalityFilter = page.getByRole('button', { name: 'Functionality' });
     this.analysisInsgightCheckBox = page.getByRole('checkbox', { name: 'Analysis & Insights' });
-    this.businessSolutionFilter= page.getByRole('button', { name: 'Business Solutions' });
+    this.businessSolutionFilter = page.getByRole('button', { name: 'Business Solutions' });
     this.b2bCheckBox = page.getByRole('checkbox', { name: 'B2B Orchestration' });
     this.crossFunctionalCheckBox = page.getByRole('checkbox', { name: 'Cross-functional Collaboration' });
     this.assetTitlePreview = page.locator('.asset-preview-block-header');
@@ -60,7 +60,6 @@ export default class SearchPage {
   async getCardDate() {
     const dateText = (await this.cardDate.textContent()).trim();
     return dateText;
-    console.log(dateText);
   }
 
   async getCardSize() {
@@ -102,7 +101,7 @@ export default class SearchPage {
         const classList = await card.evaluate((el) => el.classList.toString());
         return classList.includes('expanded');
       },
-      { timeout }
+      { timeout },
     ).toBe(true);
   }
 
@@ -143,7 +142,7 @@ export default class SearchPage {
           const match = text?.match(/\((\d+)\)/);
           return match ? Number(match[1]) : 0;
         },
-        { timeout }
+        { timeout },
       )
       .toBeGreaterThanOrEqual(expectedMin);
   }
@@ -211,27 +210,21 @@ export default class SearchPage {
   }
 
   async verifyPreviewMessage(data) {
-    const message = this.restrictedMessageBox.filter({
-      hasText: data.textBlock
-    });
+    const message = this.restrictedMessageBox.filter({ hasText: data.textBlock });
     await expect(message).toBeVisible();
     await expect(message).toContainText(data.textBlock);
     await expect(message.locator('a')).toHaveText(data.link[0].text);
   }
 
   async clickLinkFromMessage(messageText, linkText) {
-    const message = this.restrictedMessageBox.filter({
-      hasText: messageText
-    });
+    const message = this.restrictedMessageBox.filter({ hasText: messageText });
     const link = message.locator('a', { hasText: linkText });
     await link.click();
   }
 
   getFilterCount(filterName) {
     return this.page
-      .locator('.filter', {
-        has: this.page.getByRole('button', { name: filterName })
-      })
+      .locator('.filter', { has: this.page.getByRole('button', { name: filterName }) })
       .locator('.filter-selected-tags-count-btn');
   }
 }

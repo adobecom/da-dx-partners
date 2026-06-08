@@ -1,4 +1,3 @@
-import { getLibs } from '../../scripts/utils.js';
 import TrainingPreview from './TrainingPreview.js';
 import { getConfig, populateLocalizedTextFromListItems, replaceText, keepInlineFragmentInDOM } from '../utils/utils.js';
 
@@ -16,13 +15,11 @@ async function localizationPromises(localizedText, config) {
 
 export default async function init(el) {
   performance.mark('training-preview:start');
-
-  const miloLibs = getLibs();
   const config = getConfig();
 
   const sectionIndex = el.parentNode.getAttribute('data-idx');
 
-  const localizedText = { '{{Loading data}}': 'Loading data',};
+  const localizedText = { '{{Loading data}}': 'Loading data' };
   populateLocalizedTextFromListItems(el, localizedText);
 
   const deps = await Promise.all([
@@ -50,4 +47,3 @@ export default async function init(el) {
   performance.measure('training-preview block', 'training-preview:start', 'training-preview:end');
   return app;
 }
-

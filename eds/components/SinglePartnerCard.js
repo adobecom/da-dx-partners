@@ -28,7 +28,7 @@ class SinglePartnerCard extends LitElement {
   }
 
   get isEventCard() {
-    return this.data.tags?.some(tag => tag?.id === EVENT_TAG_HASH) ?? false;
+    return this.data.tags?.some((tag) => tag?.id === EVENT_TAG_HASH) ?? false;
   }
 
   render() {

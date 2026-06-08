@@ -3,6 +3,7 @@ import { getLibs } from '../../scripts/utils.js';
 const miloLibs = getLibs();
 const { css } = await import(`${miloLibs}/deps/lit-all.min.js`);
 
+// eslint-disable-next-line import/prefer-default-export
 export const partnershipProgressStyles = css`
   :host {
     display: block;
@@ -102,7 +103,7 @@ export const partnershipProgressStyles = css`
       width: 100%;
     }
   }
-  
+
   .partnership-progress-bar-wrapper {
     width: 100%;
   }
