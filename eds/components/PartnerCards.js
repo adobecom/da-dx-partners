@@ -624,14 +624,16 @@ export default class PartnerCards extends LitElement {
       return map;
     }
 
-    Object.keys(obj).forEach((tag) => {
+    // eslint-disable-next-line no-restricted-syntax, guard-for-in
+    for (const key in obj) {
+      const tag = obj[key];
       if (tag && typeof tag === 'object') {
         map.set(tag.tagID, tag);
         if (tag.tags && Object.keys(tag.tags).length > 0) {
           this.flattenTagsToMap(tag.tags, map);
         }
       }
-    });
+    }
 
     return map;
   }
