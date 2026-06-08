@@ -84,7 +84,7 @@ class SearchCard extends LitElement {
       }
             </span>
             <p class="card-description">${unsafeHTML(DOMPurify.sanitize(this.data.contentArea?.description))}</p>
-            ${ this.data.contentArea?.contentType !== 'course' ? html`<div class="card-tags-wrapper">${this.cardTags}</div>` : '' }
+            ${this.data.contentArea?.contentType !== 'course' ? html`<div class="card-tags-wrapper">${this.cardTags}</div>` : ''}
           </div>
         </div>
       </div>

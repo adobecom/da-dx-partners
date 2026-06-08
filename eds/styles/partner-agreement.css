@@ -43,5 +43,5 @@
 #partner-agreement-modal .agreement-alert {
     height: 30px;
     width: 30px;
-    background: transparent url(/eds/img/icons/alert.svg) no-repeat 50% 50%;
+    background: transparent url('/eds/img/icons/alert.svg') no-repeat 50% 50%;
 }

@@ -291,7 +291,7 @@ test.describe('MAPP sign in flow', () => {
   });
   downgradedUsers.forEach((feature) => {
     test(`${feature.name},${feature.tags}`, async ({ page, baseURL }) => {
-      const { data, path } = feature;
+      const { data } = feature;
       await test.step('Go to public home page', async () => {
         await page.goto(`${baseURL}${feature.path}`);
       });
@@ -308,12 +308,12 @@ test.describe('MAPP sign in flow', () => {
         await signInPage.searchField.press('Enter');
 
         await expect.poll(
-          async () => await signInPage.getNumberOfResults(),
+          async () => signInPage.getNumberOfResults(),
           { timeout: 15000 },
         ).not.toBe(initialResults);
 
         await expect.poll(
-          async () => await signInPage.getNumberOfResults(),
+          async () => signInPage.getNumberOfResults(),
           { timeout: 15000 },
         ).toBe(4);
 

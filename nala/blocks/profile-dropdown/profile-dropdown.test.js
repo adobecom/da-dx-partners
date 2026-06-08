@@ -34,7 +34,7 @@ test.describe('Validate profile dropdown block', () => {
     await test.step('Verify profile dropdown', async () => {
       await expect(profileDropdownPage.profileDropdown).toBeVisible();
       await profileDropdownPage.profileDropdown.click();
-      await expect(profileDropdownPage.profileIcon).toBeVisible();  
+      await expect(profileDropdownPage.profileIcon).toBeVisible();
       await expect(profileDropdownPage.profileName).toHaveText(features[0].data.profileName);
       await expect(profileDropdownPage.profileEmail).toHaveText(features[0].data.profileEmail);
       await expect(profileDropdownPage.profileJob).toHaveText(features[0].data.profileJob);

@@ -93,7 +93,7 @@ test.describe('Validate card collection block', () => {
     });
   });
   // @card-collection-or-logic
-  test(`${features[3].name},${features[3].tags}`, async ({ page}) => {
+  test(`${features[3].name},${features[3].tags}`, async ({ page }) => {
     const { data } = features[3];
     await test.step('Go to card collection page', async () => {
       await page.goto(`${features[3].path}`);
@@ -147,22 +147,18 @@ test.describe('Validate card collection block', () => {
       await cardCollectionPage.searchField.type(data.keyword);
     });
     await test.step('Filter main collection', async () => {
-
       await cardCollectionPage.industryFilter.click();
       await expect(cardCollectionPage.industryFilterPanel).toBeVisible();
       const checkBox = cardCollectionPage.filterCheckbox(data.btnRole, data.checkBoxMediaEntertainment);
       await expect(checkBox).toBeVisible();
-       await expect(checkBox).toBeEnabled();
-       const firstLocator = cardCollectionPage.cardsResults.first();
-       await checkBox.click();
-       await expect(checkBox).toBeChecked();
+      await expect(checkBox).toBeEnabled();
+      await checkBox.click();
+      await expect(checkBox).toBeChecked();
 
       const firstText = await cardCollectionPage.cardsResults.first().innerText();
 
       const mainCollectionResults = extractNumber(firstText);
       await expect(mainCollectionResults).toBe(2);
-
-      
     });
     await test.step('Sort main collection', async () => {
       await cardCollectionPage.clearAll.click();
@@ -172,12 +168,12 @@ test.describe('Validate card collection block', () => {
 
       await cardCollectionPage.selectDateSort(data.oldestSort);
       await expect
-      .poll(async () => await cardCollectionPage.getFirstCardMainCollection())
-      .not.toBe(mainCardTitleBefore);
+        .poll(async () => cardCollectionPage.getFirstCardMainCollection())
+        .not.toBe(mainCardTitleBefore);
 
       const mainCardTitleAfter = await cardCollectionPage.getFirstCardMainCollection();
       const additionalCardTitleAfter = await cardCollectionPage.getFirstCardAdditionalCollection();
-      
+
       await expect(mainCardTitleBefore).not.toBe(mainCardTitleAfter);
       await expect(additionalCardTitleBefore).toBe(additionalCardTitleAfter);
     });

@@ -27,7 +27,7 @@ async function getAemRepo(project, opts) {
     aemRepo: configs['aem.repositoryId'],
     namespaces: configs['aem.tags.namespaces'],
     requiresAuth,
-    tagExt
+    tagExt,
   };
 }
 
@@ -53,8 +53,7 @@ async function getTags(path, opts, aemConfig) {
 }
 
 const getRootTags = async (namespaces, aemConfig, opts) => {
-  const createTagUrl = (namespace = '') =>
-    `https://${aemConfig.aemRepo}${ROOT_TAG_PATH}${namespace ? `/${namespace}` : ''}${aemConfig.tagExt}`;
+  const createTagUrl = (namespace = '') => `https://${aemConfig.aemRepo}${ROOT_TAG_PATH}${namespace ? `/${namespace}` : ''}${aemConfig.tagExt}`;
 
   if (namespaces.length === 0) {
     return getTags(createTagUrl(), opts, aemConfig).catch(() => null);
