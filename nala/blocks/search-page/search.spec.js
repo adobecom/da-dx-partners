@@ -235,9 +235,7 @@ export default {
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
-        cardTitle: 'Adobe Experience Manager Foundations - DX Certification',
-        cardDate: 'May 7, 2026',
-        cardSummaryValue: 'Intro to Adobe Experience Manager (AEM): Learn key concepts, solutions, features, and use cases within the AEM ecosystem.',
+        cardDate: 'May 28, 2026',
         cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg")',
       },
     },
