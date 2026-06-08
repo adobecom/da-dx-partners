@@ -299,4 +299,174 @@ test.describe('Gnav Personalisation', () => {
       expect(homeHref).toContain(data.homeIconLink);
     });
   });
+  test(`${features[11].name},${features[11].tags}`, async ({ page, context, baseURL }) => {
+    const { data, path, restrictedPath } = features[11];
+
+    await test.step('Go to the page', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
+    });
+
+    await test.step('Sign in', async () => {
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Validate GNav status on restricted 404 page', async () => {
+      const restrictedPage = await context.newPage();
+      const gnavPage = new GnavPersonalisationPage(restrictedPage);
+      try {
+        const fragmentResponse = gnavPage.waitForLoggedInGnavFragment();
+        await restrictedPage.goto(`${baseURL}${restrictedPath}`);
+        await restrictedPage.waitForLoadState('domcontentloaded');
+        const response = await fragmentResponse;
+        expect(response.url()).toContain(data.gnavFragmentPath);
+        expect(response.status()).toBe(200);
+        await gnavPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+        await gnavPage.verifyLogoVisible();
+        await gnavPage.verifyPartnerCtasHidden(data.hiddenCtas);
+        await gnavPage.verifyShortcutIconsVisible();
+        await gnavPage.verifyShortcutIconHrefs(data);
+      } finally {
+        await restrictedPage.close();
+      }
+    });
+  });
+  test(`${features[12].name},${features[12].tags}`, async ({ page, context, baseURL }) => {
+    const { data, path, restrictedPath } = features[12];
+
+    await test.step('Go to the page', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
+    });
+
+    await test.step('Sign in', async () => {
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Validate About tab on restricted 404 page', async () => {
+      const restrictedPage = await context.newPage();
+      const gnavPage = new GnavPersonalisationPage(restrictedPage);
+      try {
+        await gnavPage.open404Page(baseURL, restrictedPath);
+        await gnavPage.openAboutTab();
+        await gnavPage.verifyMyPartnershipVisible(true);
+        await gnavPage.verifyVisibleImagesNotBroken();
+      } finally {
+        await restrictedPage.close();
+      }
+    });
+  });
+  test(`${features[13].name},${features[13].tags}`, async ({ page, context, baseURL }) => {
+    const { data, path, restrictedPath } = features[13];
+
+    await test.step('Go to the page', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
+    });
+
+    await test.step('Sign in', async () => {
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Validate Promote&Sell tab part 1 on restricted 404 page', async () => {
+      const restrictedPage = await context.newPage();
+      const gnavPage = new GnavPersonalisationPage(restrictedPage);
+      try {
+        await gnavPage.open404Page(baseURL, restrictedPath);
+        await gnavPage.verifyRestrictedPromoteSellPart1(data);
+      } finally {
+        await restrictedPage.close();
+      }
+    });
+  });
+  test(`${features[14].name},${features[14].tags}`, async ({ page, context, baseURL }) => {
+    const { data, path, restrictedPath } = features[14];
+
+    await test.step('Go to the page', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
+    });
+
+    await test.step('Sign in', async () => {
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Validate Promote&Sell tab part 2 on restricted 404 page', async () => {
+      const restrictedPage = await context.newPage();
+      const gnavPage = new GnavPersonalisationPage(restrictedPage);
+      try {
+        await gnavPage.open404Page(baseURL, restrictedPath);
+        await gnavPage.verifyRestrictedPromoteSellPart2(data);
+      } finally {
+        await restrictedPage.close();
+      }
+    });
+  });
+  test(`${features[15].name},${features[15].tags}`, async ({ page, baseURL }) => {
+    const { data, restrictedPath } = features[15];
+
+    await test.step('Go to the page', async () => {
+      const fragmentResponse = gnavPersonalisationPage.waitForPublicGnavFragment();
+      await page.goto(`${baseURL}${restrictedPath}`);
+      await page.waitForLoadState('domcontentloaded');
+      const response = await fragmentResponse;
+      expect(response.url()).toContain(data.gnavFragmentPath);
+      expect(response.status()).toBe(200);
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Validate public GNav on 404 page', async () => {
+      await gnavPersonalisationPage.verifyLogoVisible();
+      await gnavPersonalisationPage.verifyPartnerCtasVisible(data.visibleCtas);
+      await gnavPersonalisationPage.verifyShortcutIconsNotVisible();
+    });
+  });
+  test(`${features[16].name},${features[16].tags}`, async ({ baseURL }) => {
+    const { data, restrictedPath } = features[16];
+
+    await test.step('Go to the page', async () => {
+      await gnavPersonalisationPage.open404Page(baseURL, restrictedPath);
+    });
+
+    await test.step('Validate About tab on public 404 page', async () => {
+      await gnavPersonalisationPage.openAboutTab();
+      await gnavPersonalisationPage.verifyMyPartnershipVisible(false);
+      await gnavPersonalisationPage.verifyPromoLinksAbsent(data.hiddenPromoLinks);
+      await gnavPersonalisationPage.verifyVisibleImagesNotBroken();
+    });
+  });
+  test(`${features[17].name},${features[17].tags}`, async ({ baseURL }) => {
+    const { data, restrictedPath } = features[17];
+
+    await test.step('Go to the page', async () => {
+      await gnavPersonalisationPage.open404Page(baseURL, restrictedPath);
+    });
+
+    await test.step('Validate Promote&Sell tab part 1 is not shown for public user', async () => {
+      await gnavPersonalisationPage.verifyPublicPromoteSellPart1Absent(data);
+    });
+  });
+  test(`${features[18].name},${features[18].tags}`, async ({ baseURL }) => {
+    const { data, restrictedPath } = features[18];
+
+    await test.step('Go to the page', async () => {
+      await gnavPersonalisationPage.open404Page(baseURL, restrictedPath);
+    });
+
+    await test.step('Validate Promote&Sell tab part 2 is not shown for public user', async () => {
+      await gnavPersonalisationPage.verifyPublicPromoteSellPart2Absent(data);
+    });
+  });
 });
