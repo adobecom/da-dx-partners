@@ -100,16 +100,6 @@ export default class AssetPreview extends LitElement {
     }
   }
 
-  get pdfViewerLink() {
-    if (this.webinarPresentation) return this.getWebinarPresentationDownloadUrl();
-
-    const fileType = this.getFileTypeFromTag()?.toLowerCase();
-    if (fileType === 'pdf') {
-      return this.url;
-    }
-    return '';
-  }
-
   async loadPdfViewer() {
     try {
       // Check if the PDF URL is reachable first
@@ -157,7 +147,7 @@ export default class AssetPreview extends LitElement {
       },
       'pdf-embed-mode': (cols) => {
         const [pdfEmbedModeEl] = cols;
-        this.blockData.pdfEmbedMode = pdfEmbedModeEl.innerText.trim().toLowerCase().replace(/ /g, '-');
+        this.blockData.pdfEmbedMode = pdfEmbedModeEl?.innerText.trim().toLowerCase().replace(/ /g, '-');
       },
     };
     const rows = Array.from(this.blockData.tableData);
@@ -200,7 +190,7 @@ export default class AssetPreview extends LitElement {
     this.url = DOMPurify.sanitize(assetMetadata.url);
     this.webinarPresentation = DOMPurify.sanitize(assetMetadata.webinarPresentation);
     this.previewImage = DOMPurify.sanitize(assetMetadata.previewImage);
-    this.blockData.pdfEmbedMode = DOMPurify.sanitize(this.blockData.pdfEmbedMode) || 'sized-container';
+    this.blockData.pdfEmbedMode = DOMPurify.sanitize(this.blockData.pdfEmbedMode) || 'full-window';
     this.backButtonUrl = DOMPurify.sanitize(this.blockData.backButtonUrl);
     this.backButtonLabel = DOMPurify.sanitize(this.blockData.backButtonLabel || DEFAULT_BACK_BTN_LABEL);
     this.tags = assetMetadata.tags
@@ -221,7 +211,7 @@ export default class AssetPreview extends LitElement {
     })();
     this.audienceTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:audience') : [];
     this.fileFormatTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:file-format') : [];
-    this.pdfPreviewUrl = DOMPurify.sanitize(assetMetadata.pdfPreviewUrl) || this.pdfViewerLink;
+    this.pdfPreviewUrl = DOMPurify.sanitize(assetMetadata.pdfPreviewUrl);
     this.isVideo = this.fileFormatTags && this.fileFormatTags.length && this.fileFormatTags[0].tagId === 'caas:file-format/video';
     if (!assetMetadata.title || !assetMetadata.url) {
       this.assetHasData = false;
