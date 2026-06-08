@@ -529,7 +529,7 @@ describe('yukon-chat block', () => {
       links.forEach((link) => {
         expect(link.getAttribute('target')).to.equal('_blank');
       });
-    })
+    });
 
     it('should render modal disclaimer below the input field container', async () => {
       const encoder = new TextEncoder();
