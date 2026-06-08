@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { getConfig, getRuntimeActionUrl } from '../blocks/utils/utils.js';
 import {
   getCookieValue,
@@ -38,6 +37,7 @@ export function handleRedirects(agreementRedirectDomains, win = window) {
     win.location.href = redirectUrl;
   }
 }
+
 function addRegeneratePropToCookie() {
   const partnerDataCookie = getCookieValue('partner_data');
   if (!partnerDataCookie) return;
@@ -63,38 +63,40 @@ async function handleAgreement(action) {
         }),
       },
     );
+
     if (!response.ok) {
+      // eslint-disable-next-line no-console
       console.error(`${action} Partner Agreement failed, status: ${response.status}`);
       return false;
     }
     const responseJson = await response.json();
     if (action === 'fetch') {
       if (!responseJson || !responseJson.terms || responseJson.terms.length < 1) {
+        // eslint-disable-next-line no-console
         console.error('Partner Agreement response is empty');
         return false;
       }
+
       return responseJson.terms?.[0];
+    // eslint-disable-next-line no-else-return
+    } else {
+      // error code "41012" means agreement already accepted
+      if (responseJson.errorCode && responseJson.errorCode !== '41012') {
+        // eslint-disable-next-line no-console
+        console.error(`Accepting partner agreement failed! Error code: ${responseJson.errorCode}`);
+        return false;
+      }
+      return true;
     }
-    // error code "41012" means agreement already accepted
-    if (responseJson.errorCode && responseJson.errorCode !== '41012') {
-      console.error(`Accepting partner agreement failed! Error code: ${responseJson.errorCode}`);
-      return false;
-    }
-    return true;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(`Partner Agreement ${action} error`, error);
     return false;
   }
 }
 
-async function acceptAgreement(
-  agreementTextContainer,
-  successMessage,
-  errorMessage,
-  agreementRedirectDomains,
-  spinner,
-  closeModalCallback,
-) {
+// eslint-disable-next-line max-len
+async function acceptAgreement(agreementTextContainer, successMessage, errorMessage, agreementRedirectDomains, spinner, closeModalCallback) {
   agreementTextContainer.replaceWith(spinner);
   const success = await handleAgreement('accept');
   if (success) {
@@ -167,6 +169,7 @@ function preventAgreementModalClose(modal) {
 async function loadAgreementMeta(metadataUrl) {
   const response = await fetch(metadataUrl);
   if (!response.ok) {
+    // eslint-disable-next-line no-console
     console.error(`Fetching partner agreement metadata failed, status ${response.status}`);
     return false;
   }
@@ -194,6 +197,7 @@ export async function partnerAgreement(miloLibs, win = window) {
 
   const partnerAgreementMetaPath = getMetadataContent('partner-agreement-meta');
   if (!partnerAgreementMetaPath) {
+    // eslint-disable-next-line no-console
     console.warn('Partner agreement should be displayed but partner agreement meta path is not authored');
     win.dispatchEvent(
       new CustomEvent(SHOW_NEXT_POPUP, { detail: { next: PORTAL_MESSAGING_POPUP } }),

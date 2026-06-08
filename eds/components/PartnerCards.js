@@ -623,7 +623,8 @@ export default class PartnerCards extends LitElement {
     if (!obj || typeof obj !== 'object') {
       return map;
     }
-    Object.values(obj).forEach((tag) => {
+
+    Object.keys(obj).forEach((tag) => {
       if (tag && typeof tag === 'object') {
         map.set(tag.tagID, tag);
         if (tag.tags && Object.keys(tag.tags).length > 0) {
@@ -631,6 +632,7 @@ export default class PartnerCards extends LitElement {
         }
       }
     });
+
     return map;
   }
 

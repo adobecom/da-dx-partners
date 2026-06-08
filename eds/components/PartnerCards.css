@@ -580,7 +580,7 @@
   }
 }
 
-.pagination-wrapper>* {
+.pagination-wrapper > * {
   padding: 5px 0;
 }
 
@@ -947,7 +947,7 @@
   border-radius: 16px;
   background-color: #fff0;
   cursor: pointer;
-  transition: border-color .3s ease-in-out, background-color .3s ease-in-out;
+  transition: border-color .3s ease-in-out,background-color .3s ease-in-out;
 }
 
 @media (hover: hover) {
@@ -1003,22 +1003,12 @@
   font-weight: 700;
 }
 
-.pagination-wrapper-default .pagination-prev-btn.disabled,
-.pagination-wrapper-default .pagination-next-btn.disabled {
-  color: #9d9d9d;
-}
-
 .pagination-wrapper-default .pagination-prev-btn:hover,
 .pagination-wrapper-default .pagination-next-btn:hover,
 .pagination-wrapper-default .page-btn:hover {
   cursor: pointer;
   text-decoration: underline;
   transition: all .3s;
-}
-
-.pagination-wrapper-default .page-btn.selected {
-  background-color: #e5e5e5;
-  border-radius: 50%;
 }
 
 .pagination-wrapper-default .pagination-prev-btn.disabled,
@@ -1028,6 +1018,17 @@
 .pagination-wrapper-default .page-btn.selected:hover {
   text-decoration: none;
   cursor: default;
+}
+
+/* stylelint-disable no-descending-specificity */
+.pagination-wrapper-default .pagination-prev-btn.disabled,
+.pagination-wrapper-default .pagination-next-btn.disabled {
+  color: #9d9d9d;
+}
+
+.pagination-wrapper-default .page-btn.selected {
+  background-color: #e5e5e5;
+  border-radius: 50%;
 }
 
 /* Search input */
