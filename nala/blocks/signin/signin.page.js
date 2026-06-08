@@ -78,17 +78,17 @@ export default class SignInPage {
         latestAgreementAccepted: latestAgreementAccepted === 'true',
         latestAgreementAcceptedVersion,
         level: partnerLevel,
-        isAdmin: isAdmin,
+        isAdmin,
         primaryBusiness: JSON.parse(primaryBusiness),
         primaryContact: primaryContact === 'true',
         primaryJobRole,
         purchasedPartnerLevel,
         salesCenterAccess: salesCenterAccess === 'true',
-        specialState: specialState,
+        specialState,
         status,
       },
     };
-    
+
     await this.context.addCookies([{
       name: 'partner_data',
       value: JSON.stringify(cookieData),
@@ -99,7 +99,7 @@ export default class SignInPage {
   async waitForResultsToSettle() {
     await this.loader.waitFor({ state: 'hidden', timeout: 30000 });
   }
-  
+
   assetTitleCheck(assetTitle) {
     return this.page.getByText(assetTitle);
   }

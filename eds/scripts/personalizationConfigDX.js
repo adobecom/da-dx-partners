@@ -1,42 +1,40 @@
 import { processPrimaryContact, processSalesAccess } from './personalizationUtils.js';
 import {
   hasSalesCenterAccess,
-  isAdminUser,
   isPartnerNewlyRegistered,
   isMember,
   partnerIsSignedIn,
-  signedInNonMember,
   getPartnerCookieValue,
   partnerCookieContainsValue,
-  isReturningUser, isAccountLocked, isBctqExpiring
+  isReturningUser, isAccountLocked, isBctqExpiring,
 } from './utils.js';
 import {
   DX_ACCESS_TYPE,
   DX_COMPLIANCE_STATUS, DX_DESIGNATION_TYPE,
   DX_PRIMARY_BUSINESS,
   DX_SPECIAL_STATE,
-  PARTNER_LEVEL
+  PARTNER_LEVEL,
 } from '../blocks/utils/dxConstants.js';
 
 export const PERSONALIZATION_PLACEHOLDERS = {
-  'firstName': '//*[text()[contains(., "$firstName")]]',
-  'lastName': '//*[text()[contains(., "$lastName")]]',
-  'purchasedPartnerLevel': '//*[text()[contains(., "$purchasedPartnerLevel")]]',
-  'level': '//*[text()[contains(., "$level")]]',
-  'primaryJobRole': '//*[text()[contains(., "$primaryJobRole")]]',
-  'accountName': '//*[text()[contains(., "$accountName")]]',
-  'company': '//*[text()[contains(., "$company")]]',
-  'email': '//*[text()[contains(., "$email")]]',
-  'bctqExpirationDays': '//*[text()[contains(., "$bctqExpirationDays")]]',
+  firstName: '//*[text()[contains(., "$firstName")]]',
+  lastName: '//*[text()[contains(., "$lastName")]]',
+  purchasedPartnerLevel: '//*[text()[contains(., "$purchasedPartnerLevel")]]',
+  level: '//*[text()[contains(., "$level")]]',
+  primaryJobRole: '//*[text()[contains(., "$primaryJobRole")]]',
+  accountName: '//*[text()[contains(., "$accountName")]]',
+  company: '//*[text()[contains(., "$company")]]',
+  email: '//*[text()[contains(., "$email")]]',
+  bctqExpirationDays: '//*[text()[contains(., "$bctqExpirationDays")]]',
   // Special handlers that replace entire element - use text() to avoid matching parent elements
-  'profileImage': '//*[contains(text(), "$profileImage")]',
-  'companyLogoUrl': '//*[contains(text(), "$companyLogoUrl")]'
+  profileImage: '//*[contains(text(), "$profileImage")]',
+  companyLogoUrl: '//*[contains(text(), "$companyLogoUrl")]',
 };
 
 export const LEVEL_CONDITION = 'partner-level';
 export const PERSONALIZATION_MARKER = 'partner-personalization';
 export const PROCESSED_MARKER = '-processed';
-export const NEGATION_PREFIX = 'partner-not-'
+export const NEGATION_PREFIX = 'partner-not-';
 
 export const PERSONALIZATION_CONDITIONS = {
   'partner-signed-in': partnerIsSignedIn(),
@@ -52,9 +50,9 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-billing-admin': partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.BILLING_ADMIN),
   'partner-salescenter-admin': partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.SALES_CENTER_ADMIN),
   'partner-admin': partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN),
-  'partner-user': !(partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN) ||
-      partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.BILLING_ADMIN) ||
-      partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.SALES_CENTER_ADMIN)),
+  'partner-user': !(partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN)
+      || partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.BILLING_ADMIN)
+      || partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.SALES_CENTER_ADMIN)),
   'partner-designation-legal': partnerCookieContainsValue('designationtype', DX_DESIGNATION_TYPE.LEGAL_AND_COMPLIANCE),
   'partner-designation-learning': partnerCookieContainsValue('designationtype', DX_DESIGNATION_TYPE.LEARNING_AND_DEVELOPMENT),
   'partner-locked-compliance': isAccountLocked() && getPartnerCookieValue('compliancestatus') === DX_COMPLIANCE_STATUS.NOT_COMPLETED.toLowerCase(),

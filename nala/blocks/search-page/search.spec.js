@@ -236,7 +236,7 @@ export default {
       data: {
         partnerLevel: 'dxp-platinum:',
         cardDate: 'May 28, 2026',
-        cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg\")',
+        cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg")',
       },
     },
   ],

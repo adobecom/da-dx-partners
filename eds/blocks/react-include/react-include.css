@@ -1,6 +1,8 @@
+/* stylelint-disable rule-empty-line-before */
 #root {
   display: block;
 }
+
 .react-include {
-  display:none
+  display: none
 }

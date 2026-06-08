@@ -45,8 +45,8 @@
   font-size: 16px;
   font-weight: bold;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
+  display: -webkit-box; /* stylelint-disable-line value-no-vendor-prefix */
+  -webkit-box-orient: vertical; /* stylelint-disable-line property-no-vendor-prefix */
   -webkit-line-clamp: 2;
   overflow-wrap: anywhere;
 }
@@ -74,7 +74,7 @@
 }
 
 .search-card .card-content {
-  display:none;
+  display: none;
 }
 
 .search-card.expanded .card-content {
@@ -154,8 +154,8 @@
   }
 
   .search-card .card-title {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
+    display: -webkit-box; /* stylelint-disable-line value-no-vendor-prefix */
+    -webkit-box-orient: vertical; /* stylelint-disable-line property-no-vendor-prefix */
     overflow: hidden;
     text-overflow: ellipsis;
     -webkit-line-clamp: 2;

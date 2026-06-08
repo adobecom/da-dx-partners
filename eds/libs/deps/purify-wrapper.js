@@ -1,2 +1,4 @@
-import '../deps/purify.min.js';
+/* eslint-disable no-undef */
+import './purify.min.js';
+
 export default DOMPurify;

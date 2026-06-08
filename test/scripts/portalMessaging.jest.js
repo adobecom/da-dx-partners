@@ -1,18 +1,14 @@
 /**
  * @jest-environment jsdom
  */
-import {PORTAL_MESSAGING_POPUP, SHOW_NEXT_POPUP} from "../../eds/scripts/utils.js";
+import { SHOW_NEXT_POPUP } from '../../eds/scripts/utils.js';
 
 const mockGetModal = jest.fn();
 const mockLoadArea = jest.fn();
 
-jest.mock('https://test-milo-libs.com/blocks/modal/modal.js', () => ({
-  getModal: (...args) => mockGetModal(...args),
-}), { virtual: true });
+jest.mock('https://test-milo-libs.com/blocks/modal/modal.js', () => ({ getModal: (...args) => mockGetModal(...args) }), { virtual: true });
 
-jest.mock('https://test-milo-libs.com/utils/utils.js', () => ({
-  loadArea: (...args) => mockLoadArea(...args),
-}), { virtual: true });
+jest.mock('https://test-milo-libs.com/utils/utils.js', () => ({ loadArea: (...args) => mockLoadArea(...args) }), { virtual: true });
 
 jest.mock('../../eds/scripts/personalizationConfigDX.js', () => ({
   PERSONALIZATION_PLACEHOLDERS: {},
@@ -27,9 +23,7 @@ jest.mock('../../eds/scripts/personalization.js', () => ({
   personalizePlaceholders: jest.fn(() => {}),
 }));
 
-jest.mock('../../eds/scripts/rewriteLinks.js', () => ({
-  rewriteLinks: jest.fn(() => {}),
-}));
+jest.mock('../../eds/scripts/rewriteLinks.js', () => ({ rewriteLinks: jest.fn(() => {}) }));
 
 jest.mock('../../eds/scripts/utils.js', () => ({
   getCurrentProgramType: jest.fn(() => 'dxp'),
@@ -46,7 +40,6 @@ jest.mock('../../eds/scripts/utils.js', () => ({
 global.fetch = jest.fn();
 
 describe('Test portalMessaging.js', () => {
-  let getCurrentProgramType;
   let getMetadataContent;
   let getPartnerCookieValue;
   let isMember;
@@ -63,7 +56,6 @@ describe('Test portalMessaging.js', () => {
     sessionStorage.clear();
 
     const utils = require('../../eds/scripts/utils.js');
-    getCurrentProgramType = utils.getCurrentProgramType;
     getMetadataContent = utils.getMetadataContent;
     getPartnerCookieValue = utils.getPartnerCookieValue;
     isMember = utils.isMember;
@@ -113,38 +105,38 @@ describe('Test portalMessaging.js', () => {
   it('returns early when popup already closed (sessionStorage flag)', async () => {
     sessionStorage.setItem('portal-messaging-popup-closed', 'true');
     const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
-    
+
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
     const { CERTIFICATION_POPUP } = require('../../eds/scripts/utils.js');
     await portalMessaging(miloLibs, false);
     expect(global.fetch).not.toHaveBeenCalled();
     expect(mockGetModal).not.toHaveBeenCalled();
-    
+
     // Verify SHOW_NEXT_POPUP event was dispatched
     expect(dispatchEventSpy).toHaveBeenCalled();
     const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
     expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
     expect(dispatchedEvent.detail).toEqual({ next: CERTIFICATION_POPUP });
-    
+
     dispatchEventSpy.mockRestore();
   });
 
   it('returns early when specialstate cookie not present', async () => {
     getPartnerCookieValue.mockReturnValue('');
     const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
-    
+
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
     const { CERTIFICATION_POPUP } = require('../../eds/scripts/utils.js');
     await portalMessaging(miloLibs, false);
     expect(global.fetch).not.toHaveBeenCalled();
     expect(mockGetModal).not.toHaveBeenCalled();
-    
+
     // Verify SHOW_NEXT_POPUP event was dispatched
     expect(dispatchEventSpy).toHaveBeenCalled();
     const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
     expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
     expect(dispatchedEvent.detail).toEqual({ next: CERTIFICATION_POPUP });
-    
+
     dispatchEventSpy.mockRestore();
   });
 
@@ -160,19 +152,19 @@ describe('Test portalMessaging.js', () => {
 
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
-    
+
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
     const { CERTIFICATION_POPUP } = require('../../eds/scripts/utils.js');
     await portalMessaging(miloLibs, false);
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('should be displayed but popup fragment path is not found'));
     expect(mockGetModal).not.toHaveBeenCalled();
-    
+
     // Verify SHOW_NEXT_POPUP event was dispatched
     expect(dispatchEventSpy).toHaveBeenCalled();
     const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
     expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
     expect(dispatchedEvent.detail).toEqual({ next: CERTIFICATION_POPUP });
-    
+
     warnSpy.mockRestore();
     dispatchEventSpy.mockRestore();
   });
@@ -190,20 +182,20 @@ describe('Test portalMessaging.js', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
-    
+
     const { portalMessaging } = require('../../eds/scripts/portalMessaging.js');
     const { CERTIFICATION_POPUP } = require('../../eds/scripts/utils.js');
     await portalMessaging(miloLibs, false);
     expect(errorSpy).toHaveBeenCalledWith('Fetching partner agreement metadata failed, status 500');
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Popup fragment for /fragments/test-popup not found'));
     expect(mockGetModal).not.toHaveBeenCalled();
-    
+
     // Verify SHOW_NEXT_POPUP event was dispatched
     expect(dispatchEventSpy).toHaveBeenCalled();
     const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
     expect(dispatchedEvent.type).toBe(SHOW_NEXT_POPUP);
     expect(dispatchedEvent.detail).toEqual({ next: CERTIFICATION_POPUP });
-    
+
     errorSpy.mockRestore();
     warnSpy.mockRestore();
     dispatchEventSpy.mockRestore();
@@ -289,8 +281,4 @@ describe('Test portalMessaging.js', () => {
 
     dispatchEventSpy.mockRestore();
   });
-
 });
-
-
-

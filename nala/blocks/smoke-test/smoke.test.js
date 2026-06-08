@@ -7,9 +7,9 @@ const { features } = SmokeSpec;
 const errorFlowCases = features.slice(10, 13);
 
 test.describe('Validate Partner Directory pages', () => {
-  test.beforeEach(async ({ page, browserName, baseURL, context }) => {
+  test.beforeEach(async ({ page, browserName, baseURL }) => {
     smokeTest = new SmokeTest(page);
-   
+
     if (browserName === 'chromium' && !baseURL.includes('partners.stage.adobe.com')) {
       await page.route('https://www.adobe.com/chimera-api/**', async (route, request) => {
         const newUrl = request.url().replace(
@@ -67,7 +67,7 @@ test.describe('Validate Partner Directory pages', () => {
     }
   }
 
-  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ baseURL }) => {
     const { path } = features[0];
     await test.step('Go to Partner Directory, verify status code and if gnav is visible', async () => {
       await smokeTest.verifyStatusCode(baseURL);
@@ -111,10 +111,10 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.becomeAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
       expect(smokeTest.becomeAPartnerButton).toBeVisible();
       expect(smokeTest.becomeAPartnerButton).toBeEnabled();
-      
+
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        smokeTest.becomeAPartnerButton.click()
+        smokeTest.becomeAPartnerButton.click(),
       ]);
 
       await newPage.waitForLoadState('domcontentloaded');
@@ -134,10 +134,10 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.findAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
       expect(smokeTest.findAPartnerButton).toBeVisible();
       expect(smokeTest.findAPartnerButton).toBeEnabled();
-      
+
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        smokeTest.findAPartnerButton.click()
+        smokeTest.findAPartnerButton.click(),
       ]);
 
       await newPage.waitForLoadState('domcontentloaded');
@@ -145,8 +145,8 @@ test.describe('Validate Partner Directory pages', () => {
       expect(newPageUrl).toContain(data.findAPartnerUrl);
       await newPage.close();
     });
-  }); 
-  test(`${features[5].name},${features[5].tags}`, async ({ page, baseURL, context }) => {
+  });
+  test(`${features[5].name},${features[5].tags}`, async ({ page, baseURL }) => {
     const { data, path } = features[5];
 
     await test.step('Go to Analytics page and log in', async () => {
@@ -194,7 +194,7 @@ test.describe('Validate Partner Directory pages', () => {
 
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        smokeTest.saleCenterButton.click()
+        smokeTest.saleCenterButton.click(),
       ]);
 
       await newPage.waitForLoadState('domcontentloaded');
@@ -204,13 +204,13 @@ test.describe('Validate Partner Directory pages', () => {
       await newPageSmokeTest.homeButton.waitFor({ state: 'visible', timeout: 30000 });
       await Promise.all([
         newPage.waitForLoadState('domcontentloaded'),
-        newPageSmokeTest.homeButton.click()
+        newPageSmokeTest.homeButton.click(),
       ]);
       const homePageUrl = newPage.url();
       expect(homePageUrl).toContain(data.homeUrl);
     });
   });
-  test(`${features[7].name},${features[7].tags}`, async ({ page, baseURL, context }) => {
+  test(`${features[7].name},${features[7].tags}`, async ({ page, baseURL }) => {
     const { data, path } = features[7];
 
     await test.step('Go to Sale Center page and log in', async () => {
@@ -228,7 +228,7 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.findAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
     });
   });
-  test(`${features[8].name},${features[8].tags}`, async ({ page, baseURL, context }) => {
+  test(`${features[8].name},${features[8].tags}`, async ({ page, baseURL }) => {
     const { data, path } = features[8];
 
     await test.step('Go to Search page and log in', async () => {
@@ -240,7 +240,7 @@ test.describe('Validate Partner Directory pages', () => {
     await test.step('Search for keyword', async () => {
       await smokeTest.waitForSearchResults();
       const numberResultsBeforeSearch = await smokeTest.getResultsCount();
-      
+
       await smokeTest.searchFor(data.searchKeyword);
 
       await smokeTest.waitForSearchResults();
@@ -255,8 +255,8 @@ test.describe('Validate Partner Directory pages', () => {
       const numberResultsAfterFilter = await smokeTest.getResultsCount();
       await expect(numberResultsAfterFilter).toBeLessThan(numberResultsAfterSearch);
     });
-  }); 
-  test(`${features[9].name},${features[9].tags}`, async ({ page, baseURL, context }) => {
+  });
+  test(`${features[9].name},${features[9].tags}`, async ({ page, baseURL }) => {
     const { data, path } = features[9];
 
     await test.step('Go to Feedback', async () => {
@@ -359,7 +359,6 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Check Feedback Dialog', async () => {
-
       await smokeTest.feedbackTitle.waitFor({ state: 'visible', timeout: 30000 });
       await expect(smokeTest.feedbackTitle).toBeVisible();
       await expect(smokeTest.feedbackTitle).toHaveText(data.feedbackTitle);

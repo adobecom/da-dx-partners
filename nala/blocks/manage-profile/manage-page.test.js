@@ -43,7 +43,7 @@ test.describe('Manage company profile', () => {
 
     await test.step('Verify remaining card titles', async () => {
       await managePage.verifyCardTitles(
-        data.cardTitles
+        data.cardTitles,
       );
     });
   });
@@ -77,7 +77,7 @@ test.describe('Manage company profile', () => {
 
     await test.step('Verify remaining card titles', async () => {
       await managePage.verifyCardTitles(
-        data.cardTitles
+        data.cardTitles,
       );
     });
   });
@@ -111,7 +111,7 @@ test.describe('Manage company profile', () => {
 
     await test.step('Verify remaining card titles', async () => {
       await managePage.verifyCardTitles(
-        data.cardTitles
+        data.cardTitles,
       );
     });
   });
@@ -145,7 +145,7 @@ test.describe('Manage company profile', () => {
 
     await test.step('Verify remaining card titles', async () => {
       await managePage.verifyCardTitles(
-        data.cardTitles
+        data.cardTitles,
       );
     });
   });

@@ -72,8 +72,8 @@ export async function localizationPromises(localizedText, config) {
 }
 
 export function getRuntimeActionUrl(action) {
-  const isProd = prodHosts.includes(window.location.host);
-  let domain = isProd ? 'https://io-partners-dx.adobe.com': 'https://io-partners-dx.stage.adobe.com';
+  const isProdURL = prodHosts.includes(window.location.host);
+  const domain = isProdURL ? 'https://io-partners-dx.adobe.com' : 'https://io-partners-dx.stage.adobe.com';
   return new URL(
     `${domain}${action}`,
   );
@@ -113,14 +113,15 @@ export function transformCardUrl(url) {
     console.error('URL is null or undefined');
     return '';
   }
-  const isProd = prodHosts.includes(window.location.host);
-  if(url.startsWith("/")){
-    url = `https://${PARTNERS_STAGE_DOMAIN}${url}`;
-  }
-  const newUrl = new URL(url);
+  const isProdURL = prodHosts.includes(window.location.host);
+  const resolvedUrl = url.startsWith('/') ? `https://${PARTNERS_STAGE_DOMAIN}${url}` : url;
+  const newUrl = new URL(resolvedUrl);
+
   newUrl.protocol = window.location.protocol;
-  if(!newUrl.host || newUrl.host === PARTNERS_PREVIEW_DOMAIN || newUrl.host === PARTNERS_STAGE_DOMAIN|| newUrl.host === PARTNERS_PROD_DOMAIN ) {
-    newUrl.host = isProd ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
+  if (!newUrl.host || newUrl.host === PARTNERS_PREVIEW_DOMAIN
+    || newUrl.host === PARTNERS_STAGE_DOMAIN
+    || newUrl.host === PARTNERS_PROD_DOMAIN) {
+    newUrl.host = isProdURL ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
   }
   return newUrl;
 }

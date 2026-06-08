@@ -414,7 +414,7 @@ describe('feedback block', () => {
 
       const stars = document.querySelectorAll('sp-action-button[data-rating]');
       stars[3].click();
-      
+
       const btoaStub = sinon.stub(window, 'btoa').throws(new Error('btoa error'));
 
       const sendButton = document.querySelector('.feedback-dialog-button.cta');
@@ -427,7 +427,6 @@ describe('feedback block', () => {
 
       btoaStub.restore();
     });
-
 
     it('should render component when meta feedback is TRUE', async () => {
       const meta = document.createElement('meta');

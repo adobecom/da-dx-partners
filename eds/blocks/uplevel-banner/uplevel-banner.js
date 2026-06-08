@@ -54,6 +54,7 @@ export default async function init(el) {
 
       parentNode.insertBefore(el, nextSibling);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('[uplevel-banner] error', e);
     }
   });

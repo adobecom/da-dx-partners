@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+
 export const LOGGED_IN_GNAV_FRAGMENT = 'dx-loggedin-gnav.plain.html';
 export const PUBLIC_GNAV_FRAGMENT = 'dx-public-gnav.plain.html';
 export default class GnavPersonalisationPage {
@@ -16,11 +17,11 @@ export default class GnavPersonalisationPage {
   }
 
   getPartnerLevelSegment(partnerLevelSegmentText) {
-    return this.page.getByRole('main').locator('div').filter({ hasText: `${partnerLevelSegmentText}` }).nth(1)
+    return this.page.getByRole('main').locator('div').filter({ hasText: `${partnerLevelSegmentText}` }).nth(1);
   }
 
   getSegments(segmentText) {
-    return this.page.locator('div').filter({ hasText: `${segmentText}` }).nth(1)
+    return this.page.locator('div').filter({ hasText: `${segmentText}` }).nth(1);
   }
 
   getSegmentsGnav(segmentText) {
@@ -35,16 +36,14 @@ export default class GnavPersonalisationPage {
 
   waitForLoggedInGnavFragment(timeout = 60000) {
     return this.page.waitForResponse(
-      (response) =>
-        response.url().includes(LOGGED_IN_GNAV_FRAGMENT) && response.status() === 200,
+      (response) => response.url().includes(LOGGED_IN_GNAV_FRAGMENT) && response.status() === 200,
       { timeout },
     );
   }
 
   waitForPublicGnavFragment(timeout = 60000) {
     return this.page.waitForResponse(
-      (response) =>
-        response.url().includes(PUBLIC_GNAV_FRAGMENT) && response.status() === 200,
+      (response) => response.url().includes(PUBLIC_GNAV_FRAGMENT) && response.status() === 200,
       { timeout },
     );
   }
@@ -109,7 +108,6 @@ export default class GnavPersonalisationPage {
     }
   }
 
- 
   async openPromoteSellTab() {
     await this.page.getByRole('button', { name: /Promote\s*&\s*Sell/i }).click();
     await this.page.waitForLoadState('domcontentloaded');

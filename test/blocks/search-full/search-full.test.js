@@ -11,18 +11,18 @@ const mockSearchResponse = {
   cards,
   count: {
     all: cards.length,
-    assets: cards.filter(card => card.contentArea.type !== 'announcement').length,
-    pages: cards.filter(card => card.contentArea.type === 'html').length,
-    courses: cards.filter(card => card.contentArea.type === 'course').length
-  }
+    assets: cards.filter((card) => card.contentArea.type !== 'announcement').length,
+    pages: cards.filter((card) => card.contentArea.type === 'html').length,
+    courses: cards.filter((card) => card.contentArea.type === 'course').length,
+  },
 };
 
 const mockSuggestionsResponse = {
   suggested_completions: [
     { name: 'Adobe Analytics', type: 'product' },
     { name: 'Analytics Certification', type: 'asset' },
-    { name: 'Target Implementation', type: 'asset' }
-  ]
+    { name: 'Target Implementation', type: 'asset' },
+  ],
 };
 
 describe('search-full block', () => {
@@ -30,13 +30,13 @@ describe('search-full block', () => {
 
   beforeEach(async () => {
     fetchStub = sinon.stub(window, 'fetch');
-    
+
     fetchStub.resolves({
       ok: true,
-      json: () => Promise.resolve(mockSearchResponse)
+      json: () => Promise.resolve(mockSearchResponse),
     });
 
-    sinon.stub(Search.prototype, 'fetchData').callsFake(async function () {
+    sinon.stub(Search.prototype, 'fetchData').callsFake(async () => {
     });
 
     sinon.stub(Search.prototype, 'fetchTags').resolves({ tags: [] });
@@ -57,10 +57,10 @@ describe('search-full block', () => {
         sort: {
           items: [
             { key: 'most-recent', value: 'Most Recent' },
-            { key: 'most-relevant', value: 'Most Relevant' }
-          ]
+            { key: 'most-relevant', value: 'Most Relevant' },
+          ],
         },
-        filters: []
+        filters: [],
       };
     });
 
@@ -124,7 +124,7 @@ describe('search-full block', () => {
     return { searchCardsWrapper };
   };
 
-  it('should render search cards for mobile', async function () {
+  it('should render search cards for mobile', async () => {
     const { searchCardsWrapper } = await setupAndCommonTest(500);
 
     const filtersBtn = searchCardsWrapper.querySelector('.filters-btn-mobile');
@@ -137,7 +137,7 @@ describe('search-full block', () => {
     expect(searchCardsWrapper.contentTypeCounter).to.deep.equal(mockSearchResponse.count);
   });
 
-  it('should render search cards for desktop', async function () {
+  it('should render search cards for desktop', async () => {
     const { searchCardsWrapper } = await setupAndCommonTest(1500);
 
     const sidebarWrapper = searchCardsWrapper.querySelector('.partner-cards-sidebar-wrapper');
@@ -147,20 +147,20 @@ describe('search-full block', () => {
     expect(searchBoxWrapper).to.exist;
   });
 
-  it('should render search cards with proper content type filtering', async function () {
+  it('should render search cards with proper content type filtering', async () => {
     const { searchCardsWrapper } = await setupAndCommonTest(1200);
 
     expect(searchCardsWrapper.contentType).to.equal('all');
-    
+
     expect(searchCardsWrapper.contentTypeCounter).to.deep.equal(mockSearchResponse.count);
-    
+
     const partnerCardsCollection = searchCardsWrapper.querySelector('.partner-cards-collection');
     expect(partnerCardsCollection).to.exist;
-    
+
     expect(searchCardsWrapper.paginatedCards).to.have.length.at.least(1);
   });
 
-  it('should handle search input and typeahead functionality', async function () {
+  it('should handle search input and typeahead functionality', async () => {
     const { searchCardsWrapper } = await setupAndCommonTest(1200);
 
     const typeaheadDialog = searchCardsWrapper.querySelector('dialog#typeahead');
@@ -173,22 +173,22 @@ describe('search-full block', () => {
     expect(searchCardsWrapper.searchTerm).to.equal('analytics');
   });
 
-  it('should handle different content types (all, assets, pages, courses)', async function () {
+  it('should handle different content types (all, assets, pages, courses)', async () => {
     const { searchCardsWrapper } = await setupAndCommonTest(1200);
 
     expect(searchCardsWrapper.contentType).to.equal('all');
-    
+
     searchCardsWrapper.contentType = 'asset';
     expect(searchCardsWrapper.contentType).to.equal('asset');
-    
+
     searchCardsWrapper.contentType = 'page';
     expect(searchCardsWrapper.contentType).to.equal('page');
   });
 
-  it('should display no results when no cards are found', async function () {
+  it('should display no results when no cards are found', async () => {
     Search.prototype.handleActionsCore.restore();
     Search.prototype.firstUpdated.restore();
-    
+
     sinon.stub(Search.prototype, 'handleActionsCore').callsFake(async function () {
       this.cards = [];
       this.paginatedCards = [];
@@ -213,24 +213,24 @@ describe('search-full block', () => {
     expect(searchCardsWrapper.contentTypeCounter.countAll).to.equal(0);
   });
 
-  it('should handle pagination correctly', async function () {
+  it('should handle pagination correctly', async () => {
     const { searchCardsWrapper } = await setupAndCommonTest(1200);
 
     expect(searchCardsWrapper.paginationCounter).to.equal(1);
     expect(searchCardsWrapper.cardsPerPage).to.equal(12);
-    
+
     expect(searchCardsWrapper.blockData.pagination).to.equal('default');
   });
 
-  it('should handle API errors gracefully', async function () {
+  it('should handle API errors gracefully', async () => {
     fetchStub.resolves({
       ok: false,
-      statusText: 'Server Error'
+      statusText: 'Server Error',
     });
 
     Search.prototype.handleActionsCore.restore();
     Search.prototype.firstUpdated.restore();
-    
+
     sinon.stub(Search.prototype, 'handleActionsCore').callsFake(async function () {
       this.cards = [];
       this.paginatedCards = [];
@@ -254,16 +254,16 @@ describe('search-full block', () => {
     expect(searchCardsWrapper.paginatedCards).to.have.length(0);
   });
 
-  it('should display loading indicator when data is being fetched', async function () {
+  it('should display loading indicator when data is being fetched', async () => {
     Search.prototype.handleActionsCore.restore();
     Search.prototype.firstUpdated.restore();
-    
+
     // Stub firstUpdated to set hasResponseData to false initially
     sinon.stub(Search.prototype, 'firstUpdated').callsFake(async function () {
       this.allCards = [];
       this.cards = [];
       this.paginatedCards = [];
-      this.hasResponseData = false;  // Set to false to show loading state
+      this.hasResponseData = false; // Set to false to show loading state
       this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
       this.allTags = [];
       this.selectedSortOrder = { key: 'most-recent', value: 'Most Recent' };
@@ -273,7 +273,7 @@ describe('search-full block', () => {
     sinon.stub(Search.prototype, 'handleActionsCore').callsFake(async function () {
       this.cards = [];
       this.paginatedCards = [];
-      this.hasResponseData = false;  // Keep as false to maintain loading state
+      this.hasResponseData = false; // Keep as false to maintain loading state
       this.contentTypeCounter = { countAll: 0, countAssets: 0, countPages: 0, countCourses: 0 };
     });
 
@@ -281,17 +281,17 @@ describe('search-full block', () => {
 
     // Verify the component is in loading state
     expect(searchCardsWrapper.hasResponseData).to.be.false;
-    
+
     // Check that the progress circle is rendered
     const partnerCardsContent = searchCardsWrapper.querySelector('.partner-cards-content');
     expect(partnerCardsContent).to.exist;
-    
+
     const partnerCardsCollection = partnerCardsContent.querySelector('.partner-cards-collection');
     expect(partnerCardsCollection).to.exist;
-    
+
     const progressCircleWrapper = partnerCardsCollection.querySelector('.progress-circle-wrapper');
     expect(progressCircleWrapper).to.exist;
-    
+
     const progressCircle = progressCircleWrapper.querySelector('sp-progress-circle');
     expect(progressCircle).to.exist;
     expect(progressCircle.getAttribute('label')).to.equal('Cards loading');
@@ -299,11 +299,11 @@ describe('search-full block', () => {
     expect(progressCircle.getAttribute('indeterminate')).to.equal('');
   });
 
-  it('should render chosen filter buttons when filters are selected', async function () {
+  it('should render chosen filter buttons when filters are selected', async () => {
     Search.prototype.handleActionsCore.restore();
     Search.prototype.firstUpdated.restore();
     Search.prototype.setBlockData.restore();
-    
+
     // Stub setBlockData to include filters
     sinon.stub(Search.prototype, 'setBlockData').callsFake(function () {
       this.blockData = {
@@ -311,8 +311,8 @@ describe('search-full block', () => {
         sort: {
           items: [
             { key: 'most-recent', value: 'Most Recent' },
-            { key: 'most-relevant', value: 'Most Relevant' }
-          ]
+            { key: 'most-relevant', value: 'Most Relevant' },
+          ],
         },
         filters: [
           {
@@ -320,21 +320,21 @@ describe('search-full block', () => {
             value: 'Product',
             tags: [
               { key: 'analytics', parentKey: 'product', value: 'Analytics', checked: true },
-              { key: 'target', parentKey: 'product', value: 'Target', checked: true }
-            ]
+              { key: 'target', parentKey: 'product', value: 'Target', checked: true },
+            ],
           },
           {
             key: 'industry',
             value: 'Industry',
             tags: [
-              { key: 'retail', parentKey: 'industry', value: 'Retail', checked: true }
-            ]
-          }
+              { key: 'retail', parentKey: 'industry', value: 'Retail', checked: true },
+            ],
+          },
         ],
-        filtersInfos: {} // Add empty filtersInfos to prevent undefined error
+        filtersInfos: {}, // Add empty filtersInfos to prevent undefined error
       };
     });
-    
+
     // Stub firstUpdated to set selectedFilters
     sinon.stub(Search.prototype, 'firstUpdated').callsFake(async function () {
       this.allCards = cards;
@@ -346,24 +346,24 @@ describe('search-full block', () => {
         namespaces: {
           caas: {
             tags: {
-              'analytics': { tagID: 'analytics', title: 'Analytics' },
-              'target': { tagID: 'target', title: 'Target' },
-              'retail': { tagID: 'retail', title: 'Retail' }
-            }
-          }
-        }
+              analytics: { tagID: 'analytics', title: 'Analytics' },
+              target: { tagID: 'target', title: 'Target' },
+              retail: { tagID: 'retail', title: 'Retail' },
+            },
+          },
+        },
       };
       this.selectedSortOrder = { key: 'most-recent', value: 'Most Recent' };
-      
+
       // Set selectedFilters to trigger chosenFilters rendering
       this.selectedFilters = {
         product: [
           { key: 'analytics', parentKey: 'product', value: 'Analytics', checked: true },
-          { key: 'target', parentKey: 'product', value: 'Target', checked: true }
+          { key: 'target', parentKey: 'product', value: 'Target', checked: true },
         ],
         industry: [
-          { key: 'retail', parentKey: 'industry', value: 'Retail', checked: true }
-        ]
+          { key: 'retail', parentKey: 'industry', value: 'Retail', checked: true },
+        ],
       };
     });
 
@@ -379,7 +379,7 @@ describe('search-full block', () => {
 
     // Wait for component to fully render
     await searchCardsWrapper.updateComplete;
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     // Verify selectedFilters are set
     expect(searchCardsWrapper.selectedFilters).to.exist;
@@ -392,7 +392,7 @@ describe('search-full block', () => {
       expect(chosenFiltersData.htmlContent).to.exist;
 
       // Look for the chosen filter buttons in the DOM
-      const sidebarChosenFilterBtns = searchCardsWrapper.querySelectorAll('.sidebar-chosen-filter-btn');
+      searchCardsWrapper.querySelectorAll('.sidebar-chosen-filter-btn');
 
       // The buttons might not be rendered if the sidebar isn't showing, but the getter should work
       expect(chosenFiltersData.tagsCount).to.equal(3);
@@ -421,14 +421,14 @@ describe('SearchCards Unit Tests', () => {
         '{{clear-all}}': 'Clear all',
         '{{show}}': 'Show',
         '{{all}}': 'All',
-        '{{assets}}': 'Assets', 
+        '{{assets}}': 'Assets',
         '{{pages}}': 'Pages',
         '{{of}}': 'of',
         '{{results}}': 'results',
-        '{{search-topics-resources-files}}': 'Search topics, resources, files'
+        '{{search-topics-resources-files}}': 'Search topics, resources, files',
       },
       sort: { items: [] },
-      pagination: 'default'
+      pagination: 'default',
     };
     searchComponent.selectedSortOrder = { key: 'most-recent', value: 'Most Recent' };
     searchComponent.cardsPerPage = 12;
@@ -474,7 +474,7 @@ describe('SearchCards Unit Tests', () => {
       const mockInput = { id: 'search' };
       sinon.stub(searchComponent, 'querySelector')
         .withArgs('#search').returns(mockInput);
-      
+
       const result = searchComponent._searchInput;
       expect(result).to.equal(mockInput);
       expect(searchComponent.querySelector.calledWith('#search')).to.be.true;
@@ -484,7 +484,7 @@ describe('SearchCards Unit Tests', () => {
       const mockDialog = { className: 'suggestion-dialog' };
       sinon.stub(searchComponent, 'querySelector')
         .withArgs('.suggestion-dialog').returns(mockDialog);
-      
+
       const result = searchComponent._dialog;
       expect(result).to.equal(mockDialog);
       expect(searchComponent.querySelector.calledWith('.suggestion-dialog')).to.be.true;
@@ -496,12 +496,12 @@ describe('SearchCards Unit Tests', () => {
       const mockDialog = { close: sinon.spy(), returnValue: '' };
       sinon.stub(searchComponent, 'querySelector')
         .withArgs('dialog#typeahead').returns(mockDialog);
-      
+
       const closeTypeaheadSpy = sinon.spy(searchComponent, 'closeTypeahead');
       const event = { target: { value: '' } };
-      
+
       await searchComponent.onSearchInput(event);
-      
+
       expect(searchComponent.searchTerm).to.equal('');
       expect(closeTypeaheadSpy.calledWith('SEE_ALL')).to.be.true;
     });
@@ -510,13 +510,12 @@ describe('SearchCards Unit Tests', () => {
       const debouncedSpy = sinon.spy();
       searchComponent.debouncedUpdateTypeahead = debouncedSpy;
       const event = { target: { value: 'analytics' } };
-      
+
       searchComponent.onSearchInput(event);
-      
+
       expect(searchComponent.searchTerm).to.equal('analytics');
       expect(debouncedSpy.called).to.be.true;
     });
-
   });
 
   describe('updateTypeaheadDialog', () => {
@@ -527,17 +526,17 @@ describe('SearchCards Unit Tests', () => {
         .withArgs('dialog#typeahead').returns(mockDialog)
         .withArgs('#search')
         .returns(mockInput);
-      
+
       // Set up required dependencies for getSuggestions
       searchComponent.contentType = 'all';
       searchComponent.searchTerm = 'analytics';
       searchComponent.isTypeaheadOpen = false;
-      
-      // Stub getSuggestions to return test data  
-      const getSuggestionsStub = sinon.stub(searchComponent, 'getSuggestions').resolves(['suggestion1', 'suggestion2']);
-      
+
+      // Stub getSuggestions to return test data
+      sinon.stub(searchComponent, 'getSuggestions').resolves(['suggestion1', 'suggestion2']);
+
       await searchComponent.updateTypeaheadDialog();
-      
+
       // Verify that typeahead state was updated - the isTypeaheadOpen flag should be set
       expect(searchComponent.isTypeaheadOpen).to.be.true;
     });
@@ -545,12 +544,12 @@ describe('SearchCards Unit Tests', () => {
     it('should not update typeahead when searchTerm is empty', async () => {
       const mockDialog = { show: sinon.spy() };
       sinon.stub(searchComponent, 'querySelector').withArgs('dialog#typeahead').returns(mockDialog);
-      
+
       searchComponent.searchTerm = '';
       searchComponent.typeaheadOptions = ['existing', 'suggestions'];
-      
+
       await searchComponent.updateTypeaheadDialog();
-      
+
       expect(searchComponent.typeaheadOptions).to.deep.equal([]);
       expect(mockDialog.show.called).to.be.false;
     });
@@ -562,17 +561,17 @@ describe('SearchCards Unit Tests', () => {
         .withArgs('dialog#typeahead').returns(mockDialog)
         .withArgs('#search')
         .returns(mockInput);
-      
+
       searchComponent.searchTerm = 'test';
       searchComponent.isTypeaheadOpen = false;
-      
+
       // Stub getSuggestions on the instance to reject
       const getSuggestionsStub = sinon.stub(searchComponent, 'getSuggestions').rejects(new Error('API Error'));
-      
+
       await searchComponent.updateTypeaheadDialog();
-      
+
       expect(consoleErrorStub.called).to.be.true;
-      
+
       // Restore the stub
       getSuggestionsStub.restore();
     });
@@ -580,18 +579,18 @@ describe('SearchCards Unit Tests', () => {
 
   describe('closeTypeahead', () => {
     it('should close typeahead and handle search', () => {
-      const mockDialog = { 
-        close: sinon.spy(), 
-        returnValue: 'selected value' 
+      const mockDialog = {
+        close: sinon.spy(),
+        returnValue: 'selected value',
       };
       sinon.stub(searchComponent, 'querySelector')
         .withArgs('dialog#typeahead').returns(mockDialog);
-      
+
       const handleSearchStub = sinon.stub(searchComponent, 'handleSearch');
       searchComponent.isTypeaheadOpen = true;
-      
+
       searchComponent.closeTypeahead('test value');
-      
+
       expect(searchComponent.isTypeaheadOpen).to.be.false;
       expect(mockDialog.close.calledWith('test value')).to.be.true;
       expect(searchComponent.searchTerm).to.equal('selected value');
@@ -599,18 +598,18 @@ describe('SearchCards Unit Tests', () => {
     });
 
     it('should not update searchTerm when value is SEE_ALL', () => {
-      const mockDialog = { 
-        close: sinon.spy(), 
-        returnValue: 'should not be used' 
+      const mockDialog = {
+        close: sinon.spy(),
+        returnValue: 'should not be used',
       };
       sinon.stub(searchComponent, 'querySelector')
         .withArgs('dialog#typeahead').returns(mockDialog);
-      
+
       const handleSearchStub = sinon.stub(searchComponent, 'handleSearch');
       searchComponent.searchTerm = 'original';
-      
+
       searchComponent.closeTypeahead('SEE_ALL');
-      
+
       expect(searchComponent.searchTerm).to.equal('original');
       expect(handleSearchStub.called).to.be.true;
     });
@@ -620,10 +619,10 @@ describe('SearchCards Unit Tests', () => {
     it('should set URL params and handle actions with search term', () => {
       const handleUrlSearchParamsStub = sinon.stub(searchComponent, 'handleUrlSearchParams');
       const handleActionsStub = sinon.stub(searchComponent, 'handleActions');
-      
+
       searchComponent.searchTerm = 'analytics';
       searchComponent.handleSearch();
-      
+
       expect(searchComponent.urlSearchParams.get('term')).to.equal('analytics');
       expect(searchComponent.paginationCounter).to.equal(1);
       expect(handleUrlSearchParamsStub.called).to.be.true;
@@ -631,14 +630,14 @@ describe('SearchCards Unit Tests', () => {
     });
 
     it('should remove URL param when no search term', () => {
-      const handleUrlSearchParamsStub = sinon.stub(searchComponent, 'handleUrlSearchParams');
+      sinon.stub(searchComponent, 'handleUrlSearchParams');
       const handleActionsStub = sinon.stub(searchComponent, 'handleActions');
-      
+
       searchComponent.searchTerm = '';
       searchComponent.urlSearchParams.set('term', 'old-term');
-      
+
       searchComponent.handleSearch();
-      
+
       expect(searchComponent.urlSearchParams.has('term')).to.be.false;
       expect(handleActionsStub.called).to.be.true;
     });
@@ -665,24 +664,24 @@ describe('SearchCards Unit Tests', () => {
     it('should generate filters from selected filters', () => {
       searchComponent.selectedFilters = {
         category: [{ key: 'analytics' }, { key: 'marketing' }],
-        level: [{ key: 'beginner' }]
+        level: [{ key: 'beginner' }],
       };
-      
+
       const result = searchComponent.generateFilters();
-      
+
       expect(result).to.deep.equal({
         filters: {
           category: ['analytics', 'marketing'],
-          level: ['beginner']
-        }
+          level: ['beginner'],
+        },
       });
     });
 
     it('should handle empty selected filters', () => {
       searchComponent.selectedFilters = {};
-      
+
       const result = searchComponent.generateFilters();
-      
+
       expect(result).to.deep.equal({ filters: {} });
     });
   });
@@ -691,9 +690,9 @@ describe('SearchCards Unit Tests', () => {
     it('should update content type and handle actions', () => {
       const handleActionsStub = sinon.stub(searchComponent, 'handleActions');
       searchComponent.contentType = 'all';
-      
+
       searchComponent.handleContentType('asset');
-      
+
       expect(searchComponent.contentType).to.equal('asset');
       expect(searchComponent.paginationCounter).to.equal(1);
       expect(handleActionsStub.called).to.be.true;
@@ -702,9 +701,9 @@ describe('SearchCards Unit Tests', () => {
     it('should not do anything if content type is the same', () => {
       const handleActionsStub = sinon.stub(searchComponent, 'handleActions');
       searchComponent.contentType = 'all';
-      
+
       searchComponent.handleContentType('all');
-      
+
       expect(handleActionsStub.called).to.be.false;
     });
   });
@@ -741,21 +740,21 @@ describe('SearchCards Unit Tests', () => {
       sinon.stub(searchComponent, 'querySelector')
         .withArgs('dialog#typeahead')
         .returns(mockDialog);
-      
+
       const closeTypeaheadSpy = sinon.spy(searchComponent, 'closeTypeahead');
       const event = { key: 'Enter' };
-      
+
       searchComponent.handleEnter(event);
-      
+
       expect(closeTypeaheadSpy.calledWith('SEE_ALL')).to.be.true;
     });
 
     it('should not close typeahead for other keys', () => {
       const closeTypeaheadSpy = sinon.spy(searchComponent, 'closeTypeahead');
       const event = { key: 'Space' };
-      
+
       searchComponent.handleEnter(event);
-      
+
       expect(closeTypeaheadSpy.called).to.be.false;
     });
   });
@@ -764,61 +763,53 @@ describe('SearchCards Unit Tests', () => {
     it('should return early if typeahead is not open', () => {
       searchComponent.isTypeaheadOpen = false;
       const closeTypeaheadSpy = sinon.spy(searchComponent, 'closeTypeahead');
-      
+
       searchComponent.handleClickOutside({ clientX: 100, clientY: 100 });
-      
+
       expect(closeTypeaheadSpy.called).to.be.false;
     });
 
     it('should close typeahead when clicking outside dialog and search input', () => {
       searchComponent.isTypeaheadOpen = true;
-      
-      const mockDialog = {
-        getBoundingClientRect: sinon.stub().returns({ left: 50, right: 150, top: 50, bottom: 150 })
-      };
-      const mockSearchInput = {
-        getBoundingClientRect: sinon.stub().returns({ left: 200, right: 300, top: 50, bottom: 100 })
-      };
+
+      const mockDialog = { getBoundingClientRect: sinon.stub().returns({ left: 50, right: 150, top: 50, bottom: 150 }) };
+      const mockSearchInput = { getBoundingClientRect: sinon.stub().returns({ left: 200, right: 300, top: 50, bottom: 100 }) };
       const mockTypeaheadDialog = { close: sinon.spy(), returnValue: '' };
-      
+
       const querySelectorStub = sinon.stub();
       querySelectorStub.withArgs('.suggestion-dialog').returns(mockDialog);
       querySelectorStub.withArgs('#search').returns(mockSearchInput);
       querySelectorStub.withArgs('dialog#typeahead').returns(mockTypeaheadDialog);
 
       sinon.stub(searchComponent, 'querySelector').callsFake(querySelectorStub);
-      
+
       const closeTypeaheadSpy = sinon.spy(searchComponent, 'closeTypeahead');
-      
+
       // Click outside both elements
       searchComponent.handleClickOutside({ clientX: 400, clientY: 400 });
-      
+
       expect(closeTypeaheadSpy.calledWith('SEE_ALL')).to.be.true;
     });
 
     it('should not close typeahead when clicking inside dialog', () => {
       searchComponent.isTypeaheadOpen = true;
-      
-      const mockDialog = {
-        getBoundingClientRect: sinon.stub().returns({ left: 50, right: 150, top: 50, bottom: 150 })
-      };
-      const mockSearchInput = {
-        getBoundingClientRect: sinon.stub().returns({ left: 200, right: 300, top: 50, bottom: 100 })
-      };
+
+      const mockDialog = { getBoundingClientRect: sinon.stub().returns({ left: 50, right: 150, top: 50, bottom: 150 }) };
+      const mockSearchInput = { getBoundingClientRect: sinon.stub().returns({ left: 200, right: 300, top: 50, bottom: 100 }) };
       const mockTypeaheadDialog = { close: sinon.spy(), returnValue: '' };
-      
+
       const querySelectorStub = sinon.stub();
       querySelectorStub.withArgs('.suggestion-dialog').returns(mockDialog);
       querySelectorStub.withArgs('#search').returns(mockSearchInput);
       querySelectorStub.withArgs('dialog#typeahead').returns(mockTypeaheadDialog);
-      
+
       sinon.stub(searchComponent, 'querySelector').callsFake(querySelectorStub);
-      
+
       const closeTypeaheadSpy = sinon.spy(searchComponent, 'closeTypeahead');
-      
+
       // Click inside dialog
       searchComponent.handleClickOutside({ clientX: 100, clientY: 100 });
-      
+
       expect(closeTypeaheadSpy.called).to.be.false;
     });
   });
@@ -828,9 +819,9 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.paginatedCards = [1, 2, 3]; // 3 cards loaded
       searchComponent.contentTypeCounter = { countAll: 10 }; // 10 total
       searchComponent.contentType = 'all';
-      
+
       const result = searchComponent.shouldDisplayLoadMore();
-      
+
       expect(result).to.be.true;
     });
 
@@ -838,9 +829,9 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.paginatedCards = [1, 2, 3, 4, 5]; // 5 cards loaded
       searchComponent.contentTypeCounter = { countAssets: 5 }; // 5 total
       searchComponent.contentType = 'asset';
-      
+
       const result = searchComponent.shouldDisplayLoadMore();
-      
+
       expect(result).to.be.false;
     });
   });
@@ -850,9 +841,9 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.blockData.pagination = 'load-more';
       searchComponent.paginationCounter = 1;
       searchComponent.paginatedCards = [1, 2, 3];
-      
+
       searchComponent.additionalResetActions();
-      
+
       expect(searchComponent.paginatedCards).to.deep.equal([]);
     });
 
@@ -860,9 +851,9 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.blockData.pagination = 'load-more';
       searchComponent.paginationCounter = 2;
       searchComponent.paginatedCards = [1, 2, 3];
-      
+
       searchComponent.additionalResetActions();
-      
+
       expect(searchComponent.paginatedCards).to.deep.equal([1, 2, 3]);
     });
 
@@ -870,9 +861,9 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.blockData.pagination = 'default';
       searchComponent.paginationCounter = 1;
       searchComponent.paginatedCards = [1, 2, 3];
-      
+
       searchComponent.additionalResetActions();
-      
+
       expect(searchComponent.paginatedCards).to.deep.equal([1, 2, 3]);
     });
   });
@@ -890,36 +881,36 @@ describe('SearchCards Unit Tests', () => {
     it('should successfully fetch and return cards data', async () => {
       const mockResponse = {
         ok: true,
-        json: sinon.stub().resolves({ 
+        json: sinon.stub().resolves({
           cards: [{ id: 1 }, { id: 2 }, { id: 3 }],
-          count: { all: 3, assets: 1, pages: 1, courses: 1 }
-        })
+          count: { all: 3, assets: 1, pages: 1, courses: 1 },
+        }),
       };
-      
+
       fetchStub.resolves(mockResponse);
       searchComponent.generateFilters = sinon.stub().returns({ filters: {} });
       searchComponent.getSortValue = sinon.stub().returns('recent');
-      
+
       const result = await searchComponent.getCards();
-      
+
       expect(searchComponent.hasResponseData).to.be.true;
-      expect(result).to.deep.equal({ 
+      expect(result).to.deep.equal({
         cards: [{ id: 1 }, { id: 2 }, { id: 3 }],
-        count: { all: 3, assets: 1, pages: 1, courses: 1 }
+        count: { all: 3, assets: 1, pages: 1, courses: 1 },
       });
     });
 
     it('should handle API errors gracefully', async () => {
       const mockResponse = {
         ok: false,
-        statusText: 'Server Error'
+        statusText: 'Server Error',
       };
-      
+
       fetchStub.resolves(mockResponse);
       searchComponent.generateFilters = sinon.stub().returns({ filters: {} });
       searchComponent.getSortValue = sinon.stub().returns('recent');
       const result = await searchComponent.getCards();
-      
+
       expect(consoleErrorStub.called).to.be.true;
       expect(result).to.be.null;
     });
@@ -928,9 +919,9 @@ describe('SearchCards Unit Tests', () => {
       fetchStub.rejects(new Error('Network error'));
       searchComponent.generateFilters = sinon.stub().returns({ filters: {} });
       searchComponent.getSortValue = sinon.stub().returns('recent');
-      
+
       const result = await searchComponent.getCards();
-      
+
       expect(consoleErrorStub.called).to.be.true;
       expect(result).to.be.null;
     });
@@ -938,15 +929,15 @@ describe('SearchCards Unit Tests', () => {
     it('should set hasResponseData to false when no cards returned', async () => {
       const mockResponse = {
         ok: true,
-        json: sinon.stub().resolves({ cards: null, count: { all: 0 } })
+        json: sinon.stub().resolves({ cards: null, count: { all: 0 } }),
       };
-      
+
       fetchStub.resolves(mockResponse);
       searchComponent.generateFilters = sinon.stub().returns({ filters: {} });
       searchComponent.getSortValue = sinon.stub().returns('recent');
-      
+
       await searchComponent.getCards();
-      
+
       expect(searchComponent.hasResponseData).to.be.false;
     });
   });
@@ -962,37 +953,37 @@ describe('SearchCards Unit Tests', () => {
     it('should successfully fetch and return suggestions', async () => {
       const mockResponse = {
         ok: true,
-        json: sinon.stub().resolves({ 
+        json: sinon.stub().resolves({
           suggested_completions: [
             { name: 'Analytics', type: 'product' },
-            { name: 'Marketing', type: 'asset' }
-          ]
-        })
+            { name: 'Marketing', type: 'asset' },
+          ],
+        }),
       };
-      
+
       fetchStub.resolves(mockResponse);
       searchComponent.generateFilters = sinon.stub().returns({ filters: {} });
       searchComponent.getSortValue = sinon.stub().returns('recent');
-      
+
       const result = await searchComponent.getSuggestions();
-      
+
       expect(result).to.deep.equal([
         { name: 'Analytics', type: 'product' },
-        { name: 'Marketing', type: 'asset' }
+        { name: 'Marketing', type: 'asset' },
       ]);
     });
 
     it('should handle API errors gracefully', async () => {
       const mockResponse = {
         ok: false,
-        statusText: 'Server Error'
+        statusText: 'Server Error',
       };
-      
+
       fetchStub.resolves(mockResponse);
       searchComponent.generateFilters = sinon.stub().returns({ filters: {} });
       searchComponent.getSortValue = sinon.stub().returns('recent');
       const result = await searchComponent.getSuggestions();
-      
+
       expect(consoleErrorStub.called).to.be.true;
       expect(result).to.be.null;
     });
@@ -1001,9 +992,9 @@ describe('SearchCards Unit Tests', () => {
       fetchStub.rejects(new Error('Network error'));
       searchComponent.generateFilters = sinon.stub().returns({ filters: {} });
       searchComponent.getSortValue = sinon.stub().returns('recent');
-      
+
       const result = await searchComponent.getSuggestions();
-      
+
       expect(consoleErrorStub.called).to.be.true;
       expect(result).to.be.null;
     });
@@ -1016,11 +1007,11 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.additionalResetActions = sinon.spy();
       searchComponent.getCards = sinon.stub().resolves({
         cards: [{ id: 2 }, { id: 3 }],
-        count: { all: 15, assets: 5, pages: 5, courses: 5 }
+        count: { all: 15, assets: 5, pages: 5, courses: 5 },
       });
-      
+
       await searchComponent.handleActionsCore();
-      
+
       expect(searchComponent.hasResponseData).to.be.true;
       expect(searchComponent.additionalResetActions.called).to.be.true;
       expect(searchComponent.cards).to.deep.equal([{ id: 2 }, { id: 3 }]);
@@ -1030,7 +1021,7 @@ describe('SearchCards Unit Tests', () => {
         countAll: 15,
         countAssets: 5,
         countPages: 5,
-        countCourses: 5
+        countCourses: 5,
       });
     });
 
@@ -1040,11 +1031,11 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.additionalResetActions = sinon.spy();
       searchComponent.getCards = sinon.stub().resolves({
         cards: [{ id: 2 }, { id: 3 }],
-        count: { all: 15, assets: 5, pages: 5, courses: 5 }
+        count: { all: 15, assets: 5, pages: 5, courses: 5 },
       });
-      
+
       await searchComponent.handleActionsCore();
-      
+
       expect(searchComponent.hasResponseData).to.be.true;
       expect(searchComponent.cards).to.deep.equal([{ id: 2 }, { id: 3 }]);
       expect(searchComponent.paginatedCards).to.deep.equal([{ id: 2 }, { id: 3 }]);
@@ -1053,7 +1044,7 @@ describe('SearchCards Unit Tests', () => {
     it('should handle null cards data gracefully', async () => {
       searchComponent.additionalResetActions = sinon.spy();
       searchComponent.getCards = sinon.stub().resolves(null);
-      
+
       await searchComponent.handleActionsCore();
 
       expect(searchComponent.cards).to.deep.equal([]);
@@ -1062,7 +1053,7 @@ describe('SearchCards Unit Tests', () => {
         countAll: 0,
         countAssets: 0,
         countPages: 0,
-        countCourses: 0
+        countCourses: 0,
       });
     });
   });
@@ -1074,9 +1065,9 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.searchTerm = 'ana';
       searchComponent.typeaheadOptions = [
         { name: 'Analytics', type: 'product' },
-        { name: 'Marketing', type: 'asset' }
+        { name: 'Marketing', type: 'asset' },
       ];
-      
+
       const html = searchComponent.typeaheadOptionsHTML;
       expect(html).to.exist;
     });
@@ -1340,7 +1331,7 @@ describe('SearchCards Unit Tests', () => {
       expect(searchComponent.allTags).to.deep.equal(mockTagsResponse);
       expect(searchComponent.allTagsFlatMap).to.be.instanceOf(Map);
       expect(searchComponent.allTagsFlatMap.size).to.equal(3);
-      
+
       // Check that all expected tags are in the map
       expect(searchComponent.allTagsFlatMap.has('caas:content-type')).to.be.true;
       expect(searchComponent.allTagsFlatMap.has('caas:content-type/blog')).to.be.true;
@@ -1348,13 +1339,7 @@ describe('SearchCards Unit Tests', () => {
     });
 
     it('should handle empty tags structure', async () => {
-      const mockTagsResponse = {
-        namespaces: {
-          caas: {
-            tags: {},
-          },
-        },
-      };
+      const mockTagsResponse = { namespaces: { caas: { tags: {} } } };
 
       fetchStub.resolves({
         ok: true,
@@ -1448,9 +1433,9 @@ describe('SearchCards Unit Tests', () => {
   describe('chosenFilters getter', () => {
     it('should return undefined when no filters are selected', () => {
       searchComponent.selectedFilters = {};
-      
+
       const result = searchComponent.chosenFilters;
-      
+
       expect(result).to.be.undefined;
     });
 
@@ -1458,15 +1443,15 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.selectedFilters = {
         product: [
           { key: 'analytics', parentKey: 'product', value: 'Analytics', checked: true },
-          { key: 'target', parentKey: 'product', value: 'Target', checked: true }
+          { key: 'target', parentKey: 'product', value: 'Target', checked: true },
         ],
         industry: [
-          { key: 'retail', parentKey: 'industry', value: 'Retail', checked: true }
-        ]
+          { key: 'retail', parentKey: 'industry', value: 'Retail', checked: true },
+        ],
       };
-      
+
       const result = searchComponent.chosenFilters;
-      
+
       expect(result).to.exist;
       expect(result.tagsCount).to.equal(3);
       expect(result.htmlContent).to.exist;
@@ -1477,15 +1462,15 @@ describe('SearchCards Unit Tests', () => {
         category: [
           { key: 'zebra', parentKey: 'category', value: 'Zebra', checked: true },
           { key: 'apple', parentKey: 'category', value: 'Apple', checked: true },
-          { key: 'monkey', parentKey: 'category', value: 'Monkey', checked: true }
-        ]
+          { key: 'monkey', parentKey: 'category', value: 'Monkey', checked: true },
+        ],
       };
-      
+
       const result = searchComponent.chosenFilters;
-      
+
       expect(result).to.exist;
       expect(result.tagsCount).to.equal(3);
-      
+
       // Verify tags are sorted: Apple, Monkey, Zebra
       const extractedTags = Object.values(searchComponent.selectedFilters).flatMap((tagsArray) => tagsArray);
       const sortedTags = extractedTags.sort((a, b) => a.value.localeCompare(b.value));
@@ -1498,19 +1483,19 @@ describe('SearchCards Unit Tests', () => {
       searchComponent.selectedFilters = {
         product: [
           { key: 'analytics', parentKey: 'product', value: 'product/Analytics', checked: true },
-          { key: 'target', parentKey: 'product', value: 'product/Target', checked: true }
-        ]
+          { key: 'target', parentKey: 'product', value: 'product/Target', checked: true },
+        ],
       };
-      
+
       const result = searchComponent.chosenFilters;
-      
+
       expect(result).to.exist;
       expect(result.tagsCount).to.equal(2);
-      
+
       // The template uses tag.value?.split('/')[1] || tag.value
       // Verify the logic extracts the correct part
       const extractedTags = Object.values(searchComponent.selectedFilters).flatMap((tagsArray) => tagsArray);
-      extractedTags.forEach(tag => {
+      extractedTags.forEach((tag) => {
         const displayValue = tag.value?.split('/')[1] || tag.value;
         expect(displayValue).to.not.include('/');
         expect(['Analytics', 'Target']).to.include(displayValue);
@@ -1520,22 +1505,22 @@ describe('SearchCards Unit Tests', () => {
     it('should flatten multiple filter categories', () => {
       searchComponent.selectedFilters = {
         product: [
-          { key: 'analytics', parentKey: 'product', value: 'Analytics', checked: true }
+          { key: 'analytics', parentKey: 'product', value: 'Analytics', checked: true },
         ],
         industry: [
-          { key: 'retail', parentKey: 'industry', value: 'Retail', checked: true }
+          { key: 'retail', parentKey: 'industry', value: 'Retail', checked: true },
         ],
         level: [
           { key: 'beginner', parentKey: 'level', value: 'Beginner', checked: true },
-          { key: 'advanced', parentKey: 'level', value: 'Advanced', checked: true }
-        ]
+          { key: 'advanced', parentKey: 'level', value: 'Advanced', checked: true },
+        ],
       };
-      
+
       const result = searchComponent.chosenFilters;
-      
+
       expect(result).to.exist;
       expect(result.tagsCount).to.equal(4);
-      
+
       // Verify all tags from different categories are flattened
       const extractedTags = Object.values(searchComponent.selectedFilters).flatMap((tagsArray) => tagsArray);
       expect(extractedTags).to.have.lengthOf(4);
@@ -1544,12 +1529,12 @@ describe('SearchCards Unit Tests', () => {
     it('should handle tags with undefined values gracefully', () => {
       searchComponent.selectedFilters = {
         category: [
-          { key: 'test', parentKey: 'category', value: undefined, checked: true }
-        ]
+          { key: 'test', parentKey: 'category', value: undefined, checked: true },
+        ],
       };
-      
+
       const result = searchComponent.chosenFilters;
-      
+
       expect(result).to.exist;
       expect(result.tagsCount).to.equal(1);
     });
@@ -1563,10 +1548,10 @@ describe('SearchCard Unit Tests', () => {
   beforeEach(async () => {
     // Import SearchCard component
     await import('../../../eds/components/SearchCard.js');
-    
+
     // Create a search-card element
     searchCard = document.createElement('search-card');
-    
+
     // Set up mock data
     searchCard.data = {
       id: 'test-card-1',
@@ -1575,23 +1560,23 @@ describe('SearchCard Unit Tests', () => {
         description: 'This is a test card description',
         type: 'pdf',
         url: 'https://example.com/test.pdf',
-        size: '2.5 MB'
+        size: '2.5 MB',
       },
       cardDate: '2024-01-15',
       arbitrary: [
         { product: 'analytics' },
-        { industry: 'retail' }
-      ]
+        { industry: 'retail' },
+      ],
     };
-    
+
     searchCard.localizedText = {
       '{{download}}': 'Download',
       '{{open-in}}': 'Open in',
       '{{open-in-disabled}}': 'Open in (disabled)',
       '{{last-modified}}': 'Last Modified',
-      '{{size}}': 'Size'
+      '{{size}}': 'Size',
     };
-    
+
     searchCard.ietf = 'en-US';
   });
 
@@ -1609,12 +1594,12 @@ describe('SearchCard Unit Tests', () => {
           contains: sinon.stub().returns(false),
           add: sinon.spy(),
           remove: sinon.spy(),
-          toggle: sinon.spy()
-        }
+          toggle: sinon.spy(),
+        },
       };
-      
+
       searchCard.toggleCard(mockElement);
-      
+
       expect(mockElement.classList.toggle.calledOnce).to.be.true;
     });
 
@@ -1625,12 +1610,12 @@ describe('SearchCard Unit Tests', () => {
           contains: sinon.stub().returns(true),
           add: sinon.spy(),
           remove: sinon.spy(),
-          toggle: sinon.spy()
-        }
+          toggle: sinon.spy(),
+        },
       };
-      
+
       searchCard.toggleCard(mockElement);
-      
+
       expect(mockElement.classList.toggle.calledOnce).to.be.true;
       expect(mockElement.classList.toggle.calledWith('expanded')).to.be.true;
     });
@@ -1640,18 +1625,18 @@ describe('SearchCard Unit Tests', () => {
       const testElement = document.createElement('div');
       testElement.classList.add('search-card');
       document.body.appendChild(testElement);
-      
+
       // Verify class is not present initially
       expect(testElement.classList.contains('expanded')).to.be.false;
-      
+
       // Call toggleCard to add the class
       searchCard.toggleCard(testElement);
       expect(testElement.classList.contains('expanded')).to.be.true;
-      
+
       // Call toggleCard again to remove the class
       searchCard.toggleCard(testElement);
       expect(testElement.classList.contains('expanded')).to.be.false;
-      
+
       // Clean up
       document.body.removeChild(testElement);
     });
@@ -1659,38 +1644,38 @@ describe('SearchCard Unit Tests', () => {
     it('should work when integrated with rendered search card', async () => {
       // Append the search card to the DOM to trigger rendering
       document.body.appendChild(searchCard);
-      
+
       // Wait for component to render
       await searchCard.updateComplete;
-      
+
       // Get the search-card element from DOM
       const cardElement = searchCard.querySelector('.search-card');
       expect(cardElement).to.exist;
-      
+
       // Verify initial state - no expanded class
       expect(cardElement.classList.contains('expanded')).to.be.false;
-      
+
       // Click on the card to trigger toggleCard
       cardElement.click();
-      
+
       // Wait a bit for the event to process
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
       // Verify expanded class was added
       expect(cardElement.classList.contains('expanded')).to.be.true;
-      
+
       // Click again to toggle off
       cardElement.click();
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
       // Verify expanded class was removed
       expect(cardElement.classList.contains('expanded')).to.be.false;
-      
+
       // Clean up
       document.body.removeChild(searchCard);
     });
 
-    it('should contain search cards analytics attributes', async function () {
+    it('should contain search cards analytics attributes', async () => {
       const searchCardsWrapper = document.querySelector('.search-cards-wrapper');
       expect(searchCardsWrapper).to.exist;
 
