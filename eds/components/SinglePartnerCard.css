@@ -32,10 +32,13 @@ single-partner-card-half-height .single-partner-card--half-height {
   transition: box-shadow .3s ease-in-out;
 }
 
-.single-partner-card .card-header,
-single-partner-card-half-height .single-partner-card--half-height {
+.single-partner-card .card-header {
   min-height: 192px;
   max-height: 192px;
+}
+
+.single-partner-card .card-header,
+single-partner-card-half-height .single-partner-card--half-height {
   background-color: #323232;
   background-repeat: no-repeat;
   background-position: 50% 50%;
