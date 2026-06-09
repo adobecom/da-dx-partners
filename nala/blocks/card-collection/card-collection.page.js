@@ -43,6 +43,18 @@ export default class CardCollectionPage {
       .toBeVisible({ timeout: 20000 });
   }
 
+  cardHeaderByTitle(title) {
+    return this.page.locator(`.card-wrapper:has(.card-title:has-text("${title}")) .card-header`);
+  }
+
+  async expectDefaultCardBackgroundImage(title, imagePath) {
+    const cardHeader = this.cardHeaderByTitle(title);
+    await expect(cardHeader).toBeVisible({ timeout: 20000 });
+    const backgroundImage = await cardHeader.evaluate((el) => getComputedStyle(el).backgroundImage);
+    const urlCount = (backgroundImage.match(new RegExp(imagePath.replace(/\//g, '\\/'), 'g')) || []).length;
+    await expect(urlCount).toBe(2);
+  }
+
   async getFirstCardTitle() {
     return (await this.cards.nth(0)
       .locator('.card-title')

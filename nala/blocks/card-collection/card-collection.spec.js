@@ -208,5 +208,16 @@ export default {
         btnRole3D: 'checkbox',
       },
     },
+    {
+      tcid: '14',
+      name: '@card-collection-default-image-displayed',
+      path: '/digitalexperience/drafts/automation/regression/dx-card-collection/card-collections/collection-tags1',
+      tags: '@da-dx-card-collection @regression @circleCi @anonymous',
+      data: {
+        keyword: 'QA Automation Asset',
+        cardTitle: 'QA Automation Asset - AEM rendition exists, and thumbnail does not exist',
+        defaultImagePath: '/eds/partners-shared/images/card-collection/sample-default.png',
+      },
+    },
   ],
 };
