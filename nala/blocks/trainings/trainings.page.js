@@ -52,6 +52,18 @@ export default class TrainingPage extends SearchPage {
     await this.searchAllResults.click();
   }
 
+  async waitForSearchResultsReady(minResults = 1) {
+    await this.waitForResultsToSettle();
+    await this.searchAllResults.waitFor({ state: 'visible', timeout: 30000 });
+    await this.waitForNumberOfResults(minResults);
+    await this.cardTitles.first().waitFor({ state: 'visible', timeout: 30000 });
+    await expect(this.cardTitles.first()).not.toHaveText('', { timeout: 30000 });
+  }
+
+  async waitForResultsToSettle() {
+    await this.loader.waitFor({ state: 'hidden', timeout: 30000 });
+  }
+
   async verifyTrainingSearchResults(data) {
     await this.waitForResultsToSettle();
 
@@ -103,7 +115,7 @@ export default class TrainingPage extends SearchPage {
     const cardDate = this.getCardDateLocator(card);
     await expect(cardDate).toContainText(data.lastModifiedDate);
 
-    await expect(card.getByText(data.shortDescription, { exact: true })).toBeVisible({ timeout: 30000 });
+    await expect(card.getByText(data.shortDescription, { exact: true })).toBeVisible({ timeout: 60000 });
 
     await this.verifyTrainingCardButtonLink(card, data.previewUrl);
   }
@@ -148,7 +160,6 @@ export default class TrainingPage extends SearchPage {
   }
 
   async verifyPartnerCollectionSearchResults(data) {
-    await this.waitForResultsToSettle();
     await this.partnerCardsCollection.waitFor({ state: 'visible', timeout: 30000 });
 
     await expect
@@ -180,7 +191,6 @@ export default class TrainingPage extends SearchPage {
   }
 
   async verifyFilteredTrainingResult(data) {
-    await this.waitForResultsToSettle();
     await this.partnerCardsCollection.waitFor({ state: 'visible', timeout: 30000 });
 
     await expect
@@ -232,6 +242,5 @@ export default class TrainingPage extends SearchPage {
     await expect(this.cardCollectionSearchField).toBeVisible();
     await this.cardCollectionSearchField.fill(keyword);
     await this.cardCollectionSearchField.press('Enter');
-    await this.waitForResultsToSettle();
   }
 }

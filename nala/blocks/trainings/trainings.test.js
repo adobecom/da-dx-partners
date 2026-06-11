@@ -29,7 +29,7 @@ test.describe('Search Page Trainings', () => {
       await expect(trainingPage.searchField).toBeVisible();
       await trainingPage.searchField.fill(data.searchKeyword);
       await trainingPage.searchField.press('Enter');
-      await trainingPage.waitForResultsToSettle();
+      await trainingPage.waitForSearchResultsReady();
     });
 
     await test.step('Filter results by Trainings tab', async () => {
@@ -166,12 +166,11 @@ test.describe('Search Page Trainings', () => {
       await expect(trainingPage.searchField).toBeVisible();
       await trainingPage.searchField.fill(data.searchKeyword);
       await trainingPage.searchField.press('Enter');
-      await trainingPage.waitForResultsToSettle();
+      await trainingPage.waitForSearchResultsReady();
     });
 
     await test.step('Click Trainings tab in quick filters', async () => {
       await trainingPage.trainingButton.click();
-      await trainingPage.waitForResultsToSettle();
     });
 
     await test.step('Verify top training title is not retired training', async () => {
