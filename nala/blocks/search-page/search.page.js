@@ -111,7 +111,7 @@ export default class SearchPage {
 
   async verifyCardTag(card, tagText) {
     const tag = this.getCardTagByText(card, tagText);
-    await expect(tag).toBeVisible({ timeout: 10000 });
+    await expect(tag).toBeVisible({ timeout: 30000 });
     const text = await tag.textContent();
     expect(text.trim()).toBe(tagText);
   }
@@ -226,5 +226,52 @@ export default class SearchPage {
     return this.page
       .locator('.filter', { has: this.page.getByRole('button', { name: filterName }) })
       .locator('.filter-selected-tags-count-btn');
+  }
+
+  getCardPreviewButton(card) {
+    return card.locator('a.card-btn[aria-label="Open in"]');
+  }
+
+  async verifyAllCardTags(card, expectedTags) {
+    const tagElements = card.locator('.card-tags-wrapper .card-tag');
+    const count = await tagElements.count();
+    const actualTags = [];
+
+    for (let i = 0; i < count; i += 1) {
+      const tag = tagElements.nth(i);
+      if (await tag.isVisible()) {
+        actualTags.push((await tag.textContent())?.trim().toLowerCase() ?? '');
+      }
+    }
+
+    const normalizedExpected = expectedTags.map((tag) => tag.trim().toLowerCase());
+    expect(actualTags).toEqual(normalizedExpected);
+  }
+
+  async verifyCardPreviewButtonLink(card, expectedUrl) {
+    const buttonLink = this.getCardPreviewButton(card);
+    await expect(buttonLink).toBeVisible({ timeout: 30000 });
+    await expect(buttonLink).toHaveAttribute('target', '_blank');
+    const href = await buttonLink.getAttribute('href');
+    expect(href).toContain(expectedUrl);
+  }
+
+  async verifyCardVideoIcon(card) {
+    await expect(card.locator('.file-icon')).toBeVisible({ timeout: 30000 });
+  }
+
+  async verifyExpandedNetstorageAsset(card, data) {
+    const cardDate = this.getCardDateLocator(card);
+    await expect(cardDate).toContainText(data.lastModifiedDate);
+
+    const cardSize = this.getCardSizeLocator(card);
+    await expect(cardSize).toContainText(data.cardSize);
+
+    await expect(card.getByText(data.description, { exact: true })).toBeVisible({ timeout: 30000 });
+
+    await this.verifyAllCardTags(card, data.cardTags);
+
+    await this.verifyCardVideoIcon(card);
+    await this.verifyCardPreviewButtonLink(card, data.previewUrl);
   }
 }

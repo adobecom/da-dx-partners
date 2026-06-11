@@ -239,5 +239,30 @@ export default {
         cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg")',
       },
     },
+    {
+      tcid: '19',
+      name: '@search-page-netstorage-asset-properties-validation',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-community:',
+        searchKeyword: 'netstorageAssetSearchPageTest',
+        expectedResultCount: 1,
+        cardTitle: 'Automation Regression Public Search Page Test',
+        lastModifiedDate: 'Jun 10, 2026',
+        cardSize: '682.8 MB',
+        description: 'manual description',
+        cardTags: [
+          'px',
+          'faq',
+          'plans & pricing',
+          'automation control solutions',
+          'high tech',
+          'frame io',
+        ],
+        previewUrl:
+          'https://partners.stage.adobe.com/digitalexperience/preview/netstorage-assets/public/au/Automation_Regression_Public_Search_Page_Test.mp4.html',
+      },
+    },
   ],
 };
