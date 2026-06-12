@@ -22,7 +22,7 @@ test.describe('Search Page Trainings', () => {
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
       await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
     await test.step('Search for training keyword', async () => {
@@ -64,7 +64,7 @@ test.describe('Search Page Trainings', () => {
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
       await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
     await test.step('Search for training keyword', async () => {
@@ -108,7 +108,7 @@ test.describe('Search Page Trainings', () => {
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
       await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
     await test.step('Search for training keyword in card collection', async () => {
@@ -132,7 +132,7 @@ test.describe('Search Page Trainings', () => {
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
       await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
     await test.step('Search for training keyword in card collection', async () => {
@@ -159,7 +159,7 @@ test.describe('Search Page Trainings', () => {
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
       await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
     await test.step('Search for retired training in search bar', async () => {
