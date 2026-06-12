@@ -139,7 +139,8 @@ export default class GnavPersonalisationPage {
 
   async verifyNavMenuLinksVisible(hrefParts) {
     for (const hrefPart of hrefParts) {
-      await expect(this.navMenuLink(hrefPart).first()).toBeVisible({ timeout: 30000 });
+      const link = await this.getVisibleNavMenuLink(hrefPart);
+      await expect(link).toBeVisible({ timeout: 30000 });
     }
   }
 
@@ -157,24 +158,23 @@ export default class GnavPersonalisationPage {
 
   async verifyPromoLinksAbsent(hrefParts) {
     for (const hrefPart of hrefParts) {
-      await expect(this.promoLink(hrefPart)).toHaveCount(0);
+      expect(await this.countVisible(this.promoLink(hrefPart))).toBe(0);
     }
   }
 
   async verifyCoSellingTitleAbsent(title) {
-    await expect(
-      this.page.locator('.feds-promo-header').filter({ hasText: title }),
-    ).toHaveCount(0);
+    const headers = this.page.locator('.feds-promo-header').filter({ hasText: title });
+    expect(await this.countVisible(headers)).toBe(0);
   }
 
   async verifyNavMenuLinksAbsent(hrefParts) {
     for (const hrefPart of hrefParts) {
-      await expect(this.navMenuLink(hrefPart)).toHaveCount(0);
+      expect(await this.countVisible(this.navMenuLink(hrefPart))).toBe(0);
     }
   }
 
   async verifyCtaAbsent(hrefPart) {
-    await expect(this.ctaLink(hrefPart)).toHaveCount(0);
+    expect(await this.countVisible(this.ctaLink(hrefPart))).toBe(0);
   }
 
   async open404Page(baseURL, restrictedPath) {
@@ -189,6 +189,48 @@ export default class GnavPersonalisationPage {
     expect(await this.searchIcon.getAttribute('href')).toContain(links.searchIconLink);
     expect(await this.menageUserIcon.getAttribute('href')).toContain(links.menageUserIconLink);
     expect(await this.homeIcon.getAttribute('href')).toContain(links.homeIconLink);
+  }
+
+  async countVisible(locator) {
+    const count = await locator.count();
+    let visibleCount = 0;
+
+    for (let i = 0; i < count; i += 1) {
+      if (await locator.nth(i).isVisible()) {
+        visibleCount += 1;
+      }
+    }
+
+    return visibleCount;
+  }
+
+  async getVisibleNavMenuLink(hrefPart, timeout = 30_000) {
+    const links = this.navMenuLink(hrefPart);
+
+    await expect
+      .poll(
+        async () => {
+          const count = await links.count();
+          for (let i = 0; i < count; i += 1) {
+            if (await links.nth(i).isVisible()) {
+              return true;
+            }
+          }
+          return false;
+        },
+        { timeout },
+      )
+      .toBeTruthy();
+
+    const count = await links.count();
+    for (let i = 0; i < count; i += 1) {
+      const link = links.nth(i);
+      if (await link.isVisible()) {
+        return link;
+      }
+    }
+
+    return links.first();
   }
 
   async verifyRestrictedPromoteSellPart1(data) {

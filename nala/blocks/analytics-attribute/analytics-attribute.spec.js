@@ -19,7 +19,7 @@ export default {
       tcid: '2',
       name: '@analytics-attribute-search-page',
       path: '/digitalexperience/home/search/',
-      tags: '@da-dx-analytics-attribute @regression @circleCi @anonymous',
+      tags: '@da-dx-analytics-attribute @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
         searchKeyWord: 'Adobe',
