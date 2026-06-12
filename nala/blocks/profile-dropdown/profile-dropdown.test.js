@@ -138,4 +138,34 @@ test.describe('Validate profile dropdown block', () => {
       );
     });
   });
+  // @dxp-profile-dropdown-asset-404-page
+  test(`${features[4].name},${features[4].tags}`, async ({ page }) => {
+    let secondPage;
+    let secondProfileDropdownPage;
+
+    await test.step('Go to profile dropdown page', async () => {
+      await page.goto(`${features[4].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${features[4].data.partnerLevel}`);
+      await profileDropdownPage.profileDropdownButton.waitFor({
+        state: 'visible',
+        timeout: 10000,
+      });
+    });
+    await test.step('Open 404 page and verify profile dropdown', async () => {
+      secondPage = await page.context().newPage();
+      await secondPage.goto(`${features[4].pathSecondTab}`);
+      await secondPage.waitForLoadState('domcontentloaded');
+      secondProfileDropdownPage = new ProfileDropdownPage(secondPage);
+
+      await secondProfileDropdownPage.profileDropdown.click();
+      await expect(secondProfileDropdownPage.profileIcon).toBeVisible();
+      await expect(secondProfileDropdownPage.profileName).toHaveText(features[4].data.profileName);
+      await expect(secondProfileDropdownPage.profileJob).toBeVisible();
+      await expect(secondProfileDropdownPage.profileJob).toHaveText(features[4].data.profileJob);
+      await expect(secondProfileDropdownPage.partnerLevelDropdown).toBeVisible();
+      await expect(secondProfileDropdownPage.partnerLevelDropdown).toHaveText(features[4].data.partnerLevelDropdown);
+    });
+  });
 });
