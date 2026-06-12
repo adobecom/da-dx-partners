@@ -55,5 +55,18 @@ export default {
         signOutLink: '/digitalexperience/',
       },
     },
+    {
+      tcid: '5',
+      name: '@dxp-profile-dropdown-asset-404-page',
+      path: '/digitalexperience/',
+      pathSecondTab: '/digitalexperience-assets/automationtest.pdf#',
+      tags: '@da-dx-profile-dropdown @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-community:',
+        profileName: 'DONOT USE Yugo DX Stage Community',
+        partnerLevelDropdown: 'Community',
+        profileJob: 'Learning and Development',
+      },
+    },
   ],
 };
