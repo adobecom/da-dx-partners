@@ -308,4 +308,19 @@ test.describe('Validate card collection block', () => {
       await cardCollectionPage.expectResultsNumber(data.numberOfCardsLast90Days);
     });
   });
+  // @card-collection-default-image-displayed
+  test(`${features[13].name},${features[13].tags}`, async ({ page }) => {
+    const { data } = features[13];
+    await test.step('Go to card collection page', async () => {
+      await page.goto(`${features[13].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await cardCollectionPage.searchField.waitFor({ state: 'visible', timeout: 10000 });
+      await cardCollectionPage.searchField.click({ force: true });
+      await cardCollectionPage.searchField.type(data.keyword);
+      await cardCollectionPage.cardTitleByText(data.cardTitle);
+    });
+    await test.step('Verify default card background image is displayed', async () => {
+      await cardCollectionPage.expectDefaultCardBackgroundImage(data.cardTitle, data.defaultImagePath);
+    });
+  });
 });
