@@ -6,7 +6,7 @@ import SignInPage from '../signin/signin.page.js';
 const { features } = searchSpec;
 let searchPage;
 let signInPage;
-const thumbnailCases = features.slice(18, 22);
+const thumbnailCases = features.slice(19, 23);
 
 test.describe('Search Page', () => {
   test.beforeEach(async ({ page }) => {
@@ -571,6 +571,18 @@ test.describe('Search Page', () => {
       await expect(expandedCard).toBeVisible({ timeout: 30000 });
 
       await searchPage.verifyExpandedNetstorageAsset(expandedCard, data);
+    });
+  });
+  thumbnailCases.forEach((feature) => {
+    test(`${feature.name},${feature.tags}`, async ({ page }) => {
+      const { data } = feature;
+      await test.step('Go to asset preview page', async () => {
+        await page.goto(feature.path);
+        await page.waitForLoadState('domcontentloaded');
+      });
+      await test.step('Verify asset preview thumbnail image src', async () => {
+        await searchPage.verifyImageThumbnail(data.imageThumbnail);
+      });
     });
   });
 });
