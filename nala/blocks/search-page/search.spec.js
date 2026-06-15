@@ -241,38 +241,27 @@ export default {
     },
     {
       tcid: '19',
-      name: '@netstorage-asset-thumbnail-uploaded',
-      path: '/digitalexperience/preview/netstorage-assets/restricted/te/test.jpg.html',
+      name: '@search-page-netstorage-asset-properties-validation',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
-        imageThumbnail: '/thumbnail.png',
-      },
-    },
-    {
-      tcid: '20',
-      name: '@netstorage-asset-default-image-displayed',
-      path: '/digitalexperience/preview/netstorage-assets/restricted/qa/qaAssetTestpdf.pdf.html',
-      tags: '@da-dx-search-page @regression @circleCi',
-      data: {
-        imageThumbnail: '/sample-pdf.png',
-      },
-    },
-    {
-      tcid: '21',
-      name: '@regular-asset-aem-rendition-displayed',
-      path: '/digitalexperience/preview/qa-test/public/automation-regression-restricted-asset-message/qaAssetTestpdf.pdf.html',
-      tags: '@da-dx-search-page @regression @circleCi',
-      data: {
-        imageThumbnail: '/renditions/cq5dam.web.1280.1280.jpeg',
-      },
-    },
-    {
-      tcid: '22',
-      name: '@regular-asset-aem-rendition-deleted-custom-image-displayed',
-      path: '/digitalexperience/preview/qa-test/public/automation-regression-restricted-asset-message/qaAssetTest.pdf.html',
-      tags: '@da-dx-search-page @regression @circleCi',
-      data: {
-        imageThumbnail: '/renditions/custom-thumbnail.jpg',
+        partnerLevel: 'dxp-community:',
+        searchKeyword: 'netstorageAssetSearchPageTest',
+        expectedResultCount: 1,
+        cardTitle: 'Automation Regression Public Search Page Test',
+        lastModifiedDate: 'Jun 10, 2026',
+        cardSize: '682.8 MB',
+        description: 'manual description',
+        cardTags: [
+          'px',
+          'faq',
+          'plans & pricing',
+          'automation control solutions',
+          'high tech',
+          'frame io',
+        ],
+        previewUrl:
+          'https://partners.stage.adobe.com/digitalexperience/preview/netstorage-assets/public/au/Automation_Regression_Public_Search_Page_Test.mp4.html',
       },
     },
   ],

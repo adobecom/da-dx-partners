@@ -538,16 +538,39 @@ test.describe('Search Page', () => {
     });
   });
 
-  thumbnailCases.forEach((feature) => {
-    test(`${feature.name},${feature.tags}`, async ({ page }) => {
-      const { data } = feature;
-      await test.step('Go to asset preview page', async () => {
-        await page.goto(feature.path);
-        await page.waitForLoadState('domcontentloaded');
-      });
-      await test.step('Verify asset preview thumbnail image src', async () => {
-        await searchPage.verifyImageThumbnail(data.imageThumbnail);
-      });
+  test(`${features[18].name},${features[18].tags}`, async ({ page }) => {
+    const { data } = features[18];
+
+    await test.step('Go to search page and sign in as Community user', async () => {
+      await page.goto(features[18].path);
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Search for netstorage asset', async () => {
+      await expect(searchPage.searchField).toBeVisible();
+      await searchPage.searchField.fill(data.searchKeyword);
+      await searchPage.searchField.press('Enter');
+      await searchPage.waitForResultsToSettle();
+      await searchPage.searchAllResults.waitFor({ state: 'visible', timeout: 30000 });
+
+      await expect.poll(async () => searchPage.getNumberOfResults(), { timeout: 15000 }).toBe(data.expectedResultCount);
+    });
+
+    await test.step('Expand netstorage asset and verify properties', async () => {
+      const card = searchPage.getCardByTitle(data.cardTitle);
+      await searchPage.clickCard(card);
+      await page.waitForLoadState('domcontentloaded');
+
+      const expandedCard = searchPage
+        .getExpandedCard()
+        .filter({ hasText: data.cardTitle })
+        .first();
+      await expect(expandedCard).toBeVisible({ timeout: 30000 });
+
+      await searchPage.verifyExpandedNetstorageAsset(expandedCard, data);
     });
   });
 });
