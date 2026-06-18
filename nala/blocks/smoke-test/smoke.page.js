@@ -7,7 +7,7 @@ export default class SmokeTest {
     this.contactUsLinkSP = page.locator('a[href*="/digitalexperience/m/forms/case"]').nth(0);
     this.findPartnerLinkSP = page.locator('a[href*="/s/directory/solution"]');
     this.learnMoreLinkSP = page.locator('a[href*="/digitalexperience/about"]').nth(0);
-    this.contactUsLinkTP = page.locator('a[href*="/digitalexperience/m/forms/case"]').nth(1);;
+    this.contactUsLinkTP = page.locator('a[href*="/digitalexperience/m/forms/case"]').nth(1);
     this.findPartnerLinkTP = page.locator('a[href*="/s/directory/technology"]');
     this.learnMoreLinkTP = page.locator('a[href*="/digitalexperience/about"]').nth(1);
     this.contactUsLinkAR = page.locator('a[href*="/en/apc-helpdesk"]');
@@ -68,16 +68,16 @@ export default class SmokeTest {
   async verifyStatusCode(url) {
     const response = await this.page.goto(url);
     if (!response || response.status() !== 200) {
-      throw new Error(`Page failed to load. Status: ${response ? response.status() : "No response"}`);
+      throw new Error(`Page failed to load. Status: ${response ? response.status() : 'No response'}`);
     }
   }
 
   async verifyIfGnavIsPresent() {
-    return await this.gnav.isVisible();
+    return this.gnav.isVisible();
   }
 
   async verifyIfFooterIsPresent() {
-    return await this.footer.isVisible();
+    return this.footer.isVisible();
   }
 
   async verifyFooterSocialMediaIcons(data) {

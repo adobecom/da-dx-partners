@@ -1,8 +1,7 @@
 import { expect } from '@esm-bundle/chai';
-import { calculateRedirect } from '../../../eds/blocks/asset-redirects/calculateRedirect.js';
+import calculateRedirect from '../../../eds/blocks/asset-redirects/calculateRedirect.js';
 
 function setWindowLocation(pathname) {
-  const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
   window.history.replaceState({}, '', pathname);
 }
 
@@ -21,7 +20,7 @@ describe('calculateRedirect', () => {
 
     const result = calculateRedirect(redirectRules);
     expect(result.toString()).to.equal(
-      `${baseOrigin}${previewPath}netstorage-assets/restricted/we/webinar-recording-pko26-keynote-amer-emea.mp4.html`
+      `${baseOrigin}${previewPath}netstorage-assets/restricted/we/webinar-recording-pko26-keynote-amer-emea.mp4.html`,
     );
   });
 
@@ -69,7 +68,7 @@ describe('calculateRedirect', () => {
     const result = calculateRedirect(redirectRules);
 
     expect(result.toString()).to.equal(
-      `${baseOrigin}${previewPath}restricted/1/program-guide.pdf.html`
+      `${baseOrigin}${previewPath}restricted/1/program-guide.pdf.html`,
     );
   });
 
@@ -104,7 +103,7 @@ describe('calculateRedirect', () => {
     const result = calculateRedirect(redirectRules);
     // Should return the first matching redirect
     expect(result.toString()).to.equal(
-      `${baseOrigin}${previewPath}netstorage-assets/restricted/we/webinar-recording-content-supply-chain-ai-world-portfolio-deepdive.mp4.html`
+      `${baseOrigin}${previewPath}netstorage-assets/restricted/we/webinar-recording-content-supply-chain-ai-world-portfolio-deepdive.mp4.html`,
     );
   });
 
@@ -124,7 +123,7 @@ describe('calculateRedirect', () => {
     const result = calculateRedirect(redirectRules);
     // Should return the first matching redirect
     expect(result.toString()).to.equal(
-      `https://partners.adobe.com${previewPath}netstorage-assets/restricted/we/webinar-recording-content-supply-chain-ai-world-portfolio-deepdive.mp4.html`
+      `https://partners.adobe.com${previewPath}netstorage-assets/restricted/we/webinar-recording-content-supply-chain-ai-world-portfolio-deepdive.mp4.html`,
     );
   });
 
@@ -144,10 +143,9 @@ describe('calculateRedirect', () => {
     const result = calculateRedirect(redirectRules);
     // Should return the first matching redirect
     expect(result.toString()).to.equal(
-      `http://localhost:2000${previewPath}netstorage-assets/restricted/we/webinar-recording-content-supply-chain-ai-world-portfolio-deepdive.mp4.html?redirectWithparam=true`
+      `http://localhost:2000${previewPath}netstorage-assets/restricted/we/webinar-recording-content-supply-chain-ai-world-portfolio-deepdive.mp4.html?redirectWithparam=true`,
     );
   });
-
 
   it('test simple redirect loop', () => {
     setWindowLocation(`${baseOrigin}${previewPath}restricted/1/program-guide.pdf.html`);
@@ -167,7 +165,6 @@ describe('calculateRedirect', () => {
     expect(result).to.be.null;
   });
 
-
   it('test redirect loop from relative URL', () => {
     setWindowLocation(`${baseOrigin}${previewPath}restricted/1/program-guide.pdf.html?everything=true&nothing=false#evenwithahash`);
     const redirectRules = [
@@ -185,6 +182,4 @@ describe('calculateRedirect', () => {
     // Should return the first matching redirect
     expect(result).to.be.null;
   });
-
-
 });

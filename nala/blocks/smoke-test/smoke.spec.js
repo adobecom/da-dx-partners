@@ -46,27 +46,21 @@ export default {
       name: '@smoke-test-become-a-partner',
       path: '/digitalexperience/?georouting=off&martech=off',
       // tags: '@da-dx-smoke-test',
-      data: {
-        becomAPartnerUrl: '/digitalexperience/s/registration',
-      }
+      data: { becomAPartnerUrl: '/digitalexperience/s/registration' },
     },
     {
       tcid: '5',
       name: '@smoke-test-find-a-partner-validation',
       path: '/digitalexperience/?georouting=off&martech=off',
       tags: '@da-dx-smoke-test',
-      data: {
-        findAPartnerUrl: '/s/directory/solution',
-      }
+      data: { findAPartnerUrl: '/s/directory/solution' },
     },
     {
       tcid: '6',
       name: '@smoke-test-analytics-card-collection-validation',
       path: '/digitalexperience/products/analytics?georouting=off&martech=off',
       tags: '@da-dx-smoke-test',
-      data: {
-        partnerLevel: 'dxp-platinum:',
-      }
+      data: { partnerLevel: 'dxp-platinum:' },
     },
     {
       tcid: '7',
@@ -77,7 +71,7 @@ export default {
         partnerLevel: 'dxp-gold:',
         expectedSaleCenterUrl: '/digitalexperience/m/salescenter/',
         homeUrl: '/digitalexperience/home/',
-      }
+      },
     },
     {
       tcid: '8',
@@ -87,7 +81,7 @@ export default {
       data: {
         partnerLevel: 'cpp-distributor-india:',
         contactNotFoundUrl: '/digitalexperience/error/contact-not-found#',
-      }
+      },
     },
     {
       tcid: '9',
@@ -97,7 +91,7 @@ export default {
       data: {
         partnerLevel: 'dxp-silver:',
         searchKeyword: 'Adobe',
-      }
+      },
     },
     {
       tcid: '10',
@@ -107,7 +101,7 @@ export default {
       data: {
         feedbackTitle: 'Rate this page',
         feedbackTextArea: 'Automation Test Keywords',
-      }
+      },
     },
     {
       tcid: '11',

@@ -4,6 +4,7 @@ import { spawn } from 'child_process';
 import playwrightConfig from '../../playwright.config.js';
 
 function displayHelp() {
+  // eslint-disable-next-line no-console
   console.log(`
 
 \x1b[1m\x1b[37m## Nala command:\x1b[0m \x1b[1m\x1b[32mnpm run nala [env] [options]\x1b[0m
@@ -30,7 +31,7 @@ function displayHelp() {
   | npm run nala local @accordion                          | Runs only accordion annotated/tagged tests on local environment on chrome browser             |
   | npm run nala local @accordion browser=firefox          | Runs only accordion annotated/tagged tests on local environment on firefox browser            |
   | npm run nala local mode=ui                             | Runs all nala tests on local environment in UI mode on chrome browser                         |
-  | npm run nala local tags=@tag1,@tag2                    | Runs tests annotated with @tag1 and @tag2 on local environment on chrome browser              |         
+  | npm run nala local tags=@tag1,@tag2                    | Runs tests annotated with @tag1 and @tag2 on local environment on chrome browser              |
 
 \x1b[1mDebugging:\x1b[0m
 -----------
@@ -51,12 +52,12 @@ function parseArgs(args) {
     mode: 'headless',
     config: '',
     project: 'all',
-    milolibs: ''
+    milolibs: '',
   };
 
   const parsedParams = { ...defaultParams };
 
-  args.forEach(arg => {
+  args.forEach((arg) => {
     if (arg.includes('=')) {
       const [key, value] = arg.split('=');
       parsedParams[key] = value;
@@ -87,28 +88,27 @@ function getLocalTestLiveUrl(env, milolibs) {
   if (milolibs) {
     if (env === 'local') {
       return `http://127.0.0.1:3000/?milolibs=${milolibs}`;
-    } else if (env === 'libs') {
+    } if (env === 'libs') {
       return `http://127.0.0.1:6456/?milolibs=${milolibs}`;
-    } else {
-      return `https://${env}--da-dx-partners--adobecom.aem.live/?milolibs=${milolibs}`;
     }
-  } else {
-    if (env === 'local') {
-      return 'http://127.0.0.1:3000';
-    } else if (env === 'libs') {
-      return 'http://127.0.0.1:6456';
-    } else if (env === 'partners.stage') {
-      return 'https://partners.stage.adobe.com';
-    } else if (env === 'partners') {
-      return 'https://partners.adobe.com';
-    } else {
-      return `https://${env}--da-dx-partners--adobecom.aem.live`;
-    }
+    return `https://${env}--da-dx-partners--adobecom.aem.live/?milolibs=${milolibs}`;
   }
+  if (env === 'local') {
+    return 'http://127.0.0.1:3000';
+  } if (env === 'libs') {
+    return 'http://127.0.0.1:6456';
+  } if (env === 'partners.stage') {
+    return 'https://partners.stage.adobe.com';
+  } if (env === 'partners') {
+    return 'https://partners.adobe.com';
+  }
+  return `https://${env}--da-dx-partners--adobecom.aem.live`;
 }
 
 function buildPlaywrightCommand(parsedParams, localTestLiveUrl) {
-  const { browser, device, test, tag, mode, config, project } = parsedParams;
+  const {
+    browser, device, test, tag, mode, config, project,
+  } = parsedParams;
 
   const envVariables = {
     ...process.env,
@@ -125,9 +125,9 @@ function buildPlaywrightCommand(parsedParams, localTestLiveUrl) {
     options.push(test);
   }
 
-  if (project==='all') {
+  if (project === 'all') {
     const { projects } = playwrightConfig;
-    projects.map(p => options.push(`--project=${p.name}`));
+    projects.map((p) => options.push(`--project=${p.name}`));
   } else {
     project.split(',').forEach((p) => {
       options.push(`--project=${p}`);
@@ -164,15 +164,18 @@ function runNalaTest() {
   const localTestLiveUrl = getLocalTestLiveUrl(parsedParams.env, parsedParams.milolibs);
   const { finalCommand, envVariables } = buildPlaywrightCommand(parsedParams, localTestLiveUrl);
 
+  // eslint-disable-next-line no-console
   console.log(`\n Executing nala run command: ${finalCommand}`);
+  // eslint-disable-next-line no-console
   console.log(`\n Using URL: ${localTestLiveUrl}\n`);
 
+  // eslint-disable-next-line no-console
   console.log(`\n\x1b[1m\x1b[33mExecuting nala run command:\x1b[0m \x1b[32m${finalCommand}\x1b[0m\n\x1b[1m\x1b[33mUsing URL:\x1b[0m \x1b[32m${localTestLiveUrl}\x1b[0m\n`);
-
 
   const testProcess = spawn(finalCommand, { stdio: 'inherit', shell: true, env: envVariables });
 
   testProcess.on('close', (code) => {
+    // eslint-disable-next-line no-console
     console.log(`Playwright tests exited with code ${code}`);
     process.exit(code);
   });
@@ -187,5 +190,5 @@ export {
   parseArgs,
   getLocalTestLiveUrl,
   buildPlaywrightCommand,
-  runNalaTest
+  runNalaTest,
 };

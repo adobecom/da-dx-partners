@@ -162,7 +162,7 @@ export default {
     {
       tcid: '11',
       name: '@restricted-asset-preview-message-non-signed-in-user',
-      path: '/digitalexperience-assets/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx  ',
+      path: '/digitalexperience-assets/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx',
       tags: '@restricted-asset @da-dx-search-page @regression @circleCi',
       data: {
         textBlock: 'Access to view or download this asset is restricted to registered partners. Login or register now.',
@@ -172,7 +172,7 @@ export default {
     {
       tcid: '12',
       name: '@restricted-asset-preview-message-community-level',
-      path: '/digitalexperience-assets/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx  ',
+      path: '/digitalexperience-assets/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx',
       tags: '@restricted-asset @da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-community:',
@@ -183,7 +183,7 @@ export default {
     {
       tcid: '13',
       name: '@restricted-asset-preview-message-gold-level',
-      path: '/digitalexperience-assets/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx  ',
+      path: '/digitalexperience-assets/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx',
       tags: '@restricted-asset @da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-gold:',
@@ -194,7 +194,7 @@ export default {
     {
       tcid: '14',
       name: '@asset-special-character-filters',
-      path: '/digitalexperience/drafts/automation/regression/search-page?filters=yes&industries=caas:industry/automotive-and-mobility&content-type=caas:content-type/plans-and-pricing&journey-phase=caas:journey-phase/acquisition&topic=caas:topic/invoices ',
+      path: '/digitalexperience/drafts/automation/regression/search-page?filters=yes&industries=caas:industry/automotive-and-mobility&content-type=caas:content-type/plans-and-pricing&journey-phase=caas:journey-phase/acquisition&topic=caas:topic/invoices',
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
@@ -235,11 +235,62 @@ export default {
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
-        cardTitle: 'Adobe Experience Manager Foundations - DX Certification',
-        cardDate: 'May 7, 2026',
-        cardSummaryValue: 'Intro to Adobe Experience Manager (AEM): Learn key concepts, solutions, features, and use cases within the AEM ecosystem.',
-        cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg\")',
+        cardDate: 'Jun 11, 2026',
+        cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg")',
       },
+    },
+    {
+      tcid: '19',
+      name: '@search-page-netstorage-asset-properties-validation',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-community:',
+        searchKeyword: 'netstorageAssetSearchPageTest',
+        expectedResultCount: 1,
+        cardTitle: 'Automation Regression Public Search Page Test',
+        lastModifiedDate: 'Jun 10, 2026',
+        cardSize: '682.8 MB',
+        description: 'manual description',
+        cardTags: [
+          'px',
+          'faq',
+          'plans & pricing',
+          'automation control solutions',
+          'high tech',
+          'frame io',
+        ],
+        previewUrl:
+          'https://partners.stage.adobe.com/digitalexperience/preview/netstorage-assets/public/au/Automation_Regression_Public_Search_Page_Test.mp4.html',
+      },
+    },
+    {
+      tcid: '20',
+      name: '@netstorage-asset-thumbnail-uploaded',
+      path: '/digitalexperience/preview/netstorage-assets/restricted/te/test.jpg.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: { imageThumbnail: '/thumbnail.png' },
+    },
+    {
+      tcid: '21',
+      name: '@netstorage-asset-default-image-displayed',
+      path: '/digitalexperience/preview/netstorage-assets/restricted/qa/qaAssetTestpdf.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: { imageThumbnail: '/sample-pdf.png' },
+    },
+    {
+      tcid: '22',
+      name: '@regular-asset-aem-rendition-displayed',
+      path: '/digitalexperience/preview/qa-test/public/automation-regression-restricted-asset-message/qaAssetTestpdf.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: { imageThumbnail: '/renditions/cq5dam.web.1280.1280.jpeg' },
+    },
+    {
+      tcid: '23',
+      name: '@regular-asset-aem-rendition-deleted-custom-image-displayed',
+      path: '/digitalexperience/preview/qa-test/public/automation-regression-restricted-asset-message/qaAssetTest.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: { imageThumbnail: '/renditions/custom-thumbnail.jpg' },
     },
   ],
 };

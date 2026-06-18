@@ -8,6 +8,7 @@ import DA_SDK from 'https://da.live/nx/utils/sdk.js';
     const redirectPath = path.split('/').pop();
 
     let appHost = 'https://milostudio--milo--adobecom.aem.page';
+    // eslint-disable-next-line default-case
     switch (ref) {
       case 'stage':
         appHost = 'https://milostudio-stage--milo--adobecom.aem.page';
@@ -17,9 +18,10 @@ import DA_SDK from 'https://da.live/nx/utils/sdk.js';
         break;
     }
     window.location.replace(
-      `${appHost}/tools/da-apps/ms-apps.html?path=${redirectPath}&tenant=${repo}&ref=${ref}&token=${token}`
+      `${appHost}/tools/da-apps/ms-apps.html?path=${redirectPath}&tenant=${repo}&ref=${ref}&token=${token}`,
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error initializing DA_SDK:', error);
   }
 })();

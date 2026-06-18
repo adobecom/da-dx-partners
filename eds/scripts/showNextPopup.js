@@ -1,9 +1,9 @@
 import { portalMessaging } from './portalMessaging.js';
 import { certificationExpiresPopup } from './certificationExpiresPopup.js';
-import { CERTIFICATION_POPUP, isMember, PARTNER_AGREEMENT_POPUP, PORTAL_MESSAGING_POPUP} from './utils.js';
+import { CERTIFICATION_POPUP, isMember, PARTNER_AGREEMENT_POPUP, PORTAL_MESSAGING_POPUP } from './utils.js';
 import { partnerAgreement } from './partnerAgreement.js';
 
-export async function showNextPopup(miloLibs, imsClientId, nextPopup = '') {
+export default async function showNextPopup(miloLibs, imsClientId, nextPopup = '') {
   if (!isMember()) {
     return;
   }

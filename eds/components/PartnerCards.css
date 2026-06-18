@@ -369,7 +369,6 @@
   background-color: #f4f4f4;
   color: #323232;
   border: none;
-  padding: 0;
   display: inline-flex;
   align-items: center;
   min-width: 89px;
@@ -472,7 +471,6 @@
 
 .partner-cards-header .partner-cards-sort-wrapper .sort-list.expanded {
   position: absolute;
-  display: block;
   right: 0;
   top: 30px;
   z-index: 2;
@@ -537,6 +535,7 @@
   position: relative;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .partner-cards-collection .single-partner-card--half-height {
   min-height: 208px;
 }
@@ -794,7 +793,6 @@
 }
 
 .filter-wrapper-mobile.expanded .filter-tags-mobile {
-  width: 100%;
   list-style-type: none;
   display: flex;
   flex-direction: column;
@@ -1022,6 +1020,7 @@
   cursor: default;
 }
 
+/* stylelint-disable no-descending-specificity */
 .pagination-wrapper-default .pagination-prev-btn.disabled,
 .pagination-wrapper-default .pagination-next-btn.disabled {
   color: #9d9d9d;

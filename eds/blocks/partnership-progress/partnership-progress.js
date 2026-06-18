@@ -62,5 +62,3 @@ export default async function init(el) {
   performance.measure('partnership-progress block', 'partnership-progress:start', 'partnership-progress:end');
   return app;
 }
-
-

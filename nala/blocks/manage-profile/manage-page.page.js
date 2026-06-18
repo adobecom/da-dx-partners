@@ -26,13 +26,13 @@ export default class ManagePage {
       userPartnerLevel,
     );
   }
+
   async verifyCardTitles(cardTitles) {
     for (const [brickNumber, expectedTitle] of Object.entries(cardTitles)) {
-  
       const title = this.page.locator(
-        `[daa-lh="b${brickNumber}|brick"]:visible h1`
+        `[daa-lh="b${brickNumber}|brick"]:visible h1`,
       );
-  
+
       await expect(title).toHaveText(expectedTitle);
     }
   }

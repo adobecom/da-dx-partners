@@ -86,7 +86,6 @@ const {
   isTangentToViewport,
   lanaLog,
   loadDecorateMenu,
-  rootPath,
   loadStyles,
   logErrorFor,
   selectors,
@@ -295,9 +294,9 @@ export const CONFIG = {
               enableProfileSwitcher: true,
               miniAppContext: {
                 logger: {
-                  trace: () => {},
-                  debug: () => {},
-                  info: () => {},
+                  trace: () => { },
+                  debug: () => { },
+                  info: () => { },
                   warn: (e) => lanaLog({ message: 'Profile Menu warning', e, tags: 'universalnav', severity: 'warning' }),
                   error: (e) => lanaLog({ message: 'Profile Menu error', e, tags: 'universalnav', severity: 'error' }),
                 },
@@ -1563,7 +1562,7 @@ class Gnav {
     const delayDropdownDecoration = ({ template } = {}) => {
       let decorationTimeout;
       let desktopMegaMenuHTML = null;
-      let mobileNavCleanup = () => {};
+      let mobileNavCleanup = () => { };
 
       const decorateDropdown = () => logErrorFor(async () => {
         template.removeEventListener('click', decorateDropdown);
