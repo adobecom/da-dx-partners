@@ -202,12 +202,12 @@ test.describe('Validate Partner Directory pages', () => {
       expect(newPageUrl).toContain(data.expectedSaleCenterUrl);
       const newPageSmokeTest = new SmokeTest(newPage);
       await newPageSmokeTest.homeButton.waitFor({ state: 'visible', timeout: 30000 });
-      await Promise.all([
-        newPage.waitForLoadState('domcontentloaded'),
-        newPageSmokeTest.homeButton.click(),
-      ]);
-      const homePageUrl = newPage.url();
-      expect(homePageUrl).toContain(data.homeUrl);
+      await newPageSmokeTest.homeButton.click();
+
+      await expect(newPage).toHaveURL(
+        new RegExp(data.homeUrl),
+        { timeout: 30000 },
+      );
     });
   });
   test(`${features[7].name},${features[7].tags}`, async ({ page, baseURL }) => {
