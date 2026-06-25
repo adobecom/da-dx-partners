@@ -153,34 +153,6 @@ export default class GnavPersonalisationPage {
     }
   }
 
-  // async verifyVisibleImagesNotBroken() {
-  //   const images = this.page.locator('img');
-  // const count = await images.count();
-
-  // expect(count).toBeGreaterThan(0);
-
-  // for (let i = 0; i < count; i++) {
-  //   const img = images.nth(i);
-
-  //   const result = await img.evaluate((el) => ({
-  //     src: el.currentSrc || el.src,
-  //     complete: el.complete,
-  //     naturalWidth: el.naturalWidth,
-  //   }));
-
-  //   // Preskoči slike koje još nisu učitane
-  //   if (!result.complete) {
-  //     console.log(`Skipping unloaded image: ${result.src}`);
-  //     continue;
-  //   }
-
-  //   expect(
-  //     result.naturalWidth,
-  //     `Broken image: ${result.src}`
-  //   ).toBeGreaterThan(0);
-  // }
-  // }
-
   async openPromoteSellTab() {
     await this.page.getByRole('button', { name: /Promote\s*&\s*Sell/i }).click();
     await this.page.waitForLoadState('domcontentloaded');
