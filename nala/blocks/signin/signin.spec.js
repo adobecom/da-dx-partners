@@ -272,5 +272,25 @@ export default {
         assetTitle4: 'Regression Regular DOCX Community Asset Last modified: Mar 3, 2026 Size: 5.2 MB',
       },
     },
+    {
+      tcid: '25',
+      name: '@login-invited-user-case',
+      path: 'https://partners.stage.adobe.com/digitalexperience/',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-invited-user:',
+        expectedToSeeInURL: '/s/dxp/registration',
+      },
+    },
+    {
+      tcid: '26',
+      name: '@login-partially-saved-user-case',
+      path: 'https://partners.stage.adobe.com/digitalexperience/',
+      tags: '@da-dx-signin @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-partially-saved:',
+        expectedToSeeInURL: '/s/dxp/registration',
+      },
+    },
   ],
 };

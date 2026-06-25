@@ -9,7 +9,8 @@ const loggedInAdobe = features.slice(3, 6);
 const errorFlowCases = features.slice(8, 12);
 const forbiddenAccess = features.slice(13, 15);
 const silverPlatinumPage = features.slice(15, 17);
-const downgradedUsers = features.slice(18, 25);
+const downgradedUsers = features.slice(18, 24);
+const registrationPage = features.slice(24, 26);
 
 test.describe('MAPP sign in flow', () => {
   test.beforeEach(async ({ page, browserName, baseURL, context }) => {
@@ -322,6 +323,25 @@ test.describe('MAPP sign in flow', () => {
         await expect(signInPage.assetTitleCheck(data.assetTitle3)).toBeVisible();
         await expect(signInPage.assetTitleCheck(data.assetTitle4)).toBeVisible();
       });
+    });
+  });
+  registrationPage.forEach((feature) => {
+    test(`${feature.name},${feature.tags}`, async ({ page }) => {
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${feature.path}`);
+      await page.waitForLoadState('domcontentloaded');
+    });
+
+    await test.step('Sign in', async () => {
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${feature.data.partnerLevel}`);
+    });
+    await test.step('Verify restricted news after successful login', async () => {
+      await signInPage.registrationPageBar.waitFor({ state: 'visible', timeout: 30000 });
+      const pages = await page.context().pages();
+      await expect(pages[0].url())
+        .toContain(`${feature.data.expectedToSeeInURL}`);
+    });
     });
   });
 });
