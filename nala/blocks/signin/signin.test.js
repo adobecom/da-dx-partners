@@ -327,21 +327,20 @@ test.describe('MAPP sign in flow', () => {
   });
   registrationPage.forEach((feature) => {
     test(`${feature.name},${feature.tags}`, async ({ page }) => {
-    await test.step('Go to public home page', async () => {
-      await page.goto(`${feature.path}`);
-      await page.waitForLoadState('domcontentloaded');
-    });
-
-    await test.step('Sign in', async () => {
-      await signInPage.signInButton.click();
-      await signInPage.signIn(page, `${feature.data.partnerLevel}`);
-    });
-    await test.step('Verify restricted news after successful login', async () => {
-      await signInPage.registrationPageBar.waitFor({ state: 'visible', timeout: 30000 });
-      const pages = await page.context().pages();
-      await expect(pages[0].url())
-        .toContain(`${feature.data.expectedToSeeInURL}`);
-    });
+      await test.step('Go to public home page', async () => {
+        await page.goto(`${feature.path}`);
+        await page.waitForLoadState('domcontentloaded');
+      });
+      await test.step('Sign in', async () => {
+        await signInPage.signInButton.click();
+        await signInPage.signIn(page, `${feature.data.partnerLevel}`);
+      });
+      await test.step('Verify restricted news after successful login', async () => {
+        await signInPage.registrationPageBar.waitFor({ state: 'visible', timeout: 30000 });
+        const pages = await page.context().pages();
+        await expect(pages[0].url())
+          .toContain(`${feature.data.expectedToSeeInURL}`);
+      });
     });
   });
 });
