@@ -14,6 +14,8 @@ export default class GnavPersonalisationPage {
     this.searchIcon = page.getByRole('link', { name: 'Image' }).nth(2);
     this.menageUserIcon = page.getByRole('link', { name: 'Image' }).nth(3);
     this.homeIcon = page.getByRole('link', { name: 'Image' }).nth(4);
+    this.navigationMenuButton = page.getByRole('button', { name: 'Navigation menu' });
+    this.mainMenuButton = page.getByLabel('About').locator('div').filter({ hasText: 'Main menu' });
   }
 
   getPartnerLevelSegment(partnerLevelSegmentText) {
@@ -86,6 +88,11 @@ export default class GnavPersonalisationPage {
     await this.page.waitForLoadState('domcontentloaded');
   }
 
+  async openMoreTab() {
+    await this.page.getByRole('tab', { name: 'More' }).click();
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+
   async verifyMyPartnershipVisible(visible = true) {
     const locator = this.page.getByText('My partnership', { exact: true });
     if (visible) {
@@ -102,6 +109,44 @@ export default class GnavPersonalisationPage {
     for (let i = 0; i < count; i += 1) {
       const img = images.nth(i);
       await expect(img).toBeVisible();
+      await expect
+        .poll(async () => img.evaluate((el) => el.complete && el.naturalWidth > 0))
+        .toBeTruthy();
+    }
+  }
+
+  async verifyTabPanelImagesNotBroken() {
+    const panel = this.page.getByRole('tabpanel');
+
+    await panel.scrollIntoViewIfNeeded();
+
+    await panel.evaluate(async (el) => {
+      el.scrollTop = 0;
+
+      return new Promise((resolve) => {
+        let total = 0;
+        const step = 300;
+
+        const timer = setInterval(() => {
+          el.scrollBy(0, step);
+          total += step;
+
+          if (total >= el.scrollHeight) {
+            clearInterval(timer);
+            resolve();
+          }
+        }, 100);
+      });
+    });
+
+    const images = panel.locator('img');
+    const count = await images.count();
+
+    expect(count).toBeGreaterThan(0);
+
+    for (let i = 0; i < count; i++) {
+      const img = images.nth(i);
+
       await expect
         .poll(async () => img.evaluate((el) => el.complete && el.naturalWidth > 0))
         .toBeTruthy();
@@ -261,5 +306,86 @@ export default class GnavPersonalisationPage {
     await this.openPromoteSellTab();
     await this.verifyNavMenuLinksAbsent(data.hiddenNavMenuLinks);
     await this.verifyCtaAbsent(data.hiddenCtaHref);
+  }
+
+  async verifyGnavSegments(segmentTexts) {
+    await this.navigationMenuButton.click();
+    await expect(this.gnavDropdown).toBeVisible({ timeout: 30000 });
+
+    for (const segmentText of segmentTexts) {
+      await expect(this.getSegmentsGnav(segmentText)).toBeVisible({ timeout: 30000 });
+    }
+  }
+
+  async verifyUserPageSegments(data) {
+    await expect(this.getPartnerLevelSegment(data.partnerLevelSegmentText)).toBeVisible({ timeout: 30000 });
+    await expect(this.getSegments(data.segmentBussinessSolution)).toBeVisible({ timeout: 30000 });
+    await expect(this.getSegments(data.segemntBussinessTechnology)).toBeVisible({ timeout: 30000 });
+    await expect(this.getSegments(data.segmentBillngAdmin)).toBeVisible({ timeout: 30000 });
+    await expect(this.getSegments(data.segmentDesignationType)).toBeVisible({ timeout: 30000 });
+    await expect(this.getSegments(data.segmentAdmin)).toBeVisible({ timeout: 30000 });
+  }
+
+  async verifyUserGnavSegments(data) {
+    await this.navigationMenuButton.click();
+    await expect(this.gnavDropdown).toBeVisible({ timeout: 30000 });
+
+    const segments = [
+      {
+        tab: 'Levels',
+        link: data.gnavSegmentLevel,
+      },
+      {
+        tab: 'Admin cases',
+        link: data.gnavSegmentAdmin,
+      },
+      {
+        tab: 'Designation cases',
+        link: data.gnavSegmentDesignation,
+      },
+    ];
+
+    for (const segment of segments) {
+      await this.page.getByRole('tab', { name: segment.tab }).click();
+
+      await expect(
+        this.page.getByRole('link', { name: segment.link }),
+      ).toBeVisible({ timeout: 30000 });
+    }
+  }
+
+  async verifyMobileShortcutIcons(data) {
+    await this.navigationMenuButton.click();
+    await this.verifyShortcutIconsVisible();
+    await this.verifyShortcutIconHrefs(data);
+  }
+
+  async verifyMobilePublicGnavStatus(data) {
+    await this.verifyLogoVisible();
+    await this.navigationMenuButton.click();
+    await this.verifyPartnerCtasVisible(data.visibleCtas);
+    await this.verifyShortcutIconsNotVisible();
+  }
+
+  async verifyMobilePublicGnavAboutTab(data) {
+    await this.openAboutTab();
+    await this.verifyMyPartnershipVisible(false);
+    await this.verifyPromoLinksAbsent(data.hiddenPromoLinks);
+  }
+
+  async verifyMobilePublicGnavMoreTab() {
+    await this.openMoreTab();
+    await this.verifyTabPanelImagesNotBroken();
+  }
+
+  async verifyMobileRestrictedGnavStatus(data) {
+    await this.verifyLogoVisible();
+    await this.verifyMobileShortcutIcons(data);
+    await this.verifyPartnerCtasHidden(data.hiddenCtas);
+  }
+
+  async verifyMobileRestrictedGnavAboutTab() {
+    await this.openAboutTab();
+    await this.verifyMyPartnershipVisible(true);
   }
 }
