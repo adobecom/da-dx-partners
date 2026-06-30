@@ -25,7 +25,7 @@ export default {
       data: {
         partnerLevel: 'dxp-silver:',
         searchKeyword: 'dxRegressionTest25',
-        assetTitle1: 'Asset preview Community JPG Regular Automation',
+        assetTitle1: 'Asset preview Public PDF Regular  Automation',
         assetTitle2: 'Asset preview Community JPG Regular Automation',
         assetTitle3: 'Asset preview Silver PPTX Regular Automation',
         assetTitle4: 'Asset preview Public ZIP Netstorage Automation',
@@ -235,7 +235,7 @@ export default {
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
-        cardDate: 'Jun 14, 2026',
+        cardDate: 'Jun 26, 2026',
         cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg")',
       },
     },

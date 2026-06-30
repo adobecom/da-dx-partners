@@ -525,6 +525,7 @@ test.describe('Search Page', () => {
 
     await test.step('Open Training tab', async () => {
       await searchPage.trainingButton.click();
+      await page.waitForLoadState('domcontentloaded');
       await searchPage.clickCard(searchPage.card.first());
     });
 
