@@ -14,7 +14,9 @@ export default class SoftwareDistributionPage {
   }
 
   async verifySuccessMessage(successMessage) {
-    await expect(this.page.getByText(successMessage, { exact: true })).toBeVisible({ timeout: 60000 });
+    const message = this.page.getByText(successMessage, { exact: true });
+    await message.waitFor({ state: 'visible', timeout: 60000 });
+    await expect(message).toBeVisible();
   }
 
   async clickBadRequestCta() {
@@ -23,7 +25,9 @@ export default class SoftwareDistributionPage {
   }
 
   async verifyFailMessage(failMessage) {
-    await expect(this.page.getByText(failMessage, { exact: true })).toBeVisible({ timeout: 60000 });
+    const message = this.page.getByText(failMessage, { exact: true });
+    await message.waitFor({ state: 'visible', timeout: 60000 });
+    await expect(message).toBeVisible();
   }
 
   async verifyRequestAccessButtonNotVisible() {
