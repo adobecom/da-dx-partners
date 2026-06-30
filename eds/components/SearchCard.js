@@ -1,12 +1,12 @@
 import { formatDate, getLibs } from '../scripts/utils.js';
-import { getConfig, replaceText } from '../blocks/utils/utils.js';
+import { getConfig } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
 import { dispatchCustomEventOnLinkClick } from '../blocks/utils/analyticsUtils.js';
 
 const miloLibs = getLibs();
 const config = getConfig();
-const { html, repeat, LitElement, until, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const { html, repeat, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 class SearchCard extends LitElement {
@@ -16,7 +16,18 @@ class SearchCard extends LitElement {
     data: { type: Object },
     localizedText: { type: Object },
     ietf: { type: String },
+    allTagsFlatMap: { type: Object },
   };
+
+  getTagTitle(slug) {
+    if (!this.allTagsFlatMap) return '';
+    for (const [, tagObj] of this.allTagsFlatMap) {
+      if (tagObj.tagID?.endsWith(`/${slug}`) || tagObj.tagID === slug) {
+        return tagObj.title || '';
+      }
+    }
+    return '';
+  }
 
   get cardTags() {
     const tags = this.data.arbitrary;
@@ -28,13 +39,9 @@ class SearchCard extends LitElement {
       filteredTags,
       (tag) => tag.key,
       (tag) => {
-        const key = Object.values(tag)[0];
-        const wrappedKey = `{{${key}}}`;
-        return html`${until(
-          // eslint-disable-next-line no-confusing-arrow
-          replaceText(wrappedKey, config).then((res) => res ? html`<span class="card-tag">${res}</span>` : html``),
-          html``,
-        )}`;
+        const slug = Object.values(tag)[0];
+        const title = this.getTagTitle(slug);
+        return title ? html`<span class="card-tag">${unsafeHTML(DOMPurify.sanitize(title))}</span>` : html``;
       },
     )}`;
   }

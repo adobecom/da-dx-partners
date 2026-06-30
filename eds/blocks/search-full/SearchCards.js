@@ -180,7 +180,7 @@ export default class Search extends PartnerCards {
       return html`${repeat(
         this.paginatedCards,
         (card) => card.id,
-        (card, index) => html`<search-card class="card-wrapper" daa-lh="Search Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title ?? '')}" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf}></search-card>`,
+        (card, index) => html`<search-card class="card-wrapper" daa-lh="Search Card ${index + 1} | ${processTrackingLabels(card.contentArea?.title ?? '')}" .data=${card} .localizedText=${this.blockData.localizedText} .ietf=${this.blockData.ietf} .allTagsFlatMap=${this.allTagsFlatMap}></search-card>`,
       )}`;
     }
     return html`<div class="no-results">
