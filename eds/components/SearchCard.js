@@ -19,14 +19,8 @@ class SearchCard extends LitElement {
     allTagsFlatMap: { type: Object },
   };
 
-  getTagTitle(slug) {
-    if (!this.allTagsFlatMap) return '';
-    for (const [, tagObj] of this.allTagsFlatMap) {
-      if (tagObj.tagID?.endsWith(`/${slug}`) || tagObj.tagID === slug) {
-        return tagObj.title || '';
-      }
-    }
-    return '';
+  getTagTitle(tagId) {
+    return this.allTagsFlatMap?.get(tagId)?.title || '';
   }
 
   get cardTags() {
@@ -34,13 +28,13 @@ class SearchCard extends LitElement {
     if (!tags.length) return;
     const filteredTags = tags.filter((tag) => !Object.keys(tag).includes('partnerlevel'));
     if (!filteredTags.length) return;
-    // eslint-disable-next-line consistent-return
+    
     return html`${repeat(
       filteredTags,
       (tag) => tag.key,
       (tag) => {
-        const slug = Object.values(tag)[0];
-        const title = this.getTagTitle(slug);
+        const tagId = `${Object.keys(tag)[0]}/${Object.values(tag)[0]}`;
+        const title = this.getTagTitle(tagId);
         return title ? html`<span class="card-tag">${unsafeHTML(DOMPurify.sanitize(title))}</span>` : html``;
       },
     )}`;
