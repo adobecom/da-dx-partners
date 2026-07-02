@@ -25,10 +25,9 @@ class SearchCard extends LitElement {
 
   get cardTags() {
     const tags = this.data.arbitrary;
-    if (!tags.length) return;
+    if (!tags.length) return html``;
     const filteredTags = tags.filter((tag) => !Object.keys(tag).includes('partnerlevel'));
-    if (!filteredTags.length) return;
-    
+    if (!filteredTags.length) return html``;
     return html`${repeat(
       filteredTags,
       (tag) => tag.key,
