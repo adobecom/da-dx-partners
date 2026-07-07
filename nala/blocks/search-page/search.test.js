@@ -574,6 +574,7 @@ test.describe('Search Page', () => {
       await searchPage.verifyExpandedNetstorageAsset(expandedCard, data);
     });
   });
+
   thumbnailCases.forEach((feature) => {
     test(`${feature.name},${feature.tags}`, async ({ page }) => {
       const { data } = feature;
@@ -584,6 +585,48 @@ test.describe('Search Page', () => {
       await test.step('Verify asset preview thumbnail image src', async () => {
         await searchPage.verifyImageThumbnail(data.imageThumbnail);
       });
+    });
+  });
+
+  test(`${features[23].name},${features[23].tags}`, async ({ page, context }) => {
+    const { data, path, signInPath } = features[23];
+    const sharedData = features.find((f) => f.tcid === '8')?.data;
+    let assetPage;
+    let assetSearchPage;
+
+    await test.step('Go to digitalexperience home and sign in as MAPC user', async () => {
+      await page.goto(signInPath);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Click Adobe Partner Experience Hub logo', async () => {
+      await expect(searchPage.hubLogo).toBeVisible({ timeout: 30000 });
+      await searchPage.hubLogo.click();
+      await page.waitForLoadState('domcontentloaded');
+    });
+
+    await test.step('Open restricted asset in new tab', async () => {
+      assetPage = await context.newPage();
+      assetSearchPage = new SearchPage(assetPage);
+      await assetPage.goto(path);
+      await assetPage.waitForLoadState('domcontentloaded');
+    });
+
+    await test.step('Verify asset details and restricted preview message', async () => {
+      await assetSearchPage.verifyAssetDetails(sharedData);
+      await assetSearchPage.verifyPreviewMessage(data);
+    });
+
+    await test.step('Verify register now link opens registration page', async () => {
+      const [registrationPage] = await Promise.all([
+        context.waitForEvent('page'),
+        assetSearchPage.clickLinkFromMessage(data.textBlock, data.link[0].text),
+      ]);
+      await registrationPage.waitForLoadState();
+      await expect(registrationPage).toHaveURL(data.link[0].url);
     });
   });
 });
