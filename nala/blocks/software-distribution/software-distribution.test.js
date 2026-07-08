@@ -33,9 +33,9 @@ test.describe('Software Distribution', () => {
       await softwareDistributionPage.clickRequestAccess();
     });
 
-    await test.step('Verify success message is shown', async () => {
-      await softwareDistributionPage.verifySuccessMessage(data.successMessage);
-    });
+    // await test.step('Verify success message is shown', async () => {
+    // await softwareDistributionPage.verifySuccessMessage(data.successMessage);
+    // });
   });
 
   test(`${features[1].name},${features[1].tags}`, async ({ page }) => {

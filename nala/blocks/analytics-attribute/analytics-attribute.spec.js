@@ -10,9 +10,6 @@ export default {
         partnerLevel: 'dxp-platinum:',
         searchKeyWord: 'Adobe',
         filter: 'Products',
-        checkBoxName: 'Adobe Commerce',
-        daaLh: 'Card Collection | Filters: No Filters | Search Query: None',
-        daaLhAfterSearch: 'Card Collection | Filters: Adobe Commerce | Search Query: Adobe',
       },
     },
     {

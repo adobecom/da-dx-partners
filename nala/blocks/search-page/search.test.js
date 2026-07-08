@@ -563,7 +563,7 @@ test.describe('Search Page', () => {
     await test.step('Expand netstorage asset and verify properties', async () => {
       const card = searchPage.getCardByTitle(data.cardTitle);
       await searchPage.clickCard(card);
-      await page.waitForLoadState('domcontentloaded');
+      await expect(card).toHaveClass(/expanded/, { timeout: 30000 });
 
       const expandedCard = searchPage
         .getExpandedCard()
