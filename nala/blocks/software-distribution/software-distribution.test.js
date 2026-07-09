@@ -8,13 +8,20 @@ const { features } = softwareDistributionSpec;
 let softwareDistributionPage;
 let signInPage;
 
+async function grantLocalNetworkAccess(page, browserName) {
+  if (browserName !== 'chromium') {
+    return;
+  }
+
+  await page.context().grantPermissions(['local-network-access'], { origin: new URL(page.url()).origin });
+}
 test.describe('Software Distribution', () => {
   test.beforeEach(async ({ page }) => {
     softwareDistributionPage = new SoftwareDistributionPage(page);
     signInPage = new SignInPage(page);
   });
 
-  test(`${features[0].name},${features[0].tags}`, async ({ page }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ page, browserName }) => {
     const { data } = features[0];
 
     await test.step('Go to grant download access test page', async () => {
@@ -30,12 +37,13 @@ test.describe('Software Distribution', () => {
     });
 
     await test.step('Request access to Software Distribution', async () => {
+      await grantLocalNetworkAccess(page, browserName);
       await softwareDistributionPage.clickRequestAccess();
     });
 
-    // await test.step('Verify success message is shown', async () => {
-    // await softwareDistributionPage.verifySuccessMessage(data.successMessage);
-    // });
+    await test.step('Verify success message is shown', async () => {
+      await softwareDistributionPage.verifySuccessMessage(data.successMessage);
+    });
   });
 
   test(`${features[1].name},${features[1].tags}`, async ({ page }) => {
