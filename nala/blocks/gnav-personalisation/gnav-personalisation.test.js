@@ -470,4 +470,97 @@ test.describe('Gnav Personalisation', () => {
       await gnavPersonalisationPage.verifyPublicPromoteSellPart2Absent(data);
     });
   });
+  test(`${features[19].name},${features[19].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[19];
+
+    await test.step('Go to personalization page with gnav', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Sign in as Platinum user', async () => {
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Verify segments on page', async () => {
+      await gnavPersonalisationPage.verifyUserPageSegments(data);
+    });
+
+    await test.step('Verify segments present on Gnav', async () => {
+      await gnavPersonalisationPage.verifyUserGnavSegments(data);
+    });
+  });
+  test(`${features[20].name},${features[20].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[20];
+
+    await test.step('Go to home page and Sign in', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signIn(page, data.partnerLevel);
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Verify mobile GNav shortcut icons', async () => {
+      await gnavPersonalisationPage.verifyMobileShortcutIcons(data);
+    });
+  });
+  test(`${features[21].name},${features[21].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[21];
+
+    await test.step('Go to digitalexperience home on mobile viewport', async () => {
+      const fragmentResponse = gnavPersonalisationPage.waitForPublicGnavFragment();
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      const response = await fragmentResponse;
+      expect(response.url()).toContain(data.gnavFragmentPath);
+      expect(response.status()).toBe(200);
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Validate mobile public GNav status', async () => {
+      await gnavPersonalisationPage.verifyMobilePublicGnavStatus(data);
+    });
+
+    await test.step('Validate About tab on mobile public GNav', async () => {
+      await gnavPersonalisationPage.verifyMobilePublicGnavAboutTab(data);
+    });
+
+    await test.step('Validate More tab images on mobile public GNav', async () => {
+      await gnavPersonalisationPage.verifyMobilePublicGnavMoreTab();
+    });
+  });
+  test(`${features[22].name},${features[22].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[22];
+
+    await test.step('Go to home page on mobile viewport', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Sign in as Community user', async () => {
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Validate logged-in GNav fragment and mobile restricted GNav status', async () => {
+      const fragmentResponse = gnavPersonalisationPage.waitForLoggedInGnavFragment();
+      await page.reload();
+      await page.waitForLoadState('domcontentloaded');
+      const response = await fragmentResponse;
+      expect(response.url()).toContain(data.gnavFragmentPath);
+      expect(response.status()).toBe(200);
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+      await gnavPersonalisationPage.verifyMobileRestrictedGnavStatus(data);
+    });
+
+    await test.step('Validate About tab on mobile restricted GNav', async () => {
+      await gnavPersonalisationPage.verifyMobileRestrictedGnavAboutTab();
+    });
+  });
 });

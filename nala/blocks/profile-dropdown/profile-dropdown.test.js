@@ -168,4 +168,31 @@ test.describe('Validate profile dropdown block', () => {
       await expect(secondProfileDropdownPage.partnerLevelDropdown).toHaveText(features[4].data.partnerLevelDropdown);
     });
   });
+  // @dxp-mobile-home-page-profile-dropdown
+  test(`${features[5].name},${features[5].tags}`, async ({ page }) => {
+    const { data, path } = features[5];
+
+    await test.step('Go to home page and sign in', async () => {
+      await page.goto(path);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await profileDropdownPage.profileDropdownButton.waitFor({ state: 'visible', timeout: 60000 });
+    });
+
+    await test.step('Verify profile dropdown on home page', async () => {
+      await profileDropdownPage.openProfileDropdown();
+      await expect(profileDropdownPage.profileIcon).toBeVisible();
+      await expect(profileDropdownPage.profileName).toContainText(data.profileName);
+      await expect(profileDropdownPage.profileEmail).toContainText(data.profileEmail);
+      await expect(profileDropdownPage.profileJob).toHaveText(data.profileJob);
+      await expect(profileDropdownPage.accountName).toHaveText(data.accountName);
+      await expect(profileDropdownPage.partnerLevelDropdown).toHaveText(data.partnerLevelDropdown);
+      await expect(profileDropdownPage.updateProfile).toBeVisible();
+      await expect(profileDropdownPage.updateProfile).toHaveAttribute('href', data.updateProfileLink);
+      await expect(profileDropdownPage.manageCompanyAccount).toBeVisible();
+      await expect(profileDropdownPage.manageCompanyAccount).toHaveAttribute('href', data.manageCompanyAccountLink);
+      await expect(profileDropdownPage.signOut).toBeVisible();
+    });
+  });
 });

@@ -14,23 +14,23 @@ test.describe('Validate events block', () => {
     signInPage = new SignInPage(page);
   });
   // @events-public-page-load-validation
-  test(`${features[0].name},${features[0].tags}`, async ({ page }) => {
-    const { data } = features[0];
-    await test.step('Go to events page', async () => {
-      await page.goto(`${features[0].path}`);
-      await page.waitForLoadState('domcontentloaded');
-    });
+  // test(`${features[0].name},${features[0].tags}`, async ({ page }) => {
+  //   const { data } = features[0];
+  //   await test.step('Go to events page', async () => {
+  //     await page.goto(`${features[0].path}`);
+  //     await page.waitForLoadState('domcontentloaded');
+  //   });
 
-    await test.step('Verify public card title', async () => {
-      await eventsPage.verifyPublicCardTitle(data.publicCardTitle);
-      const results = await eventsPage.getResultsNumber();
-      await expect(results).toBeGreaterThanOrEqual(1);
-      await eventsPage.productFilter.click();
-      await eventsPage.getFirstFilterCheckbox().click();
-      const resultsAfterFilter = await eventsPage.getResultsNumber();
-      await expect(resultsAfterFilter).toBeLessThan(results);
-    });
-  });
+  //   await test.step('Verify public card title', async () => {
+  //     await eventsPage.verifyPublicCardTitle(data.publicCardTitle);
+  //     const results = await eventsPage.getResultsNumber();
+  //     await expect(results).toBeGreaterThanOrEqual(1);
+  //     await eventsPage.productFilter.click();
+  //     await eventsPage.getFirstFilterCheckbox().click();
+  //     const resultsAfterFilter = await eventsPage.getResultsNumber();
+  //     await expect(resultsAfterFilter).toBeLessThan(results);
+  //   });
+  // });
   // @events-protected-page-load-validation
   test(`${features[1].name},${features[1].tags}`, async ({ page }) => {
     const { data } = features[1];

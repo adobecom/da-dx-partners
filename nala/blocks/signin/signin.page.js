@@ -25,6 +25,7 @@ export default class SignInPage {
     this.searchAllResults = page.getByRole('button', { name: 'All', exact: true });
     this.loader = page.locator('.progress-circle-wrapper');
     this.cardWrapper = page.locator('.card-wrapper').nth(0);
+    this.registrationPageBar = page.locator('.dxp-reg-top-bar');
   }
 
   async signIn(page, partnerLevel) {
