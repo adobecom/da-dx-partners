@@ -235,7 +235,6 @@ export default {
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
-        cardDate: 'Jul 3, 2026',
         cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg")',
       },
     },

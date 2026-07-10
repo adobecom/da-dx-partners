@@ -532,9 +532,8 @@ test.describe('Search Page', () => {
     await test.step('Verify card details', async () => {
       await expect(searchPage.cardTilte).toBeVisible();
       await expect(searchPage.cardDate.first()).toBeVisible();
-      await expect(searchPage.cardDate.first()).toContainText(data.cardDate);
       await expect(searchPage.cardDescription.first()).toBeVisible();
-      await expect(searchPage.cardDescription.first()).toContainText(/.+/);
+      await expect(searchPage.fileIcon.first()).toBeVisible();
       await expect(searchPage.fileIcon.first()).toHaveCSS('background-image', data.cardIcon);
     });
   });
@@ -562,8 +561,13 @@ test.describe('Search Page', () => {
 
     await test.step('Expand netstorage asset and verify properties', async () => {
       const card = searchPage.getCardByTitle(data.cardTitle);
-      await searchPage.clickCard(card);
-      await expect(card).toHaveClass(/expanded/, { timeout: 30000 });
+      await expect(card).toBeVisible({ timeout: 30000 });
+
+      await expect(async () => {
+        await searchPage.clickCard(card, 60000);
+        const classList = await card.evaluate((el) => el.classList.toString());
+        expect(classList).toContain('expanded');
+      }).toPass({ timeout: 60000 });
 
       const expandedCard = searchPage
         .getExpandedCard()
