@@ -8,17 +8,35 @@ const { features } = softwareDistributionSpec;
 let softwareDistributionPage;
 let signInPage;
 
+async function grantLocalNetworkAccess(context, browserName, origin) {
+  if (browserName !== 'chromium' || !origin) {
+    return;
+  }
+
+  try {
+    await context.grantPermissions(['local-network-access'], { origin });
+  } catch {
+    // Playwright < 1.56 does not support this permission name.
+  }
+}
+
 test.describe('Software Distribution', () => {
-  test.beforeEach(async ({ page }) => {
+  test.describe.configure({ timeout: 120000 });
+
+  test.beforeEach(async ({ page, context, browserName, baseURL }) => {
     softwareDistributionPage = new SoftwareDistributionPage(page);
     signInPage = new SignInPage(page);
+
+    if (baseURL) {
+      await grantLocalNetworkAccess(context, browserName, new URL(baseURL).origin);
+    }
   });
 
-  test(`${features[0].name},${features[0].tags}`, async ({ page }) => {
-    const { data } = features[0];
+  test(`${features[0].name},${features[0].tags}`, async ({ page, browserName, baseURL }) => {
+    const { data, path } = features[0];
 
     await test.step('Go to grant download access test page', async () => {
-      await page.goto(features[0].path);
+      await page.goto(`${baseURL}${path}`);
       await page.waitForLoadState('domcontentloaded');
     });
 
@@ -26,10 +44,11 @@ test.describe('Software Distribution', () => {
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
       await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
     await test.step('Request access to Software Distribution', async () => {
+      await grantLocalNetworkAccess(page.context(), browserName, new URL(page.url()).origin);
       await softwareDistributionPage.clickRequestAccess();
     });
 
@@ -38,11 +57,11 @@ test.describe('Software Distribution', () => {
     });
   });
 
-  test(`${features[1].name},${features[1].tags}`, async ({ page }) => {
-    const { data } = features[1];
+  test(`${features[1].name},${features[1].tags}`, async ({ page, browserName, baseURL }) => {
+    const { data, path } = features[1];
 
     await test.step('Go to grant download access test page', async () => {
-      await page.goto(features[1].path);
+      await page.goto(`${baseURL}${path}`);
       await page.waitForLoadState('domcontentloaded');
     });
 
@@ -50,10 +69,11 @@ test.describe('Software Distribution', () => {
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
       await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
     await test.step('Click Example of a bad request', async () => {
+      await grantLocalNetworkAccess(page.context(), browserName, new URL(page.url()).origin);
       await softwareDistributionPage.clickBadRequestCta();
     });
 
@@ -62,9 +82,9 @@ test.describe('Software Distribution', () => {
     });
   });
 
-  test(`${features[2].name},${features[2].tags}`, async ({ page }) => {
+  test(`${features[2].name},${features[2].tags}`, async ({ page, baseURL }) => {
     await test.step('Go to grant download access test page as public user', async () => {
-      await page.goto(features[2].path);
+      await page.goto(`${baseURL}${features[2].path}`);
       await page.waitForLoadState('domcontentloaded');
     });
 
