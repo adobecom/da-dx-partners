@@ -285,6 +285,21 @@ export function isPartnerNewlyRegistered() {
   return differenceInMilliseconds > 0 && differenceInDays < 31;
 }
 
+export function isPartnerNewlyApproved() {
+  if (!isMember()) return false;
+
+  const firstApproveDate = getPartnerCookieValue('firstapprovedate');
+
+  if (!firstApproveDate) return false;
+
+  const approveDate = new Date(firstApproveDate);
+  const now = new Date();
+
+  const differenceInMilliseconds = now - approveDate;
+  const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
+  return differenceInMilliseconds > 0 && differenceInDays < 31;
+}
+
 export function partnerIsSignedIn() {
   return getCookieValue('partner_data');
 }
