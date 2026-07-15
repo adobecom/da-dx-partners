@@ -287,8 +287,7 @@ export function isPartnerNewlyRegistered() {
 
 export function isPartnerNewlyApproved() {
   if (!isMember()) return false;
-
-
+  
   const firstApproveDate = getPartnerCookieValue('newlyapproveddate');
 
   if (!firstApproveDate) return false;
