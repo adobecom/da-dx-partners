@@ -970,19 +970,6 @@ class Gnav {
     const accessToken = window.adobeIMS.getAccessToken();
     const { env } = getConfig();
 
-
-
-    if (!profileData.ok) {
-      lanaLog({
-        message: 'GNAV: decorateProfile has failed to fetch profile data',
-        e: `${profileData.statusText} url: ${profileData.url}`,
-        tags: 'gnav',
-        errorType: 'i',
-        severity: 'error',
-      });
-      return;
-    }
-
     // remove this block after https://github.com/adobecom/milo/pull/6222 is merged
     let { adobeIO } = env;
     if (adobeIO.includes('cc-collab')) {
@@ -1016,6 +1003,17 @@ class Gnav {
       'x-api-key': window.adobeid?.client_id,
     });
     const profileData = await fetch(`https://${adobeIO}/api/profile`, { headers });
+
+    if (!profileData.ok) {
+      lanaLog({
+        message: 'GNAV: decorateProfile has failed to fetch profile data',
+        e: `${profileData.statusText} url: ${profileData.url}`,
+        tags: 'gnav',
+        errorType: 'i',
+        severity: 'error',
+      });
+      return;
+    }
 
     const profileJson = await profileData.json();
     const avatar = profileJson?.images?.['138'] || '';
