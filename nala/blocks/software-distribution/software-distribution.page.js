@@ -5,6 +5,45 @@ export default class SoftwareDistributionPage {
     this.page = page;
     this.requestAccessButton = page.getByRole('link', { name: 'Request access to Software Distribution' });
     this.badRequestCta = page.getByRole('link', { name: 'Example of a bad request' });
+    this.apiLogs = [];
+  }
+
+  startApiCapture() {
+    this.apiLogs = [];
+
+    const isApiRequest = (request) => ['fetch', 'xhr'].includes(request.resourceType());
+
+    const onRequest = (request) => {
+      if (isApiRequest(request)) {
+        this.apiLogs.push(`REQUEST ${request.method()} ${request.url()}`);
+      }
+    };
+
+    const onResponse = (response) => {
+      const request = response.request();
+      if (isApiRequest(request)) {
+        this.apiLogs.push(`RESPONSE ${response.status()} ${request.method()} ${response.url()}`);
+      }
+    };
+
+    const onRequestFailed = (request) => {
+      if (isApiRequest(request)) {
+        this.apiLogs.push(
+          `FAILED ${request.method()} ${request.url()} ${request.failure()?.errorText ?? 'unknown error'}`,
+        );
+      }
+    };
+
+    const onConsole = (message) => {
+      if (message.type() === 'error') {
+        this.apiLogs.push(`BROWSER ERROR ${message.text()}`);
+      }
+    };
+
+    this.page.on('request', onRequest);
+    this.page.on('response', onResponse);
+    this.page.on('requestfailed', onRequestFailed);
+    this.page.on('console', onConsole);
   }
 
   getMessage(messageText) {

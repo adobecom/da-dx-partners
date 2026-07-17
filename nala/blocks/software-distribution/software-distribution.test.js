@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import SoftwareDistributionPage from './software-distribution.page.js';
 import softwareDistributionSpec from './software-distribution.spec.js';
 import SignInPage from '../signin/signin.page.js';
@@ -7,6 +7,8 @@ const { features } = softwareDistributionSpec;
 
 let softwareDistributionPage;
 let signInPage;
+
+test.use({ launchOptions: { args: ['--disable-features=LocalNetworkAccessChecks'] } });
 
 async function grantLocalNetworkAccess(context, browserName, origin) {
   if (browserName !== 'chromium' || !origin) {
@@ -32,7 +34,7 @@ test.describe('Software Distribution', () => {
     }
   });
 
-  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     const { data, path } = features[0];
 
     await test.step('Go to grant download access test page', async () => {
@@ -48,12 +50,19 @@ test.describe('Software Distribution', () => {
     });
 
     await test.step('Request access to Software Distribution', async () => {
-      const [checkmarkResponse] = await Promise.all([
-        page.waitForResponse((response) => response.url().includes('/eds/img/icons/checkmark.svg') && response.status() === 200),
-        softwareDistributionPage.clickRequestAccess(),
-      ]);
-      await checkmarkResponse.finished();
-      expect(checkmarkResponse.status()).toBe(200);
+      // const [checkmarkResponse] = await Promise.all([
+      //   page.waitForResponse((response) => response.url().includes('/eds/img/icons/checkmark.svg') && response.status() === 200),
+      //   softwareDistributionPage.clickRequestAccess(),
+      // ]);
+      // await checkmarkResponse.finished();
+      // expect(checkmarkResponse.status()).toBe(200);
+      await grantLocalNetworkAccess(page.context(), browserName, new URL(page.url()).origin);
+      await softwareDistributionPage.clickRequestAccess();
+    });
+
+    await test.step('Verify success message is shown', async () => {
+      console.log('[software-distribution] requests before success validation:', softwareDistributionPage.apiLogs);
+      await softwareDistributionPage.verifySuccessMessage(data.successMessage);
     });
   });
 
