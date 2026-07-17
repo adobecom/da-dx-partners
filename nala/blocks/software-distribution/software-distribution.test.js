@@ -50,18 +50,12 @@ test.describe('Software Distribution', () => {
     });
 
     await test.step('Request access to Software Distribution', async () => {
-      // const [checkmarkResponse] = await Promise.all([
-      //   page.waitForResponse((response) => response.url().includes('/eds/img/icons/checkmark.svg') && response.status() === 200),
-      //   softwareDistributionPage.clickRequestAccess(),
-      // ]);
-      // await checkmarkResponse.finished();
-      // expect(checkmarkResponse.status()).toBe(200);
       await grantLocalNetworkAccess(page.context(), browserName, new URL(page.url()).origin);
+      await softwareDistributionPage.mockGrantDownloadAccessResponse(200);
       await softwareDistributionPage.clickRequestAccess();
     });
 
     await test.step('Verify success message is shown', async () => {
-      console.log('[software-distribution] requests before success validation:', softwareDistributionPage.apiLogs);
       await softwareDistributionPage.verifySuccessMessage(data.successMessage);
     });
   });
