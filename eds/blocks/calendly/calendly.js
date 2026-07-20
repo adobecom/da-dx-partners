@@ -19,8 +19,7 @@ const CALENDLY_ERROR_TOAST = {
   toastNegative: 'Unable to save your booking. Please contact support if the issue persists.',
 };
 
-const CALENDLY_DOUBLE_BOOKING_TOAST = {
-  toastNegative: 'A session is already scheduled for your account. Our team will reach out to help coordinate your bookings.',
+const CALENDLY_DOUBLE_BOOKING_TOAST = {toastNegative: 'A session is already scheduled for your account. Our team will reach out to help coordinate your bookings.',
 };
 
 const delay = (ms) => new Promise((resolve) => {
