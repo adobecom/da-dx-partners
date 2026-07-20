@@ -31,7 +31,7 @@ describe('tag-data.js', () => {
       const entry = tags.find((t) => t.name === 'content-type');
       expect(entry).toBeDefined();
       expect(entry.path).toBe('/content-type');
-      expect(entry.activeTag).toBe('');
+      expect(entry.activeTag).toBe('caas');
       expect(entry.title).toBeTruthy();
       expect(entry.details['jcr:primaryType']).toBe('cq:Tag');
     });
@@ -40,7 +40,7 @@ describe('tag-data.js', () => {
       const tags = await getTags('content-type');
       expect(Array.isArray(tags)).toBe(true);
       tags.forEach((tag) => {
-        expect(tag.activeTag).toBe('content-type');
+        expect(tag.activeTag).toBe('caas/content-type');
         expect(tag.path.startsWith('content-type/')).toBe(true);
       });
     });
