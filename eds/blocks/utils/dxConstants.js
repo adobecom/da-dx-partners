@@ -1,6 +1,7 @@
 import { getPartnerCookieValue } from '../../scripts/utils.js';
 
 export const RT_SEARCH_ACTION_PATH = '/api/v1/web/dx-partners-runtime/search-dxp?';
+export const RT_DXP_STATE_MANAGEMENT_PATH = '/api/v1/web/dx-partners-runtime/dxp-state-management';
 
 export const DX_PROGRAM_TYPE = 'dxp';
 

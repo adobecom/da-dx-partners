@@ -1,3 +1,5 @@
+import { updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
+
 let calendlyScriptPromise;
 
 function loadCalendlyScript() {
@@ -26,22 +28,16 @@ function getLinkValue(columns) {
 function isCalendlyEvent(e) {
   return e.origin === 'https://calendly.com' && e.data?.event?.startsWith('calendly.');
 }
-function trackCalendlyEvent(e) {
+async function trackCalendlyEvent(e) {
   if (!isCalendlyEvent(e)) return;
   const { event, payload } = e.data;
   // send to analytics here
   console.log('[Calendly]', event, payload);
-  // todo send req to runtime to update crm data that event is scheduled, example:
-  // Calendly Event: calendly.event_scheduled
-  //
-  // {
-  //   "event": {
-  //   "uri": "https://api.calendly.com/scheduled_events/ef8c7e60-6055-407b-9f29-c5436dcf3285"
-  // },
-  //   "invitee": {
-  //   "uri": "https://api.calendly.com/scheduled_events/ef8c7e60-6055-407b-9f29-c5436dcf3285/invitees/7cf8da55-9460-4509-b56a-24cd9cb30ad1"
-  // }
-  // }
+  if (event === 'calendly.event_scheduled') {
+    await updatePartnerAccountState({
+      calendly: payload?.event?.uri || 'scheduled',
+    });
+  }
 }
 function initCalendly(link, parentElement) {
   window.Calendly.initInlineWidget({

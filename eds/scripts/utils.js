@@ -20,6 +20,8 @@ export const PARTNER_AGREEMENT_POPUP = 'dxp:partnerAgreement';
 export const PORTAL_MESSAGING_POPUP = 'dxp:portalMessaging';
 export const CERTIFICATION_POPUP = 'dxp:certificationExpires';
 export const NEXT_POPUP_PLACEHOLDER = 'dxp:nextPopupPlaceholder';
+export const PARTNER_USER_STATE_COOKIE = 'partner_user_state';
+export const PARTNER_ACCOUNT_STATE_COOKIE = 'partner_account_state';
 
 /**
  * The decision engine for where to get Milo's libs from.
@@ -253,6 +255,47 @@ export function getPartnerCookieObject(programType) {
   };
 
   return portalData;
+}
+
+
+export function getPartnerStateCookieObject(cookieName, programType = DX_PROGRAM_TYPE) {
+  try {
+    if (!programType) {
+      programType = getCurrentProgramType();
+    }
+    const cookieValue = getCookieValue(cookieName);
+    if (!cookieValue) return null;
+
+    const stateByProgram = JSON.parse(decodeURIComponent(cookieValue));
+    const programState = stateByProgram?.[programType.toUpperCase()];
+
+    if (!programState || typeof programState !== 'object' || Array.isArray(programState)) {
+      return null;
+    }
+
+    return programState;
+  } catch (error) {
+    console.error(`Error parsing ${cookieName}:`, error);
+    return null;
+  }
+}
+
+export function getPartnerUserState(programType) {
+  return getPartnerStateCookieObject(PARTNER_USER_STATE_COOKIE, programType);
+}
+
+export function getPartnerAccountState(programType) {
+  return getPartnerStateCookieObject(PARTNER_ACCOUNT_STATE_COOKIE, programType);
+}
+
+export function hasPartnerAccountStateProperty(key, programType) {
+  const accountState = getPartnerAccountState(programType);
+  if (!accountState) return false;
+  return Object.prototype.hasOwnProperty.call(accountState, key);
+}
+
+export function hasPartnerAccountStateCalendly(programType) {
+  return hasPartnerAccountStateProperty('calendly', programType);
 }
 
 export function hasSalesCenterAccess() {
