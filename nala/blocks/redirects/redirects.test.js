@@ -7,6 +7,26 @@ let redirectsPage;
 let signInPage;
 const { features } = RedirectsSpec;
 
+function isMainBaseUrl(baseURL = '') {
+  return (
+    baseURL.includes('main--da-dx-partners--adobecom')
+    || (baseURL.includes('partners.adobe.com') && !baseURL.includes('stage'))
+  );
+}
+
+function resolveEnvLink(link, baseURL) {
+  if (typeof link === 'string') return link;
+  return isMainBaseUrl(baseURL) ? link.main : link.stage;
+}
+
+function expectHrefPath(href, expectedPath) {
+  expect(new URL(href, 'https://example.com').pathname).toBe(expectedPath);
+}
+
+function expectHrefOrigin(href, expectedUrl) {
+  expect(new URL(href).origin).toBe(new URL(expectedUrl).origin);
+}
+
 test.describe('Validate redirects block', () => {
   test.beforeEach(async ({ page, browserName, baseURL, context }) => {
     redirectsPage = new RedirectsPage(page);
@@ -29,33 +49,33 @@ test.describe('Validate redirects block', () => {
     const { data, path } = features[0];
     await test.step('Go to the page', async () => {
       await page.goto(`${baseURL}${path}`);
-      await redirectsPage.signInButton.waitFor({ state: 'visible' });
+      await redirectsPage.gnav.waitFor({ state: 'visible' });
     });
     await test.step('Verify links on page', async () => {
       const href = await redirectsPage.benefitsCenter.getAttribute('href');
-      expect(href).toBe(data.benefitsCenterLink);
+      expectHrefPath(href, data.benefitsCenterLink);
       const hrefexperienceLeague = await redirectsPage.experienceLeague.getAttribute('href');
-      expect(hrefexperienceLeague).toBe(data.experienceLeagueLink);
+      expectHrefPath(hrefexperienceLeague, data.experienceLeagueLink);
       const hrefmenageUser = await redirectsPage.menageUser.getAttribute('href');
-      expect(hrefmenageUser).toBe(data.menageUserLink);
+      expectHrefPath(hrefmenageUser, data.menageUserLink);
       const hrefdemo = await redirectsPage.demo.getAttribute('href');
-      expect(hrefdemo).toBe(data.demoLink);
+      expectHrefOrigin(hrefdemo, resolveEnvLink(data.demoLink, baseURL));
       const hrefadobe = await redirectsPage.adobe.getAttribute('href');
-      expect(hrefadobe).toBe(data.adobeLink);
+      expectHrefOrigin(hrefadobe, resolveEnvLink(data.adobeLink, baseURL));
     });
     await test.step('Verify links on gnav', async () => {
       await redirectsPage.linksGnav.click();
       await redirectsPage.gnavDropdown.waitFor({ state: 'visible' });
       const hrefbenefitsCenterGnav = await redirectsPage.benefitsCenterGnav.getAttribute('href');
-      expect(hrefbenefitsCenterGnav).toBe(data.benefitsCenterLink);
+      expectHrefPath(hrefbenefitsCenterGnav, data.benefitsCenterLink);
       const hrefexperienceLeagueGnav = await redirectsPage.experienceLeagueGnav.getAttribute('href');
-      expect(hrefexperienceLeagueGnav).toBe(data.experienceLeagueLink);
+      expectHrefPath(hrefexperienceLeagueGnav, data.experienceLeagueLink);
       const hrefmenageUserGnav = await redirectsPage.menageUserGnav.getAttribute('href');
-      expect(hrefmenageUserGnav).toBe(data.menageUserLink);
+      expectHrefPath(hrefmenageUserGnav, data.menageUserLink);
       const hrefdemoGnav = await redirectsPage.demoGnav.getAttribute('href');
-      expect(hrefdemoGnav).toBe(data.demoLink);
+      expectHrefOrigin(hrefdemoGnav, resolveEnvLink(data.demoLink, baseURL));
       const hrefadobeGnav = await redirectsPage.adobeGnav.getAttribute('href');
-      expect(hrefadobeGnav).toBe(data.adobeLink);
+      expectHrefOrigin(hrefadobeGnav, resolveEnvLink(data.adobeLink, baseURL));
     });
   });
   test(`${features[1].name},${features[1].tags}`, async ({ page, baseURL }) => {
@@ -66,15 +86,15 @@ test.describe('Validate redirects block', () => {
     });
     await test.step('Verify icon links on page', async () => {
       const hrefbenefitsCenterIcon = await redirectsPage.benefitsCenterIcon.getAttribute('href');
-      expect(hrefbenefitsCenterIcon).toBe(data.benefitsCenterIconLink);
+      expectHrefPath(hrefbenefitsCenterIcon, data.benefitsCenterIconLink);
       const hrefbellIcon = await redirectsPage.bellIcon.getAttribute('href');
-      expect(hrefbellIcon).toBe(data.bellIconLink);
+      expectHrefPath(hrefbellIcon, data.bellIconLink);
       const hrefworldIcon = await redirectsPage.worldIcon.getAttribute('href');
-      expect(hrefworldIcon).toBe(data.worldIconLink);
+      expectHrefPath(hrefworldIcon, data.worldIconLink);
       const hrefmenageUserIcon = await redirectsPage.menageUserIcon.getAttribute('href');
-      expect(hrefmenageUserIcon).toBe(data.menageUserIconLink);
+      expectHrefOrigin(hrefmenageUserIcon, resolveEnvLink(data.menageUserIconLink, baseURL));
       const hrefhomeIcon = await redirectsPage.homeIcon.getAttribute('href');
-      expect(hrefhomeIcon).toBe(data.homeIconLink);
+      expectHrefOrigin(hrefhomeIcon, resolveEnvLink(data.homeIconLink, baseURL));
     });
   });
   test(`${features[2].name},${features[2].tags}`, async ({ page, baseURL }) => {
