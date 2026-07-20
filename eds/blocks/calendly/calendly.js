@@ -129,7 +129,9 @@ async function trackCalendlyEvent(e) {
 }
 
 function getCalendlyPrefill(companyQuestionKey = 'a1') {
-  const { firstName, lastName, email, accountName } = getPartnerCookieObject(getCurrentProgramType()) || {};
+  const { firstName, lastName, email, accountName } = getPartnerCookieObject(
+    getCurrentProgramType(),
+  ) || {};
   const prefill = {};
 
   if (firstName) prefill.firstName = firstName;

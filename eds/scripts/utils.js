@@ -260,11 +260,9 @@ function getComplexQueryParams(el) {
   return fullQuery;
 }
 
-export function getPartnerStateCookieObject(cookieName, programType = DX_PROGRAM_TYPE) {
+export function getPartnerStateCookieObject(cookieName) {
   try {
-    if (!programType) {
-      programType = getCurrentProgramType();
-    }
+    const programType = getCurrentProgramType();
     const cookieValue = getCookieValue(cookieName);
     if (!cookieValue) return null;
 
@@ -282,22 +280,22 @@ export function getPartnerStateCookieObject(cookieName, programType = DX_PROGRAM
   }
 }
 
-export function getPartnerUserState(programType) {
-  return getPartnerStateCookieObject(PARTNER_USER_STATE_COOKIE, programType);
+export function getPartnerUserState() {
+  return getPartnerStateCookieObject(PARTNER_USER_STATE_COOKIE);
 }
 
-export function getPartnerAccountState(programType) {
-  return getPartnerStateCookieObject(PARTNER_ACCOUNT_STATE_COOKIE, programType);
+export function getPartnerAccountState() {
+  return getPartnerStateCookieObject(PARTNER_ACCOUNT_STATE_COOKIE);
 }
 
-export function hasPartnerAccountStateProperty(key, programType) {
-  const accountState = getPartnerAccountState(programType);
+export function hasPartnerAccountStateProperty(key) {
+  const accountState = getPartnerAccountState();
   if (!accountState) return false;
   return Object.prototype.hasOwnProperty.call(accountState, key);
 }
 
-export function hasPartnerAccountStateCalendly(programType) {
-  return hasPartnerAccountStateProperty('calendly', programType);
+export function hasPartnerAccountStateCalendly() {
+  return hasPartnerAccountStateProperty('calendly');
 }
 
 export function hasSalesCenterAccess() {
