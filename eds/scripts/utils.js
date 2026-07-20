@@ -260,23 +260,6 @@ function getComplexQueryParams(el) {
   return fullQuery;
 }
 
-export function getPartnerCookieObject(programType) {
-  const partnerDataCookie = getCookieValue('partner_data');
-  const partnerInfoCookie = getCookieValue('partner_info');
-
-  const partnerDataObj = partnerDataCookie ? JSON.parse(decodeURIComponent(partnerDataCookie)) : {};
-  const partnerInfoObj = partnerInfoCookie ? JSON.parse(decodeURIComponent(partnerInfoCookie)) : {};
-
-  const programKey = programType.toUpperCase();
-  const portalData = {
-    ...(partnerDataObj?.[programKey] ?? {}),
-    ...partnerInfoObj
-  };
-
-  return portalData;
-}
-
-
 export function getPartnerStateCookieObject(cookieName, programType = DX_PROGRAM_TYPE) {
   try {
     if (!programType) {
