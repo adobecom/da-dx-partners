@@ -3,18 +3,10 @@ import DA_SDK from 'https://da.live/nx/utils/sdk.js';
 import './tag-browser.js';
 import { getTags, getRootTags } from './tag-data.js';
 
-function showError(message, link = null) {
+function showError(message) {
   const mainElement = document.body.querySelector('main');
   const errorMessage = document.createElement('p');
   errorMessage.textContent = message;
-
-  if (link) {
-    const linkEl = document.createElement('a');
-    linkEl.textContent = 'View Here';
-    linkEl.href = link;
-    linkEl.target = '_blank';
-    errorMessage.append(linkEl);
-  }
 
   const reloadButton = document.createElement('button');
   reloadButton.textContent = 'Reload';
