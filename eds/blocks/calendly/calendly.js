@@ -1,4 +1,5 @@
 import { updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
+import { getCurrentProgramType, getPartnerCookieObject } from '../../scripts/utils.js';
 
 let calendlyScriptPromise;
 
@@ -39,25 +40,53 @@ async function trackCalendlyEvent(e) {
     });
   }
 }
-function initCalendly(link, parentElement) {
+function getCalendlyPrefill(companyQuestionKey = 'a1') {
+  const { firstName, lastName, email, accountName } = getPartnerCookieObject(getCurrentProgramType()) || {};
+  const prefill = {};
+
+  if (firstName) {
+    prefill.firstName = firstName;
+  }
+  if (lastName) {
+    prefill.lastName = lastName;
+  }
+
+  if (email) {
+    prefill.email = email;
+  };
+
+  if (accountName && /^a(?:[1-9]|10)$/.test(companyQuestionKey)) {
+    prefill.customAnswers = { [companyQuestionKey]: accountName };
+  }
+
+  return prefill;
+}
+
+function initCalendly(link, parentElement, companyQuestionKey) {
+  const prefill = getCalendlyPrefill(companyQuestionKey);
   window.Calendly.initInlineWidget({
     url: link,
     parentElement,
     resize: true,
+    ...(Object.keys(prefill).length && { prefill }),
   });
 }
 function setBlockData(tableRows) {
-  const blockData = { schedulingLink: '' };
+  const blockData = { schedulingLink: '', companyQuestionKey: 'a1' };
   Array.from(tableRows).forEach((row) => {
     const columns = row.children;
-    if (getPropertyName(columns) === 'scheduling-link') {
+    const propertyName = getPropertyName(columns);
+    if (propertyName === 'scheduling-link') {
       blockData.schedulingLink = getLinkValue(columns);
+    }
+    if (propertyName === 'company-question-key') {
+      blockData.companyQuestionKey = columns[1].textContent.trim().toLowerCase();
     }
   });
   return blockData;
 }
 export default async function init(el) {
-  const { schedulingLink } = setBlockData(el.children);
+  const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
   const calendlyEmbed = document.createElement('div');
   calendlyEmbed.className = 'calendly-embed';
   calendlyEmbed.setAttribute('style', 'min-width:320px;height:700px;');
@@ -67,9 +96,8 @@ export default async function init(el) {
 
   try {
     await loadCalendlyScript();
-    // todo if calendly link is invalid, it will show calendly not found page ... is that acceptable ?
     // validating url before init would affect performance
-    initCalendly(schedulingLink, calendlyEmbed);
+    initCalendly(schedulingLink, calendlyEmbed, companyQuestionKey);
     window.addEventListener('message', trackCalendlyEvent);
   } catch (e) {
     // eslint-disable-next-line no-console
