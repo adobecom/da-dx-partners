@@ -25,6 +25,7 @@ export default class SignInPage {
     this.searchAllResults = page.getByRole('button', { name: 'All', exact: true });
     this.loader = page.locator('.progress-circle-wrapper');
     this.cardWrapper = page.locator('.card-wrapper').nth(0);
+    this.registrationPageBar = page.locator('.dxp-reg-top-bar');
   }
 
   async signIn(page, partnerLevel) {
@@ -78,17 +79,17 @@ export default class SignInPage {
         latestAgreementAccepted: latestAgreementAccepted === 'true',
         latestAgreementAcceptedVersion,
         level: partnerLevel,
-        isAdmin: isAdmin,
+        isAdmin,
         primaryBusiness: JSON.parse(primaryBusiness),
         primaryContact: primaryContact === 'true',
         primaryJobRole,
         purchasedPartnerLevel,
         salesCenterAccess: salesCenterAccess === 'true',
-        specialState: specialState,
+        specialState,
         status,
       },
     };
-    
+
     await this.context.addCookies([{
       name: 'partner_data',
       value: JSON.stringify(cookieData),
@@ -99,7 +100,7 @@ export default class SignInPage {
   async waitForResultsToSettle() {
     await this.loader.waitFor({ state: 'hidden', timeout: 30000 });
   }
-  
+
   assetTitleCheck(assetTitle) {
     return this.page.getByText(assetTitle);
   }

@@ -1,17 +1,16 @@
-import { CAAS_TAGS_URL, getLibs, prodHosts } from '../scripts/utils.js';
+import { CAAS_TAGS_URL, getLibs, prodHosts, loadPageToAnchor } from '../scripts/utils.js';
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
 import { dispatchCustomEventOnSearch } from '../blocks/utils/analyticsUtils.js';
+import DOMPurify from '../libs/deps/purify-wrapper.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, repeat, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 export default class PartnerCards extends LitElement {
-  static designMap = {
-    'half height card': 'single-partner-card--half-height'
-  };
+  static designMap = { 'half height card': 'single-partner-card--half-height' };
 
   static caasUrl;
 
@@ -115,10 +114,9 @@ export default class PartnerCards extends LitElement {
         if (!filterKey || !filterTagsKeys.length) return;
 
         const isCaasTag = filterTagsKeys[0]?.includes('caas:');
-        const getTagValue = (tagKey) =>
-          isCaasTag
-            ? this.allTagsFlatMap?.get(tagKey)?.title
-            : this.blockData.localizedText[`{{${tagKey}}}`];
+        const getTagValue = (tagKey) => (isCaasTag
+          ? this.allTagsFlatMap?.get(tagKey)?.title
+          : this.blockData.localizedText[`{{${tagKey}}}`]);
 
         const filterObj = {
           key: filterKey,
@@ -131,6 +129,7 @@ export default class PartnerCards extends LitElement {
             paramValue: tagKey.includes('-&-') ? tagKey.replace('-&-', '-and-') : null,
           })).filter((a) => {
             if (!a.value) {
+              // eslint-disable-next-line no-console
               console.log('Tag not valid', a);
             }
             return a.value;
@@ -147,6 +146,7 @@ export default class PartnerCards extends LitElement {
             ...tag,
             tags: tag.tags.filter((a) => {
               if (!a.value) {
+                // eslint-disable-next-line no-console
                 console.log('Tag not valid', a);
               }
               return a.value;
@@ -211,7 +211,7 @@ export default class PartnerCards extends LitElement {
         const [filtersPanelEl] = cols;
         const filtersPanel = filtersPanelEl.innerText.trim().toLowerCase().replace(/ /g, '-');
         this.blockData.filtersPanel = filtersPanel;
-      }
+      },
     };
 
     const rows = Array.from(this.blockData.tableData);
@@ -230,7 +230,7 @@ export default class PartnerCards extends LitElement {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  onViewUpdate() {}
+  onViewUpdate() { }
 
   async firstUpdated() {
     if (!this.blockData.filters) {
@@ -244,6 +244,23 @@ export default class PartnerCards extends LitElement {
     this.additionalFirstUpdated();
     this.initUrlSearchParams();
     this.handleActions();
+
+    if (window.location.hash) {
+      await this.updateComplete;
+
+      const childCards = [...this.querySelectorAll('single-partner-card, single-partner-card-half-height, search-card')];
+      await Promise.all(childCards.map((card) => card.updateComplete));
+
+      if (document.readyState !== 'complete') {
+        await new Promise((resolve) => { window.addEventListener('load', resolve, { once: true }); });
+      }
+
+      if (document.fonts) await document.fonts.ready;
+      await new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      });
+      loadPageToAnchor();
+    }
   }
 
   // gets text content from node,
@@ -265,7 +282,7 @@ export default class PartnerCards extends LitElement {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  additionalFirstUpdated() {}
+  additionalFirstUpdated() { }
 
   mergeTagAndArbitraryFilters(card) {
     const filterTagMap = new Map(
@@ -313,7 +330,7 @@ export default class PartnerCards extends LitElement {
           card.orderNum = index + 1;
           this.mergeTagAndArbitraryFilters(card);
           card.arbitrary?.forEach((filter) => {
-            if(Object.keys(filter).length === 0){
+            if (Object.keys(filter).length === 0) {
               return;
             }
             const [key, value] = Object.entries(filter)[0]; // Extract key-value pair
@@ -336,7 +353,7 @@ export default class PartnerCards extends LitElement {
   }
 
   // eslint-disable-next-line class-methods-use-this, no-unused-vars
-  onDataFetched(apiData) {}
+  onDataFetched(apiData) { }
 
   // eslint-disable-next-line class-methods-use-this
   getFetchOptions() { return {}; }
@@ -381,7 +398,7 @@ export default class PartnerCards extends LitElement {
       </div>`;
     }
 
-    if(this.blockData.cardDesign === PartnerCards.designMap['half height card']) {
+    if (this.blockData.cardDesign === PartnerCards.designMap['half height card']) {
       return html`${repeat(
         this.paginatedCards,
         (card) => card.id,
@@ -606,6 +623,8 @@ export default class PartnerCards extends LitElement {
     if (!obj || typeof obj !== 'object') {
       return map;
     }
+
+    // eslint-disable-next-line no-restricted-syntax, guard-for-in
     for (const key in obj) {
       const tag = obj[key];
       if (tag && typeof tag === 'object') {
@@ -615,6 +634,7 @@ export default class PartnerCards extends LitElement {
         }
       }
     }
+
     return map;
   }
 
@@ -666,7 +686,7 @@ export default class PartnerCards extends LitElement {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  additionalActions() {}
+  additionalActions() { }
 
   handleResetActions() {
     this.searchTerm = '';
@@ -685,10 +705,10 @@ export default class PartnerCards extends LitElement {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  additionalResetActions() {}
+  additionalResetActions() { }
 
   handleSearchAction() {
-    // If Card Collection doesn't have filters enabled, do not apply search from URL search query param
+    // If Card Collection doesn't have filters enabled, do not apply search from URL query param
     if (this.blockData.filtersPanel === 'disable') return;
 
     // eslint-disable-next-line max-len
@@ -699,7 +719,7 @@ export default class PartnerCards extends LitElement {
   handleSearch(event) {
     this.searchTerm = event.target.value;
     if (this.searchTerm) {
-      this.urlSearchParams.set('term', this.searchTerm.toLowerCase());
+      this.urlSearchParams.set('term', this.searchTerm);
     } else {
       this.urlSearchParams.delete('term');
     }
@@ -761,11 +781,10 @@ export default class PartnerCards extends LitElement {
 
   handleOnSearchAnalytics() {
     const selectedFiltersAnalytics = Object.entries(this.selectedFilters).flatMap(
-      ([key, values]) =>
-        values.map(value => {
-          if (value.key.startsWith('caas:')) return value.key;
-          return `caas:${key}/${value.key}`;
-        })
+      ([key, values]) => values.map((value) => {
+        if (value.key.startsWith('caas:')) return value.key;
+        return `caas:${key}/${value.key}`;
+      }),
     );
 
     dispatchCustomEventOnSearch(
@@ -914,7 +933,7 @@ export default class PartnerCards extends LitElement {
 
     window.scrollTo({
       top: targetRect.top + window.scrollY - gnavHeight,
-      behavior: 'auto'
+      behavior: 'auto',
     });
   }
 
@@ -947,17 +966,22 @@ export default class PartnerCards extends LitElement {
     window.removeEventListener('resize', this.updateView);
   }
 
-
   // eslint-disable-next-line class-methods-use-this
-  getSlider() {}
+  getSlider() { }
+
+  get filtersLabel() {
+    return Object.keys(this.selectedFilters).length > 0
+      ? Object.values(this.selectedFilters).flat().map((item) => item.value).join(', ')
+      : 'No Filters';
+  }
 
   /* eslint-disable indent */
   render() {
     return html`
       ${this.fetchedData
         ? html`
-          <div class="partner-cards ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled': ''}"
-            daa-lh="Card Collection | Filters: ${processTrackingLabels(Object.keys(this.selectedFilters).length > 0 ? Object.values(this.selectedFilters).flat().map(item => item.value).join(", ") : 'No Filters')} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
+          <div class="partner-cards ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled' : ''}"
+            daa-lh="Card Collection | Filters: ${processTrackingLabels(this.filtersLabel)} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
           >
           ${this.blockData.filtersPanel === 'disable'
             ? ''
@@ -971,7 +995,7 @@ export default class PartnerCards extends LitElement {
                                  placeholder="${this.blockData.localizedText[this.searchInputPlaceholder]}"></sp-search>
                     </sp-theme>
                     ${!this.mobileView
-                      ? html`
+                ? html`
                           ${this.getSlider()}
                           <div class="sidebar-header">
                             <h3 class="sidebar-title">${this.blockData.localizedText['{{filter}}']}</h3>
@@ -991,10 +1015,10 @@ export default class PartnerCards extends LitElement {
                               <div class="title">${unsafeHTML(this.blockData.filterInfoBox.title)}</div>
                               ${unsafeHTML(this.blockData.filterInfoBox.description)}
                             </div>` : ''
-                          }
+                  }
                         `
-                      : ''
-                    }
+                : ''
+              }
                   </div>
                 </div>
               `
@@ -1003,8 +1027,8 @@ export default class PartnerCards extends LitElement {
             ${this.getPartnerCardsHeader()}
             <div class="partner-cards-collection ${this.blockData.filtersPanel === 'disable' ? 'layout-4-up' : ''}">
               ${this.hasResponseData
-                ? this.partnerCards
-                : html`
+            ? this.partnerCards
+            : html`
                     <div class="progress-circle-wrapper">
                       <sp-theme theme="spectrum" color="light" scale="medium">
                         <sp-progress-circle label="Cards loading" indeterminate="" size="l"
@@ -1012,10 +1036,10 @@ export default class PartnerCards extends LitElement {
                       </sp-theme>
                     </div>
                   `
-              }
+          }
             </div>
             ${this.shouldDisplayPagination()
-              ? html`
+            ? html`
                   <div
                     class="pagination-wrapper ${this.blockData?.pagination === 'load-more' ? 'pagination-wrapper-load-more' : 'pagination-wrapper-default'}">
                     ${this.pagination}
@@ -1023,8 +1047,8 @@ export default class PartnerCards extends LitElement {
                       class="pagination-total-results">${this.cardsCounter} ${this.blockData.localizedText['{{of}}']} ${this.cards.length} ${this.blockData.localizedText['{{results}}']}</span>
                   </div>
                 `
-              : ''
-            }
+            : ''
+          }
           </div>
         </div>` : ''}
       ${this.getFilterFullScreenView(this.mobileView && this.fetchData)}
@@ -1064,12 +1088,11 @@ export default class PartnerCards extends LitElement {
       <div class="partner-cards-header">
         <div class="partner-cards-title-wrapper">
           <h3 class="partner-cards-title">${this.blockData.title}</h3>
-          ${
-            this.blockData.pagination !== 'disable'
-            ? html`<span
+          ${this.blockData.pagination !== 'disable'
+        ? html`<span
             class="partner-cards-cards-results"><strong>${this.cards?.length}</strong> ${this.blockData.localizedText['{{results}}']}</span>`
-            : ''
-          }
+        : ''
+      }
 
         </div>
         <div class="partner-cards-sort-wrapper ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled' : ''}">

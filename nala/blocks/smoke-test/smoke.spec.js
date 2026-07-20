@@ -46,27 +46,21 @@ export default {
       name: '@smoke-test-become-a-partner',
       path: '/digitalexperience/?georouting=off&martech=off',
       // tags: '@da-dx-smoke-test',
-      data: {
-        becomAPartnerUrl: '/digitalexperience/s/registration',
-      }
+      data: { becomAPartnerUrl: '/digitalexperience/s/registration' },
     },
     {
       tcid: '5',
       name: '@smoke-test-find-a-partner-validation',
       path: '/digitalexperience/?georouting=off&martech=off',
       tags: '@da-dx-smoke-test',
-      data: {
-        findAPartnerUrl: '/s/directory/solution',
-      }
+      data: { findAPartnerUrl: '/s/directory/solution' },
     },
     {
       tcid: '6',
       name: '@smoke-test-analytics-card-collection-validation',
       path: '/digitalexperience/products/analytics?georouting=off&martech=off',
       tags: '@da-dx-smoke-test',
-      data: {
-        partnerLevel: 'dxp-platinum:',
-      }
+      data: { partnerLevel: 'dxp-platinum:' },
     },
     {
       tcid: '7',
@@ -77,7 +71,7 @@ export default {
         partnerLevel: 'dxp-gold:',
         expectedSaleCenterUrl: '/digitalexperience/m/salescenter/',
         homeUrl: '/digitalexperience/home/',
-      }
+      },
     },
     {
       tcid: '8',
@@ -87,7 +81,7 @@ export default {
       data: {
         partnerLevel: 'cpp-distributor-india:',
         contactNotFoundUrl: '/digitalexperience/error/contact-not-found#',
-      }
+      },
     },
     {
       tcid: '9',
@@ -97,7 +91,7 @@ export default {
       data: {
         partnerLevel: 'dxp-silver:',
         searchKeyword: 'Adobe',
-      }
+      },
     },
     {
       tcid: '10',
@@ -107,7 +101,7 @@ export default {
       data: {
         feedbackTitle: 'Rate this page',
         feedbackTextArea: 'Automation Test Keywords',
-      }
+      },
     },
     {
       tcid: '11',
@@ -175,6 +169,43 @@ export default {
         feedbackTitle: 'Rate this page',
         feedbackTextArea: 'Automation Test Keywords',
       },
-    }
+    },
+    {
+      tcid: '18',
+      name: '@smoke-test-footer-validation-public-and-protected-pages',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: {
+        partnerLevel: 'dxp-platinum:',
+        facebookLink: 'https://www.facebook.com/adobe',
+        instagramLink: 'https://www.instagram.com/adobe/',
+        linkedinLink: 'https://www.linkedin.com/company/adobe-partners/',
+        twitterLink: 'https://twitter.com/AdobePartner',
+      },
+    },
+    {
+      tcid: '19',
+      name: '@smoke-test-footer-validation-404-and-react-include-pages',
+      path: '/digitalexperience/home-page',
+      tags: '@da-dx-smoke-test',
+      data: {
+        partnerLevel: 'dxp-platinum:',
+        facebookLink: 'https://www.facebook.com/adobe',
+        instagramLink: 'https://www.instagram.com/adobe/',
+        linkedinLink: 'https://www.linkedin.com/company/adobe-partners/',
+        twitterLink: 'https://twitter.com/AdobePartner',
+        reactIncludePage: '/digitalexperience/home/manage-user',
+      },
+    },
+    {
+      tcid: '20',
+      name: '@smoke-test-signout-redirect',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: {
+        partnerLevel: 'dxp-community:',
+        homeUrl: '/digitalexperience/home/',
+      },
+    },
   ],
 };

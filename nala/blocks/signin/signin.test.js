@@ -9,7 +9,8 @@ const loggedInAdobe = features.slice(3, 6);
 const errorFlowCases = features.slice(8, 12);
 const forbiddenAccess = features.slice(13, 15);
 const silverPlatinumPage = features.slice(15, 17);
-const downgradedUsers = features.slice(18, 25);
+const downgradedUsers = features.slice(18, 24);
+const registrationPage = features.slice(24, 26);
 
 test.describe('MAPP sign in flow', () => {
   test.beforeEach(async ({ page, browserName, baseURL, context }) => {
@@ -37,7 +38,7 @@ test.describe('MAPP sign in flow', () => {
 
     await test.step('Sign in', async () => {
       await signInPage.signIn(page, `${features[0].data.partnerLevel}`);
-      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 })
+      await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
     });
 
@@ -278,7 +279,7 @@ test.describe('MAPP sign in flow', () => {
       await signInPage.signIn(page, `${features[17].data.partnerLevel}`);
       await signInPage.globalFooter.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
-      });
+    });
 
     await test.step('Verify error message', async () => {
       await page.waitForLoadState('networkidle');
@@ -291,28 +292,54 @@ test.describe('MAPP sign in flow', () => {
   });
   downgradedUsers.forEach((feature) => {
     test(`${feature.name},${feature.tags}`, async ({ page, baseURL }) => {
-      const { data, path } = feature;
+      const { data } = feature;
       await test.step('Go to public home page', async () => {
         await page.goto(`${baseURL}${feature.path}`);
       });
-  
+
       await test.step('Sign in', async () => {
         await signInPage.signIn(page, `${feature.data.partnerLevel}`);
         await signInPage.popupCloseButton.waitFor({ state: 'visible', timeout: 30000 });
         await signInPage.popupCloseButton.click();
       });
+
       await test.step('Verify assets visibility', async () => {
         await signInPage.searchField.fill(data.searchKeyword);
+        const initialResults = await signInPage.getNumberOfResults();
         await signInPage.searchField.press('Enter');
-        await signInPage.waitForResultsToSettle();
-        await signInPage.cardWrapper.waitFor({ state: 'visible', timeout: 30000 });
-        const numberResults = await signInPage.getNumberOfResults();
-        await expect(numberResults).toEqual(4);
+
+        await expect.poll(
+          async () => signInPage.getNumberOfResults(),
+          { timeout: 15000 },
+        ).not.toBe(initialResults);
+
+        await expect.poll(
+          async () => signInPage.getNumberOfResults(),
+          { timeout: 15000 },
+        ).toBe(4);
 
         await expect(signInPage.assetTitleCheck(data.assetTitle1)).toBeVisible();
         await expect(signInPage.assetTitleCheck(data.assetTitle2)).toBeVisible();
         await expect(signInPage.assetTitleCheck(data.assetTitle3)).toBeVisible();
         await expect(signInPage.assetTitleCheck(data.assetTitle4)).toBeVisible();
+      });
+    });
+  });
+  registrationPage.forEach((feature) => {
+    test(`${feature.name},${feature.tags}`, async ({ page }) => {
+      await test.step('Go to public home page', async () => {
+        await page.goto(`${feature.path}`);
+        await page.waitForLoadState('domcontentloaded');
+      });
+      await test.step('Sign in', async () => {
+        await signInPage.signInButton.click();
+        await signInPage.signIn(page, `${feature.data.partnerLevel}`);
+      });
+      await test.step('Verify restricted news after successful login', async () => {
+        await signInPage.registrationPageBar.waitFor({ state: 'visible', timeout: 30000 });
+        const pages = await page.context().pages();
+        await expect(pages[0].url())
+          .toContain(`${feature.data.expectedToSeeInURL}`);
       });
     });
   });

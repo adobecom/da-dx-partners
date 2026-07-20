@@ -17,12 +17,17 @@ import {
   redirectLoggedinPartner,
   updateNavigation,
   loadPageToAnchor,
-  updateFooter, updateIMSConfig, PARTNER_LOGIN_QUERY, setFeedback, SHOW_NEXT_POPUP, PARTNER_AGREEMENT_POPUP
+  updateFooter,
+  updateIMSConfig,
+  PARTNER_LOGIN_QUERY,
+  setFeedback,
+  SHOW_NEXT_POPUP,
+  PARTNER_AGREEMENT_POPUP,
 } from './utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
 import { prependContent } from './portalMessaging.js';
-import { showNextPopup } from './showNextPopup.js';
+import showNextPopup from './showNextPopup.js';
 // import PartnerNews  from '../blocks/partner-news/PartnerNews.js';
 
 // Add project-wide style path here.
@@ -33,24 +38,26 @@ const LIBS = '/libs';
 
 const isProd = prodHosts.includes(window.location.host);
 // required for react-include component: react-app may need different ims client ids.
-let imsClientId = document.querySelector(`meta[name=${isProd? 'ims_client_id' : 'ims_client_id_stage' }]`)?.content
+let imsClientId = document.querySelector(`meta[name=${isProd ? 'ims_client_id' : 'ims_client_id_stage'}]`)?.content;
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
 
 const localesDefault = { '': { ietf: 'en-US', tk: 'hah7vzn.css' } };
-//typekits with swap
+// typekits with swap
 const localesSafari = { '': { ietf: 'en-US', tk: 'vti0xwb.css' } };
 const isSafari = navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome');
 
 // Add any config options.
-let CONFIG = {
+const CONFIG = {
   codeRoot: '/eds',
   contentRoot: '/eds/partners-shared',
   useDotHtml: false,
   imsClientId,
+  imsScope: 'AdobeID,openid,gnav,pps.read,firefly_api,additional_info.roles,read_organizations,account_cluster.read',
   clientEnv: isProd ? 'prod' : null,
   // geoRouting: 'off',
   // fallbackRouting: 'off',
   locales: isSafari ? localesSafari : localesDefault,
+  pdfViewerClientId: '3b6559c26f1e478a99e97ffe3da634bb',
   jarvis: {
     id: 'spp_default',
     version: '1.0',
@@ -59,10 +66,13 @@ let CONFIG = {
   local: { edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e' },
   stage: {
     edgeConfigId: '04688385-4eb5-41af-9875-91f21eea9a5e',
-    marTechUrl:
-      'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-f10da6991680-staging.min.js',
+    marTechUrl: 'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-f10da6991680-staging.min.js',
+    pdfViewerClientId: 'a393b24431f4441da82113085aafe95f',
   },
-  prod: { marTechUrl: 'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-78b077e5ada7.min.js' },
+  prod: {
+    marTechUrl: 'https://assets.adobedtm.com/f4f129aad11d/915cb137e42a/launch-78b077e5ada7.min.js',
+    pdfViewerClientId: '3b6559c26f1e478a99e97ffe3da634bb',
+  },
 };
 
 (function removePartnerLoginQuery() {
@@ -86,8 +96,11 @@ let CONFIG = {
 
 // Load LCP image immediately
 (function loadLCPImage() {
-  const lcpImg = document.querySelector('img');
-  lcpImg?.removeAttribute('loading');
+  const lcpImg = document.querySelector('main img') || document.querySelector('img');
+  if (!lcpImg) return;
+
+  lcpImg.setAttribute('loading', 'eager');
+  lcpImg.setAttribute('fetchpriority', 'high');
 }());
 
 /*
@@ -113,6 +126,7 @@ function setUpPage() {
   updateNavigation();
   updateFooter();
 }
+
 async function loadPage() {
   await prependContent();
   applyPagePersonalization();
@@ -129,6 +143,7 @@ async function loadPage() {
   rewriteLinks(document.querySelector('main') ?? document);
   window.addEventListener(SHOW_NEXT_POPUP, async (e) => {
     if ('detail' in e) {
+      // eslint-disable-next-line no-console
       console.log('CustomEvent data:', e.detail?.next);
       await showNextPopup(miloLibs, imsClientId, e.detail?.next);
     } else {
@@ -138,7 +153,7 @@ async function loadPage() {
   await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
 
   // Run when navigating back/forward
-  window.addEventListener('pageshow', (e) => {
+  window.addEventListener('pageshow', () => {
     loadPageToAnchor();
   });
 }

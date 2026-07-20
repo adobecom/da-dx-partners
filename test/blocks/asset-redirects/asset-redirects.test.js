@@ -7,10 +7,10 @@ describe('Asset redirects', () => {
 
   beforeEach(async () => {
     // Load mock HTML
-    document.body.innerHTML = await readFile({path: './mocks/body.html'});
+    document.body.innerHTML = await readFile({ path: './mocks/body.html' });
 
     // Import init function
-    ({default: init} = await import('../../../eds/blocks/asset-redirects/asset-redirects.js'));
+    ({ default: init } = await import('../../../eds/blocks/asset-redirects/asset-redirects.js'));
   });
 
   afterEach(() => {

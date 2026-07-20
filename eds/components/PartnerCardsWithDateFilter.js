@@ -1,4 +1,4 @@
-import { getLibs, loadPageToAnchor } from '../scripts/utils.js';
+import { getLibs } from '../scripts/utils.js';
 import PartnerCards from './PartnerCards.js';
 
 const miloLibs = getLibs();
@@ -22,8 +22,6 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
       const [defaultDateFilter] = this.blockData.dateFilter.tags;
       this.selectedDateFilter = defaultDateFilter;
     }
-
-    loadPageToAnchor();
   }
 
   get dateFilter() {
@@ -149,7 +147,7 @@ export default class PartnerCardsWithDateFilter extends PartnerCards {
   }
 
   additionalResetActions() {
-    if(!this.blockData.dateFilter) return;
+    if (!this.blockData.dateFilter) return;
     this.initDateTags(this.blockData.dateFilter.tags);
   }
 

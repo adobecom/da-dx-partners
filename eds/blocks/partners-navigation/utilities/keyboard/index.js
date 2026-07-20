@@ -2,6 +2,7 @@
 import { getNextVisibleItemPosition, getPreviousVisibleItemPosition, selectors } from './utils.js';
 import MainNav from './mainNav.js';
 import { closeAllDropdowns, lanaLog, logErrorFor, isDesktopForContext } from '../utilities.js';
+import MobileGnav from './mobileGnav.js';
 
 const cycleOnOpenSearch = ({ e, isDesktop }) => {
   const withoutBreadcrumbs = [
@@ -77,12 +78,18 @@ class KeyboardNavigation {
     try {
       this.addEventListeners();
       this.mainNav = new MainNav();
+      this.mobileGnav = MobileGnav.init();
       if (newNavWithLnav) {
         this.loadLnavNavigation();
       }
       this.desktop = window.matchMedia('(min-width: 900px)');
     } catch (e) {
-      lanaLog({ message: 'Keyboard Navigation failed to load', e, tags: 'gnav-keyboard', errorType: 'e' });
+      lanaLog({
+        message: 'Keyboard Navigation failed to load',
+        e,
+        tags: 'gnav-keyboard',
+        severity: 'critical',
+      });
     }
   }
 
@@ -93,7 +100,13 @@ class KeyboardNavigation {
           const { default: LnavNavigation } = await import('./localNav.js');
           return new LnavNavigation();
         } catch (e) {
-          lanaLog({ message: 'Keyboard Navigation failed to load for LNAV', e, tags: 'gnav-keyboard', errorType: 'i' });
+          lanaLog({
+            message: 'Keyboard Navigation failed to load for LNAV',
+            e,
+            tags: 'gnav-keyboard',
+            errorType: 'i',
+            severity: 'critical',
+          });
           return null;
         }
       })();
@@ -111,7 +124,7 @@ class KeyboardNavigation {
               const isNewNav = !!document.querySelector('header.new-nav');
               const isOpen = document
                 .querySelector(selectors.navWrapper)
-                .classList.contains(selectors.navWrapperExpanded.slice(1));
+                ?.classList.contains(selectors.navWrapperExpanded.slice(1));
               if (isNewNav && isOpen) {
                 if (e.target.classList.contains(selectors.mainNavToggle.slice(1))) {
                   e.preventDefault();

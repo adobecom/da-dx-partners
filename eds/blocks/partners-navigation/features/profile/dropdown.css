@@ -57,6 +57,7 @@
   /* PARTNERS_NAVIGATION START */
   /* MWPW-157753 - Make profile picture, firstName, lastName and email unclickable */
   pointer-events: none;
+  border-radius: 50%; /* MWPW-186333 - Profile icons are not rounded */
   /* PARTNERS_NAVIGATION END */
 }
 
@@ -106,7 +107,10 @@
   font-size: 11px;
   font-weight: 600;
   line-height: 1.5;
+  /* PARTNERS_NAVIGATION START */
+  /* MWPW-180485 - Implement Profile Dropdown */
   text-transform: none;
+  /* PARTNERS_NAVIGATION END */
 }
 
 .feds-local-menu p {

@@ -11,7 +11,7 @@
     "nala": "node nala/utils/nala.run.js",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint .",
-    "lint:css": "stylelint 'blocks/**/*.css' 'styles/*.css'",
+    "lint:css": "stylelint 'eds/blocks/**/*.css' 'eds/styles/**/*.css' 'eds/components/**/*.css'",
     "jest": "jest --testPathPattern=test --coverage --coverageDirectory=coverage/jest",
     "lint:fix": "eslint --fix --ext .js,.jsx ."
   },
@@ -55,8 +55,8 @@
   },
   "dependencies": {
     "@adobecom/milo": "github:adobecom/milo#main",
-    "axios": "^1.13.5",
-    "dompurify": "^3.3.2",
+    "dompurify": "^3.4.0",
+    "axios": "^1.16.0",
     "playwright": "^1.58.2"
   }
 }

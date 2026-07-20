@@ -49,7 +49,6 @@ describe('Test partnerAgreement.js', () => {
   let getMetadataContent;
   let getPartnerCookieValue;
   let isMember;
-  let getConfig;
   let getRuntimeActionUrl;
 
   beforeEach(() => {
@@ -123,7 +122,6 @@ describe('Test partnerAgreement.js', () => {
     isMember = utilsModule.isMember;
 
     const blockUtilsModule = require('../../eds/blocks/utils/utils.js');
-    getConfig = blockUtilsModule.getConfig;
     getRuntimeActionUrl = blockUtilsModule.getRuntimeActionUrl;
   });
 
@@ -307,7 +305,7 @@ describe('Test partnerAgreement.js', () => {
       `;
 
       let call = 0;
-      global.fetch.mockImplementation((url) => {
+      global.fetch.mockImplementation(() => {
         call += 1;
         if (call === 1) return Promise.resolve({ ok: true, text: () => Promise.resolve(metaHtml) });
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: ['<p>Partner Agreement Text</p>'] }) });
@@ -471,7 +469,7 @@ describe('Test partnerAgreement.js', () => {
       getPartnerCookieValue.mockReturnValue(null);
       getMetadataContent.mockReturnValue('/digitalexperience/fragments/partner-agreement-meta');
 
-      const metaHtml = `<html><head><meta name="agreementtitle" content="T" /></head></html>`;
+      const metaHtml = '<html><head><meta name="agreementtitle" content="T" /></head></html>';
       global.fetch.mockImplementation((url) => {
         if (url === '/digitalexperience/fragments/partner-agreement-meta') return Promise.resolve({ ok: true, text: () => Promise.resolve(metaHtml) });
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: ['<p>Terms</p>'] }) });
@@ -495,4 +493,3 @@ describe('Test partnerAgreement.js', () => {
     });
   });
 });
-

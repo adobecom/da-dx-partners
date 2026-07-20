@@ -48,36 +48,36 @@ export const FILE_EXTENSION_TO_DOWNLOAD_LABEL = {
 };
 
 export const DX_COMPLIANCE_STATUS = {
-    COMPLETED: 'Completed',
-    NOT_COMPLETED: 'Not Completed'
-}
+  COMPLETED: 'Completed',
+  NOT_COMPLETED: 'Not Completed',
+};
 
 export const DX_SPECIAL_STATE = {
-    LOCKED: 'locked',
-    LOCKED_COMPLIANCE_PAST: 'locked-compliance-past',
-    LOCKED_PAYMENT_FUTURE: 'locked-payment-future',
-    SUBMITTED_IN_REVIEW: 'submitted-in-review',
-}
+  LOCKED: 'locked',
+  LOCKED_COMPLIANCE_PAST: 'locked-compliance-past',
+  LOCKED_PAYMENT_FUTURE: 'locked-payment-future',
+  SUBMITTED_IN_REVIEW: 'submitted-in-review',
+};
 
 export const DX_PRIMARY_BUSINESS = {
-    SOLUTION: 'Solution',
-    TECHNOLOGY: 'Technology',
-}
+  SOLUTION: 'Solution',
+  TECHNOLOGY: 'Technology',
+};
 
 export const DX_ACCESS_TYPE = {
-    BILLING_ADMIN: 'Billing Admin',
-    SALES_CENTER_ADMIN: 'Sales Center Admin',
-    ADMIN: 'Admin'
-}
+  BILLING_ADMIN: 'Billing Admin',
+  SALES_CENTER_ADMIN: 'Sales Center Admin',
+  ADMIN: 'Admin',
+};
 
 export const DX_DESIGNATION_TYPE = {
-    LEGAL_AND_COMPLIANCE: 'Legal and Compliance',
-    LEARNING_AND_DEVELOPMENT: 'Learning & Development'
-}
+  LEGAL_AND_COMPLIANCE: 'Legal and Compliance',
+  LEARNING_AND_DEVELOPMENT: 'Learning & Development',
+};
 
 export const DX_PARTNER_LEVEL = {
-    COMMUNITY: 'Community',
-    SILVER: 'Silver',
-    GOLD: 'Gold',
-    PLATINUM: 'Platinum'
-}
+  COMMUNITY: 'Community',
+  SILVER: 'Silver',
+  GOLD: 'Gold',
+  PLATINUM: 'Platinum',
+};

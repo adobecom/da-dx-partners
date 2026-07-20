@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 export default class SmokeTest {
   constructor(page) {
     this.page = page;
@@ -5,7 +7,7 @@ export default class SmokeTest {
     this.contactUsLinkSP = page.locator('a[href*="/digitalexperience/m/forms/case"]').nth(0);
     this.findPartnerLinkSP = page.locator('a[href*="/s/directory/solution"]');
     this.learnMoreLinkSP = page.locator('a[href*="/digitalexperience/about"]').nth(0);
-    this.contactUsLinkTP = page.locator('a[href*="/digitalexperience/m/forms/case"]').nth(1);;
+    this.contactUsLinkTP = page.locator('a[href*="/digitalexperience/m/forms/case"]').nth(1);
     this.findPartnerLinkTP = page.locator('a[href*="/s/directory/technology"]');
     this.learnMoreLinkTP = page.locator('a[href*="/digitalexperience/about"]').nth(1);
     this.contactUsLinkAR = page.locator('a[href*="/en/apc-helpdesk"]');
@@ -46,6 +48,8 @@ export default class SmokeTest {
     this.jarvisChatPanel = page.frameLocator('iframe[title="Adobe Virtual Assistant"]').getByText("We're here to help.");
     this.searchCardsCollection = page.locator('.partner-cards-collection');
     this.cardCollectionSortButton = page.getByRole('button', { name: 'date: newest' });
+    this.globalFooter = page.locator('.global-footer');
+    this.signOutButton = page.getByRole('link', { name: 'Sign Out' });
   }
 
   async smokeSignIn(page, baseURL, partnerLevel) {
@@ -64,16 +68,31 @@ export default class SmokeTest {
   async verifyStatusCode(url) {
     const response = await this.page.goto(url);
     if (!response || response.status() !== 200) {
-      throw new Error(`Page failed to load. Status: ${response ? response.status() : "No response"}`);
+      throw new Error(`Page failed to load. Status: ${response ? response.status() : 'No response'}`);
     }
   }
 
   async verifyIfGnavIsPresent() {
-    return await this.gnav.isVisible();
+    return this.gnav.isVisible();
   }
 
   async verifyIfFooterIsPresent() {
-    return await this.footer.isVisible();
+    return this.footer.isVisible();
+  }
+
+  async verifyFooterSocialMediaIcons(data) {
+    const root = this.globalFooter;
+    const pairs = [
+      ['facebook', data.facebookLink],
+      ['instagram', data.instagramLink],
+      ['linkedin', data.linkedinLink],
+      ['twitter', data.twitterLink],
+    ];
+    for (const [label, href] of pairs) {
+      const link = root.locator(`a.feds-social-link[aria-label="${label}"]`);
+      await expect(link).toBeVisible();
+      await expect(link).toHaveAttribute('href', href);
+    }
   }
 
   async getResultsCount() {
@@ -94,5 +113,12 @@ export default class SmokeTest {
     await this.searchField.type(keyword, { delay: 80 });
     await this.page.waitForTimeout(5000);
     await this.page.keyboard.press('Enter');
+  }
+
+  async signOut() {
+    await this.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    await this.profileIconButton.click();
+    await this.signOutButton.waitFor({ state: 'visible', timeout: 10000 });
+    await this.signOutButton.click();
   }
 }

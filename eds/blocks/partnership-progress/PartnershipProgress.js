@@ -1,7 +1,7 @@
-import {getLibs, getPartnerCookieValue, invokeAfterImsIsReady} from '../../scripts/utils.js';
+import { getLibs, getPartnerCookieValue, invokeAfterImsIsReady } from '../../scripts/utils.js';
 import { partnershipProgressStyles } from './PartnershipProgressStyles.js';
-import { getConfig } from '../utils/utils.js';
-import {DX_PARTNER_LEVEL, DX_PRIMARY_BUSINESS} from "../utils/dxConstants.js";
+import { DX_PARTNER_LEVEL, DX_PRIMARY_BUSINESS } from '../utils/dxConstants.js';
+import { getPartnershipData } from '../utils/partnershipDataService.js';
 
 const miloLibs = getLibs();
 const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -9,12 +9,10 @@ import(`${miloLibs}/features/spectrum-web-components/dist/theme.js`);
 import(`${miloLibs}/features/spectrum-web-components/dist/progress-circle.js`);
 
 const LEVEL_ORDER = [
-    DX_PARTNER_LEVEL.SILVER.toLowerCase(),
-    DX_PARTNER_LEVEL.GOLD.toLowerCase(),
-    DX_PARTNER_LEVEL.PLATINUM.toLowerCase(),
+  DX_PARTNER_LEVEL.SILVER.toLowerCase(),
+  DX_PARTNER_LEVEL.GOLD.toLowerCase(),
+  DX_PARTNER_LEVEL.PLATINUM.toLowerCase(),
 ];
-const PARTNERSHIP_PROGRESS_API =
-    'https://partner-registration-stage.adobe.io/api/v1/dxp/partner/membership/level-requirements';
 
 function getTargetLevel(currentLevel) {
   const norm = String(currentLevel).toLowerCase();
@@ -37,11 +35,13 @@ export default class PartnershipProgress extends LitElement {
     super();
     this.data = null;
     this.loading = false;
+    // eslint-disable-next-line no-underscore-dangle
     this._onImsReady = this._onImsReady.bind(this);
   }
 
   connectedCallback() {
     super.connectedCallback();
+    // eslint-disable-next-line no-underscore-dangle
     invokeAfterImsIsReady(this._onImsReady);
   }
 
@@ -49,39 +49,17 @@ export default class PartnershipProgress extends LitElement {
     super.disconnectedCallback();
   }
 
+  // eslint-disable-next-line no-underscore-dangle
   _onImsReady() {
     this.fetchData();
   }
 
   async fetchData() {
-    let url = PARTNERSHIP_PROGRESS_API;
-    const { env } = getConfig();
-    if (env.name === 'prod') {
-      url = url.replace('-stage', '');
-    }
-
     this.loading = true;
-
     try {
-      const token = window.adobeIMS?.getAccessToken?.().token;
-      if (!token) {
-        throw new Error('Missing IMS access token');
-      }
-
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'X-Api-Key': token,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Failed to load data: ${res.status}`);
-      }
-
-      const json = await res.json();
-      this.data = json;
+      this.data = await getPartnershipData();
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('[partnership-progress] fetch error', e);
     } finally {
       this.loading = false;
@@ -98,6 +76,7 @@ export default class PartnershipProgress extends LitElement {
     return items.find((item) => item.level?.toLowerCase() === targetLevelKey) || null;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   renderProgressBar(percentage, label) {
     const value = Number.isFinite(percentage) ? percentage : 0;
     const pct = Math.max(0, Math.min(100, value));
@@ -121,10 +100,9 @@ export default class PartnershipProgress extends LitElement {
   renderMetricRow(label, metric) {
     if (!metric) return html``;
 
-    const value =
-        typeof metric.percentage === 'number'
-            ? Math.max(0, Math.min(metric.percentage, 100))
-            : 0;
+    const value = typeof metric.percentage === 'number'
+      ? Math.max(0, Math.min(metric.percentage, 100))
+      : 0;
 
     return html`
       <div class="partnership-progress-metric-row">
@@ -159,11 +137,11 @@ export default class PartnershipProgress extends LitElement {
 
         <div class="partnership-progress-rows">
           ${this.renderMetricRow(
-        specializationsMetric && programData.specializations
-            ? this.blockData.localizedText['{{Specializations}}']
-            : this.blockData.localizedText['{{Exchange Marketplace listings}}'],
-        specializationsMetric,
-    )}
+    specializationsMetric && programData.specializations
+      ? this.blockData.localizedText['{{Specializations}}']
+      : this.blockData.localizedText['{{Exchange Marketplace listings}}'],
+    specializationsMetric,
+  )}
           ${this.renderMetricRow(this.blockData.localizedText['{{Credentials}}'], credentialsMetric)}
           ${this.renderMetricRow(this.blockData.localizedText['{{Active Customer Deployments}}'], deploymentsMetric)}
         </div>
@@ -186,8 +164,8 @@ export default class PartnershipProgress extends LitElement {
 
     return html`
       <div class="partnership-progress-container">
-        ${this.renderProgramProgress(this.blockData.localizedText[`{{Solution}}`], DX_PRIMARY_BUSINESS.SOLUTION)}
-        ${this.renderProgramProgress(this.blockData.localizedText[`{{Technology}}`], DX_PRIMARY_BUSINESS.TECHNOLOGY)}
+        ${this.renderProgramProgress(this.blockData.localizedText['{{Solution}}'], DX_PRIMARY_BUSINESS.SOLUTION)}
+        ${this.renderProgramProgress(this.blockData.localizedText['{{Technology}}'], DX_PRIMARY_BUSINESS.TECHNOLOGY)}
       </div>
     `;
   }

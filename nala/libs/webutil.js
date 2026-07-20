@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 
 const fs = require('fs');
 // eslint-disable-next-line import/no-extraneous-dependencies
-//const yaml = require('js-yaml');
+const yaml = require('js-yaml');
 const { request } = require('@playwright/test');
 
 /**
@@ -39,6 +39,7 @@ exports.WebUtil = class WebUtil {
     try {
       return await this.locator.evaluate((e) => e.offsetWidth > 0 && e.offsetHeight > 0);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(`Error checking if element is displayed for locator: ${locator.toString()}`, e);
       return false;
     }
@@ -102,6 +103,7 @@ exports.WebUtil = class WebUtil {
         try {
           await expect(this.locator).toHaveCSS(property, expectedValue);
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error(`CSS property ${property} not found:`, error);
           result = false;
         }
@@ -128,6 +130,7 @@ exports.WebUtil = class WebUtil {
           try {
             await expect(await this.locator).toHaveClass(classes.join(' '));
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Attribute class not found:', error);
             result = false;
           }
@@ -135,6 +138,7 @@ exports.WebUtil = class WebUtil {
           try {
             await expect(await this.locator).toHaveAttribute(property, expectedValue);
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error(`Attribute ${property} not found:`, error);
             result = false;
           }
@@ -160,6 +164,7 @@ exports.WebUtil = class WebUtil {
       const shouldStop = (position) => (dir === 'down' ? position > scrollHeight() : position < 0);
       const increment = dir === 'down' ? 100 : -100;
       const delayTime = spd === 'slow' ? 30 : 5;
+      // eslint-disable-next-line no-console
       console.error(start, shouldStop(start), increment);
       for (let i = start; !shouldStop(i); i += increment) {
         window.scrollTo(0, i);
@@ -196,6 +201,7 @@ exports.WebUtil = class WebUtil {
 
       return inViewport;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error verifying modal veiwport:', error);
       return false;
     }
@@ -260,7 +266,7 @@ exports.WebUtil = class WebUtil {
  * @returns {string} - A string formatted as 'gnav|<project>|nopzn|nopzn'.
  */
   // eslint-disable-next-line class-methods-use-this
-  async getGnavDaalh(project = milo) {
+  async getGnavDaalh(project = 'milo') {
     return `gnav|${project}|nopzn|nopzn`;
   }
 
@@ -272,7 +278,7 @@ exports.WebUtil = class WebUtil {
  * @returns {string} - A string formatted as 'gnav|<project>|<pznExpName>|<pznFileName>'.
  */
   // eslint-disable-next-line class-methods-use-this, default-param-last
-  async getPznGnavDaalh(project = milo, pznExpName, pznFileName) {
+  async getPznGnavDaalh(project = 'milo', pznExpName, pznFileName) {
     const slicedExpName = pznExpName.slice(0, 15);
     const slicedFileName = pznFileName.slice(0, 15);
     return `gnav|${project}|${slicedExpName}|${slicedFileName}`;
@@ -331,7 +337,7 @@ exports.WebUtil = class WebUtil {
  * @returns {string} - A string formatted as '<cleanedLinkText>-<counter>--<cleanedLastHeaderText>'.
  */
   // eslint-disable-next-line class-methods-use-this
-  async getLinkDaall(linkText, counter, lastHeaderText, pzn = false) {
+  async getLinkDaall(linkText, counter, lastHeaderText, _pzn = false) {
     const cleanAndSliceText = (text) => text
       ?.replace(/[^\w\s]+/g, ' ')
       .replace(/\s+/g, ' ')

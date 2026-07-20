@@ -9,7 +9,7 @@ const { features } = eventsSpec;
 const goldAndPlatinumAccess = features.slice(2, 4);
 
 test.describe('Validate events block', () => {
-  test.beforeEach(async ({ page, browserName, baseURL, context }) => {
+  test.beforeEach(async ({ page }) => {
     eventsPage = new EventsPage(page);
     signInPage = new SignInPage(page);
   });
@@ -18,15 +18,15 @@ test.describe('Validate events block', () => {
     const { data } = features[0];
     await test.step('Go to events page', async () => {
       await page.goto(`${features[0].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     });
 
     await test.step('Verify public card title', async () => {
       await eventsPage.verifyPublicCardTitle(data.publicCardTitle);
       const results = await eventsPage.getResultsNumber();
       await expect(results).toBeGreaterThanOrEqual(1);
-      await eventsPage.productFilter.click();
-      await eventsPage.getFirstFilterCheckbox().click();
+      await eventsPage.filterRegion.click();
+      await eventsPage.japanRegion.click();
       const resultsAfterFilter = await eventsPage.getResultsNumber();
       await expect(resultsAfterFilter).toBeLessThan(results);
     });
@@ -36,7 +36,7 @@ test.describe('Validate events block', () => {
     const { data } = features[1];
     await test.step('Go to events page', async () => {
       await page.goto(`${features[1].path}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
@@ -60,7 +60,7 @@ test.describe('Validate events block', () => {
       const { data } = feature;
       await test.step('Go to events page', async () => {
         await page.goto(`${feature.path}`);
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
         await signInPage.signInButton.click();
         await signInPage.signIn(page, `${data.partnerLevel}`);
         await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
@@ -69,6 +69,21 @@ test.describe('Validate events block', () => {
         await eventsPage.verifyPublicCardTitle(data.visibleCardTitle);
         await eventsPage.verifyCardNotVisible(data.notVisibleCardTitle);
       });
+    });
+  });
+  // @events-sessions-test-on-public-page
+  test(`${features[4].name},${features[4].tags}`, async ({ page }) => {
+    const { data } = features[4];
+    await test.step('Go to events page', async () => {
+      await page.goto(`${features[4].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await eventsPage.partnerCradCollection.waitFor({ state: 'visible', timeout: 30000 });
+    });
+    await test.step('Verify sessions', async () => {
+      await eventsPage.verifyPublicCardTitle(data.sessionOne);
+      await eventsPage.verifyCardDateDaysFromToday(data.sessionOne, data.sessionOneDaysFromToday);
+      await eventsPage.verifyPublicCardTitle(data.sessionTwo);
+      await eventsPage.verifyCardDateDaysFromToday(data.sessionTwo, data.sessionTwoDaysFromToday);
     });
   });
 });

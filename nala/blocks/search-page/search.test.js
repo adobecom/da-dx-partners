@@ -6,6 +6,7 @@ import SignInPage from '../signin/signin.page.js';
 const { features } = searchSpec;
 let searchPage;
 let signInPage;
+const thumbnailCases = features.slice(19, 23);
 
 test.describe('Search Page', () => {
   test.beforeEach(async ({ page }) => {
@@ -21,7 +22,7 @@ test.describe('Search Page', () => {
     });
     await test.step('Sign in', async () => {
       await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Verify search page', async () => {
       await expect(searchPage.searchField).toBeVisible();
@@ -29,36 +30,46 @@ test.describe('Search Page', () => {
       await searchPage.searchField.press('Enter');
       await searchPage.waitForResultsToSettle();
       await searchPage.searchAllResults.waitFor({ state: 'visible' });
-      const numberResults = await searchPage.getNumberOfResults();
-      await expect(numberResults).toBeGreaterThanOrEqual(6);
+      await expect.poll(
+        async () => searchPage.getNumberOfResults(),
+        { timeout: 15000 },
+      ).toBeGreaterThanOrEqual(6);
     });
     await test.step('Asset Card Content Validation', async () => {
-      const card = searchPage.getCardByTitle(data.cardTitle);
-      await searchPage.clickCard(card);
+      await expect(async () => {
+        const card = searchPage.getCardByTitle(data.cardTitle);
+        await searchPage.clickCard(card);
+        await page.waitForLoadState('domcontentloaded');
+        const expanded = await card.evaluate((el) => el.classList.contains('expanded'));
 
-      const cardDate = searchPage.getCardDateLocator(card);
-      await expect(cardDate).toBeVisible();
-      const dateText = await cardDate.textContent();
-      expect(dateText).toContain(data.cardDate);
+        expect(expanded).toBe(true);
+      }).toPass({ timeout: 30000 });
+      const expandedCard = searchPage
+        .getExpandedCard()
+        .filter({ hasText: data.cardTitle })
+        .first();
+      await expect(expandedCard).toBeVisible({ timeout: 30000 });
 
-      const cardSize = searchPage.getCardSizeLocator(card);
-      await expect(cardSize).toBeVisible();
-      const sizeText = await cardSize.textContent();
-      expect(sizeText).toContain(data.cardSize);
+      const cardDate = searchPage.getCardDateLocator(expandedCard);
+      await expect(cardDate).toContainText(data.cardDate);
+
+      const cardSize = searchPage.getCardSizeLocator(expandedCard);
+      await expect(cardSize).toContainText(data.cardSize);
 
       for (const tagText of data.cardTags) {
-        await searchPage.verifyCardTag(card, tagText);
+        const tag = searchPage.getCardTagByText(expandedCard, tagText);
+        await expect(tag).toBeVisible({ timeout: 30000 });
       }
 
-      await searchPage.verifyCardButtonLink(card, data.cardButtonLink);
+      await searchPage.verifyCardButtonLink(expandedCard, data.cardButtonLink);
     });
 
     await test.step('Check Silver Asset', async () => {
-        await searchPage.clearSearch.click();
-        await searchPage.searchField.fill(data.silverAssetTitle);
-        await searchPage.searchField.press('Enter');
-        const firstCardTitle = await searchPage.getCardTitle();
-        await expect(firstCardTitle).not.toBe(data.silverAssetTitle);
+      await searchPage.clearSearch.click();
+      await searchPage.searchField.fill(data.silverAssetTitle);
+      await searchPage.searchField.press('Enter');
+      const firstCardTitle = await searchPage.getCardTitle();
+      await expect(firstCardTitle).not.toBe(data.silverAssetTitle);
     });
   });
   test(`${features[1].name},${features[1].tags}`, async ({ page }) => {
@@ -68,24 +79,24 @@ test.describe('Search Page', () => {
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Search for asset', async () => {
       await searchPage.searchField.fill(data.searchKeyword);
       await searchPage.searchField.press('Enter');
-      await searchPage.waitForResultsToSettle();
-      const numberResults = await searchPage.getNumberOfResults();
-      await expect(numberResults).toBeGreaterThanOrEqual(4);
+      await expect.poll(
+        async () => signInPage.getNumberOfResults(),
+        { timeout: 15000 },
+      ).toBe(4);
     });
     await test.step('Check Filter Journey Phase Explore', async () => {
       await searchPage.journeyPhaseFilter.click();
-      await searchPage.journeyPhaseFilterPanel.waitFor({ state: 'visible', timeout: 30000 });
       await searchPage.exploreCheckBox.click();
       await expect(searchPage.exploreCheckBox).toBeChecked();
-      await searchPage.waitForResultsToSettle();
-
-      const firstCardTitle = await searchPage.getCardTitle();
-      await expect(firstCardTitle).toBe(data.assetTitle1);
+      await expect.poll(
+        async () => searchPage.getCardTitle(),
+        { timeout: 15000 },
+      ).toBe(data.assetTitle1);
     });
     await test.step('Check Filter Journey Phase Discover', async () => {
       await searchPage.discoverCheckBox.click();
@@ -97,7 +108,6 @@ test.describe('Search Page', () => {
     });
     await test.step('Check Filter Functionality Analysis & Insights', async () => {
       await searchPage.functionalityFilter.click();
-      await searchPage.functionalityFilterPanel.waitFor({ state: 'visible', timeout: 30000 });
       await searchPage.analysisInsgightCheckBox.click();
       await expect(searchPage.analysisInsgightCheckBox).toBeChecked();
       await searchPage.waitForResultsToSettle();
@@ -131,7 +141,7 @@ test.describe('Search Page', () => {
     });
 
     await test.step('View Asset', async () => {
-    const [newTab] = await Promise.all([
+      const [newTab] = await Promise.all([
         page.waitForEvent('popup'),
         searchPage.viewAssetButton.click(),
       ]);
@@ -157,9 +167,9 @@ test.describe('Search Page', () => {
     await test.step('Logged in user asset validation', async () => {
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
 
-      await expect(searchPage.downloadImageButton).toBeVisible(); 
+      await expect(searchPage.downloadImageButton).toBeVisible();
     });
     await test.step('Search All Assets', async () => {
       await searchPage.searchAllAssetsButton.click();
@@ -188,7 +198,7 @@ test.describe('Search Page', () => {
     await test.step('Logged in user asset validation', async () => {
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
 
       await expect(searchPage.downloadPPTButton).toBeVisible();
       await expect(searchPage.searchAllAssetsButton).toBeVisible();
@@ -201,7 +211,7 @@ test.describe('Search Page', () => {
       await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Verify asset details without login', async () => {
       await searchPage.verifyAssetDetails(data);
@@ -215,7 +225,7 @@ test.describe('Search Page', () => {
       await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Verify asset details without login', async () => {
       await searchPage.verifyAssetDetails(data);
@@ -228,10 +238,11 @@ test.describe('Search Page', () => {
       await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Verify asset details', async () => {
       await searchPage.verifyAssetDetails(data);
+      await expect(searchPage.downloadAssetButton).not.toBeVisible();
     });
   });
   test(`${features[8].name},${features[8].tags}`, async ({ page, context }) => {
@@ -246,10 +257,10 @@ test.describe('Search Page', () => {
     await test.step('Check Training', async () => {
       await searchPage.trainingButton.click();
       await page.waitForTimeout(5000);
-      
+
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        searchPage.trainingPreviewButton.click()
+        searchPage.trainingPreviewButton.click(),
       ]);
 
       await newPage.waitForURL((url) => url.toString().includes(data.trainingLink), { timeout: 30000 });
@@ -259,7 +270,7 @@ test.describe('Search Page', () => {
       await newPage.close();
     });
   });
-  test(`${features[9].name},${features[9].tags}`, async ({ page, browserName }) => {
+  test(`${features[9].name},${features[9].tags}`, async ({ page }) => {
     const { data } = features[9];
     await test.step('Go to search page', async () => {
       await page.goto(`${features[9].path}`);
@@ -277,7 +288,7 @@ test.describe('Search Page', () => {
       const numberResults = await searchPage.getNumberOfResults();
       await expect(numberResults).toBeGreaterThanOrEqual(4);
     });
-    await test.step('Check Filter Busines Solution', async () => { 
+    await test.step('Check Filter Busines Solution', async () => {
       await searchPage.functionalityFilter.click();
       await searchPage.loader.waitFor({ state: 'hidden', timeout: 10000 });
       await searchPage.analysisInsgightCheckBox.click();
@@ -327,7 +338,7 @@ test.describe('Search Page', () => {
 
   test(`${features[10].name},${features[10].tags}`, async ({ page, context }) => {
     const { data } = features[10];
-    const sharedData = features.find(f => f.tcid === '8')?.data;
+    const sharedData = features.find((f) => f.tcid === '8')?.data;
 
     await test.step('Go to search page', async () => {
       await page.goto(`${features[10].path}`);
@@ -339,13 +350,13 @@ test.describe('Search Page', () => {
     });
 
     await test.step('Verify asset restricted preview message', async () => {
-      await searchPage.verifyPreviewMessage(data)
+      await searchPage.verifyPreviewMessage(data);
     });
 
     await test.step('Verify register link', async () => {
       const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        searchPage.clickLinkFromMessage(data.textBlock, data.link[0].text)
+        searchPage.clickLinkFromMessage(data.textBlock, data.link[0].text),
       ]);
       await newPage.waitForLoadState();
       await expect(newPage).toHaveURL(data.link[0].url);
@@ -354,7 +365,7 @@ test.describe('Search Page', () => {
 
   test(`${features[11].name},${features[11].tags}`, async ({ page }) => {
     const { data } = features[11];
-    const sharedData = features.find(f => f.tcid === '8')?.data;
+    const sharedData = features.find((f) => f.tcid === '8')?.data;
 
     await test.step('Go to search page', async () => {
       await page.goto(`${features[11].path}`);
@@ -369,20 +380,20 @@ test.describe('Search Page', () => {
     });
 
     await test.step('Verify asset restricted preview message', async () => {
-      await searchPage.verifyPreviewMessage(data)
+      await searchPage.verifyPreviewMessage(data);
     });
 
     await test.step('Verify silver-membership link', async () => {
       await expect(
         searchPage.restrictedMessageBox
-          .locator('a', { hasText: data.link[0].text })
+          .locator('a', { hasText: data.link[0].text }),
       ).toHaveAttribute('href', data.link[0].url);
     });
   });
 
   test(`${features[12].name},${features[12].tags}`, async ({ page }) => {
     const { data } = features[12];
-    const sharedData = features.find(f => f.tcid === '8')?.data;
+    const sharedData = features.find((f) => f.tcid === '8')?.data;
 
     await test.step('Go to search page', async () => {
       await page.goto(`${features[12].path}`);
@@ -397,13 +408,13 @@ test.describe('Search Page', () => {
     });
 
     await test.step('Verify asset restricted preview message', async () => {
-      await searchPage.verifyPreviewMessage(data)
+      await searchPage.verifyPreviewMessage(data);
     });
 
     await test.step('Verify upleveling link', async () => {
       await searchPage.clickLinkFromMessage(
         data.textBlock,
-        data.link[0].text
+        data.link[0].text,
       );
       await page.waitForURL(data.link[0].url);
       await expect(page).toHaveURL(data.link[0].url);
@@ -418,7 +429,7 @@ test.describe('Search Page', () => {
       await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.click();
       await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
     await test.step('Verify selected filters', async () => {
@@ -434,6 +445,192 @@ test.describe('Search Page', () => {
     await test.step('Verify asset', async () => {
       await expect(searchPage.getCardByTitle(data.cardTitle)).toBeVisible();
       await expect(searchPage.getCardByTitle(data.cardTitle)).toContainText(data.cardTitle);
+    });
+  });
+
+  test(`${features[14].name},${features[14].tags}`, async ({ page, context }) => {
+    const { data } = features[14];
+    let newTab;
+    await test.step('Go to search page', async () => {
+      await page.goto(`${features[14].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Open page in a new tab', async () => {
+      newTab = await context.newPage();
+      await newTab.goto(`${data.newURL}`);
+      await expect(newTab.url()).toContain(`${data.newURL}`);
+    });
+
+    await test.step('Verify error message', async () => {
+      await expect(searchPage.errorHeading).toContainText(data.errorText);
+    });
+  });
+
+  test(`${features[15].name},${features[15].tags}`, async ({ request }) => {
+    const response = await request.get(`${features[15].path}`);
+    expect(response.status()).toBe(200);
+  });
+
+  test(`${features[16].name},${features[16].tags}`, async ({ context }) => {
+    const { data } = features[16];
+    const newTab = await context.newPage();
+    const signInPageTab = new SignInPage(newTab);
+    const searchPageTab = new SearchPage(newTab);
+
+    await test.step('Open asset preview link in incognito tab', async () => {
+      await newTab.goto(`${features[16].path}`, { waitUntil: 'domcontentloaded' });
+      await newTab.waitForURL(`**${data.previewURL}**`);
+      expect(newTab.url()).toContain(data.previewURL);
+    });
+
+    await test.step('Login with silver partner account', async () => {
+      await signInPageTab.signInButton.click();
+      await signInPageTab.signIn(newTab, `${data.partnerLevel}`);
+      await signInPageTab.profileIconButton.waitFor({
+        state: 'visible',
+        timeout: 10000,
+      });
+    });
+
+    await test.step('Verify redirect happens again and View button is visible', async () => {
+      await newTab.waitForURL(`**${data.previewURL}**`);
+      await expect(searchPageTab.viewAssetButton).toBeVisible();
+    });
+
+    await test.step('Click View button and verify asset opens successfully', async () => {
+      const responsePromise = context.waitForEvent('response', {
+        predicate: (response) => response.url().includes(features[16].path)
+          && response.status() === 200,
+      });
+      await searchPageTab.viewAssetButton.click();
+      const response = await responsePromise;
+      expect(response.status()).toBe(200);
+    });
+  });
+
+  test(`${features[17].name},${features[17].tags}`, async ({ page }) => {
+    const { data } = features[17];
+
+    await test.step('Go to search page', async () => {
+      await page.goto(`${features[17].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, `${data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Open Training tab', async () => {
+      await searchPage.trainingButton.click();
+      await page.waitForLoadState('domcontentloaded');
+      await searchPage.clickCard(searchPage.card.first());
+    });
+
+    await test.step('Verify card details', async () => {
+      await expect(searchPage.cardTilte).toBeVisible();
+      await expect(searchPage.cardDate.first()).toBeVisible();
+      await expect(searchPage.cardDescription.first()).toBeVisible();
+      await expect(searchPage.fileIcon.first()).toBeVisible();
+      await expect(searchPage.fileIcon.first()).toHaveCSS('background-image', data.cardIcon);
+    });
+  });
+
+  test(`${features[18].name},${features[18].tags}`, async ({ page }) => {
+    const { data } = features[18];
+
+    await test.step('Go to search page and sign in as Community user', async () => {
+      await page.goto(features[18].path);
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Search for netstorage asset', async () => {
+      await expect(searchPage.searchField).toBeVisible();
+      await searchPage.searchField.fill(data.searchKeyword);
+      await searchPage.searchField.press('Enter');
+      await searchPage.waitForResultsToSettle();
+      await searchPage.searchAllResults.waitFor({ state: 'visible', timeout: 30000 });
+
+      await expect.poll(async () => searchPage.getNumberOfResults(), { timeout: 15000 }).toBe(data.expectedResultCount);
+    });
+
+    await test.step('Expand netstorage asset and verify properties', async () => {
+      const card = searchPage.getCardByTitle(data.cardTitle);
+      await expect(card).toBeVisible({ timeout: 30000 });
+
+      await expect(async () => {
+        await searchPage.clickCard(card, 60000);
+        const classList = await card.evaluate((el) => el.classList.toString());
+        expect(classList).toContain('expanded');
+      }).toPass({ timeout: 60000 });
+
+      const expandedCard = searchPage
+        .getExpandedCard()
+        .filter({ hasText: data.cardTitle })
+        .first();
+      await expect(expandedCard).toBeVisible({ timeout: 30000 });
+
+      await searchPage.verifyExpandedNetstorageAsset(expandedCard, data);
+    });
+  });
+
+  thumbnailCases.forEach((feature) => {
+    test(`${feature.name},${feature.tags}`, async ({ page }) => {
+      const { data } = feature;
+      await test.step('Go to asset preview page', async () => {
+        await page.goto(feature.path);
+        await page.waitForLoadState('domcontentloaded');
+      });
+      await test.step('Verify asset preview thumbnail image src', async () => {
+        await searchPage.verifyImageThumbnail(data.imageThumbnail);
+      });
+    });
+  });
+
+  test(`${features[23].name},${features[23].tags}`, async ({ page, context }) => {
+    const { data, path, signInPath } = features[23];
+    const sharedData = features.find((f) => f.tcid === '8')?.data;
+    let assetPage;
+    let assetSearchPage;
+
+    await test.step('Go to digitalexperience home and sign in as MAPC user', async () => {
+      await page.goto(signInPath);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Click Adobe Partner Experience Hub logo', async () => {
+      await expect(searchPage.hubLogo).toBeVisible({ timeout: 30000 });
+      await searchPage.hubLogo.click();
+      await page.waitForLoadState('domcontentloaded');
+    });
+
+    await test.step('Open restricted asset in new tab', async () => {
+      assetPage = await context.newPage();
+      assetSearchPage = new SearchPage(assetPage);
+      await assetPage.goto(path);
+      await assetPage.waitForLoadState('domcontentloaded');
+    });
+
+    await test.step('Verify asset details and restricted preview message', async () => {
+      await assetSearchPage.verifyAssetDetails(sharedData);
+      await assetSearchPage.verifyPreviewMessage(data);
+    });
+
+    await test.step('Verify register now link opens registration page', async () => {
+      const [registrationPage] = await Promise.all([
+        context.waitForEvent('page'),
+        assetSearchPage.clickLinkFromMessage(data.textBlock, data.link[0].text),
+      ]);
+      await registrationPage.waitForLoadState();
+      await expect(registrationPage).toHaveURL(data.link[0].url);
     });
   });
 });

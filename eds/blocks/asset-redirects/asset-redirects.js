@@ -1,4 +1,4 @@
-import { calculateRedirect } from './calculateRedirect.js';
+import calculateRedirect from './calculateRedirect.js';
 
 /**
  * Extracts redirect rules from DOM element

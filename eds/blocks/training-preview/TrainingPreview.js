@@ -24,6 +24,7 @@ export default class TrainingPreview extends LitElement {
   firstUpdated() {
     const container = document.getElementById('root_content_outer_position_component');
     if (!container) {
+      // eslint-disable-next-line no-console
       console.log('React mount container not found');
       return;
     }

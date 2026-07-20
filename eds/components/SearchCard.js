@@ -1,12 +1,12 @@
 import { formatDate, getLibs } from '../scripts/utils.js';
-import { getConfig, replaceText } from '../blocks/utils/utils.js';
+import { getConfig } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
 import { dispatchCustomEventOnLinkClick } from '../blocks/utils/analyticsUtils.js';
 
 const miloLibs = getLibs();
 const config = getConfig();
-const { html, repeat, LitElement, until, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const { html, repeat, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 class SearchCard extends LitElement {
@@ -16,25 +16,25 @@ class SearchCard extends LitElement {
     data: { type: Object },
     localizedText: { type: Object },
     ietf: { type: String },
+    allTagsFlatMap: { type: Object },
   };
+
+  getTagTitle(tagId) {
+    return this.allTagsFlatMap?.get(tagId)?.title || '';
+  }
 
   get cardTags() {
     const tags = this.data.arbitrary;
-    if (!tags.length) return;
+    if (!tags.length) return html``;
     const filteredTags = tags.filter((tag) => !Object.keys(tag).includes('partnerlevel'));
-    if (!filteredTags.length) return;
-    // eslint-disable-next-line consistent-return
+    if (!filteredTags.length) return html``;
     return html`${repeat(
       filteredTags,
       (tag) => tag.key,
       (tag) => {
-        const key = Object.values(tag)[0];
-        const wrappedKey = `{{${key}}}`;
-        return html`${until(
-          // eslint-disable-next-line no-confusing-arrow
-          replaceText(wrappedKey, config).then((res) => res ? html`<span class="card-tag">${res}</span>` : html``),
-          html``,
-        )}`;
+        const tagId = `${Object.keys(tag)[0]}/${Object.values(tag)[0]}`;
+        const title = this.getTagTitle(tagId);
+        return title ? html`<span class="card-tag">${unsafeHTML(DOMPurify.sanitize(title))}</span>` : html``;
       },
     )}`;
   }
@@ -84,7 +84,7 @@ class SearchCard extends LitElement {
       }
             </span>
             <p class="card-description">${unsafeHTML(DOMPurify.sanitize(this.data.contentArea?.description))}</p>
-            ${ this.data.contentArea?.contentType !== 'course' ? html`<div class="card-tags-wrapper">${this.cardTags}</div>` : '' }
+            ${this.data.contentArea?.contentType !== 'course' ? html`<div class="card-tags-wrapper">${this.cardTags}</div>` : ''}
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import {DX_COMPLIANCE_STATUS, DX_PROGRAM_TYPE, DX_SPECIAL_STATE} from "../blocks/utils/dxConstants.js";
+import { DX_PROGRAM_TYPE, DX_SPECIAL_STATE } from '../blocks/utils/dxConstants.js';
 
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
@@ -60,19 +60,28 @@ export const prodHosts = [
  * Note: This file should have no self-invoking functions.
  * ------------------------------------------------------------
  */
-export function formatDate(cardDate, locale = 'en-US') {
+export function formatDate(cardDate, locale = 'en-US', isEventCard = false) {
   if (!cardDate) return;
 
   const dateObject = new Date(cardDate);
-  const options = {
+
+  const formattedDate = dateObject.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  };
+  });
 
-  const formattedDate = dateObject.toLocaleString(locale, options);
   // eslint-disable-next-line consistent-return
-  return formattedDate;
+  if (!isEventCard) return formattedDate;
+
+  const formattedTime = dateObject.toLocaleTimeString(locale, {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
+
+  // eslint-disable-next-line consistent-return
+  return `${formattedDate} | ${formattedTime}`;
 }
 
 export function getLocale(locales, pathname = window.location.pathname) {
@@ -148,17 +157,31 @@ export function getCookieValue(key) {
   const cookie = cookies.find((el) => el.startsWith(`${key}=`));
   return cookie?.substring((`${key}=`).length);
 }
+export function getPartnerCookieObject(programType) {
+  const partnerDataCookie = getCookieValue('partner_data');
+  const partnerInfoCookie = getCookieValue('partner_info');
+
+  const partnerDataObj = partnerDataCookie ? JSON.parse(decodeURIComponent(partnerDataCookie)) : {};
+  const partnerInfoObj = partnerInfoCookie ? JSON.parse(decodeURIComponent(partnerInfoCookie)) : {};
+
+  const programKey = programType.toUpperCase();
+  const portalData = {
+    ...(partnerDataObj?.[programKey] ?? {}),
+    ...partnerInfoObj,
+  };
+
+  return portalData;
+}
 export function getPartnerCookieValue(key, programType = DX_PROGRAM_TYPE) {
   try {
-    if(!programType){
-      programType = getCurrentProgramType();
-    }
-    const portalData = getPartnerCookieObject(programType);
+    const type = programType || getCurrentProgramType();
+    const portalData = getPartnerCookieObject(type);
     const lowercasedPortalData = JSON.parse(
-      JSON.stringify(portalData).toLowerCase()
+      JSON.stringify(portalData).toLowerCase(),
     );
     return lowercasedPortalData?.[key] || '';
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error parsing partner data object:', error);
     // eslint-disable-next-line consistent-return
     return '';
@@ -166,17 +189,15 @@ export function getPartnerCookieValue(key, programType = DX_PROGRAM_TYPE) {
 }
 
 function extractTableCollectionTags(el) {
-  let tableCollectionTags = [];
+  const tableCollectionTags = [];
   Array.from(el.children).forEach((row) => {
     const cols = Array.from(row.children);
     const rowTitle = cols[0].textContent.trim().toLowerCase().replace(/ /g, '-');
     const colsContent = cols.slice(1);
     if (rowTitle === 'collection-tags') {
       const [collectionTagsEl] = colsContent;
-      const collectionTags = Array.from(collectionTagsEl.querySelectorAll('li'), (li) =>
-        li.textContent ? `"${li.textContent.trim().toLowerCase()}"` : ''
-      );
-      tableCollectionTags.push(collectionTags)
+      const collectionTags = Array.from(collectionTagsEl.querySelectorAll('li'), (li) => (li.textContent ? `"${li.textContent.trim().toLowerCase()}"` : ''));
+      tableCollectionTags.push(collectionTags);
     }
   });
 
@@ -185,20 +206,19 @@ function extractTableCollectionTags(el) {
 
 function getPartnerLevelParams(portal) {
   const partnerLevel = getPartnerCookieValue('level', portal);
-  const partnerTagBase = `caas:adobe-partners/px/partner-level/`;
+  const partnerTagBase = 'caas:adobe-partners/px/partner-level/';
 
   const partnerLevels = ['gold', 'silver', 'platinum', 'community'];
 
   // Build the NOT conditions for all partner levels (excluding the target one)
   const notConditions = partnerLevels
-    .map(level => `NOT+"${partnerTagBase}${level}"`)
+    .map((level) => `NOT+"${partnerTagBase}${level}"`)
     .join('+AND+');
 
-  if(partnerLevel){
-    return `("${partnerTagBase}${partnerLevel}"+OR+(${notConditions}))`
-  } else {
-    return `(${notConditions})`;
+  if (partnerLevel) {
+    return `("${partnerTagBase}${partnerLevel}"+OR+(${notConditions}))`;
   }
+  return `(${notConditions})`;
 }
 
 function checkForQaContent(el) {
@@ -222,21 +242,20 @@ function getComplexQueryParams(el) {
   const tableTags = extractTableCollectionTags(el);
 
   const groupedTagExpressions = tableTags
-    .filter(group => group.length)
-    .map(group => `(${group.join('+AND+')})`);
+    .filter((group) => group.length)
+    .map((group) => `(${group.join('+AND+')})`);
   let fullQuery = '';
-  if (groupedTagExpressions.length){
-    fullQuery  = `(${groupedTagExpressions.join('+OR+')})`;
+  if (groupedTagExpressions.length) {
+    fullQuery = `(${groupedTagExpressions.join('+OR+')})`;
   }
-
 
   const qaContentTag = '"caas:adobe-partners/qa-content"';
   if (!checkForQaContent(el)) {
-    fullQuery += `${fullQuery.length>0?'+AND+':''}(+NOT+${qaContentTag})`;
+    fullQuery += `${fullQuery.length > 0 ? '+AND+' : ''}(+NOT+${qaContentTag})`;
   }
 
   const partnerLevelParams = getPartnerLevelParams(DX_PROGRAM_TYPE);
-  if (partnerLevelParams) fullQuery += `${fullQuery.length>0?'+AND+':''}${partnerLevelParams}`;
+  if (partnerLevelParams) fullQuery += `${fullQuery.length > 0 ? '+AND+' : ''}${partnerLevelParams}`;
 
   return fullQuery;
 }
@@ -307,6 +326,10 @@ export function isAdminUser() {
   return !!isAdmin;
 }
 
+export function isMember() {
+  return getPartnerCookieObject(getCurrentProgramType())?.status === 'MEMBER';
+}
+
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
 
@@ -321,8 +344,18 @@ export function isPartnerNewlyRegistered() {
   return differenceInMilliseconds > 0 && differenceInDays < 31;
 }
 
-export function isMember() {
-  return getPartnerCookieObject(getCurrentProgramType())?.status === 'MEMBER';
+export function isPartnerNewlyApproved() {
+  if (!isMember()) return false;
+  const firstApproveDate = getPartnerCookieValue('newlyapproveddate');
+
+  if (!firstApproveDate) return false;
+
+  const approveDate = new Date(firstApproveDate);
+  const now = new Date();
+
+  const differenceInMilliseconds = now - approveDate;
+  const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
+  return differenceInMilliseconds > 0 && differenceInDays < 31;
 }
 
 export function partnerIsSignedIn() {
@@ -341,30 +374,30 @@ export function partnerCookieContainsValue(key, value) {
 
 export function isAccountLocked() {
   if (!partnerIsSignedIn()) return false;
-  return partnerCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED) ||
-    partnerCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_COMPLIANCE_PAST) ||
-    partnerCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE);
+  return partnerCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED)
+    || partnerCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_COMPLIANCE_PAST)
+    || partnerCookieContainsValue('specialstate', DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE);
+}
+
+export function getDaysUntilComplianceExpiration() {
+  if (!partnerIsSignedIn()) return null;
+
+  const expirationTimestamp = getPartnerCookieValue('complianceexpirydate');
+  if (!expirationTimestamp) return null;
+
+  const expirationDate = new Date(Number(expirationTimestamp));
+  const now = new Date();
+
+  const differenceInMilliseconds = expirationDate - now;
+  if (differenceInMilliseconds < 0) return null;
+
+  return Math.ceil(differenceInMilliseconds / (1000 * 60 * 60 * 24));
 }
 
 export function isBctqExpiring(renewalNoticeDays) {
   const daysRemaining = getDaysUntilComplianceExpiration();
   const status = getPartnerCookieValue('status');
   return daysRemaining !== null && daysRemaining <= renewalNoticeDays && status !== 'locked';
-}
-
-export function getDaysUntilComplianceExpiration() {
-    if (!partnerIsSignedIn()) return null;
-
-    const expirationTimestamp = getPartnerCookieValue('complianceexpirydate');
-    if (!expirationTimestamp) return null;
-
-    const expirationDate = new Date(Number(expirationTimestamp));
-    const now = new Date();
-
-    const differenceInMilliseconds = expirationDate - now;
-    if (differenceInMilliseconds < 0) return null;
-
-    return Math.ceil(differenceInMilliseconds / (1000 * 60 * 60 * 24));
 }
 
 export function getDaysFromRegistration() {
@@ -482,28 +515,28 @@ function setApiParams(api, block) {
 }
 
 function getAuthoredList(col) {
-  let authoredList = col.querySelectorAll('li');
-  if(authoredList && authoredList.length){
-    return Array.from(authoredList).map(li => li.textContent.trim()).join(',');
+  const authoredList = col.querySelectorAll('li');
+  if (authoredList && authoredList.length) {
+    return Array.from(authoredList).map((li) => li.textContent.trim()).join(',');
   }
   return col.textContent.trim();
 }
 
 export function getCaasUrl(block) {
-  let isNonProd = !prodHosts.includes(window.location.host);
+  const isNonProd = !prodHosts.includes(window.location.host);
   const domain = `${isNonProd ? 'https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1' : 'https://www.adobe.com/chimera-api'}`;
   let sources = 'da-dx-partners';
   let featuredQuery = '';
   Array.from(block.el.children).forEach((row) => {
     const cols = Array.from(row.children);
     const rowTitle = cols[0].textContent.trim().toLowerCase().replace(/ /g, '-');
-    if (rowTitle === 'sources' && cols.length>1) {
-      sources = getAuthoredList(cols[1])
+    if (rowTitle === 'sources' && cols.length > 1) {
+      sources = getAuthoredList(cols[1]);
     }
-    if(isNonProd && rowTitle === 'featured-cards-stage' && cols.length>1){
+    if (isNonProd && rowTitle === 'featured-cards-stage' && cols.length > 1) {
       featuredQuery = `&featuredCards=${(getAuthoredList(cols[1]))}`;
     }
-    if(!isNonProd && rowTitle === 'featured-cards' && cols.length>1){
+    if (!isNonProd && rowTitle === 'featured-cards' && cols.length > 1) {
       featuredQuery = `&featuredCards=${(getAuthoredList(cols[1]))}`;
     }
   });
@@ -513,9 +546,7 @@ export function getCaasUrl(block) {
 
 export async function preloadResources(locales, miloLibs) {
   const locale = getLocale(locales);
-  const cardBlocks = {
-    'dx-card-collection': '',
-  };
+  const cardBlocks = { 'dx-card-collection': '' };
   // since we are going to add search-full later
   // adding this code update now to prevent being forgotten since in search
   // block we are not aware of this logic
@@ -530,7 +561,7 @@ export async function preloadResources(locales, miloLibs) {
     }
   });
 
-  Object.entries(cardBlocks).forEach(async ([key, value]) => {
+  Object.entries(cardBlocks).forEach(async ([key]) => {
     const el = document.querySelector(`.${key}`);
     if (!el) return;
 
@@ -588,7 +619,7 @@ export async function setFeedback(getConfig) {
     const block = page.querySelector('.feedback');
     const div = document.createElement('div');
     div.appendChild(block);
-    if (main) main.insertBefore(div, main.firstChild);
+    if (main) main.appendChild(div);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error fetching plain html of feedback fragment:', error);
@@ -620,7 +651,7 @@ export function loadPageToAnchor() {
   }
 }
 
-export function preventModalClose(modal) {
+export function preventModalClose(_modal) {
   // prevent closing the modal by clicking outside
   const curtain = document.querySelector('.modal-curtain, .is-open');
   const blockClickOutside = (e) => {
@@ -629,5 +660,5 @@ export function preventModalClose(modal) {
       e.stopImmediatePropagation();
     }
   };
-  curtain.addEventListener('click', blockClickOutside, {capture: true});
+  curtain.addEventListener('click', blockClickOutside, { capture: true });
 }

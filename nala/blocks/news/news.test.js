@@ -1,12 +1,12 @@
-import { test, expect } from '@playwright/test';
-import NewsPage from './news.page.js';
-import SignInPage from '../signin/signin.page.js';
+// import { test, expect } from '@playwright/test';
+// import NewsPage from './news.page.js';
+// import SignInPage from '../signin/signin.page.js';
+// import News from './news.spec.js';
 
-let newsPage;
-let signInPage;
-import News from './news.spec.js';
+// let newsPage;
+// let signInPage;
 
-const { features } = News;
+// const { features } = News;
 
 // test.describe('Validate news block', () => {
 //   test.beforeEach(async ({ page, browserName, baseURL, context }) => {
@@ -25,7 +25,6 @@ const { features } = News;
 //           });
 //         }
 //   });
-
 
 //   async function findCardsForPartnerLevel(page, path, data, context) {
 //     await test.step('Click Sign In', async () => {
