@@ -31,7 +31,7 @@ export default {
           },
           {
             label: 'Active Customer Deployments',
-            value: '10',
+            value: '15',
           },
         ],
       },
