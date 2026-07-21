@@ -3,6 +3,7 @@
  */
 
 import {
+  refreshPartnerAccountState,
   updatePartnerAccountState,
   updatePartnerUserState,
 } from '../../eds/scripts/partnerStateUtils.js';
@@ -34,6 +35,7 @@ describe('partnerStateUtils', () => {
         method: 'POST',
         credentials: 'include',
         body: JSON.stringify({
+          hostUrl: 'http://localhost',
           programType: 'DXP',
           action: 'updatePartnerUserState',
           email: 'test@adobetest.com',
@@ -57,6 +59,7 @@ describe('partnerStateUtils', () => {
       'https://runtime.com/api/v1/web/dx-partners-runtime/dxp-state-management',
       expect.objectContaining({
         body: JSON.stringify({
+          hostUrl: 'http://localhost',
           programType: 'DXP',
           action: 'updatePartnerAccountState',
           email: 'test@adobetest.com',
@@ -97,5 +100,27 @@ describe('partnerStateUtils', () => {
       status: 409,
       errorText: 'dxpAccountState is not fresh',
     });
+  });
+
+  it('refreshes partner account state cookie via runtime action', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ message: 'ok' }),
+    });
+
+    const result = await refreshPartnerAccountState();
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://runtime.com/api/v1/web/dx-partners-runtime/dxp-state-management',
+      expect.objectContaining({
+        body: JSON.stringify({
+          hostUrl: 'http://localhost',
+          programType: 'DXP',
+          action: 'refreshPartnerAccountState',
+        }),
+      }),
+    );
+    expect(result.success).toBe(true);
   });
 });

@@ -1,5 +1,5 @@
 import showToast from '../../components/Toast.js';
-import { updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
+import { refreshPartnerAccountState, updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
 import {
   getCurrentProgramType,
   getLibs,
@@ -17,7 +17,9 @@ let toastStyleLoaded = false;
 
 const CALENDLY_ERROR_TOAST = { toastNegative: 'Unable to save your booking. Please contact support if the issue persists.' };
 
-const CALENDLY_DOUBLE_BOOKING_TOAST = { toastNegative: 'A session is already scheduled for your account. Our team will reach out to help coordinate your bookings.' };
+const CALENDLY_ALREADY_BOOKED_MESSAGE = 'Calendly already booked by another admin.';
+
+const CALENDLY_DOUBLE_BOOKING_TOAST = { toastNegative: CALENDLY_ALREADY_BOOKED_MESSAGE };
 
 const delay = (ms) => new Promise((resolve) => {
   setTimeout(resolve, ms);
@@ -33,6 +35,20 @@ function getCalendlyEventId(eventUri) {
 
 function hasCalendlyBooked() {
   return !!getPartnerAccountState()?.calendly;
+}
+
+function showCalendlyBookedMessage(container) {
+  container.classList.add('con-block');
+
+  const foreground = document.createElement('div');
+  foreground.className = 'foreground';
+
+  const message = document.createElement('div');
+  message.className = 'calendly-booked-message';
+  message.textContent = CALENDLY_ALREADY_BOOKED_MESSAGE;
+
+  foreground.append(message);
+  container.append(foreground);
 }
 
 function loadCalendlyScript() {
@@ -168,13 +184,27 @@ function setBlockData(tableRows) {
 }
 export default async function init(el) {
   const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
-  const calendlyEmbed = document.createElement('div');
-  calendlyEmbed.className = 'calendly-embed';
-
-  el.innerHTML = '';
-  el.append(calendlyEmbed);
 
   try {
+    await loadStyle('/eds/blocks/calendly/calendly.css');
+    await refreshPartnerAccountState();
+
+    el.innerHTML = '';
+
+    if (hasCalendlyBooked()) {
+      showCalendlyBookedMessage(el);
+      return;
+    }
+
+    const calendlyEmbed = document.createElement('div');
+    calendlyEmbed.className = 'calendly-embed';
+
+    el.classList.add('con-block');
+    const foreground = document.createElement('div');
+    foreground.className = 'foreground';
+    foreground.append(calendlyEmbed);
+    el.append(foreground);
+
     await loadCalendlyScript();
     initCalendly(schedulingLink, calendlyEmbed, companyQuestionKey);
     window.addEventListener('message', trackCalendlyEvent);

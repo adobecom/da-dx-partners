@@ -14,19 +14,29 @@ function getErrorText(body) {
   return '';
 }
 
-async function updatePartnerState(action, stateUpdates) {
+function buildStateManagementBody(action, stateUpdates) {
+  const body = {
+    hostUrl: window.location.origin,
+    programType: getCurrentProgramType().toUpperCase(),
+    action,
+  };
+
+  if (stateUpdates) {
+    body.email = getPartnerCookieValue('email');
+    body.stateUpdates = stateUpdates;
+  }
+
+  return body;
+}
+
+async function callStateManagement(action, stateUpdates) {
   try {
     const url = getRuntimeActionUrl(RT_DXP_STATE_MANAGEMENT_PATH);
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({
-        programType: getCurrentProgramType().toUpperCase(),
-        action,
-        email: getPartnerCookieValue('email'),
-        stateUpdates,
-      }),
+      body: JSON.stringify(buildStateManagementBody(action, stateUpdates)),
     });
 
     const body = await response.json().catch(() => null);
@@ -49,9 +59,13 @@ async function updatePartnerState(action, stateUpdates) {
 }
 
 export function updatePartnerUserState(stateUpdates) {
-  return updatePartnerState('updatePartnerUserState', stateUpdates);
+  return callStateManagement('updatePartnerUserState', stateUpdates);
 }
 
 export function updatePartnerAccountState(stateUpdates) {
-  return updatePartnerState('updatePartnerAccountState', stateUpdates);
+  return callStateManagement('updatePartnerAccountState', stateUpdates);
+}
+
+export function refreshPartnerAccountState() {
+  return callStateManagement('refreshPartnerAccountState');
 }
