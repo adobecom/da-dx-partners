@@ -294,10 +294,6 @@ export function hasPartnerAccountStateProperty(key) {
   return Object.prototype.hasOwnProperty.call(accountState, key);
 }
 
-export function hasPartnerAccountStateCalendly() {
-  return hasPartnerAccountStateProperty('calendly');
-}
-
 export function hasSalesCenterAccess() {
   return getPartnerCookieValue('salescenteraccess');
 }
@@ -309,6 +305,11 @@ export function isAdminUser() {
 
 export function isMember() {
   return getPartnerCookieObject(getCurrentProgramType())?.status === 'MEMBER';
+}
+
+export function hasPartnerAccountStateCalendly() {
+  if (!isMember()) return false;
+  return hasPartnerAccountStateProperty('calendly');
 }
 
 export function isPartnerNewlyRegistered() {
