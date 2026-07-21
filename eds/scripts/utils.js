@@ -20,6 +20,8 @@ export const PARTNER_AGREEMENT_POPUP = 'dxp:partnerAgreement';
 export const PORTAL_MESSAGING_POPUP = 'dxp:portalMessaging';
 export const CERTIFICATION_POPUP = 'dxp:certificationExpires';
 export const NEXT_POPUP_PLACEHOLDER = 'dxp:nextPopupPlaceholder';
+export const PARTNER_USER_STATE_COOKIE = 'partner_user_state';
+export const PARTNER_ACCOUNT_STATE_COOKIE = 'partner_account_state';
 
 /**
  * The decision engine for where to get Milo's libs from.
@@ -258,6 +260,41 @@ function getComplexQueryParams(el) {
   return fullQuery;
 }
 
+export function getPartnerStateCookieObject(cookieName) {
+  try {
+    const programType = getCurrentProgramType();
+    const cookieValue = getCookieValue(cookieName);
+    if (!cookieValue) return null;
+
+    const stateByProgram = JSON.parse(decodeURIComponent(cookieValue));
+    const programState = stateByProgram?.[programType.toUpperCase()];
+
+    if (!programState || typeof programState !== 'object' || Array.isArray(programState)) {
+      return null;
+    }
+
+    return programState;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Error parsing ${cookieName}:`, error);
+    return null;
+  }
+}
+
+export function getPartnerUserState() {
+  return getPartnerStateCookieObject(PARTNER_USER_STATE_COOKIE);
+}
+
+export function getPartnerAccountState() {
+  return getPartnerStateCookieObject(PARTNER_ACCOUNT_STATE_COOKIE);
+}
+
+export function hasPartnerAccountStateProperty(key) {
+  const accountState = getPartnerAccountState();
+  if (!accountState) return false;
+  return Object.prototype.hasOwnProperty.call(accountState, key);
+}
+
 export function hasSalesCenterAccess() {
   return getPartnerCookieValue('salescenteraccess');
 }
@@ -269,6 +306,11 @@ export function isAdminUser() {
 
 export function isMember() {
   return getPartnerCookieObject(getCurrentProgramType())?.status === 'MEMBER';
+}
+
+export function hasPartnerAccountStateCalendly() {
+  if (!isMember()) return false;
+  return hasPartnerAccountStateProperty('calendly');
 }
 
 export function isPartnerNewlyRegistered() {
