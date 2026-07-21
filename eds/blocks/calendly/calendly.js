@@ -170,7 +170,6 @@ export default async function init(el) {
   const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
   const calendlyEmbed = document.createElement('div');
   calendlyEmbed.className = 'calendly-embed';
-  calendlyEmbed.setAttribute('style', 'min-width:320px;height:700px;');
 
   el.innerHTML = '';
   el.append(calendlyEmbed);
