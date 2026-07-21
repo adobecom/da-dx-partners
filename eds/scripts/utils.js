@@ -285,6 +285,20 @@ export function isPartnerNewlyRegistered() {
   return differenceInMilliseconds > 0 && differenceInDays < 31;
 }
 
+export function isPartnerNewlyApproved() {
+  if (!isMember()) return false;
+  const firstApproveDate = getPartnerCookieValue('newlyapproveddate');
+
+  if (!firstApproveDate) return false;
+
+  const approveDate = new Date(firstApproveDate);
+  const now = new Date();
+
+  const differenceInMilliseconds = now - approveDate;
+  const differenceInDays = Math.abs(differenceInMilliseconds) / (1000 * 60 * 60 * 24);
+  return differenceInMilliseconds > 0 && differenceInDays < 31;
+}
+
 export function partnerIsSignedIn() {
   return getCookieValue('partner_data');
 }
@@ -546,7 +560,7 @@ export async function setFeedback(getConfig) {
     const block = page.querySelector('.feedback');
     const div = document.createElement('div');
     div.appendChild(block);
-    if (main) main.insertBefore(div, main.firstChild);
+    if (main) main.appendChild(div);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error fetching plain html of feedback fragment:', error);

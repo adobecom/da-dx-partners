@@ -6,6 +6,7 @@ export default class EventsPage {
     this.cardsResults = page.locator('.partner-cards-cards-results strong');
     this.productFilter = page.getByLabel('Products');
     this.filterRegion = page.getByRole('button', { name: 'Region' });
+    this.japanRegion = page.getByRole('checkbox', { name: 'Japan' });
     this.partnerCradCollection = page.locator('.partner-cards-collection ');
   }
 
