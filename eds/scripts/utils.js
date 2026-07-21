@@ -275,6 +275,7 @@ export function getPartnerStateCookieObject(cookieName) {
 
     return programState;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(`Error parsing ${cookieName}:`, error);
     return null;
   }
