@@ -30,7 +30,7 @@
 }
 
 @media (max-width: 599px) {
-  .submit-button-block .action-area .con-button {
+  .submit-button-block.full-width-mobile .action-area .con-button {
     width: 100%;
     text-align: center;
   }
