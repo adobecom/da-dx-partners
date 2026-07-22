@@ -16,13 +16,12 @@ function getErrorText(body) {
 
 function buildStateManagementBody(action, stateUpdates) {
   const body = {
-    hostUrl: window.location.origin,
     programType: getCurrentProgramType().toUpperCase(),
     action,
+    email: getPartnerCookieValue('email'),
   };
 
   if (stateUpdates) {
-    body.email = getPartnerCookieValue('email');
     body.stateUpdates = stateUpdates;
   }
 
