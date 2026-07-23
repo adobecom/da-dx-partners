@@ -52,7 +52,6 @@ const CONFIG = {
   contentRoot: '/eds/partners-shared',
   useDotHtml: false,
   imsClientId,
-  imsScope: 'AdobeID,openid,gnav,pps.read,additional_info.roles,read_organizations,account_cluster.read',
   clientEnv: isProd ? 'prod' : null,
   // geoRouting: 'off',
   // fallbackRouting: 'off',

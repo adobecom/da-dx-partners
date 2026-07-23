@@ -61,7 +61,7 @@ class ProfileDropdown {
     rawElem,
     decoratedElem,
     avatar,
-    hasOrgs,
+    sections,
     buttonElem,
     openOnInit,
   } = {}) {
@@ -70,7 +70,7 @@ class ProfileDropdown {
     this.avatar = avatar;
     this.buttonElem = buttonElem;
     this.decoratedElem = decoratedElem;
-    this.hasOrgs = hasOrgs;
+    this.sections = sections;
     this.openOnInit = openOnInit;
     // PARTNERS_NAVIGATION START
     // MWPW-180485 - Implement Profile Dropdown
@@ -99,12 +99,11 @@ class ProfileDropdown {
         this.placeholders.signOut,
         this.placeholders.viewAccount,
         this.placeholders.profileAvatar,
-        this.placeholders.goToAdminConsole,
       ],
       { displayName: this.profileData.displayName, email: this.profileData.email },
     ] = await Promise.all([
       replaceKeyArray(
-        ['profile-button', 'sign-out', 'view-account', 'profile-avatar', 'go-to-admin-console'],
+        ['profile-button', 'sign-out', 'view-account', 'manage-teams', 'manage-enterprise', 'profile-avatar'],
         getFedsPlaceholderConfig(),
       ),
       window.adobeIMS.getProfile(),
@@ -156,7 +155,8 @@ class ProfileDropdown {
         </div>
         ${this.localMenu ? this.decorateLocalMenu() : ''}
         <ul class="feds-profile-actions">
-          ${this.hasOrgs ? decorateAction(this.placeholders.goToAdminConsole || 'Go to Admin Console') : ''}
+          ${this.sections?.manage?.items?.team?.id ? decorateAction(this.placeholders.manageTeams, '/team') : ''}
+          ${this.sections?.manage?.items?.enterprise?.id ? decorateAction(this.placeholders.manageEnterprise) : ''}
           ${this.decorateSignOut()}
         </ul>
       </div>
