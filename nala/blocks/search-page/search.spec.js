@@ -235,7 +235,6 @@ export default {
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
-        cardDate: 'Jun 26, 2026',
         cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg")',
       },
     },
@@ -256,9 +255,9 @@ export default {
           'px',
           'faq',
           'plans & pricing',
-          'automation control solutions',
+          'automation & control solutions',
           'high tech',
-          'frame io',
+          'frame.io',
         ],
         previewUrl:
           'https://partners.stage.adobe.com/digitalexperience/preview/netstorage-assets/public/au/Automation_Regression_Public_Search_Page_Test.mp4.html',
@@ -291,6 +290,24 @@ export default {
       path: '/digitalexperience/preview/qa-test/public/automation-regression-restricted-asset-message/qaAssetTest.pdf.html',
       tags: '@da-dx-search-page @regression @circleCi',
       data: { imageThumbnail: '/renditions/custom-thumbnail.jpg' },
+    },
+    {
+      tcid: '24',
+      name: '@restricted-asset-preview-message-mapc-user',
+      signInPath: '/digitalexperience/',
+      path: '/digitalexperience/preview/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx.html',
+      tags: '@restricted-asset @da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'cpp-distributor-india:',
+        textBlock:
+          'Access to view or download this asset is restricted to registered partners. Login or register now.',
+        link: [
+          {
+            text: 'register now',
+            url: 'https://partners.stage.adobe.com/digitalexperience/s/registration',
+          },
+        ],
+      },
     },
   ],
 };

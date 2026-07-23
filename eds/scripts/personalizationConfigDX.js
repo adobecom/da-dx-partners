@@ -6,7 +6,8 @@ import {
   partnerIsSignedIn,
   getPartnerCookieValue,
   partnerCookieContainsValue,
-  isReturningUser, isAccountLocked, isBctqExpiring,
+  isReturningUser, isAccountLocked, isBctqExpiring, isPartnerNewlyApproved,
+  hasPartnerAccountStateCalendly,
 } from './utils.js';
 import {
   DX_ACCESS_TYPE,
@@ -61,6 +62,8 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-locked-payment-future': getPartnerCookieValue('specialstate') === DX_SPECIAL_STATE.LOCKED_PAYMENT_FUTURE,
   'partner-submitted-in-review': getPartnerCookieValue('specialstate') === DX_SPECIAL_STATE.SUBMITTED_IN_REVIEW,
   'partner-bctq-expiring-90d': isBctqExpiring(90),
+  'partner-newly-approved': isPartnerNewlyApproved(),
+  'partner-account-state-calendly': hasPartnerAccountStateCalendly(),
 };
 
 export const PROFILE_PERSONALIZATION_ACTIONS = {

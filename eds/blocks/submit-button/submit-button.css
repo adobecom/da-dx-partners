@@ -12,6 +12,10 @@
   margin: 0 auto;
 }
 
+[class*=-up] .submit-button-block .foreground {
+  max-width: none;
+}
+
 .submit-button-block .action-area {
   display: flex;
   width: 100%;
@@ -38,4 +42,16 @@
   border-color: #e0e0e0;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+@media (max-width: 599px) {
+  .submit-button-block.no-spacing-top-mobile {
+    padding-top: 0;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 1199px) {
+  .submit-button-block.no-spacing-top-tablet {
+    padding-top: 0;
+  }
 }
