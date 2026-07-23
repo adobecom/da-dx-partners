@@ -18,7 +18,7 @@ let toastStyleLoaded = false;
 
 const CALENDLY_ERROR_TOAST = { toastNegative: 'Unable to save your booking. Please contact support if the issue persists.' };
 
-const CALENDLY_DOUBLE_BOOKING_TOAST = { toastNegative: CALENDLY_ALREADY_BOOKED_MESSAGE };
+const CALENDLY_DOUBLE_BOOKING_TOAST = { toastNegative: 'Calendly event was already booked by another admin.' };
 
 const delay = (ms) => new Promise((resolve) => {
   setTimeout(resolve, ms);
