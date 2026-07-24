@@ -31,7 +31,9 @@ jobs:
       run: sudo apt-get install xvfb
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci --include=dev
+      env:
+        NODE_ENV: development
 
     - name: Run the tests
       run: xvfb-run -a npm test
