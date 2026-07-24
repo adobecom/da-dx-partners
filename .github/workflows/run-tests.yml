@@ -34,9 +34,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        npm config delete omit || true
-        npm config delete production || true
-        npm ci
+        npm install --include=dev
         test -x node_modules/.bin/web-test-runner || (echo "ERROR: web-test-runner binary missing after install" && exit 1)
 
     - name: Run the tests
