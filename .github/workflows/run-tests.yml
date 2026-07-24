@@ -34,7 +34,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        npm install --include=dev
+        npm install --include=dev --legacy-peer-deps
         test -x node_modules/.bin/web-test-runner || (echo "ERROR: web-test-runner binary missing after install" && exit 1)
 
     - name: Run the tests
