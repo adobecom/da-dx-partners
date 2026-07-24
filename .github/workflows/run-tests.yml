@@ -30,7 +30,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Upgrade npm
-      run: npm install -g npm@10
+      run: npm install -g npm@9.9.4
 
     - name: Show Node and npm versions
       run: |
@@ -42,7 +42,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        npm install --include=dev --legacy-peer-deps
+        npm cache clean --force
+        npm ci --include=dev --legacy-peer-deps --no-audit --no-fund || npm install --include=dev --legacy-peer-deps --no-audit --no-fund
         test -x node_modules/.bin/web-test-runner || (echo "ERROR: web-test-runner binary missing after install" && exit 1)
 
     - name: Run the tests
