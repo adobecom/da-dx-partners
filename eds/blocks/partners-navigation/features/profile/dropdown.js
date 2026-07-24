@@ -61,7 +61,10 @@ class ProfileDropdown {
     rawElem,
     decoratedElem,
     avatar,
-    hasOrgs,
+    // PARTNERS_NAVIGATION START
+    //  MWPW-201682
+    // hasOrgs,
+    // PARTNERS_NAVIGATION END
     buttonElem,
     openOnInit,
   } = {}) {
@@ -70,7 +73,10 @@ class ProfileDropdown {
     this.avatar = avatar;
     this.buttonElem = buttonElem;
     this.decoratedElem = decoratedElem;
-    this.hasOrgs = hasOrgs;
+    // PARTNERS_NAVIGATION START
+    //  MWPW-201682
+    // this.hasOrgs = hasOrgs;
+    // PARTNERS_NAVIGATION END
     this.openOnInit = openOnInit;
     // PARTNERS_NAVIGATION START
     // MWPW-180485 - Implement Profile Dropdown
@@ -156,9 +162,10 @@ class ProfileDropdown {
         </div>
         ${this.localMenu ? this.decorateLocalMenu() : ''}
         <ul class="feds-profile-actions">
-<!--      start  https://jira.corp.adobe.com/browse/MWPW-201682-->
+<!-- PARTNERS_NAVIGATION START-->
+<!-- MWPW-201682-->
 <!--          ${this.hasOrgs ? decorateAction(this.placeholders.goToAdminConsole || 'Go to Admin Console') : ''}-->
-<!-- end https://jira.corp.adobe.com/browse/MWPW-201682          -->
+<!-- PARTNERS_NAVIGATION END          -->
 ${this.decorateSignOut()}
         </ul>
       </div>
