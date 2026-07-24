@@ -156,8 +156,10 @@ class ProfileDropdown {
         </div>
         ${this.localMenu ? this.decorateLocalMenu() : ''}
         <ul class="feds-profile-actions">
-          ${this.hasOrgs ? decorateAction(this.placeholders.goToAdminConsole || 'Go to Admin Console') : ''}
-          ${this.decorateSignOut()}
+<!--      start  https://jira.corp.adobe.com/browse/MWPW-201682-->
+<!--          ${this.hasOrgs ? decorateAction(this.placeholders.goToAdminConsole || 'Go to Admin Console') : ''}-->
+<!-- end https://jira.corp.adobe.com/browse/MWPW-201682          -->
+${this.decorateSignOut()}
         </ul>
       </div>
     `;
