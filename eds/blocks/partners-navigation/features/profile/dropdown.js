@@ -61,10 +61,7 @@ class ProfileDropdown {
     rawElem,
     decoratedElem,
     avatar,
-    // PARTNERS_NAVIGATION START
-    //  MWPW-201682
-    // hasOrgs,
-    // PARTNERS_NAVIGATION END
+    hasOrgs,
     buttonElem,
     openOnInit,
   } = {}) {
@@ -73,10 +70,7 @@ class ProfileDropdown {
     this.avatar = avatar;
     this.buttonElem = buttonElem;
     this.decoratedElem = decoratedElem;
-    // PARTNERS_NAVIGATION START
-    //  MWPW-201682
-    // this.hasOrgs = hasOrgs;
-    // PARTNERS_NAVIGATION END
+    this.hasOrgs = hasOrgs;
     this.openOnInit = openOnInit;
     // PARTNERS_NAVIGATION START
     // MWPW-180485 - Implement Profile Dropdown
@@ -162,11 +156,8 @@ class ProfileDropdown {
         </div>
         ${this.localMenu ? this.decorateLocalMenu() : ''}
         <ul class="feds-profile-actions">
-<!-- PARTNERS_NAVIGATION START-->
-<!-- MWPW-201682-->
-<!--          ${this.hasOrgs ? decorateAction(this.placeholders.goToAdminConsole || 'Go to Admin Console') : ''}-->
-<!-- PARTNERS_NAVIGATION END          -->
-${this.decorateSignOut()}
+          ${this.hasOrgs ? decorateAction(this.placeholders.goToAdminConsole || 'Go to Admin Console') : ''}
+          ${this.decorateSignOut()}
         </ul>
       </div>
     `;
