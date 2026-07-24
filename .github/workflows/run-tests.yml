@@ -29,6 +29,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - name: Upgrade npm
+      run: npm install -g npm@latest
+
     - name: Install XVFB
       run: sudo apt-get install xvfb
 
