@@ -39,8 +39,8 @@ jobs:
 
     - name: Verify web test runner is installed
       run: |
-        npm ls @web/test-runner
-        test -x node_modules/.bin/wtr
+        node -e "require.resolve('@web/test-runner')"
+        npx --no-install wtr --help > /dev/null
 
     - name: Run the tests
       run: xvfb-run -a npm test
