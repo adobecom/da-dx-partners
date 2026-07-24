@@ -6,7 +6,7 @@
   "description": "Website foundation technology.",
   "scripts": {
     "test": "npm run wtr && npm run jest",
-    "wtr": "wtr \"./test/**/*.test.js\" --node-resolve --port=2000 --coverage",
+    "wtr": "web-test-runner \"./test/**/*.test.js\" --node-resolve --port=2000 --coverage",
     "test:watch": "npm test -- --watch",
     "nala": "node nala/utils/nala.run.js",
     "lint": "npm run lint:js && npm run lint:css",
