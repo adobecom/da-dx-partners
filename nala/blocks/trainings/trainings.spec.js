@@ -1,0 +1,84 @@
+export default {
+  features: [
+    {
+      tcid: '1',
+      name: '@search-page-trainings-community-user-validation',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
+      tags: '@da-dx-search-page @da-dx-training @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-community:',
+        searchKeyword: 'Automation Regression: Test',
+        topResultTitle: 'Automation Regression: Test Learning Path',
+        excludedResultTitle: 'Automation Regression: Test Course',
+        lastModifiedDate: 'Jan 12, 2026',
+        shortDescription: 'This test training is used in our automation tests.',
+        previewUrl: 'https://partners.stage.adobe.com/digitalexperience/training/learning_program/learningProgrammock-trainig-1.html',
+      },
+    },
+    {
+      tcid: '2',
+      name: '@search-page-trainings-silver-user-validation',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
+      tags: '@da-dx-search-page @da-dx-training @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-silver:',
+        searchKeyword: 'Automation Regression: Test',
+        firstResultTitle: 'Automation Regression: Test Courseh',
+        secondResultTitle: 'Automation Regression: Test Learning Path',
+        topResultTitle: 'Automation Regression: Test Courseh',
+        lastModifiedDate: ' Jan 12, 2026',
+        shortDescription: 'This test training is used in our automation tests.',
+        previewUrl: '/digitalexperience/training/courses/coursemock-trainig-2.html',
+      },
+    },
+    {
+      tcid: '3',
+      name: '@on-demand-trainings-tag-mapping-filter-validation',
+      path: '/digitalexperience/drafts/automation/regression/on-demand-trainings?georouting=off&martech=off#',
+      tags: '@da-dx-training @da-dx-on-demand-trainings @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-gold:',
+        searchKeyword: 'Automation Regression: Test',
+        expectedResultTitle: 'Automation Regression: Test Courseh',
+        expectedResultCount: 1,
+      },
+    },
+    {
+      tcid: '4',
+      name: '@on-demand-trainings-preview-image-validation',
+      path: '/digitalexperience/drafts/automation/regression/on-demand-trainings?georouting=off&martech=off#',
+      tags: '@da-dx-training @da-dx-on-demand-trainings @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-silver:',
+        searchKeyword: 'Automation Regression: Test',
+        expectedResultCount: 2,
+        firstResultTitle: 'Automation Regression: Test Course',
+        secondResultTitle: 'Automation Regression: Test Learning Path',
+        cardThumbnails: [
+          {
+            title: 'Automation Regression: Test Course',
+            thumbnailUrl: '/eds/partners-shared/images/campaign.jpg',
+          },
+          {
+            title: 'Automation Regression: Test Learning Path',
+            thumbnailUrl: '/eds/partners-shared/images/target.jpg',
+          },
+        ],
+      },
+    },
+    {
+      tcid: '5',
+      name: '@retired-training-not-shown-validation',
+      path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
+      tags: '@da-dx-search-page @da-dx-training @da-dx-on-demand-trainings @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-platinum:',
+        searchKeyword: 'Automation Regression: Retired Training',
+        retiredTrainingTitle: 'Automation Regression: Retired Training',
+        onDemandTrainingsPath:
+          '/digitalexperience/drafts/automation/regression/on-demand-trainings?georouting=off&martech=off#',
+        noResultsMessage: 'No Results Found',
+      },
+    },
+  ],
+};
