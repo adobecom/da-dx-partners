@@ -979,13 +979,13 @@ class Gnav {
     // Get user profile for x-account-id
     let accountId = '';
     let hasOrgs = false;
+    // PARTNERS_NAVIGATION START
+    // MWPW-201682
     try {
-      const [profile, organizations] = await Promise.all([
-        window.adobeIMS.getProfile(),
-        window.adobeIMS.getOrganizations(),
-      ]);
+      const [profile] = await Promise.all([
+        window.adobeIMS.getProfile()]);
       accountId = profile?.userId || '';
-      hasOrgs = organizations?.count > 0;
+      // PARTNERS_NAVIGATION END
     } catch (e) {
       accountId = '';
       hasOrgs = false;

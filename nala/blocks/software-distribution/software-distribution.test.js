@@ -8,6 +8,8 @@ const { features } = softwareDistributionSpec;
 let softwareDistributionPage;
 let signInPage;
 
+test.use({ launchOptions: { args: ['--disable-features=LocalNetworkAccessChecks'] } });
+
 async function grantLocalNetworkAccess(context, browserName, origin) {
   if (browserName !== 'chromium' || !origin) {
     return;
@@ -32,7 +34,7 @@ test.describe('Software Distribution', () => {
     }
   });
 
-  test(`${features[0].name},${features[0].tags}`, async ({ page, browserName, baseURL }) => {
+  test(`${features[0].name},${features[0].tags}`, async ({ page, baseURL, browserName }) => {
     const { data, path } = features[0];
 
     await test.step('Go to grant download access test page', async () => {
@@ -49,6 +51,7 @@ test.describe('Software Distribution', () => {
 
     await test.step('Request access to Software Distribution', async () => {
       await grantLocalNetworkAccess(page.context(), browserName, new URL(page.url()).origin);
+      await softwareDistributionPage.mockGrantDownloadAccessResponse(200);
       await softwareDistributionPage.clickRequestAccess();
     });
 
