@@ -850,12 +850,13 @@ describe('Test personalization.js', () => {
 
       it('should return true when compliance expires exactly on 90 days', () => {
         jest.isolateModules(() => {
-          const futureDate = new Date();
-          futureDate.setDate(futureDate.getDate() + 90);
+          const now = new Date();
+          // Set expiry to 90 days from now in milliseconds, which will ceil to exactly 90 days
+          const expiryTimeMs = now.getTime() + (90 * 24 * 60 * 60 * 1000);
           const cookieObject = {
             DXP: {
               status: 'MEMBER',
-              complianceExpiryDate: futureDate.getTime().toString(),
+              complianceExpiryDate: expiryTimeMs.toString(),
             },
           };
           document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
