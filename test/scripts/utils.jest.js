@@ -412,4 +412,42 @@ describe('Test utils.js', () => {
     document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(isReturningUser(30)).toBe(false);
   });
+
+  it("Don't redirect logged in partner when adobe-loggedin-no-redirect metadata is set", () => {
+    const fakeWindow = { location: { assign: jest.fn() } };
+    const cookieObjectMember = { DXP: { status: 'MEMBER' } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
+
+    const targetMeta = document.createElement('meta');
+    targetMeta.name = 'adobe-target-after-login';
+    targetMeta.content = '/digitalexperience/home';
+    document.head.appendChild(targetMeta);
+
+    const noRedirectMeta = document.createElement('meta');
+    noRedirectMeta.name = 'adobe-loggedin-no-redirect';
+    noRedirectMeta.content = 'true';
+    document.head.appendChild(noRedirectMeta);
+
+    redirectLoggedinPartner(fakeWindow);
+    expect(fakeWindow.location.assign).not.toHaveBeenCalled();
+  });
+
+  it("Don't redirect and clear partner_redirects_count cookie when max redirects reached", () => {
+    const fakeWindow = { location: { assign: jest.fn() } };
+    const cookieObjectMember = { DXP: { status: 'MEMBER' } };
+    document.cookie = `partner_data=${JSON.stringify(cookieObjectMember)}`;
+    document.cookie = `partner_info=${JSON.stringify({})}`;
+    document.cookie = 'partner_redirects_count=3; path=/';
+
+    const targetMeta = document.createElement('meta');
+    targetMeta.name = 'adobe-target-after-login';
+    targetMeta.content = '/digitalexperience/home';
+    document.head.appendChild(targetMeta);
+
+    redirectLoggedinPartner(fakeWindow);
+
+    expect(fakeWindow.location.assign).not.toHaveBeenCalled();
+    expect(getCookieValue('partner_redirects_count')).toBeUndefined();
+  });
 });
