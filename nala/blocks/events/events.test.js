@@ -25,8 +25,8 @@ test.describe('Validate events block', () => {
       await eventsPage.verifyPublicCardTitle(data.publicCardTitle);
       const results = await eventsPage.getResultsNumber();
       await expect(results).toBeGreaterThanOrEqual(1);
-      await eventsPage.productFilter.click();
-      await eventsPage.getFirstFilterCheckbox().click();
+      await eventsPage.filterRegion.click();
+      await eventsPage.japanRegion.click();
       const resultsAfterFilter = await eventsPage.getResultsNumber();
       await expect(resultsAfterFilter).toBeLessThan(results);
     });

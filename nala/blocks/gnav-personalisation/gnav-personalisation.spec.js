@@ -31,14 +31,14 @@ export default {
       tcid: '1',
       name: '@gnav-personalisation-non-logged-in-user-accsess',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
-      tags: '@da-dx-personalisation @regression @anonymous @circleCi',
+      tags: '@da-dx-personalisation @regression @anonymous @circleCi @da-dx-main',
       data: { segmentText: '(NOT) Partner NOT member :' },
     },
     {
       tcid: '2',
       name: '@gnav-personalisation-logged-in-platinum-user-accsess',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerLevelSegmentText: 'Partner platinum',
         segmentBussinessSolution: 'Partner primary business solution: users primaryBusiness is solution',
@@ -74,7 +74,7 @@ export default {
       tcid: '3',
       name: '@gnav-personalisation-logged-in-gold-user-accsess',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerLevelSegmentText: 'Partner gold',
         accsesTypeSegment: 'Partner salescenter admin:',
@@ -106,7 +106,7 @@ export default {
       tcid: '4',
       name: '@gnav-personalisation-logged-in-silver-user-accsess',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerLevelSegmentText: 'Partner silver',
         primaryBusinessSegment: 'Partner primary business solution: users primaryBusiness is solution',
@@ -139,7 +139,7 @@ export default {
       tcid: '5',
       name: '@gnav-personalisation-logged-in-community-user-accsess',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerLevelSegmentText: 'Partner community',
         primaryBusinessSegment: '(NOT) Partner Not primary',
@@ -173,7 +173,7 @@ export default {
       tcid: '6',
       name: '@gnav-personalisation-logged-in-locked-compliance-past-user-accsess',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerLevelSegmentText: 'Partner community',
         primaryBusinessSegment: '(NOT) Partner Not primary',
@@ -213,7 +213,7 @@ export default {
       tcid: '7',
       name: '@gnav-personalisation-logged-in-locked-compliance-past-admin-user-accsess',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerLevelSegmentText: 'Partner community',
         primaryBusinessSegment: '(NOT) Partner Not primary',
@@ -251,7 +251,7 @@ export default {
       tcid: '8',
       name: '@gnav-personalisation-new-user-30-days-segment',
       path: '/digitalexperience/drafts/automation/regression/personalization/mocked-personalization',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerSegmentText: 'Partner-new-user-segment:',
         partnerData: {
@@ -279,7 +279,7 @@ export default {
       tcid: '9',
       name: '@gnav-personalisation-new-user-60-days-segment',
       path: '/digitalexperience/drafts/automation/regression/personalization/mocked-personalization',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerSegmentText: 'Partner-returning-user-60d:',
         partnerData: {
@@ -307,7 +307,7 @@ export default {
       tcid: '10',
       name: '@gnav-personalisation-new-user-90-days-segment',
       path: '/digitalexperience/drafts/automation/regression/personalization/mocked-personalization',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerSegmentText: 'Partner-returning-user-90d:',
         partnerData: {
@@ -335,7 +335,7 @@ export default {
       tcid: '11',
       name: '@gnav-icons-test-validation',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
-      tags: '@da-dx-personalisation @regression @anonymous',
+      tags: '@da-dx-personalisation @regression @anonymous @da-dx-main',
       data: {
         partnerData: {
           partnerPortal: 'DXP',
@@ -491,7 +491,7 @@ export default {
       tcid: '22',
       name: '@gnav-mobile-public-gnav-validation',
       path: '/digitalexperience/',
-      tags: '@da-dx-gnav @regression @circleCi @mobile @anonymous',
+      tags: '@da-dx-gnav @regression @circleCi @mobile @anonymous @da-dx-main',
       data: {
         gnavFragmentPath: '/digitalexperience/fragments/gnav/dx-public-gnav.plain.html',
         visibleCtas: ['Find a partner', 'Become a partner'],

@@ -52,6 +52,7 @@ const config = {
       use: {
         ...devices['Desktop Chrome'],
         bypassCSP: true,
+        launchOptions: { args: ['--disable-features=LocalNetworkAccessChecks'] },
       },
       launchOptions: { args: ['--disable-web-security', '--disable-gpu'] },
       grepInvert: /@mobile/, // EXCLUDES tests tagged with @mobile

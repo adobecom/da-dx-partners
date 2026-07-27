@@ -13,4 +13,8 @@ export default class ProfileDropdownPage {
     this.manageCompanyAccount = page.getByRole('link', { name: 'Manage Company Account' });
     this.signOut = page.getByRole('link', { name: 'Sign Out' });
   }
+
+  async openProfileDropdown() {
+    await this.profileDropdownButton.click();
+  }
 }

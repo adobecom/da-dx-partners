@@ -1,3 +1,13 @@
+const DEMO_LINK = {
+  stage: 'https://demo-stage.adobe.com/',
+  main: 'https://demo.adobe.com/',
+};
+
+const ADOBE_LINK = {
+  stage: 'https://stage.adobe.com/',
+  main: 'https://adobe.com/',
+};
+
 export default {
   FeatureName: 'DXP Redirects',
   features: [
@@ -5,26 +15,26 @@ export default {
       tcid: '1',
       name: '@redirects-links-validation-public-page',
       path: '/digitalexperience/drafts/automation/regression/links-rewrite/page-with-gnav',
-      tags: '@da-dx-redirects @regression @circleCi @anonymous',
+      tags: '@da-dx-redirects @regression @circleCi @anonymous @da-dx-main',
       data: {
-        benefitsCenterLink: 'https://pp-staging.adobe.com/benefits-center.html',
-        experienceLeagueLink: 'https://experienceleague.stage.adobe.com/en/home',
-        menageUserLink: 'https://partners.stage.adobe.com/digitalexperience/home/manage-user',
-        demoLink: 'https://demo-stage.adobe.com/',
-        adobeLink: 'https://stage.adobe.com/',
+        benefitsCenterLink: '/benefits-center.html',
+        experienceLeagueLink: '/en/home',
+        menageUserLink: '/digitalexperience/home/manage-user',
+        demoLink: DEMO_LINK,
+        adobeLink: ADOBE_LINK,
       },
     },
     {
       tcid: '2',
       name: '@redirects-icon-links-validation-public-page',
       path: '/digitalexperience/drafts/automation/regression/links-rewrite/page-with-gnav',
-      tags: '@da-dx-redirects @regression @circleCi @anonymous',
+      tags: '@da-dx-redirects @regression @circleCi @anonymous @da-dx-main',
       data: {
-        benefitsCenterIconLink: 'https://pp-staging.adobe.com/benefits-center.html',
-        bellIconLink: 'https://experienceleague.stage.adobe.com/en/home',
-        worldIconLink: 'https://partners.stage.adobe.com/digitalexperience/home/manage-user',
-        menageUserIconLink: 'https://demo-stage.adobe.com/',
-        homeIconLink: 'https://stage.adobe.com/',
+        benefitsCenterIconLink: '/benefits-center.html',
+        bellIconLink: '/en/home',
+        worldIconLink: '/digitalexperience/home/manage-user',
+        menageUserIconLink: DEMO_LINK,
+        homeIconLink: ADOBE_LINK,
       },
     },
     {

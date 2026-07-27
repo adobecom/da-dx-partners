@@ -22,11 +22,16 @@ test.describe('Validate analytics attributes', () => {
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Verify analytics attributes card collection', async () => {
-      await analyticsAttributesPage.byDaaLh(data.daaLh).waitFor({ state: 'visible', timeout: 30000 });
+      await analyticsAttributesPage.verifyInitialCardCollectionDaaLh();
+
       await analyticsAttributesPage.search(data.searchKeyWord);
-      await analyticsAttributesPage.getFilter(data.filter);
-      await analyticsAttributesPage.getCheckBox(data.checkBoxName).click();
-      await expect(analyticsAttributesPage.byDaaLh(data.daaLhAfterSearch)).toBeVisible();
+
+      const selectedFilter = await analyticsAttributesPage.clickFirstCheckboxInFilter(data.filter);
+
+      await analyticsAttributesPage.verifyPartnerCardsDaaLh({
+        searchQuery: data.searchKeyWord,
+        selectedFilter,
+      });
     });
   });
   test(`${features[1].name},${features[1].tags}`, async ({ page, baseURL }) => {
