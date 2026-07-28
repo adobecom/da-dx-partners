@@ -5,7 +5,6 @@ import {
   getCurrentProgramType,
   getPartnerAccountState,
   getPartnerCookieObject,
-  invokeAfterImsIsReady,
 } from '../../scripts/utils.js';
 import { keepInlineFragmentInDOM } from '../utils/utils.js';
 
@@ -168,9 +167,8 @@ export default async function init(el) {
   const inlineChildren = Array.from(el.children);
   el.innerHTML = '';
 
-  // Defer all data fetching until IMS + user state are confirmed ready.
-  // This mirrors the pattern used by PartnershipProgress and uplevel-banner blocks.
-  await invokeAfterImsIsReady(async () => {
+  // set timeout just to avoid delaying milo load of page
+  setTimeout(async () => {
     try {
       await Promise.all([
         refreshPartnerAccountState().catch((error) => {
@@ -199,5 +197,5 @@ export default async function init(el) {
       // eslint-disable-next-line no-console
       console.error('Calendly widget failed to load', e);
     }
-  });
+  }, 1);
 }
