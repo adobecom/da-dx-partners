@@ -1,10 +1,11 @@
 import showToast from '../../components/Toast.js';
 import { refreshPartnerAccountState, updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
 import {
-  getCurrentProgramType,
   getLibs,
+  getCurrentProgramType,
   getPartnerAccountState,
   getPartnerCookieObject,
+  invokeAfterImsIsReady,
 } from '../../scripts/utils.js';
 import { keepInlineFragmentInDOM } from '../utils/utils.js';
 
@@ -14,7 +15,6 @@ const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 const CALENDLY_RETRY_DELAY_MS = 200;
 
 let calendlyScriptPromise;
-let toastStyleLoaded = false;
 
 const CALENDLY_ERROR_TOAST = { toastNegative: 'Unable to save your booking. Please contact support if the issue persists.' };
 
@@ -51,12 +51,6 @@ function loadCalendlyScript() {
   return calendlyScriptPromise;
 }
 
-async function ensureToastStyle() {
-  if (toastStyleLoaded) return;
-  await loadStyle('/eds/components/Toast.css');
-  toastStyleLoaded = true;
-}
-
 function getPropertyName(columns) {
   return columns[0].textContent.trim().toLowerCase().replace(/\s+/g, '-');
 }
@@ -72,12 +66,10 @@ function isCalendlyEvent(e) {
 }
 
 async function showCalendlyErrorToast() {
-  await ensureToastStyle();
   showToast('calendly', false, null, CALENDLY_ERROR_TOAST);
 }
 
 async function showDoubleBookingToast() {
-  await ensureToastStyle();
   showToast('calendly', false, null, CALENDLY_DOUBLE_BOOKING_TOAST);
 }
 
@@ -168,30 +160,52 @@ function setBlockData(tableRows) {
   return blockData;
 }
 export default async function init(el) {
-  const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
-  try {
-    await refreshPartnerAccountState();
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log('err', error);
-  }
-  const calendlyEmbed = document.createElement('div');
-  if (hasCalendlyBooked()) {
-    keepInlineFragmentInDOM(Array.from(el.children), calendlyEmbed, 'already-booked-fragment', false);
-    el.innerHTML = '';
-    el.append(calendlyEmbed);
-    return;
-  }
+  await loadStyle('/eds/components/Toast.css');
 
-  calendlyEmbed.className = 'calendly-embed';
+  const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
+
+  // Capture inline fragment children before clearing DOM
+  const inlineChildren = Array.from(el.children);
+  //
+  // // Show loader immediately with inline styles — visible without waiting for CSS.
+  // // init() is synchronous so Milo loadArea() moves on to navigation/footer instantly.
+  // const loader = document.createElement('div');
+  // loader.className = 'calendly-loader';
+  // loader.style.cssText = 'display:flex;align-items:center;justify-content:center;min-height:700px;width:100%';
   el.innerHTML = '';
-  el.append(calendlyEmbed);
-  try {
-    await loadCalendlyScript();
-    initCalendly(schedulingLink, calendlyEmbed, companyQuestionKey);
-    window.addEventListener('message', trackCalendlyEvent);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('Calendly widget failed to load', e);
-  }
+  // el.append(loader);
+
+  // Defer all data fetching until IMS + user state are confirmed ready.
+  // This mirrors the pattern used by PartnershipProgress and uplevel-banner blocks.
+  invokeAfterImsIsReady(async () => {
+    try {
+      await Promise.all([
+        refreshPartnerAccountState().catch((error) => {
+          // eslint-disable-next-line no-console
+          console.log('err', error);
+        }),
+      ]);
+
+      // loader.remove();
+      const calendlyEmbed = document.createElement('div');
+
+      if (hasCalendlyBooked()) {
+        keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
+        el.innerHTML = '';
+        el.append(calendlyEmbed);
+        return;
+      }
+
+      calendlyEmbed.className = 'calendly-embed';
+      el.innerHTML = '';
+      el.append(calendlyEmbed);
+
+      await loadCalendlyScript();
+      initCalendly(schedulingLink, calendlyEmbed, companyQuestionKey);
+      window.addEventListener('message', trackCalendlyEvent);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Calendly widget failed to load', e);
+    }
+  });
 }
