@@ -1,11 +1,12 @@
 import showToast from '../../components/Toast.js';
-import { updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
+import { refreshPartnerAccountState, updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
 import {
   getCurrentProgramType,
   getLibs,
   getPartnerAccountState,
   getPartnerCookieObject,
 } from '../../scripts/utils.js';
+import { keepInlineFragmentInDOM } from '../utils/utils.js';
 
 const miloLibs = getLibs();
 const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
@@ -168,12 +169,23 @@ function setBlockData(tableRows) {
 }
 export default async function init(el) {
   const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
+  try {
+    await refreshPartnerAccountState();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log('err', error);
+  }
   const calendlyEmbed = document.createElement('div');
-  calendlyEmbed.className = 'calendly-embed';
+  if (hasCalendlyBooked()) {
+    keepInlineFragmentInDOM(Array.from(el.children), calendlyEmbed, 'already-booked-fragment', false);
+    el.innerHTML = '';
+    el.append(calendlyEmbed);
+    return;
+  }
 
+  calendlyEmbed.className = 'calendly-embed';
   el.innerHTML = '';
   el.append(calendlyEmbed);
-
   try {
     await loadCalendlyScript();
     initCalendly(schedulingLink, calendlyEmbed, companyQuestionKey);
