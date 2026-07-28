@@ -163,6 +163,14 @@ export default function init(el) {
   // Capture inline fragment children before clearing DOM
   const inlineChildren = Array.from(el.children);
   el.innerHTML = '';
+  const calendlyEmbed = document.createElement('div');
+  // if cookie state already shows calendly booked, we just display already booked fragment
+  if (hasCalendlyBooked()) {
+    keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
+    el.innerHTML = '';
+    el.append(calendlyEmbed);
+    return;
+  }
 
   // Defer heavy work so Milo loadArea() is not blocked — init returns immediately.
   setTimeout(async () => {
@@ -176,7 +184,6 @@ export default function init(el) {
           console.log('err', err);
         }),
       ]);
-      const calendlyEmbed = document.createElement('div');
 
       if (hasCalendlyBooked()) {
         keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
