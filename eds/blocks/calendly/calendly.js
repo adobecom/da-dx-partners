@@ -166,18 +166,11 @@ export default async function init(el) {
 
   // Capture inline fragment children before clearing DOM
   const inlineChildren = Array.from(el.children);
-  //
-  // // Show loader immediately with inline styles — visible without waiting for CSS.
-  // // init() is synchronous so Milo loadArea() moves on to navigation/footer instantly.
-  // const loader = document.createElement('div');
-  // loader.className = 'calendly-loader';
-  // loader.style.cssText = 'display:flex;align-items:center;justify-content:center;min-height:700px;width:100%';
   el.innerHTML = '';
-  // el.append(loader);
 
   // Defer all data fetching until IMS + user state are confirmed ready.
   // This mirrors the pattern used by PartnershipProgress and uplevel-banner blocks.
-  invokeAfterImsIsReady(async () => {
+  await invokeAfterImsIsReady(async () => {
     try {
       await Promise.all([
         refreshPartnerAccountState().catch((error) => {
@@ -186,7 +179,6 @@ export default async function init(el) {
         }),
       ]);
 
-      // loader.remove();
       const calendlyEmbed = document.createElement('div');
 
       if (hasCalendlyBooked()) {
