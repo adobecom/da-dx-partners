@@ -170,13 +170,7 @@ export default async function init(el) {
   // set timeout just to avoid delaying milo load of page
   setTimeout(async () => {
     try {
-      await Promise.all([
-        refreshPartnerAccountState().catch((error) => {
-          // eslint-disable-next-line no-console
-          console.log('err', error);
-        }),
-      ]);
-
+      await refreshPartnerAccountState();
       const calendlyEmbed = document.createElement('div');
 
       if (hasCalendlyBooked()) {
