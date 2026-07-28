@@ -969,10 +969,42 @@ class Gnav {
     // If user is signed in, decorate the profile avatar
     const accessToken = window.adobeIMS.getAccessToken();
     const { env } = getConfig();
-    const headers = new Headers({ Authorization: `Bearer ${accessToken.token}` });
-    const profileData = await fetch(`https://${env.adobeIO}/profile`, { headers });
 
-    if (profileData.status !== 200) {
+    // remove this block after https://github.com/adobecom/milo/pull/6222 is merged
+    let { adobeIO } = env;
+    if (adobeIO.includes('cc-collab')) {
+      adobeIO = `pps${env.name === 'stage' ? '-stage' : ''}.adobe.io`;
+    }
+
+    // Get user profile for x-account-id
+    let accountId = '';
+    let hasOrgs = false;
+    // PARTNERS_NAVIGATION START
+    // MWPW-201682
+    try {
+      const [profile] = await Promise.all([
+        window.adobeIMS.getProfile()]);
+      accountId = profile?.userId || '';
+      // PARTNERS_NAVIGATION END
+    } catch (e) {
+      accountId = '';
+      hasOrgs = false;
+      lanaLog({
+        message: 'GNAV: decorateProfile has failed to fetch profile or organizations data',
+        e,
+        tags: 'gnav',
+        errorType: 'i',
+        severity: 'error',
+      });
+    }
+    const headers = new Headers({
+      Authorization: `Bearer ${accessToken.token}`,
+      'x-account-id': accountId,
+      'x-api-key': window.adobeid?.client_id,
+    });
+    const profileData = await fetch(`https://${adobeIO}/api/profile`, { headers });
+
+    if (!profileData.ok) {
       lanaLog({
         message: 'GNAV: decorateProfile has failed to fetch profile data',
         e: `${profileData.statusText} url: ${profileData.url}`,
@@ -983,7 +1015,8 @@ class Gnav {
       return;
     }
 
-    const { sections, user: { avatar } } = await profileData.json();
+    const profileJson = await profileData.json();
+    const avatar = profileJson?.images?.['138'] || '';
 
     this.blocks.profile.buttonElem = await decorateProfileTrigger({ avatar });
     decoratedElem.append(this.blocks.profile.buttonElem);
@@ -1004,7 +1037,7 @@ class Gnav {
         rawElem,
         decoratedElem,
         avatar,
-        sections,
+        hasOrgs,
         buttonElem: this.blocks.profile.buttonElem,
         // If the dropdown has been decorated due to a click, open it
         openOnInit: e instanceof Event,

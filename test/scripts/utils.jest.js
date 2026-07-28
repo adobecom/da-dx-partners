@@ -32,6 +32,9 @@ import {
   getDaysFromRegistration,
   isReturningUser,
   prodHosts,
+  getPartnerAccountState,
+  getPartnerUserState,
+  hasPartnerAccountStateCalendly,
 } from '../../eds/scripts/utils.js';
 import {DX_PROGRAM_TYPE} from "../../eds/blocks/utils/dxConstants.js";
 
@@ -146,6 +149,17 @@ describe('Test utils.js', () => {
     document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
     document.cookie = `partner_info=${JSON.stringify({})}`;
     expect(getPartnerCookieObject('dxp')).toStrictEqual(cookieObject.DXP);
+  });
+  it('Should return partner account state cookie object', () => {
+    const cookieObject = { DXP: { calendly: 'scheduled' } };
+    document.cookie = `partner_account_state=${encodeURIComponent(JSON.stringify(cookieObject))}`;
+    expect(getPartnerAccountState()).toStrictEqual(cookieObject.DXP);
+    expect(hasPartnerAccountStateCalendly()).toBe(true);
+  });
+  it('Should return partner user state cookie object', () => {
+    const cookieObject = { DXP: { test: 'value' } };
+    document.cookie = `partner_user_state=${encodeURIComponent(JSON.stringify(cookieObject))}`;
+    expect(getPartnerUserState()).toStrictEqual(cookieObject.DXP);
   });
   it('Check if user is a member', () => {
     const cookieObjectMember = { DXP: { status: 'MEMBER' } };

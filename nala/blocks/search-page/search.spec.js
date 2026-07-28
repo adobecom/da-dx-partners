@@ -25,7 +25,7 @@ export default {
       data: {
         partnerLevel: 'dxp-silver:',
         searchKeyword: 'dxRegressionTest25',
-        assetTitle1: 'Asset preview Community JPG Regular Automation',
+        assetTitle1: 'Asset preview Public PDF Regular  Automation',
         assetTitle2: 'Asset preview Community JPG Regular Automation',
         assetTitle3: 'Asset preview Silver PPTX Regular Automation',
         assetTitle4: 'Asset preview Public ZIP Netstorage Automation',
@@ -235,7 +235,6 @@ export default {
       tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-platinum:',
-        cardDate: 'Jun 11, 2026',
         cardIcon: 'url("https://partners.stage.adobe.com/eds/img/icons/course.svg")',
       },
     },
@@ -256,12 +255,58 @@ export default {
           'px',
           'faq',
           'plans & pricing',
-          'automation control solutions',
+          'automation & control solutions',
           'high tech',
-          'frame io',
+          'frame.io',
         ],
         previewUrl:
           'https://partners.stage.adobe.com/digitalexperience/preview/netstorage-assets/public/au/Automation_Regression_Public_Search_Page_Test.mp4.html',
+      },
+    },
+    {
+      tcid: '20',
+      name: '@netstorage-asset-thumbnail-uploaded',
+      path: '/digitalexperience/preview/netstorage-assets/restricted/te/test.jpg.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: { imageThumbnail: '/thumbnail.png' },
+    },
+    {
+      tcid: '21',
+      name: '@netstorage-asset-default-image-displayed',
+      path: '/digitalexperience/preview/netstorage-assets/restricted/qa/qaAssetTestpdf.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: { imageThumbnail: '/sample-pdf.png' },
+    },
+    {
+      tcid: '22',
+      name: '@regular-asset-aem-rendition-displayed',
+      path: '/digitalexperience/preview/qa-test/public/automation-regression-restricted-asset-message/qaAssetTestpdf.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: { imageThumbnail: '/renditions/cq5dam.web.1280.1280.jpeg' },
+    },
+    {
+      tcid: '23',
+      name: '@regular-asset-aem-rendition-deleted-custom-image-displayed',
+      path: '/digitalexperience/preview/qa-test/public/automation-regression-restricted-asset-message/qaAssetTest.pdf.html',
+      tags: '@da-dx-search-page @regression @circleCi',
+      data: { imageThumbnail: '/renditions/custom-thumbnail.jpg' },
+    },
+    {
+      tcid: '24',
+      name: '@restricted-asset-preview-message-mapc-user',
+      signInPath: '/digitalexperience/',
+      path: '/digitalexperience/preview/netstorage-assets/restricted/as/asset_preview_platinumdocxnetstorage.docx.html',
+      tags: '@restricted-asset @da-dx-search-page @regression @circleCi',
+      data: {
+        partnerLevel: 'cpp-distributor-india:',
+        textBlock:
+          'Access to view or download this asset is restricted to registered partners. Login or register now.',
+        link: [
+          {
+            text: 'register now',
+            url: 'https://partners.stage.adobe.com/digitalexperience/s/registration',
+          },
+        ],
       },
     },
   ],

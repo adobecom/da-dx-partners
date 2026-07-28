@@ -52,8 +52,10 @@ const config = {
       use: {
         ...devices['Desktop Chrome'],
         bypassCSP: true,
+        launchOptions: { args: ['--disable-features=LocalNetworkAccessChecks'] },
       },
       launchOptions: { args: ['--disable-web-security', '--disable-gpu'] },
+      grepInvert: /@mobile/, // EXCLUDES tests tagged with @mobile
     },
     {
       name: 'da-dx-partners-live-firefox',
@@ -66,6 +68,7 @@ const config = {
           clearStorageState: true,
         }
       },
+      grepInvert: /@mobile/, // EXCLUDES tests tagged with @mobile
       retries: process.env.CI ? 2 : 1,
       launchOptions: {
         args: [
@@ -80,6 +83,11 @@ const config = {
           'dom.max_script_run_time': 60,
         }
       },
+    },
+    {
+      name: 'mobile-chrome-pixel5',
+      use: { ...devices['Pixel 5'] },
+      grep: /@mobile/, // ⬅️ Only INCLUDE tests tagged with @mobile
     },
     //     {
     //       name: 'da-dx-partners-live-webkit',
