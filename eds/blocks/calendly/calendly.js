@@ -9,7 +9,6 @@ import {
 import { keepInlineFragmentInDOM } from '../utils/utils.js';
 
 const miloLibs = getLibs();
-const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 
 const CALENDLY_RETRY_DELAY_MS = 200;
 
@@ -158,19 +157,25 @@ function setBlockData(tableRows) {
   });
   return blockData;
 }
-export default async function init(el) {
-  await loadStyle('/eds/components/Toast.css');
-
+export default function init(el) {
   const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
 
   // Capture inline fragment children before clearing DOM
   const inlineChildren = Array.from(el.children);
   el.innerHTML = '';
 
-  // set timeout just to avoid delaying milo load of page
+  // Defer heavy work so Milo loadArea() is not blocked — init returns immediately.
   setTimeout(async () => {
     try {
-      await refreshPartnerAccountState();
+      // loadStyle import resolves from cache instantly (milo/utils already loaded)
+      const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+      await Promise.all([
+        loadStyle('/eds/components/Toast.css'),
+        refreshPartnerAccountState().catch((err) => {
+          // eslint-disable-next-line no-console
+          console.log('err', err);
+        }),
+      ]);
       const calendlyEmbed = document.createElement('div');
 
       if (hasCalendlyBooked()) {
