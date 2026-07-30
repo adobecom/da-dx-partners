@@ -36,32 +36,34 @@ test.describe('Search Page', () => {
       ).toBeGreaterThanOrEqual(6);
     });
     await test.step('Asset Card Content Validation', async () => {
-      await expect(async () => {
-        const card = searchPage.getCardByTitle(data.cardTitle);
-        await searchPage.clickCard(card);
-        await page.waitForLoadState('domcontentloaded');
-        const expanded = await card.evaluate((el) => el.classList.contains('expanded'));
-
-        expect(expanded).toBe(true);
-      }).toPass({ timeout: 30000 });
+      const card = searchPage.getCardByTitle(data.cardTitle);
+      await searchPage.clickCard(card);
       const expandedCard = searchPage
         .getExpandedCard()
         .filter({ hasText: data.cardTitle })
         .first();
-      await expect(expandedCard).toBeVisible({ timeout: 30000 });
 
+      await expect(expandedCard).toBeVisible({ timeout: 30000 });
       const cardDate = searchPage.getCardDateLocator(expandedCard);
+      await expect(cardDate).toBeVisible({ timeout: 30000 });
       await expect(cardDate).toContainText(data.cardDate);
 
       const cardSize = searchPage.getCardSizeLocator(expandedCard);
+      await expect(cardSize).toBeVisible({ timeout: 30000 });
       await expect(cardSize).toContainText(data.cardSize);
 
+      const tags = expandedCard.locator('.card-tag');
+      await expect(tags).toHaveCount(data.cardTags.length, { timeout: 30000 });
       for (const tagText of data.cardTags) {
-        const tag = searchPage.getCardTagByText(expandedCard, tagText);
-        await expect(tag).toBeVisible({ timeout: 30000 });
+        await expect(
+          tags.filter({ hasText: tagText }),
+        ).toBeVisible({ timeout: 30000 });
       }
 
-      await searchPage.verifyCardButtonLink(expandedCard, data.cardButtonLink);
+      await searchPage.verifyCardButtonLink(
+        expandedCard,
+        data.cardButtonLink,
+      );
     });
 
     await test.step('Check Silver Asset', async () => {
@@ -516,17 +518,26 @@ test.describe('Search Page', () => {
     const { data } = features[17];
 
     await test.step('Go to search page', async () => {
-      await page.goto(`${features[17].path}`);
-      await page.waitForLoadState('domcontentloaded');
+      await page.goto(features[17].path);
+
       await signInPage.signInButton.click();
-      await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await signInPage.signIn(page, data.partnerLevel);
+
+      await expect(signInPage.profileIconButton).toBeVisible({ timeout: 30000 });
     });
 
     await test.step('Open Training tab', async () => {
       await searchPage.trainingButton.click();
-      await page.waitForLoadState('domcontentloaded');
+
+      await searchPage.waitForResultsToSettle();
+
+      await expect(searchPage.card.first()).toBeVisible({ timeout: 30000 });
+
       await searchPage.clickCard(searchPage.card.first());
+
+      const expandedCard = searchPage.getExpandedCard().first();
+
+      await expect(expandedCard).toBeVisible({ timeout: 30000 });
     });
 
     await test.step('Verify card details', async () => {

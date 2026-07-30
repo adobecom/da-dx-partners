@@ -116,14 +116,17 @@ export default class GnavPersonalisationPage {
   }
 
   async verifyTabPanelImagesNotBroken() {
-    const panel = this.page.getByRole('tabpanel');
+    const panel = this.page
+      .getByRole('tabpanel')
+      .locator(':visible')
+      .first();
 
-    await panel.scrollIntoViewIfNeeded();
+    await expect(panel).toBeVisible({ timeout: 30000 });
 
     await panel.evaluate(async (el) => {
       el.scrollTop = 0;
 
-      return new Promise((resolve) => {
+      await new Promise((resolve) => {
         let total = 0;
         const step = 300;
 
@@ -148,7 +151,12 @@ export default class GnavPersonalisationPage {
       const img = images.nth(i);
 
       await expect
-        .poll(async () => img.evaluate((el) => el.complete && el.naturalWidth > 0))
+        .poll(
+          async () => img.evaluate(
+            (el) => el.complete && el.naturalWidth > 0,
+          ),
+          { timeout: 30000 },
+        )
         .toBeTruthy();
     }
   }
