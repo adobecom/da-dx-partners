@@ -40,6 +40,7 @@ export default async function init(el) {
   keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'training-not-available-fragment');
   keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'enroll-alert-text');
   keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'training-warning-text');
+  keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'certification-prerequisits-title');
   el.replaceWith(app);
 
   await deps;
