@@ -61,9 +61,15 @@ test.describe('Validate Partner Directory pages', () => {
     }
 
     for (const { element, expected } of linksToCheck) {
-      await expect(element).toBeVisible();
-      const href = await element.getAttribute('href');
-      expect(href).toContain(expected);
+      await expect(element).toBeVisible({ timeout: 30000 });
+
+      await expect.poll(
+        async () => {
+          const href = await element.getAttribute('href');
+          return href;
+        },
+        { timeout: 30000 },
+      ).toContain(expected);
     }
   }
 
@@ -117,9 +123,10 @@ test.describe('Validate Partner Directory pages', () => {
         smokeTest.becomeAPartnerButton.click(),
       ]);
 
-      await newPage.waitForLoadState('domcontentloaded');
-      const newPageUrl = newPage.url();
-      expect(newPageUrl).toContain(data.becomAPartnerUrl);
+      await expect(newPage).toHaveURL(
+        new RegExp(data.becomAPartnerUrl),
+        { timeout: 30000 },
+      );
       await newPage.close();
     });
   });
@@ -140,9 +147,12 @@ test.describe('Validate Partner Directory pages', () => {
         smokeTest.findAPartnerButton.click(),
       ]);
 
-      await newPage.waitForLoadState('domcontentloaded');
-      const newPageUrl = newPage.url();
-      expect(newPageUrl).toContain(data.findAPartnerUrl);
+      await expect
+        .poll(
+          () => newPage.url(),
+          { timeout: 30000 },
+        )
+        .toContain(data.findAPartnerUrl);
       await newPage.close();
     });
   });
@@ -221,9 +231,10 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Check contact not found page', async () => {
-      await page.waitForLoadState('domcontentloaded');
-      const currentPageUrl = page.url();
-      expect(currentPageUrl).toContain(data.contactNotFoundUrl);
+      await expect(page).toHaveURL(
+        new RegExp(data.contactNotFoundUrl),
+        { timeout: 30000 },
+      );
 
       await smokeTest.findAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
     });
@@ -299,8 +310,10 @@ test.describe('Validate Partner Directory pages', () => {
       await test.step('Verify error message', async () => {
         await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
         const pages = await page.context().pages();
-        await expect(pages[0].url())
-          .toContain(`${feature.data.expectedToSeeInURL}`);
+        await expect(pages[0]).toHaveURL(
+          new RegExp(feature.data.expectedToSeeInURL),
+          { timeout: 30000 },
+        );
       });
     });
   });

@@ -3,6 +3,7 @@
  */
 
 import {
+  refreshPartnerAccountState,
   updatePartnerAccountState,
   updatePartnerUserState,
 } from '../../eds/scripts/partnerStateUtils.js';
@@ -97,5 +98,27 @@ describe('partnerStateUtils', () => {
       status: 409,
       errorText: 'dxpAccountState is not fresh',
     });
+  });
+
+  it('refreshes partner account state cookie via runtime action', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ message: 'ok' }),
+    });
+
+    const result = await refreshPartnerAccountState();
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://runtime.com/api/v1/web/dx-partners-runtime/dxp-state-management',
+      expect.objectContaining({
+        body: JSON.stringify({
+          programType: 'DXP',
+          action: 'refreshPartnerAccountState',
+          email: 'test@adobetest.com',
+        }),
+      }),
+    );
+    expect(result.success).toBe(true);
   });
 });

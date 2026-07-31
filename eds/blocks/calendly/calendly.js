@@ -1,19 +1,18 @@
 import showToast from '../../components/Toast.js';
-import { updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
+import { refreshPartnerAccountState, updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
 import {
-  getCurrentProgramType,
   getLibs,
+  getCurrentProgramType,
   getPartnerAccountState,
   getPartnerCookieObject,
 } from '../../scripts/utils.js';
+import { keepInlineFragmentInDOM } from '../utils/utils.js';
 
 const miloLibs = getLibs();
-const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 
 const CALENDLY_RETRY_DELAY_MS = 200;
 
 let calendlyScriptPromise;
-let toastStyleLoaded = false;
 
 const CALENDLY_ERROR_TOAST = { toastNegative: 'Unable to save your booking. Please contact support if the issue persists.' };
 
@@ -50,12 +49,6 @@ function loadCalendlyScript() {
   return calendlyScriptPromise;
 }
 
-async function ensureToastStyle() {
-  if (toastStyleLoaded) return;
-  await loadStyle('/eds/components/Toast.css');
-  toastStyleLoaded = true;
-}
-
 function getPropertyName(columns) {
   return columns[0].textContent.trim().toLowerCase().replace(/\s+/g, '-');
 }
@@ -71,12 +64,10 @@ function isCalendlyEvent(e) {
 }
 
 async function showCalendlyErrorToast() {
-  await ensureToastStyle();
   showToast('calendly', false, null, CALENDLY_ERROR_TOAST);
 }
 
 async function showDoubleBookingToast() {
-  await ensureToastStyle();
   showToast('calendly', false, null, CALENDLY_DOUBLE_BOOKING_TOAST);
 }
 
@@ -166,20 +157,51 @@ function setBlockData(tableRows) {
   });
   return blockData;
 }
-export default async function init(el) {
+export default function init(el) {
   const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
-  const calendlyEmbed = document.createElement('div');
-  calendlyEmbed.className = 'calendly-embed';
 
+  // Capture inline fragment children before clearing DOM
+  const inlineChildren = Array.from(el.children);
   el.innerHTML = '';
-  el.append(calendlyEmbed);
-
-  try {
-    await loadCalendlyScript();
-    initCalendly(schedulingLink, calendlyEmbed, companyQuestionKey);
-    window.addEventListener('message', trackCalendlyEvent);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('Calendly widget failed to load', e);
+  const calendlyEmbed = document.createElement('div');
+  // if cookie state already shows calendly booked, we just display already booked fragment
+  if (hasCalendlyBooked()) {
+    keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
+    el.innerHTML = '';
+    el.append(calendlyEmbed);
+    return;
   }
+
+  // Defer heavy work so Milo loadArea() is not blocked — init returns immediately.
+  setTimeout(async () => {
+    try {
+      // loadStyle import resolves from cache instantly (milo/utils already loaded)
+      const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+      await Promise.all([
+        loadStyle('/eds/components/Toast.css'),
+        refreshPartnerAccountState().catch((err) => {
+          // eslint-disable-next-line no-console
+          console.log('err', err);
+        }),
+      ]);
+
+      if (hasCalendlyBooked()) {
+        keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
+        el.innerHTML = '';
+        el.append(calendlyEmbed);
+        return;
+      }
+
+      calendlyEmbed.className = 'calendly-embed';
+      el.innerHTML = '';
+      el.append(calendlyEmbed);
+
+      await loadCalendlyScript();
+      initCalendly(schedulingLink, calendlyEmbed, companyQuestionKey);
+      window.addEventListener('message', trackCalendlyEvent);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Calendly widget failed to load', e);
+    }
+  }, 1);
 }

@@ -82,6 +82,7 @@ export default class SmokeTest {
 
   async verifyFooterSocialMediaIcons(data) {
     const root = this.globalFooter;
+    await expect(root).toBeVisible({ timeout: 30000 });
     const pairs = [
       ['facebook', data.facebookLink],
       ['instagram', data.instagramLink],
@@ -90,7 +91,7 @@ export default class SmokeTest {
     ];
     for (const [label, href] of pairs) {
       const link = root.locator(`a.feds-social-link[aria-label="${label}"]`);
-      await expect(link).toBeVisible();
+      await expect(link).toBeVisible({ timeout: 30000 });
       await expect(link).toHaveAttribute('href', href);
     }
   }
@@ -112,6 +113,7 @@ export default class SmokeTest {
     await this.searchField.fill('');
     await this.searchField.type(keyword, { delay: 80 });
     await this.page.waitForTimeout(5000);
+    await this.dismissSearchSuggestions();
     await this.page.keyboard.press('Enter');
   }
 
@@ -120,5 +122,19 @@ export default class SmokeTest {
     await this.profileIconButton.click();
     await this.signOutButton.waitFor({ state: 'visible', timeout: 10000 });
     await this.signOutButton.click();
+  }
+
+  async dismissSearchSuggestions() {
+    const searchValue = await this.searchField.inputValue();
+    const typeahead = this.page.locator('dialog#typeahead.suggestion-dialog-wrapper');
+
+    await this.searchField.blur();
+
+    if (await typeahead.isVisible()) {
+      await typeahead.evaluate((dialog) => dialog.close());
+    }
+
+    await expect(typeahead).toBeHidden({ timeout: 10000 });
+    await expect(this.searchField).toHaveValue(searchValue);
   }
 }

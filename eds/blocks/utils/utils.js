@@ -129,7 +129,7 @@ export function isProd() {
   return prodHosts.includes(window.location.host);
 }
 
-export function keepInlineFragmentInDOM(tableRows, blockElement, fragmentRowTitle) {
+export function keepInlineFragmentInDOM(tableRows, blockElement, fragmentRowTitle, hide = true) {
   tableRows.forEach((row) => {
     const cols = Array.from(row.children);
     const rowTitle = cols[0].innerText.trim().toLowerCase().replace(/ /g, '-');
@@ -138,7 +138,7 @@ export function keepInlineFragmentInDOM(tableRows, blockElement, fragmentRowTitl
       const inlineXfContent = document.createElement('div');
       inlineXfContent.append(...colsContent[0].childNodes);
 
-      inlineXfContent.style.display = 'none';
+      inlineXfContent.style.display = hide ? 'none' : 'block';
       inlineXfContent.id = fragmentRowTitle;
       blockElement.appendChild(inlineXfContent);
     }

@@ -179,10 +179,10 @@ test.describe('MAPP sign in flow', () => {
 
     await test.step('Open public page in a new tab', async () => {
       const newTab = await context.newPage();
-      await newTab.goto(`${features[7].protectedPageUrl}`);
-      const pages = await page.context().pages();
-      await expect(pages[1].url())
-        .toContain(`${features[7].data.expectedToSeeInURL}`);
+      await newTab.goto(features[7].protectedPageUrl);
+      await expect(newTab).toHaveURL(
+        new RegExp(features[7].data.expectedToSeeInURL),
+      );
     });
   });
 
@@ -217,8 +217,9 @@ test.describe('MAPP sign in flow', () => {
 
       await signInPage.signIn(page, `${features[12].data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
-      await expect(pages[0].url())
-        .toContain(`${features[12].data.expectedToSeeInURL}`);
+      await expect(pages[0]).toHaveURL(
+        new RegExp(features[12].data.expectedToSeeInURL),
+      );
       await expect(signInPage.notFound).toBeVisible();
     });
   });

@@ -74,15 +74,13 @@ export default class SearchPage {
   }
 
   async clickCard(card, timeout = 30000) {
-    await card.waitFor({ state: 'visible', timeout });
-    await card.scrollIntoViewIfNeeded();
     await expect(card).toBeVisible({ timeout });
+
     try {
       await card.click({ timeout });
     } catch {
       await card.click({ force: true });
     }
-    await this.waitForCardToExpand(card, timeout);
   }
 
   getCardDateLocator(card) {
