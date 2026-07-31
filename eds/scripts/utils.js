@@ -433,7 +433,7 @@ export function getMetadataContent(name) {
 }
 
 export function redirectLoggedinPartner(win = window) {
-  if (!isMember()) return;
+  if (!isMember() || getMetadataContent('adobe-loggedin-no-redirect')) return;
   const partnerErrorRedirectsCount = getCookieValue(PARTNER_ERROR_REDIRECTS_COUNT_COOKIE);
   if (partnerErrorRedirectsCount) {
     const count = Number(partnerErrorRedirectsCount);
