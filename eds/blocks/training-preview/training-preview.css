@@ -44,9 +44,9 @@
 }
 
 .training-preview-block .prerequisites-wrapper .icon.checkmark {
-  background-image: url(/eds/partners-shared/mnemonics/trainings/checkmark.svg);
+  background-image: url('/eds/partners-shared/mnemonics/trainings/checkmark.svg');
 }
 
 .training-preview-block .prerequisites-wrapper .icon.on-demand {
-  background-image: url(/eds/partners-shared/mnemonics/trainings/on-demand.svg);
+  background-image: url('/eds/partners-shared/mnemonics/trainings/on-demand.svg');
 }
