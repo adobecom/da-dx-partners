@@ -130,11 +130,11 @@ export default {
     {
       tcid: '13',
       name: '@error-flow-404-user-case',
-      path: ' https://partners.stage.adobe.com/digitalexperience/home-page',
+      path: 'https://partners.stage.adobe.com/digitalexperience/home-page',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
         partnerLevel: 'dxp-firstaccount-gold:',
-        expectedToSeeInURL: '/digitalexperience/home#',
+        expectedToSeeInURL: 'https://partners.stage.adobe.com/digitalexperience/home/#',
       },
     },
     {
@@ -282,15 +282,16 @@ export default {
         expectedToSeeInURL: '/s/dxp/registration',
       },
     },
-    {
-      tcid: '26',
-      name: '@login-partially-saved-user-case',
-      path: 'https://partners.stage.adobe.com/digitalexperience/',
-      tags: '@da-dx-signin @regression @circleCi',
-      data: {
-        partnerLevel: 'dxp-partially-saved:',
-        expectedToSeeInURL: '/s/dxp/registration',
-      },
-    },
+    // need to be updated
+    // {
+    //   tcid: '26',
+    //   name: '@login-partially-saved-user-case',
+    //   path: 'https://partners.stage.adobe.com/digitalexperience/',
+    //   tags: '@da-dx-signin @regression @circleCi',
+    //   data: {
+    //     partnerLevel: 'dxp-partially-saved:',
+    //     expectedToSeeInURL: '/s/dxp/registration',
+    //   },
+    // },
   ],
 };

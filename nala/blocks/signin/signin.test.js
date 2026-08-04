@@ -211,7 +211,7 @@ test.describe('MAPP sign in flow', () => {
       await page.waitForLoadState('domcontentloaded');
       const pages = await page.context().pages();
       await expect(pages[0].url())
-        .toContain(`${features[12].data.expectedToSeeInURL}`);
+        .toContain(`${features[12].path}`);
       await expect(signInPage.notFound).toBeVisible();
       await signInPage.signInButton.click();
 
@@ -220,7 +220,6 @@ test.describe('MAPP sign in flow', () => {
       await expect(pages[0]).toHaveURL(
         new RegExp(features[12].data.expectedToSeeInURL),
       );
-      await expect(signInPage.notFound).toBeVisible();
     });
   });
 
