@@ -600,6 +600,9 @@ export async function setFeedback(getConfig) {
     const page = parser.parseFromString(data, 'text/html');
     const main = document.querySelector('main');
     const block = page.querySelector('.feedback');
+    // add on this element because display:block !important is added on parent div
+    // only on react includes pages , with css injected there
+    block.style.display = 'none';
     const div = document.createElement('div');
     div.appendChild(block);
     if (main) main.appendChild(div);
