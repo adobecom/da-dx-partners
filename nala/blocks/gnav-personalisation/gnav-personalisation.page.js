@@ -84,13 +84,19 @@ export default class GnavPersonalisationPage {
   }
 
   async openAboutTab() {
-    await this.page.getByRole('button', { name: 'About' }).click();
-    await this.page.waitForLoadState('domcontentloaded');
+    const aboutTab = this.page.getByRole('button', { name: 'About' });
+    await expect(aboutTab).toBeVisible({ timeout: 30000 });
+    await expect(aboutTab).toBeEnabled();
+    await aboutTab.click();
+    await expect(this.page.getByRole('tabpanel')).toBeVisible({ timeout: 30000 });
   }
 
   async openMoreTab() {
-    await this.page.getByRole('tab', { name: 'More' }).click();
-    await this.page.waitForLoadState('domcontentloaded');
+    const moreTab = this.page.getByRole('tab', { name: 'More' });
+    await expect(moreTab).toBeVisible({ timeout: 30000 });
+    await expect(moreTab).toBeEnabled();
+    await moreTab.click();
+    await expect(this.page.getByRole('tabpanel')).toBeVisible({ timeout: 30000 });
   }
 
   async verifyMyPartnershipVisible(visible = true) {
@@ -231,9 +237,11 @@ export default class GnavPersonalisationPage {
   }
 
   async open404Page(baseURL, restrictedPath) {
-    await this.page.goto(`${baseURL}${restrictedPath}`);
-    await this.page.waitForLoadState('domcontentloaded');
-    await this.gnav.waitFor({ state: 'visible', timeout: 30000 });
+    await this.page.goto(`${baseURL}${restrictedPath}`, { waitUntil: 'domcontentloaded' });
+
+    await expect(this.gnav).toBeVisible({ timeout: 30000 });
+
+    await expect(this.navigationMenuButton).toBeVisible({ timeout: 30000 });
   }
 
   async verifyShortcutIconHrefs(links) {

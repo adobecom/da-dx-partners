@@ -282,7 +282,7 @@ export default {
         expectedToSeeInURL: '/s/dxp/registration',
       },
     },
-    // need to be updated
+    // TODO: Re-enable this test once the required data is mocked.
     // {
     //   tcid: '26',
     //   name: '@login-partially-saved-user-case',
