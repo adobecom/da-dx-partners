@@ -118,15 +118,22 @@ describe('feedback block', () => {
 
     it('should show email field when user is not signed in', async () => {
       document.cookie = 'partner_data=; Path=/; Max-Age=0;';
-      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const customEmailRow = document.createElement('div');
+      customEmailRow.innerHTML = '<div>Dialog-Email</div><div>Share your email address</div>';
       const block = document.querySelector('.feedback');
+      block.appendChild(customEmailRow);
+
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
       await init(block);
 
       const stickyButton = document.querySelector('.sticky-feedback-button');
       stickyButton.click();
 
       const emailField = document.querySelector('#feedback-email');
+      const emailLabel = document.querySelector('.feedback-email-wrapper .feedback-label-text');
       expect(emailField).to.exist;
+      expect(emailLabel).to.exist;
+      expect(emailLabel.textContent).to.equal('Share your email address');
     });
 
     it('should hide email field when user is signed in', async () => {
