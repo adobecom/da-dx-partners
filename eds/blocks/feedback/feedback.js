@@ -233,7 +233,6 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     config.savedComment = '';
     if (!isSignedIn) config.savedEmail = '';
     closeDialog();
-    console.log('payload', payload);
     showToast('feedback', true, null, config);
   };
 

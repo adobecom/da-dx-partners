@@ -159,12 +159,12 @@
   font-weight: 300;
 }
 
-.common-toast-icon-close:hover,
-.spectrum-Toast--positive .spectrum-Toast-content a:hover {
-  opacity: 0.8;
-}
-
 .common-toast-cta,
 .spectrum-Toast--positive .spectrum-Toast-content a {
   transition: all 0.2s;
+}
+
+.common-toast-icon-close:hover,
+.spectrum-Toast--positive .spectrum-Toast-content a:hover {
+  opacity: 0.8;
 }
