@@ -272,16 +272,17 @@ export default {
         assetTitle4: 'Regression Regular DOCX Community Asset Last modified: Mar 13, 2026 Size: 5.2 MB',
       },
     },
-    {
-      tcid: '25',
-      name: '@login-invited-user-case',
-      path: 'https://partners.stage.adobe.com/digitalexperience/',
-      tags: '@da-dx-signin @regression @circleCi',
-      data: {
-        partnerLevel: 'dxp-invited-user:',
-        expectedToSeeInURL: '/s/dxp/registration',
-      },
-    },
+    // TODO: Re-enable this test once the required data is mocked.
+    // {
+    //   tcid: '25',
+    //   name: '@login-invited-user-case',
+    //   path: 'https://partners.stage.adobe.com/digitalexperience/',
+    //   tags: '@da-dx-signin @regression @circleCi',
+    //   data: {
+    //     partnerLevel: 'dxp-invited-user:',
+    //     expectedToSeeInURL: '/s/dxp/registration',
+    //   },
+    // },
     // TODO: Re-enable this test once the required data is mocked.
     // {
     //   tcid: '26',

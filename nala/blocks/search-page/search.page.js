@@ -234,16 +234,18 @@ export default class SearchPage {
 
   async verifyAllCardTags(card, expectedTags) {
     const tagElements = card.locator('.card-tags-wrapper .card-tag');
-    const count = await tagElements.count();
+    await expect(tagElements).toHaveCount(expectedTags.length, { timeout: 15000 });
+
     const actualTags = [];
-
-    for (let i = 0; i < count; i += 1) {
+    for (let i = 0; i < expectedTags.length; i += 1) {
       const tag = tagElements.nth(i);
-      if (await tag.isVisible()) {
-        actualTags.push((await tag.textContent())?.trim().toLowerCase() ?? '');
-      }
-    }
 
+      await expect(tag).toBeVisible();
+
+      actualTags.push(
+        ((await tag.textContent()) ?? '').trim().toLowerCase(),
+      );
+    }
     const normalizedExpected = expectedTags.map((tag) => tag.trim().toLowerCase());
     expect(actualTags).toEqual(normalizedExpected);
   }

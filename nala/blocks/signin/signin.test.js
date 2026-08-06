@@ -197,10 +197,12 @@ test.describe('MAPP sign in flow', () => {
         await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
       });
       await test.step('Verify error message', async () => {
-        await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
-        const pages = await page.context().pages();
-        await expect(pages[0].url())
-          .toContain(`${feature.data.expectedToSeeInURL}`);
+        await expect(signInPage.profileIconButton).toBeVisible({ timeout: 30000 });
+
+        await page.waitForURL(
+          (url) => url.toString().includes(feature.data.expectedToSeeInURL),
+          { timeout: 30000 },
+        );
       });
     });
   });
@@ -217,7 +219,8 @@ test.describe('MAPP sign in flow', () => {
 
       await signInPage.signIn(page, `${features[12].data.partnerLevel}`);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
-      await expect(pages[0]).toHaveURL(
+      await page.waitForURL((url) => url.toString().includes(features[12].data.expectedToSeeInURL), { timeout: 30000 });
+      await expect(page).toHaveURL(
         new RegExp(features[12].data.expectedToSeeInURL),
       );
     });
