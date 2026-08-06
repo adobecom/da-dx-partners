@@ -116,6 +116,34 @@ describe('feedback block', () => {
       expect(dialog).to.exist;
     });
 
+    it('should show email field when user is not signed in', async () => {
+      document.cookie = 'partner_data=; Path=/; Max-Age=0;';
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      await init(block);
+
+      const stickyButton = document.querySelector('.sticky-feedback-button');
+      stickyButton.click();
+
+      const emailField = document.querySelector('#feedback-email');
+      expect(emailField).to.exist;
+    });
+
+    it('should hide email field when user is signed in', async () => {
+      document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { status: 'MEMBER' } }))}`;
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      await init(block);
+
+      const stickyButton = document.querySelector('.sticky-feedback-button');
+      stickyButton.click();
+
+      const emailField = document.querySelector('#feedback-email');
+      expect(emailField).to.not.exist;
+
+      document.cookie = 'partner_data=; Path=/; Max-Age=0;';
+    });
+
     it('should handle star hover and textarea input', async () => {
       const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
       const block = document.querySelector('.feedback');
@@ -133,13 +161,40 @@ describe('feedback block', () => {
 
       expect(stars[2]).to.exist;
 
-      const textarea = document.querySelector('.feedback-textarea');
+      const textarea = document.querySelector('#feedback-comment');
       const charCount = document.querySelector('.feedback-label-count');
 
       textarea.value = 'Test feedback';
       textarea.dispatchEvent(new Event('input'));
 
       expect(charCount.textContent).to.equal('487');
+    });
+
+    it('should prevent submission when email is invalid', async () => {
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      await init(block);
+
+      const stickyButton = document.querySelector('.sticky-feedback-button');
+      stickyButton.click();
+
+      const stars = document.querySelectorAll('sp-action-button[data-rating]');
+      stars[3].click();
+
+      const emailField = document.querySelector('#feedback-email');
+      emailField.value = 'invalid-email';
+      emailField.dispatchEvent(new Event('input'));
+
+      const sendButton = document.querySelector('.feedback-dialog-button.cta');
+      sendButton.click();
+
+      expect(emailField.hasAttribute('invalid')).to.be.true;
+      expect(document.querySelector('.feedback-dialog')).to.exist;
+
+      const formSubmitCall = fetchStub
+        .getCalls()
+        .find((call) => typeof call.args[0] === 'string' && call.args[0].includes('forms.adobe.com'));
+      expect(formSubmitCall).to.not.exist;
     });
 
     it('should close dialog and save rating when cancel is clicked or clicking outside', async () => {
