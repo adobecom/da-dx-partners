@@ -61,24 +61,32 @@ export default class TrainingPage extends SearchPage {
   }
 
   async waitForResultsToSettle() {
-    await this.loader.waitFor({ state: 'hidden', timeout: 30000 });
+    await Promise.all(
+      (await this.loader.all()).map((loader) => loader.waitFor({ state: 'hidden', timeout: 30000 })),
+    );
   }
 
   async verifyTrainingSearchResults(data) {
     await this.waitForResultsToSettle();
 
     if (data.secondResultTitle) {
-      const firstTitle = await this.getCardTitleAtIndex(0);
-      expect(firstTitle).toBe(data.firstResultTitle);
-      const secondTitle = await this.getCardTitleAtIndex(1);
-      expect(secondTitle).toBe(data.secondResultTitle);
+      await expect
+        .poll(() => this.getCardTitleAtIndex(0), { timeout: 30000 })
+        .toBe(data.firstResultTitle);
+
+      await expect
+        .poll(() => this.getCardTitleAtIndex(1), { timeout: 30000 })
+        .toBe(data.secondResultTitle);
+
       return;
     }
 
-    const firstTitle = await this.getCardTitleAtIndex(0);
-    expect(firstTitle).toBe(data.topResultTitle);
+    await expect
+      .poll(() => this.getCardTitleAtIndex(0), { timeout: 30000 })
+      .toBe(data.topResultTitle);
 
     const allTitles = await this.getAllCardTitles();
+
     expect(allTitles).not.toContain(data.excludedResultTitle);
 
     if (allTitles.length > 1) {

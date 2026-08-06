@@ -133,8 +133,8 @@ export default {
       path: ' https://partners.stage.adobe.com/digitalexperience/home-page',
       tags: '@da-dx-signin @regression @circleCi',
       data: {
-        partnerLevel: 'dxp-gold:',
-        expectedToSeeInURL: '/digitalexperience/home-page',
+        partnerLevel: 'dxp-firstaccount-gold:',
+        expectedToSeeInURL: '/digitalexperience/home#',
       },
     },
     {
