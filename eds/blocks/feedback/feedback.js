@@ -11,9 +11,7 @@ const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 function validateEmailField(emailField) {
   const email = emailField.value.trim();
   const invalid = email !== '' && !emailRegex.test(email);
-
   emailField.toggleAttribute('invalid', invalid);
-
   return !invalid;
 }
 
@@ -170,7 +168,6 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
         return;
       }
     }
-
     document.querySelectorAll('.feedback-dialog-button').forEach((button) => {
       button.disabled = true;
     });
