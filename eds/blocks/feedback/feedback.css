@@ -272,6 +272,7 @@
   cursor: not-allowed;
 }
 
+/* Honeypot field */
 .feedback-context-field {
   position: absolute;
   width: 1px;
