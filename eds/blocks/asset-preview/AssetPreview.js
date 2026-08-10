@@ -253,94 +253,114 @@ export default class AssetPreview extends LitElement {
     this.chapters = assetMetadata.chapters || [];
     this.chapters = [
       {
-        "title": "Session Kickoff And Introductions",
-        "summary": "Joe Wax opens the session, introduces Adobe team members Adrian Witten, Nikki Wang, Michael Smith, and Manish Shah, and frames the roundtable as a strategic forum for top Marketo partners to weigh in on FY25 vision.",
-        "timerange": "00:00:13.325 - 00:02:42.428"
+        "title": "Welcome And Session Context",
+        "summary": "Joe Wax opens the roundtable, introduces the Marketo Engage product marketing team including Adrian Witten, Nikki Wang, Michael Smith, and Manish Shah, and explains this is a hand-picked strategic partner forum for feedback on FY25 innovation investments.",
+        "timerange": "00:00:13.325 - 00:02:42.133"
       },
       {
-        "title": "Addressing Marketo Engage Perception",
-        "summary": "Adrian Witten addresses the market perception that Marketo Engage is going away, clarifying Adobe is doubling down on investments and accelerating innovation despite focus on AEP and AJO B2B Edition.",
+        "title": "Addressing Marketo Engage Market Perception",
+        "summary": "Adrian Witten addresses the market perception that Marketo Engage is going away, clarifying that Adobe is doubling down on Marketo investments and accelerating innovation despite the launch of Adobe Journey Optimizer B2B Edition.",
         "timerange": "00:02:44.255 - 00:06:28.495"
       },
       {
-        "title": "Partner Opportunities Overview",
-        "summary": "Manish Shah outlines three partner opportunities from Marketo innovation: new services packages, re-engaging existing customers with new features, and higher win rates on net new opportunities against competitors.",
-        "timerange": "00:06:29.788 - 00:07:33.117"
+        "title": "Partner Opportunities From Marketo Innovation",
+        "summary": "Manish Shah outlines three key partner opportunities: new services packages around Marketo innovations, re-engaging existing customers with new features, and higher win rates on net new opportunities against competitors.",
+        "timerange": "00:06:29.788 - 00:08:53.117"
       },
       {
-        "title": "Poll On Innovation Awareness Channels",
-        "summary": "First poll asks partners how they hear about Marketo innovations. Top responses were Adobe Summit (25%) and Product Roadmap Webinars (21%), with SPP and partner communications also noted.",
-        "timerange": "00:07:34.295 - 00:11:15.199"
+        "title": "Partner Communication Channels Poll",
+        "summary": "Nikki Wang launches the first poll asking partners how they hear about new Marketo innovations. Results show Adobe Summit leads at 25%, followed by product roadmap webinars at 21%, with diverse engagement across channels.",
+        "timerange": "00:08:54.295 - 00:12:45.293"
+      },
+      {
+        "title": "Website Updates And Awareness Poll",
+        "summary": "Adrian discusses working with the web team to improve business.adobe.com for surfacing innovations, noting new feature videos launched in September. A second poll is launched to gauge awareness of upcoming innovations.",
+        "timerange": "00:12:51.107 - 00:14:14.418"
       },
       {
         "title": "Marketo Roadmap And AI Vision",
-        "summary": "Nikki Wang presents Marketo's roadmap focused on bringing Gen AI to three pillars: channels, content, and data. She explains how AI reduces hours to minutes and addresses changing buyer expectations post-pandemic.",
-        "timerange": "00:11:16.245 - 00:18:56.185"
+        "summary": "Nikki presents Marketo's roadmap focused on bringing Gen AI to improve three marketing pillars: channels, content, and data. She frames Marketo Engage as a digital foundation and marketing hub for mature customers.",
+        "timerange": "00:14:14.458 - 00:17:14.0"
       },
       {
-        "title": "Continuous Innovation And Shared Components",
-        "summary": "Adrian reviews Marketo's ongoing innovation including smart campaigns updates, executable campaigns, and self-service flow steps. She explains how shared components across Adobe products like the email editor accelerate development for both Marketo and AJO B2B.",
-        "timerange": "00:18:56.205 - 00:22:22.466"
+        "title": "Changing Buyer Expectations And AI Opportunity",
+        "summary": "Nikki explains how the pandemic accelerated digital maturity, modern B2B buyers avoid forms and prefer digital surfaces, and AI has advanced to help marketers create content and conversations that meet these shifting expectations.",
+        "timerange": "00:17:14.700 - 00:19:04.402"
       },
       {
-        "title": "AI-Powered Marketo Engage Innovations",
-        "summary": "Nikki details how AI unlocks lead-based journeys through Gen AI chat features, email authoring, improved Salesforce CRM connector, and Adobe real-time CDP connector improvements.",
-        "timerange": "00:22:22.486 - 00:25:20.418"
+        "title": "Upcoming Innovations Poll Results",
+        "summary": "Poll results show the new email designer with Gen AI at 26% and Gen AI chat in-the-moment responses as the top awareness items. Nikki previews the new email designer, chat/webinar AI features, CRM connector improvements, and AEM assets live link.",
+        "timerange": "00:19:04.782 - 00:21:12.635"
       },
       {
-        "title": "Discussion On Marketo Feature Access",
-        "summary": "Danielle asks whether new features require additional Adobe product purchases. Nikki clarifies innovations like the new email designer, CRM sync, and Gen AI email are available to all Marketo customers, with some requiring legal terms.",
-        "timerange": "00:25:20.955 - 00:29:09.394"
+        "title": "Continuous Marketo Engage Innovation History",
+        "summary": "Adrian highlights Marketo's continuous innovation since the Adobe acquisition, noting features like smart campaigns are constantly updated, and calls out executable campaigns and self-service flow steps as high-value but under-marketed features.",
+        "timerange": "00:21:12.655 - 00:24:35.176"
       },
       {
-        "title": "AI Adoption Barriers Feedback",
-        "summary": "Garrett raises concerns about enterprise customers facing internal legal and approval barriers to AI adoption. Nikki acknowledges this feedback, noting smaller customers embrace Gen AI more readily than larger brands.",
-        "timerange": "00:29:16.403 - 00:32:16.547"
+        "title": "Analyst Recognition And Shared Adobe Innovation",
+        "summary": "Adrian references IDC, Forrester, and Gartner Magic Quadrant leadership, then explains how Adobe now ports innovation across products, such as sharing the email editor between Marketo Engage and Adobe Journey Optimizer B2B and B2C editions.",
+        "timerange": "00:24:35.196 - 00:26:54.908"
       },
       {
-        "title": "New Email Designer Overview",
-        "summary": "Nikki introduces the new email designer with modern templates, WYSIWYG editor, Gen AI content generation, reusable fragments, conditional content, native AEM Assets and Firefly connectors, and Adobe Express integration.",
-        "timerange": "00:32:29.657 - 00:36:50.685"
+        "title": "Distinct Use Cases Across Adobe Products",
+        "summary": "Adrian clarifies that while Marketo Engage, RCDP, and AJO B2B Edition share components, they have distinct use cases: Marketo for lead-based and account-based marketing, AJO for buying group marketing.",
+        "timerange": "00:26:55.797 - 00:27:22.466"
+      },
+      {
+        "title": "AI-Powered Innovations For Marketo Users",
+        "summary": "Nikki details how AI unlocks lead-based journeys at scale through Gen AI chat features, email authoring, on-demand webinar summaries, and improved Salesforce CRM and Adobe Real-Time CDP connectors.",
+        "timerange": "00:27:22.486 - 00:29:59.823"
+      },
+      {
+        "title": "Discussion On Feature Availability And Licensing",
+        "summary": "Danielle asks whether new features require additional Adobe product purchases. Nikki clarifies most innovations including the new email designer, Gen AI email, and CRM sync are available to all Marketo customers, with some usage limits.",
+        "timerange": "00:30:00.129 - 00:35:09.428"
+      },
+      {
+        "title": "Marketo-Only Sales Focus And AI Adoption Barriers",
+        "summary": "Nikki confirms Adobe still has dedicated Marketo sales teams. Garrett raises enterprise customer barriers to AI adoption due to legal concerns, which Nikki acknowledges as valid feedback also heard from customers.",
+        "timerange": "00:35:09.428 - 00:37:46.237"
+      },
+      {
+        "title": "New Email Designer Deep Dive",
+        "summary": "Nikki details the new email designer featuring modern templates, WYSIWYG editor, Gen AI content generation, reusable fragments, conditional content, and native connectors to AEM Assets, Adobe Firefly, and Adobe Express. Adobe IMS migration is required.",
+        "timerange": "00:37:49.036 - 00:40:50.719"
       },
       {
         "title": "Email Designer Live Demo",
-        "summary": "Mike Rusk demos the new email designer inside Marketo Design Studio, showcasing template selection, drag-and-drop editing, tokenization, AI Assistant prompt library, responsive previews, and upcoming conditional content and fragments.",
-        "timerange": "00:36:51.446 - 00:41:41.151"
+        "summary": "Mike demonstrates the new email designer in Marketo Design Studio, showing email creation, personalization tokens, drag-and-drop editing, AEM live connection, AI Assistant with prompt library, device previews, and simulation features.",
+        "timerange": "00:40:51.480 - 00:45:44.798"
       },
       {
         "title": "Interactive Webinar Gen AI Features",
-        "summary": "Adrian shares stories about Gen AI features for on-demand webinars that create chapters and summaries from transcripts, plus the engagement dashboard that tracks real-time attendee attention.",
-        "timerange": "00:41:42.172 - 00:44:26.916"
+        "summary": "Adrian shares two stories about interactive webinar innovations: Gen AI automated chapter breaks and summaries from webinar transcripts which customers pushed to production during beta, and an engagement dashboard that shows in real-time who isn't paying attention.",
+        "timerange": "00:45:47.000 - 00:48:42.275"
       },
       {
         "title": "Salesforce CRM Sync Enhancements",
-        "summary": "Nikki presents the newly launched Salesforce Sync dashboard, allowing MOPS admins to identify record sync backlogs and access best practices without contacting support, plus upcoming error reduction improvements.",
-        "timerange": "00:44:26.956 - 00:45:24.258"
+        "summary": "Nikki introduces the live Salesforce Sync dashboard letting MOps admins identify sync backlogs themselves without contacting support, plus upcoming updates to reduce errors and improve reliability.",
+        "timerange": "00:48:42.295 - 00:50:19.092"
       },
       {
-        "title": "Innovation Value Polls",
-        "summary": "Two polls gauge which innovations partners and their customers find most valuable. New email designer led responses, followed by CRM sync and landing pages/forms, matching customer feedback trends.",
-        "timerange": "00:45:25.891 - 00:47:50.969"
+        "title": "Feature Value Polls And IMS Migration",
+        "summary": "Polls reveal partners rank the new email designer, CRM sync, and landing pages/forms as most valuable. Adrian and Manish encourage partners to email SPP help to migrate sandboxes from classic Marketo to the IMS instance.",
+        "timerange": "00:50:19.810 - 00:55:32.838"
       },
       {
-        "title": "IMS Migration Reminder",
-        "summary": "Adrian and Manish remind partners to migrate sandboxes to Adobe Identity Management System to access new features. Manish provides the SPP help email process for initiating migration for classic Marketo Engage instances.",
-        "timerange": "00:47:55.228 - 00:53:32.832"
+        "title": "Partner Feedback On Roadmap And Migration",
+        "summary": "Tom, Cindy, and others share feedback: Gen AI email is a frequently asked question, velocity scripting migration is a concern, and Cindy notes that migration work may divert resources from ROI-driving customer projects.",
+        "timerange": "00:55:33.559 - 00:59:59.093"
       },
       {
-        "title": "Partner Feedback On Roadmap",
-        "summary": "Tom and Cindy share reactions praising the Gen AI email and Salesforce sync features. Concerns raised about velocity script migration, template redesign efforts, and whether migration projects positively impact partner practices versus delaying customer ROI work.",
-        "timerange": "00:53:34.514 - 00:59:49.743"
+        "title": "Migration Support And Partner Enablement",
+        "summary": "Nikki confirms the old and new email designers will run in parallel for over a year. Partners request that Adobe provide migration tooling that partners can leverage to help clients transition, similar to the IMS migration approach.",
+        "timerange": "01:00:00.009 - 01:02:32.306"
       },
       {
-        "title": "Migration Tooling Discussion",
-        "summary": "Nikki confirms the PM team is working on tools to help migrate customers from the old to new email designer. Partners request the ability to perform migrations themselves, similar to the IMS migration approach.",
-        "timerange": "00:59:49.743 - 01:00:57.622"
-      },
-      {
-        "title": "Wrap-Up And Next Steps",
-        "summary": "Joe wraps up, thanking partners and outlining next steps: sharing the recording and cleaned-up presentation deck via the Solution Partner Portal, with continued Q&A available through Manish, Adrian, and Nikki.",
-        "timerange": "01:01:02.841 - 01:01:45.453"
+        "title": "Wrap Up And Next Steps",
+        "summary": "Manish closes by outlining next steps: sharing the recording and refined pitch deck via the Solution Partner Portal, encouraging continued questions through Adrian, Nikki, and himself, and thanking partners for their strategic feedback.",
+        "timerange": "01:02:34.735 - 01:04:21.335"
       }
     ];
   }
@@ -434,11 +454,11 @@ export default class AssetPreview extends LitElement {
                   <source src="${this.getDownloadUrl()}" type="video/mp4">
                 </video>
               </div>
-              <div class="video-chapters">
+              <div class="${this.chapters.length > 0 ? 'video-chapters visible' : 'video-chapters hidden'}">
                 ${this.chapters.length > 0 ? this.renderChapters() : ''}
               </div>
             </div>`
-          : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset data not found}}']}</div>`}
+    : ''}` : html`<div class="asset-preview-block-header">${this.isLoading ? this.blockData.localizedText['{{Loading data}}'] : this.blockData.localizedText['{{Asset data not found}}']}</div>`}
     `;
   }
 

@@ -238,3 +238,7 @@ span.asset-preview-block-details-left-label {
   font-size: 12px;
   line-height: 1;
 }
+
+.video-chapters.hidden {
+  display: none;
+}
