@@ -3,7 +3,7 @@ import { getLibs } from '../scripts/utils.js';
 const miloLibs = getLibs();
 const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
 
-class LoadingSpinner extends LitElement {
+export default class LoadingSpinner extends LitElement {
   static properties = {
     text: { type: String },
     theme: { type: String },
@@ -47,5 +47,3 @@ class LoadingSpinner extends LitElement {
 if (!customElements.get('loading-spinner')) {
   customElements.define('loading-spinner', LoadingSpinner);
 }
-
-export default LoadingSpinner;

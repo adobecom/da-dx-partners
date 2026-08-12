@@ -1,5 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-import '../../components/LoadingSpinner.js';
 import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
@@ -16,6 +15,7 @@ import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
+await import('../../components/LoadingSpinner.js');
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
 export default class AssetPreview extends LitElement {
