@@ -181,19 +181,8 @@ span.asset-preview-block-details-left-label {
   font-weight: 500;
 }
 
-.asset-preview-block-video .video-loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid var(--asset-preview-white);
-  border-radius: 50%;
-  animation: asset-preview-block-spin 1s linear infinite;
-}
 
-@keyframes asset-preview-block-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+
 
 .asset-preview-block {
   --grid-container-width: 83.4%;

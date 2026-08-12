@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+import '../../components/LoadingSpinner.js';
 import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
@@ -296,7 +297,7 @@ export default class AssetPreview extends LitElement {
           <div class="video-container video-holder">
             ${this.isVideoLoading ? html`
               <div class="video-loading-overlay">
-                <div class="video-loading-spinner"></div>
+                <loading-spinner theme="dark"></loading-spinner>
               </div>
             ` : ''}
             <video

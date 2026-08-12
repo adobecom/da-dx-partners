@@ -1,4 +1,5 @@
 import showToast from '../../components/Toast.js';
+import '../../components/LoadingSpinner.js';
 import { refreshPartnerAccountState, updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
 import {
   getLibs,
@@ -6,7 +7,7 @@ import {
   getPartnerAccountState,
   getPartnerCookieObject,
 } from '../../scripts/utils.js';
-import { keepInlineFragmentInDOM } from '../utils/utils.js';
+import { keepInlineFragmentInDOM, getConfig, localizationPromises, populateLocalizedTextFromListItems } from '../utils/utils.js';
 
 const miloLibs = getLibs();
 
@@ -133,6 +134,15 @@ function getCalendlyPrefill(companyQuestionKey = 'a1') {
   return prefill;
 }
 
+function createCalendlyLoader(localizedText) {
+  const loader = document.createElement('div');
+  loader.className = 'calendly-loader';
+  loader.innerHTML = `
+    <loading-spinner text="${localizedText['{{loading-calendly-message}}']}"></loading-spinner>
+  `;
+  return loader;
+}
+
 function initCalendly(link, parentElement, companyQuestionKey) {
   const prefill = getCalendlyPrefill(companyQuestionKey);
   window.Calendly.initInlineWidget({
@@ -157,18 +167,29 @@ function setBlockData(tableRows) {
   });
   return blockData;
 }
-export default function init(el) {
+export default async function init(el) {
+  const config = getConfig();
+  const localizedText = { '{{loading-calendly-message}}': 'Loading your scheduling options...' };
+  populateLocalizedTextFromListItems(el, localizedText);
+  await localizationPromises(localizedText, config);
+
   const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
 
   // Capture inline fragment children before clearing DOM
   const inlineChildren = Array.from(el.children);
   el.innerHTML = '';
   const calendlyEmbed = document.createElement('div');
+  const calendlyLoader = createCalendlyLoader(localizedText);
+
+  el.setAttribute('aria-busy', 'true');
+  el.append(calendlyLoader);
+
   // if cookie state already shows calendly booked, we just display already booked fragment
   if (hasCalendlyBooked()) {
     keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
     el.innerHTML = '';
     el.append(calendlyEmbed);
+    el.removeAttribute('aria-busy');
     return;
   }
 
@@ -189,6 +210,7 @@ export default function init(el) {
         keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
         el.innerHTML = '';
         el.append(calendlyEmbed);
+        el.removeAttribute('aria-busy');
         return;
       }
 
@@ -199,9 +221,11 @@ export default function init(el) {
       await loadCalendlyScript();
       initCalendly(schedulingLink, calendlyEmbed, companyQuestionKey);
       window.addEventListener('message', trackCalendlyEvent);
+      el.removeAttribute('aria-busy');
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('Calendly widget failed to load', e);
+      el.removeAttribute('aria-busy');
     }
   }, 1);
 }
