@@ -136,6 +136,12 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   textareaTheme.appendChild(textarea);
   textareaSection.appendChild(textareaHeader);
   textareaSection.appendChild(textareaTheme);
+  const honeypotInput = document.createElement('input');
+  honeypotInput.name = 'feedback_context';
+  honeypotInput.type = 'text';
+  honeypotInput.className = 'feedback-context-field';
+  honeypotInput.setAttribute('tabindex', '-1');
+  honeypotInput.setAttribute('autocomplete', 'off');
   const buttonsContainer = document.createElement('div');
   buttonsContainer.className = 'feedback-dialog-actions';
   const cancelButton = document.createElement('button');
@@ -163,6 +169,11 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     }
   });
   const submitFeedback = async () => {
+    if (honeypotInput.value.length > 0) {
+      closeDialog();
+      showToast('feedback', true, null, config);
+      return;
+    }
     if (!isSignedIn) {
       if (!validateEmailField(emailField)) {
         return;
@@ -242,6 +253,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   if (!isSignedIn) dialogBody.appendChild(emailContainer);
   dialogBody.appendChild(starContainer);
   dialogBody.appendChild(textareaSection);
+  dialogBody.appendChild(honeypotInput);
   feedbackDialog.appendChild(dialogBody);
   feedbackDialog.appendChild(buttonsContainer);
   document.body.appendChild(feedbackDialog);
