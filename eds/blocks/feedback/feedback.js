@@ -46,7 +46,9 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     emailTheme.setAttribute('scale', 'medium');
     emailField = document.createElement('sp-textfield');
     emailField.setAttribute('id', 'feedback-email');
+    emailField.setAttribute('name', 'email');
     emailField.setAttribute('type', 'email');
+    emailField.setAttribute('autocomplete', 'email');
     emailField.placeholder = '';
     emailField.value = config.savedEmail;
     validateEmailField(emailField);
