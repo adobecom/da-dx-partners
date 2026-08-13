@@ -21,7 +21,13 @@ export default function showToast(variant, success, onTryAgain, config) {
   content.className = 'spectrum-Toast-content';
 
   const message = document.createElement('span');
-  message.textContent = success ? config.toastPositive : config.toastNegative;
+  if (success && config.toastPositiveIsHtml) {
+    message.innerHTML = config.toastPositive;
+  } else if (success) {
+    message.textContent = config.toastPositive;
+  } else {
+    message.textContent = config.toastNegative;
+  }
   content.appendChild(message);
 
   if (!success) {
