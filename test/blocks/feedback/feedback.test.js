@@ -253,6 +253,35 @@ describe('feedback block', () => {
       expect(toast).to.exist;
     });
 
+    it('should skip submit when honeypot field is filled', async () => {
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      const block = document.querySelector('.feedback');
+      await init(block);
+
+      const stickyButton = document.querySelector('.sticky-feedback-button');
+      stickyButton.click();
+
+      const stars = document.querySelectorAll('sp-action-button[data-rating]');
+      stars[3].click();
+
+      const honeypotField = document.querySelector('.feedback-context-field');
+      honeypotField.value = 'spam-bot-value';
+
+      const sendButton = document.querySelector('.feedback-dialog-button.cta');
+      sendButton.click();
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const formSubmitCall = fetchStub
+        .getCalls()
+        .find((call) => typeof call.args[0] === 'string' && call.args[0].includes('forms.adobe.com'));
+      expect(formSubmitCall).to.not.exist;
+      expect(document.querySelector('.feedback-dialog')).to.not.exist;
+
+      const toast = document.querySelector('.feedback-toast.spectrum-Toast--positive');
+      expect(toast).to.exist;
+    });
+
     it('should show error toast on submission failure', async () => {
       fetchStub.restore();
       fetchStub = sinon.stub(window, 'fetch').rejects(new Error('Network error'));
