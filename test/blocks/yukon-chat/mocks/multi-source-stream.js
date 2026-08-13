@@ -20,7 +20,7 @@ const DOCUMENT_FAQ = {
 };
 
 /** @param {{ signal?: AbortSignal }} [opts] */
-export function createMockYukonMultiSourceResponse(opts = {}) {
+export default function createMockYukonMultiSourceResponse(opts = {}) {
   const { signal } = opts;
   const encoder = new TextEncoder();
 

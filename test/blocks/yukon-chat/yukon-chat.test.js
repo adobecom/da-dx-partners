@@ -2,7 +2,7 @@ import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { readFile } from '@web/test-runner-commands';
 import { setLibs } from '../../../eds/scripts/utils.js';
-import { createMockYukonMultiSourceResponse } from './mocks/multi-source-stream.js';
+import createMockYukonMultiSourceResponse from './mocks/multi-source-stream.js';
 
 describe('yukon-chat block', () => {
   let fetchStub;
