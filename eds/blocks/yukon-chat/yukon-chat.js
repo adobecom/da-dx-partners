@@ -1,10 +1,17 @@
 import { prodHosts, getLibs } from '../../scripts/utils.js';
-import { getConfig, populateLocalizedTextFromListItems, replaceText } from '../utils/utils.js';
 import { parseMarkdown, extractAuthoredConfigs } from './utils.js';
+import { getConfig, populateLocalizedTextFromListItems, replaceText } from '../utils/utils.js';
+
+const miloLibs = getLibs();
+const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`);
+const { createTag } = await import(`${miloLibs}/utils/utils.js`);
+const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 const aiChatIconString = '<svg title="Ask" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.25 18.998C6.15039 18.998 6.05078 18.9785 5.95605 18.9385C5.67968 18.8203 5.5 18.5488 5.5 18.248V14.998H4.75C2.68262 14.998 1 13.3154 1 11.248V5.74805C1 3.68067 2.68262 1.99805 4.75 1.99805H8.70312C9.11718 1.99805 9.45312 2.33399 9.45312 2.74805C9.45312 3.16211 9.11718 3.49805 8.70312 3.49805H4.75C3.50977 3.49805 2.5 4.50782 2.5 5.74805V11.248C2.5 12.4883 3.50977 13.498 4.75 13.498H6.25C6.66406 13.498 7 13.834 7 14.248V16.4844L9.88379 13.708C10.0234 13.5732 10.21 13.498 10.4043 13.498H15.25C16.4902 13.498 17.5 12.4883 17.5 11.248V9.97657C17.5 9.56251 17.8359 9.22657 18.25 9.22657C18.6641 9.22657 19 9.56251 19 9.97657V11.248C19 13.3154 17.3174 14.998 15.25 14.998H10.707L6.77051 18.7881C6.62793 18.9258 6.44043 18.998 6.25 18.998Z" fill="currentColor"/><path d="M13.2774 9.08292C13.0889 9.08292 12.8995 9.03409 12.7286 8.93546C12.3126 8.6962 12.1016 8.22062 12.2022 7.75187L12.6622 5.62687L11.2022 4.01652C10.8799 3.66105 10.8243 3.14445 11.0635 2.72941C11.3038 2.31437 11.7842 2.10343 12.2471 2.20304L14.3721 2.663L15.9825 1.20304C16.338 0.881747 16.8575 0.827057 17.2696 1.06437C17.6856 1.30363 17.8965 1.77921 17.796 2.24796L17.336 4.37296L18.796 5.98331C19.1182 6.33878 19.1739 6.85538 18.9346 7.27042C18.6944 7.68644 18.2178 7.89933 17.751 7.79679L15.626 7.33683L14.0157 8.79679C13.8077 8.98527 13.544 9.08292 13.2774 9.08292ZM13.1514 3.9335L13.9112 4.77139C14.1475 5.0292 14.2462 5.39248 14.1719 5.74014L13.9327 6.84757L14.7706 6.0878C15.0294 5.85147 15.3966 5.75382 15.7393 5.82706L16.8467 6.06632L16.087 5.22843C15.8506 4.97062 15.752 4.60734 15.8262 4.25968L16.0655 3.15226L15.2276 3.91203C14.9698 4.14933 14.6046 4.24894 14.2589 4.17277L13.1514 3.9335Z" fill="currentColor"/><path d="M7.93261 11.5039C7.8037 11.5039 7.6748 11.4707 7.55761 11.4033C7.27538 11.2402 7.13085 10.9141 7.19921 10.5957L7.37694 9.77538L6.81346 9.15429C6.59471 8.91308 6.55662 8.55761 6.71971 8.27538C6.8828 7.99315 7.21092 7.85448 7.52733 7.91698L8.34764 8.09471L8.96873 7.53123C9.21092 7.31248 9.56443 7.27439 9.84764 7.43748C10.1299 7.60057 10.2744 7.92674 10.206 8.2451L10.0283 9.06541L10.5918 9.6865C10.8105 9.92771 10.8486 10.2832 10.6855 10.5654C10.5225 10.8476 10.1933 10.9892 9.87792 10.9238L9.05761 10.7461L8.43652 11.3096C8.29492 11.4375 8.11425 11.5039 7.93261 11.5039Z" fill="currentColor"/></svg>';
 const submitIconString = '<svg xmlns="http://www.w3.org/2000/svg" class="send-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M18.6485 9.9735C18.6482 9.67899 18.4769 9.41106 18.2059 9.29056L4.05752 2.93282C3.80133 2.8175 3.50129 2.85583 3.28171 3.03122C3.06178 3.20765 2.95889 3.49146 3.01516 3.76733L4.28678 10.008L3.06488 16.2384C3.0162 16.4852 3.09492 16.738 3.27031 16.9134C3.29068 16.9337 3.31278 16.9531 3.33522 16.9714C3.55619 17.1454 3.85519 17.182 4.11069 17.066L18.2086 10.6578C18.4773 10.5356 18.6489 10.268 18.6485 9.9735ZM14.406 9.22716L5.66439 9.25379L4.77705 4.90084L14.406 9.22716ZM4.81711 15.0973L5.6694 10.7529L14.4323 10.7264L4.81711 15.0973Z"></path></svg>';
 const arrowIconString = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M13.55029,13.71484c-.29297-.29297-.76758-.29297-1.06055,0l-1.73975,1.73975V2.76172c0-.41406-.33594-.75-.75-.75s-.75.33594-.75.75v12.6626l-1.70996-1.70947c-.29297-.29297-.76758-.29297-1.06055,0s-.29297.76758,0,1.06055l3.00537,3.00488c.14648.14648.33838.21973.53027.21973s.38379-.07324.53027-.21973l3.00488-3.00488c.29297-.29297.29297-.76758,0-1.06055Z" stroke-width="0"></path></svg>';
+const assetIconString = '<svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.367 0H0.5C0.367392 0 0.240215 0.0526784 0.146447 0.146447C0.0526785 0.240215 0 0.367392 0 0.5V15.5C0 15.6326 0.0526785 15.7598 0.146447 15.8536C0.240215 15.9473 0.367392 16 0.5 16H11.5C11.6326 16 11.7598 15.9473 11.8536 15.8536C11.9473 15.7598 12 15.6326 12 15.5V4.633C12.0001 4.50152 11.9743 4.37131 11.924 4.24982C11.8737 4.12834 11.8 4.01796 11.707 3.925L8.074 0.293C7.88651 0.105451 7.63219 5.66374e-05 7.367 0ZM11 15H1V1H7.061V4.439C7.061 4.57161 7.11368 4.69879 7.20745 4.79255C7.30122 4.88632 7.42839 4.939 7.561 4.939H11V15ZM8 4V1.633L10.367 4H8Z" fill="#222222"/></svg>';
+const pageIconString = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="#707070"><path d="M1 2.5v13a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5V2.5a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0-.5.5ZM16 15H2V5h14Z"/></svg>';
 
 async function localizationPromises(localizedText, config) {
   return Promise.all(Object.keys(localizedText).map(async (key) => {
@@ -17,11 +24,6 @@ async function localizationPromises(localizedText, config) {
     }
   }));
 }
-
-const miloLibs = getLibs();
-const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`);
-const { createTag } = await import(`${miloLibs}/utils/utils.js`);
-const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
 let currentAbortController = null; // Store abort controller for ongoing requests
 const requestId = crypto.randomUUID();
@@ -45,10 +47,12 @@ const createInputField = (textareaEl, buttonEl) => {
 
   const textareaWrap = createTag('div', { class: 'yc-textarea-grow-wrap' });
   textareaWrap.appendChild(textareaEl);
+
   container.appendChild(label);
   container.appendChild(tooltip);
   container.appendChild(textareaWrap);
   container.appendChild(buttonEl);
+
   return container;
 };
 
@@ -136,6 +140,133 @@ function showChatError(chatHistory, text) {
   chatHistory.appendChild(chatMessage);
 }
 
+/**
+ * Groups footnote keys by document_id. Entries without a usable id are kept separate.
+ * @returns {{ citationKeys: string[], item: object }[]}
+ */
+function groupSourcesByDocumentId(sourceObj) {
+  const sortedKeys = Object.keys(sourceObj).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+
+  const groupKeyFor = (item, key) => {
+    const id = item?.document_id;
+    if (id != null && String(id).trim() !== '') {
+      return String(id);
+    }
+    return `__unique_${key}`;
+  };
+
+  const byId = new Map();
+  sortedKeys.forEach((key) => {
+    const item = sourceObj[key];
+    const gk = groupKeyFor(item, key);
+    if (!byId.has(gk)) {
+      byId.set(gk, { citationKeys: [], item });
+    }
+    byId.get(gk).citationKeys.push(key);
+  });
+
+  const groups = [];
+  const seen = new Set();
+  sortedKeys.forEach((key) => {
+    const item = sourceObj[key];
+    const gk = groupKeyFor(item, key);
+    if (!seen.has(gk)) {
+      seen.add(gk);
+      groups.push(byId.get(gk));
+    }
+  });
+
+  return groups;
+}
+
+function createSourcesAccordion(sourceObj, localizedText) {
+  const accordionContainer = document.createElement('div');
+  accordionContainer.className = 'yc-sources-accordion';
+
+  const accordionHeader = document.createElement('button');
+  accordionHeader.className = 'yc-accordion-header';
+  accordionHeader.setAttribute('aria-expanded', 'false');
+  accordionHeader.innerHTML = `<svg class="yc-accordion-icon" width="10" height="11" viewBox="0 0 10 11" fill="none"><path d="M5.59375 7.99866L9.2168 4.37561C9.54492 4.04749 9.54492 3.51623 9.2168 3.18811C8.88868 2.85999 8.35742 2.85999 8.0293 3.18811L5 6.21741L1.9707 3.18811C1.64258 2.85999 1.11132 2.85999 0.783201 3.18811C0.619142 3.35217 0.537111 3.56702 0.537111 3.78186C0.537111 3.9967 0.619142 4.21155 0.783201 4.37561L4.40625 7.99866C4.73437 8.32678 5.26563 8.32678 5.59375 7.99866Z" fill="currentColor"></path></svg><span>${localizedText['{{sources}}'] || 'Sources'}</span>`;
+
+  const accordionContent = document.createElement('div');
+  accordionContent.className = 'yc-accordion-content';
+  accordionContent.style.display = 'none';
+
+  accordionHeader.addEventListener('click', () => {
+    const isExpanded = accordionHeader.getAttribute('aria-expanded') === 'true';
+    accordionHeader.setAttribute('aria-expanded', !isExpanded);
+    accordionContent.style.display = isExpanded ? 'none' : 'block';
+    if (!isExpanded) accordionHeader.classList.add('expanded');
+    else accordionHeader.classList.remove('expanded');
+  });
+
+  const ol = document.createElement('ol');
+  ol.className = 'yc-sources-list';
+
+  const isAsset = (item) => {
+    if (item.document_name && item.document_name.includes('.')) {
+      return !item.document_name.endsWith('.html');
+    }
+    try {
+      const u = new URL(item.document_url);
+      const p = u.pathname.split('/').filter(Boolean).pop();
+      if (!p) return false;
+      return p.includes('.') && !p.endsWith('.html');
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const groups = groupSourcesByDocumentId(sourceObj);
+
+  groups.forEach(({ citationKeys, item }) => {
+    const li = document.createElement('li');
+    const citeLabel = citationKeys.join(', ');
+    const prefix = document.createElement('span');
+    prefix.className = 'yc-source-citation-refs';
+    prefix.textContent = `${citeLabel} `;
+
+    const a = document.createElement('a');
+    a.href = item.document_url;
+
+    const itemIsAsset = isAsset(item);
+    let displayName;
+    if (itemIsAsset) {
+      displayName = item.title || item.document_name || item.document_url;
+    } else {
+      displayName = item.title || item.document_url;
+    }
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className = itemIsAsset ? 'yc-asset-icon' : 'yc-page-icon';
+    iconSpan.style.marginRight = '6px';
+    iconSpan.style.display = 'inline-flex';
+    iconSpan.innerHTML = itemIsAsset ? assetIconString : pageIconString;
+
+    const textSpan = document.createElement('span');
+    textSpan.textContent = displayName;
+    textSpan.className = 'yc-source-content';
+
+    a.appendChild(iconSpan);
+    a.appendChild(textSpan);
+    a.style.display = 'flex';
+    a.style.alignItems = 'center';
+
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+
+    li.appendChild(prefix);
+    li.appendChild(a);
+    ol.appendChild(li);
+  });
+
+  accordionContent.appendChild(ol);
+  accordionContainer.appendChild(accordionHeader);
+  accordionContainer.appendChild(accordionContent);
+
+  return accordionContainer;
+}
+
 const appendUserMessage = (messageText, chatHistory, scrollToBottomBtn) => {
   if (!chatHistory) return null;
   const userMessage = document.createElement('div');
@@ -195,6 +326,7 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
   try {
     const origin = prodHosts.includes(window.location.host) ? 'https://partners.adobe.com' : 'https://partners.stage.adobe.com';
     const url = new URL(`${origin}/services/gravity/yukonAIAssistant`);
+
     url.searchParams.append('question', question);
     url.searchParams.append('requestId', requestId);
     url.searchParams.append('yukonProfile', configs.yukonProfile);
@@ -230,7 +362,7 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
     const reader = resp.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let buffer = '';
-    let sourcesProcessed = false;
+    const accumulatedSources = {};
     let accumulatedMarkdown = '';
     let messageAdded = false;
 
@@ -260,8 +392,10 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
           // eslint-disable-next-line no-continue
           if (!line || !line.startsWith('[')) continue;
           const data = JSON.parse(line);
+
           const generatedText = data[0]?.generated_text || '';
           const source = data[0]?.source || {};
+
           if (generatedText) {
             accumulatedMarkdown += generatedText;
             if (loadingElement && !messageAdded) {
@@ -276,15 +410,20 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
             messageText.innerHTML = await parseMarkdown(accumulatedMarkdown);
           }
           if (source && Object.keys(source).length > 0) {
-            if (!sourcesProcessed) {
-              sourcesProcessed = true;
-            }
+            Object.assign(accumulatedSources, source);
           }
         } catch (parseError) {
           // eslint-disable-next-line no-console
           console.debug('Skipping non-JSON line:', line);
         }
       }
+    }
+    if (messageAdded && Object.keys(accumulatedSources).length > 0) {
+      const currentScrollTop = chatHistory.scrollTop;
+      const accordion = createSourcesAccordion(accumulatedSources, localizedText);
+      messageContent.appendChild(accordion);
+      chatHistory.scrollTop = currentScrollTop;
+      checkScrollPosition(chatHistory, scrollToBottomBtn);
     }
     textArea.removeAttribute('disabled');
     inputFieldButton.removeAttribute('disabled');
@@ -324,6 +463,7 @@ const sendMessage = async (textArea, chatHistory, sharedInputField, scrollToBott
 export default async function init(el) {
   extractAuthoredConfigs(configs, el.children);
   const config = getConfig();
+
   const localizedText = {
     '{{send-message}}': 'Send Message',
     '{{open-chat}}': 'Open Chat',
@@ -331,6 +471,7 @@ export default async function init(el) {
     '{{timeout-error}}': 'This is taking longer than expected. Please try again in a moment.',
     '{{server-error}}': 'We’re having trouble processing your request right now. Please try again later.',
     '{{network-error}}': 'Network error. Please check your connection and try again.',
+    '{{sources}}': 'Sources',
     '{{modal-disclaimer}}': 'AI can make mistakes. Please verify important information.',
   };
   await localizationPromises(localizedText, config);
