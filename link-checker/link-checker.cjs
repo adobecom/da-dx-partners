@@ -15,8 +15,6 @@ const CONFIG = {
   excludePrefixes: ['/digitalexperience/drafts/'],
   adminApiKey: process.env.SITE_ADMIN_API_KEY,
   contentApiKey: process.env.SITE_CONTENT_API_KEY,
-  // Temporary testing cap — limits how many pages are checked per run. Remove/unset PAGE_LIMIT for a full run.
-  pageLimit: Number(process.env.PAGE_LIMIT) || 20, // TO DO: remove this limit when ready for full run
 };
 
 // ---------------------------------------------------------------------------
@@ -319,7 +317,7 @@ async function run() {
  
   const allPages = await fetchLivePages();
   const livePagePaths = new Set(allPages.map(normalizePath));
-  const pages = filterPages(allPages).slice(0, CONFIG.pageLimit); // TO DO: remove slice() when ready for full run
+  const pages = filterPages(allPages);
   console.log(`Found ${pages.length} page(s) to check.`); 
 
   const report = [];
