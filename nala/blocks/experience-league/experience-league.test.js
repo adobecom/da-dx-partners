@@ -40,57 +40,62 @@ test.describe('Experience League Page', () => {
       await page.waitForLoadState('domcontentloaded');
     });
 
-    await test.step('Search for automation regression card', async () => {
+    await test.step('Search and verify the first card', async () => {
       await experienceLeagueCardCollectionPage.searchCardCollection(data.searchKeyword);
-    });
-
-    await test.step('Verify first card metadata after search', async () => {
       await experienceLeagueCardCollectionPage.verifyCardMetadata(data, previewUrl);
     });
 
     await test.step('Apply Industry filter, click View now, and verify Experience League page', async () => {
-      await experienceLeagueCardCollectionPage.applyIndustryFilter(
-        data.industryFilter,
-        data.industryCheckbox,
-      );
+      await experienceLeagueCardCollectionPage.applyFilter(data.industryFilter, data.industryCheckbox);
       await experienceLeagueCardCollectionPage.verifyCardStillDisplayed(data);
       await experienceLeagueCardCollectionPage.clickViewNowLinkAndVerifyNewTab(previewUrl);
+      await experienceLeagueCardCollectionPage.applyFilter(data.contentTypeFilter, data.documentationCheckbox);
+      await experienceLeagueCardCollectionPage.verifyCardStillDisplayed(data);
     });
   });
 
-  test(`${features[1].name},${features[1].tags}`, async ({ page, baseURL }) => {
-    const { data, path } = features[1];
-    const { previewUrl } = data;
-    let card;
+  test(`${features[1].name},${features[1].tags} + ${features[2].name},${features[2].tags}`, async ({ page, baseURL }) => {
+    const { data: data2, path } = features[1];
+    const { data: data3 } = features[2];
 
     await test.step('Go to search page and sign in as Community user', async () => {
       await page.goto(`${baseURL}${path}`);
       await page.waitForLoadState('domcontentloaded');
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
-      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.signIn(page, data2.partnerLevel);
       await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
     });
 
-    await test.step('Search, open Pages tab, and verify expanded card metadata', async () => {
-      await experienceLeagueCardCollectionPage.searchOnSearchPage(data.searchKeyword);
+    await test.step('Search and open Pages tab', async () => {
+      await experienceLeagueCardCollectionPage.searchOnSearchPage(data2.searchKeyword);
       await experienceLeagueCardCollectionPage.clickPagesTab();
-      card = await experienceLeagueCardCollectionPage.expandAndVerifySearchPageCard(data, previewUrl);
     });
 
-    await test.step('Apply Industry filter and verify same card stays on top', async () => {
-      await experienceLeagueCardCollectionPage.applyIndustryFilter(
-        data.industryFilter,
-        data.industryCheckbox,
+    await test.step('Verify expanded card and Industry filter', async () => {
+      const { previewUrl } = data2;
+      const card = await experienceLeagueCardCollectionPage.expandAndVerifySearchPageCard(
+        data2,
+        previewUrl,
       );
-      await experienceLeagueCardCollectionPage.verifySearchPageTopCardTitle(data);
-    });
-
-    await test.step('Click preview button and verify Experience League page opens in new tab', async () => {
+      await experienceLeagueCardCollectionPage.applyFilter(data2.industryFilter, data2.industryCheckbox);
+      await experienceLeagueCardCollectionPage.verifySearchPageTopCardTitle(data2);
       await experienceLeagueCardCollectionPage.clickSearchPagePreviewButtonAndVerifyNewTab(
         card,
         previewUrl,
       );
+    });
+
+    await test.step('Verify content type filters', async () => {
+      await experienceLeagueCardCollectionPage.applyFilter(data3.contentTypeFilter, data3.documentationCheckbox);
+      await experienceLeagueCardCollectionPage.verifySearchPageTopCardTitle(data3);
+
+      await experienceLeagueCardCollectionPage.applyFilter(data3.contentTypeFilter, data3.customerStoryCheckbox);
+      await experienceLeagueCardCollectionPage.verifyPartnerCollectionCardNotPresent(data3);
+
+      await experienceLeagueCardCollectionPage.uncheckFilter(data3.contentTypeFilter, data3.customerStoryCheckbox);
+      await experienceLeagueCardCollectionPage.applyFilter(data3.industryFilter, data3.industryCheckbox);
+      await experienceLeagueCardCollectionPage.verifySearchPageTopCardTitle(data3);
     });
   });
 });

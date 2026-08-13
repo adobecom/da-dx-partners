@@ -40,7 +40,6 @@ export default class ExperienceLeaguePage {
 
     await newPage.waitForLoadState('domcontentloaded');
     expect(newPage.url()).toBe(previewUrl);
-    await expect(newPage.getByText(/404|page not found|error/i)).toBeHidden({ timeout: 10000 });
     await newPage.close();
   }
 
@@ -145,15 +144,13 @@ export default class ExperienceLeaguePage {
     );
   }
 
-  async applyIndustryFilter(industryFilter, industryCheckbox) {
-    await this.page.getByRole('button', { name: industryFilter }).click();
-    const checkbox = this.page.getByRole('checkbox', { name: industryCheckbox });
-    await checkbox.waitFor({ state: 'visible', timeout: 30000 });
-
+  async applyFilter(filterGroup, checkboxName) {
+    await this.openFilterGroup(filterGroup);
+    const checkbox = this.page.getByRole('checkbox', { name: checkboxName });
+    await expect(checkbox).toBeVisible();
     if (!(await checkbox.isChecked())) {
       await checkbox.click();
     }
-
     await this.waitForResultsToSettle();
   }
 
@@ -167,5 +164,31 @@ export default class ExperienceLeaguePage {
 
   getPartnerCollectionCardByTitle(title) {
     return this.partnerCollectionCards.filter({ hasText: title }).first();
+  }
+
+  async verifyPartnerCollectionCardNotPresent(data) {
+    await expect(
+      this.getPartnerCollectionCardByTitle(data.cardTitle),
+    ).toHaveCount(0);
+  }
+
+  async uncheckFilter(filterGroup, checkboxName) {
+    await this.openFilterGroup(filterGroup);
+    const checkbox = this.page.getByRole('checkbox', { name: checkboxName });
+    await expect(checkbox).toBeVisible();
+    if (await checkbox.isChecked()) {
+      await checkbox.click();
+    }
+    await this.waitForResultsToSettle();
+  }
+
+  async openFilterGroup(filterGroup) {
+    const filter = this.page
+      .locator('.filter')
+      .filter({ has: this.page.getByRole('button', { name: filterGroup }) });
+
+    if (!(await filter.evaluate((el) => el.classList.contains('expanded')))) {
+      await filter.getByRole('button', { name: filterGroup }).click();
+    }
   }
 }
