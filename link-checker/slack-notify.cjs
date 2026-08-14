@@ -27,6 +27,20 @@ async function slackApi(method, body) {
   return data;
 }
 
+async function slackApiForm(method, params) {
+  const res = await fetch(`${SLACK_API}/${method}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${requireEnv('SLACK_BOT_TOKEN')}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams(params),
+  });
+  const data = await res.json();
+  if (!data.ok) throw new Error(`Slack API ${method} failed: ${data.error}`);
+  return data;
+}
+
 async function postStartMessage() {
   const channel = requireEnv('SLACK_CHANNEL_ID');
   const buildUrl = process.env.CIRCLE_BUILD_URL;
@@ -40,9 +54,9 @@ async function postStartMessage() {
 }
 
 async function uploadSnippet(channel, threadTs, content, title) {
-  const { upload_url: uploadUrl, file_id: fileId } = await slackApi('files.getUploadURLExternal', {
+  const { upload_url: uploadUrl, file_id: fileId } = await slackApiForm('files.getUploadURLExternal', {
     filename: 'report.txt',
-    length: Buffer.byteLength(content),
+    length: String(Buffer.byteLength(content)),
   });
 
   const uploadRes = await fetch(uploadUrl, { method: 'POST', body: content });
