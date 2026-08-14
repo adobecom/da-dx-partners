@@ -1,21 +1,10 @@
-// ---------------------------------------------------------------------------
-// Posts CircleCI link-checker updates to Slack.
-//
-// Usage:
-//   node slack-notify.cjs start   # posts the "job started" message, saves its ts
-//   node slack-notify.cjs report  # replies in-thread with report.txt (or a
-//                                  # snippet upload if the report is too long)
-//
-// Required env vars: SLACK_BOT_TOKEN, SLACK_CHANNEL_ID
-// ---------------------------------------------------------------------------
 const fs = require('fs');
 const path = require('path');
 
 const SLACK_API = 'https://slack.com/api';
 const THREAD_TS_FILE = path.join(__dirname, 'thread_ts.txt');
 const REPORT_FILE = path.join(__dirname, 'report.txt');
-// Slack truncates a single mrkdwn text block around this length, so anything
-// longer is uploaded as a snippet instead of posted as a plain message.
+
 const MAX_MESSAGE_LENGTH = 3000;
 
 function requireEnv(name) {
@@ -50,10 +39,6 @@ async function postStartMessage() {
   console.log(`Posted start message, thread_ts=${ts}`);
 }
 
-// ---------------------------------------------------------------------------
-// files.upload was retired in March 2025; this is the current 3-step upload
-// flow required to share a file into an existing thread.
-// ---------------------------------------------------------------------------
 async function uploadSnippet(channel, threadTs, content, title) {
   const { upload_url: uploadUrl, file_id: fileId } = await slackApi('files.getUploadURLExternal', {
     filename: 'report.txt',

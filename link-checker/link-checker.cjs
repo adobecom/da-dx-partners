@@ -2,9 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 
-// ---------------------------------------------------------------------------
-// CONFIG — adjust these for your environment
-// ---------------------------------------------------------------------------
 const CONFIG = {
   baseUrl: process.env.SITE_BASE_URL || 'https://main--da-dx-partners--adobecom.aem.live',
   owner: process.env.SITE_OWNER || 'adobecom',
@@ -17,20 +14,12 @@ const CONFIG = {
   contentApiKey: process.env.SITE_CONTENT_API_KEY,
 };
 
-// ---------------------------------------------------------------------------
-// A real browser UA — many sites (WAF/bot protection) block or mis-handle
-// requests from generic HTTP clients, especially HEAD requests.
-// ---------------------------------------------------------------------------
 const DEFAULT_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
   Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
   'Accept-Language': 'en-US,en;q=0.9',
 };
 
-// ---------------------------------------------------------------------------
-// Only attach the auth token when calling our own site's origin — never send
-// it along with requests to third-party link targets found on the page.
-// ---------------------------------------------------------------------------
 function getAuthHeaders(url) {
   if (!CONFIG.contentApiKey) return { ...DEFAULT_HEADERS };
   try {
@@ -41,13 +30,6 @@ function getAuthHeaders(url) {
   return { ...DEFAULT_HEADERS, Authorization: `token ${CONFIG.contentApiKey}` };
 }
 
-// ---------------------------------------------------------------------------
-// Native fetch has no default timeout — a single unresponsive link (hung
-// connection, redirect loop, server that never answers HEAD/GET) would make
-// the whole script appear to freeze on one page forever. Wrap every fetch
-// with an AbortController-based timeout so a bad link just gets reported as
-// broken instead of hanging indefinitely. Override with REQUEST_TIMEOUT_MS.
-// ---------------------------------------------------------------------------
 const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS) || 15000;
 
 async function fetchWithTimeout(url, options = {}) {
@@ -60,11 +42,6 @@ async function fetchWithTimeout(url, options = {}) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Minimal standalone AEM Admin API client — inlined here instead of importing
-// services/aem-admin/aem-admin.js so this script has no dependency on the
-// runtime project (avoids pulling in node-fetch and @adobe/aio-sdk).
-// ---------------------------------------------------------------------------
 function getAdminAuthHeaders() {
   return { Authorization: `token ${CONFIG.adminApiKey}` };
 }
@@ -99,13 +76,6 @@ async function awaitJob(topic, jobName) {
   throw new Error('Polling exceeded maximum attempts.');
 }
 
-// ---------------------------------------------------------------------------
-// Step 1: fetch all live pages via the AEM Admin bulk status job
-//
-// Same mechanism as actions/search/dx/search-index-sync/index.js: start a
-// bulk status job for '/*' selecting only 'live' resources, poll until it
-// finishes, then read the resulting resource list from job status details.
-// ---------------------------------------------------------------------------
 async function fetchLivePages() {
   if (!CONFIG.adminApiKey) {
     throw new Error('SITE_ADMIN_API_KEY is required to discover live pages via the AEM Admin bulk status job.');
@@ -130,9 +100,6 @@ async function fetchLivePages() {
     .map((resource) => resource.path);
 }
 
-// ---------------------------------------------------------------------------
-// Step 2: filter to /digitalexperience/, excluding /drafts/
-// ---------------------------------------------------------------------------
 function filterPages(paths) {
   return paths.filter((path) => {
     if (!path.startsWith(CONFIG.pathPrefix)) return false;
@@ -146,13 +113,8 @@ function toFullUrl(path, base = CONFIG.baseUrl) {
   return new URL(path, base).toString();
 }
 
-// Links pointing into these paths are intentionally not verified (e.g. search/member-only routes).
 const skipLinkPrefixes = ['/digitalexperience/s/','/s/', '/digitalexperience/m/', '/digitalexperience/preview/', '/digitalexperience/training/'];
 
-// These platforms redirect anonymous/bot requests to a login wall that itself returns
-// non-2xx (e.g. Facebook profile URLs 302 -> /login/?next=... which 400s for non-browser
-// clients), so unauthenticated automated requests can never verify them — skip instead of
-// producing false-positive "broken link" reports.
 const loginWalledHosts = ['facebook.com', 'www.facebook.com', 'instagram.com', 'www.instagram.com', 'linkedin.com', 'www.linkedin.com', 'x.com', 'twitter.com'];
 
 function shouldSkipLink(href) {
@@ -178,11 +140,8 @@ function normalizePath(pathname) {
   return clean.length > 1 ? clean.replace(/\/+$/, '') : clean;
 }
 
-// Skip links whose visible text is just an email address (e.g. example emails in docs, not real navigable links).
 const EMAIL_TEXT_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Matches the class names eds/scripts/personalization.js uses to conditionally remove
-// elements client-side (e.g. partner-personalization, partner-level, partner-not-*).
 const PERSONALIZATION_CLASS_PATTERN = /^partner-|^personalization-hide$/;
 
 function isPersonalizedContent($, el) {
@@ -192,9 +151,6 @@ function isPersonalizedContent($, el) {
   });
 }
 
-// ---------------------------------------------------------------------------
-// Step 3: fetch a page, check its status, then check every anchor on it
-// ---------------------------------------------------------------------------
 async function checkPage(pagePath, report, livePagePaths) {
   const pageUrl = toFullUrl(pagePath);
   let response;
@@ -291,9 +247,6 @@ async function checkLinkOk(url) {
   return attemptLinkCheck(url, headers);
 }
 
-// ---------------------------------------------------------------------------
-// Reporting
-// ---------------------------------------------------------------------------
 function formatReport(title, report) {
   const lines = [`=== ${title}: ${report.length} issue(s) ===`];
   if (report.length === 0) {
@@ -310,9 +263,6 @@ function formatReport(title, report) {
   return lines.join('\n');
 }
 
-// ---------------------------------------------------------------------------
-// Main
-// ---------------------------------------------------------------------------
 async function run() {
  
   const allPages = await fetchLivePages();
@@ -333,7 +283,7 @@ async function run() {
   fs.writeFileSync(path.join(__dirname, 'report.txt'), reportText);
 
   if (report.length > 0) {
-    process.exitCode = 1; // useful if this runs in CI
+    process.exitCode = 1;
   }
 }
 
