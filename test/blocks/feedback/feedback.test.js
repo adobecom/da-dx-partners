@@ -132,6 +132,8 @@ describe('feedback block', () => {
       const emailField = document.querySelector('#feedback-email');
       const emailLabel = document.querySelector('.feedback-email-wrapper .feedback-label-text');
       expect(emailField).to.exist;
+      expect(emailField.getAttribute('name')).to.equal('email');
+      expect(emailField.getAttribute('autocomplete')).to.equal('email');
       expect(emailLabel).to.exist;
       expect(emailLabel.textContent).to.equal('Share your email address');
     });
