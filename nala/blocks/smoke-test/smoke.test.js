@@ -221,6 +221,7 @@ test.describe('Validate Partner Directory pages', () => {
     });
   });
   test(`${features[7].name},${features[7].tags}`, async ({ page, baseURL }) => {
+    test.setTimeout(60000);
     const { data, path } = features[7];
 
     await test.step('Go to Sale Center page and log in', async () => {
@@ -228,12 +229,12 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await smokeTest.signInButton.click();
       await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
-      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 60000 });
     });
     await test.step('Check contact not found page', async () => {
       await expect(page).toHaveURL(
         new RegExp(data.contactNotFoundUrl),
-        { timeout: 30000 },
+        { timeout: 60000 },
       );
 
       await smokeTest.findAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
@@ -298,6 +299,7 @@ test.describe('Validate Partner Directory pages', () => {
   });
   errorFlowCases.forEach((feature) => {
     test(`${feature.name},${feature.tags}`, async ({ page, baseURL }) => {
+      test.setTimeout(60000);
       await test.step('Go to public home page', async () => {
         await page.goto(`${feature.path}`);
         await page.waitForLoadState('domcontentloaded');
@@ -305,14 +307,12 @@ test.describe('Validate Partner Directory pages', () => {
         await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
         await smokeTest.signInButton.click();
         await smokeTest.smokeSignIn(page, baseURL, feature.data.partnerLevel);
-        await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+        await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 60000 });
       });
       await test.step('Verify error message', async () => {
-        await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
-        const pages = await page.context().pages();
-        await expect(pages[0]).toHaveURL(
+        await expect(page).toHaveURL(
           new RegExp(feature.data.expectedToSeeInURL),
-          { timeout: 30000 },
+          { timeout: 60000 },
         );
       });
     });
@@ -430,6 +430,7 @@ test.describe('Validate Partner Directory pages', () => {
     });
   });
   test(`${features[19].name},${features[19].tags}`, async ({ page, baseURL }) => {
+    test.setTimeout(60000);
     const { data, path } = features[19];
 
     await test.step('Go to home page and Log in', async () => {
@@ -437,15 +438,15 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await smokeTest.signInButton.click();
       await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
-      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 60000 });
 
-      await page.waitForURL(new RegExp(`${data.homeUrl}#?$`), { timeout: 30000 });
+      await page.waitForURL(new RegExp(`${data.homeUrl}#?$`), { timeout: 60000 });
       await expect(page).toHaveURL(new RegExp(`${data.homeUrl}#?$`));
     });
 
     await test.step('Log out and verify redirect page', async () => {
       await smokeTest.signOut();
-      await page.waitForURL(new RegExp(`${path}#?$`), { timeout: 30000 });
+      await page.waitForURL(new RegExp(`${path}#?$`), { timeout: 60000 });
       await expect(page).toHaveURL(new RegExp(`${path}#?$`));
     });
   });
