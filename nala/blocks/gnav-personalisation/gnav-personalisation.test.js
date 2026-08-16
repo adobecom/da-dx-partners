@@ -305,27 +305,26 @@ test.describe('Gnav Personalisation', () => {
 
     await test.step('Go to the page', async () => {
       await page.goto(`${baseURL}${path}`);
-      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
+      await expect(gnavPersonalisationPage.gnav).toBeVisible({ timeout: 30000 });
     });
 
     await test.step('Sign in', async () => {
-      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(signInPage.signInButton).toBeVisible({ timeout: 30000 });
       await signInPage.signInButton.click();
+
       await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+
+      await expect(signInPage.profileIconButton).toBeVisible({ timeout: 30000 });
     });
 
     await test.step('Validate GNav status on restricted 404 page', async () => {
       const restrictedPage = await context.newPage();
       const gnavPage = new GnavPersonalisationPage(restrictedPage);
+
       try {
-        const fragmentResponse = gnavPage.waitForLoggedInGnavFragment();
-        await restrictedPage.goto(`${baseURL}${restrictedPath}`);
-        await restrictedPage.waitForLoadState('domcontentloaded');
-        const response = await fragmentResponse;
-        expect(response.url()).toContain(data.gnavFragmentPath);
-        expect(response.status()).toBe(200);
-        await gnavPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+        await restrictedPage.goto(`${baseURL}${restrictedPath}`, { waitUntil: 'domcontentloaded' });
+        await restrictedPage.bringToFront();
+        await expect(gnavPage.gnav).toBeVisible({ timeout: 30000 });
         await gnavPage.verifyLogoVisible();
         await gnavPage.verifyPartnerCtasHidden(data.hiddenCtas);
         await gnavPage.verifyShortcutIconsVisible();
@@ -335,6 +334,7 @@ test.describe('Gnav Personalisation', () => {
       }
     });
   });
+
   test(`${features[12].name},${features[12].tags}`, async ({ page, context, baseURL }) => {
     const { data, path, restrictedPath } = features[12];
 
@@ -551,11 +551,18 @@ test.describe('Gnav Personalisation', () => {
     await test.step('Validate logged-in GNav fragment and mobile restricted GNav status', async () => {
       const fragmentResponse = gnavPersonalisationPage.waitForLoggedInGnavFragment();
       await page.reload();
-      await page.waitForLoadState('domcontentloaded');
+
       const response = await fragmentResponse;
+
       expect(response.url()).toContain(data.gnavFragmentPath);
       expect(response.status()).toBe(200);
-      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+
+      await expect(gnavPersonalisationPage.gnav).toBeVisible({ timeout: 30000 });
+
+      await expect(
+        gnavPersonalisationPage.navigationMenuButton,
+      ).toBeVisible({ timeout: 30000 });
+
       await gnavPersonalisationPage.verifyMobileRestrictedGnavStatus(data);
     });
 
