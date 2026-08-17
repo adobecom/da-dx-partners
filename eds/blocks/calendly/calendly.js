@@ -1,5 +1,4 @@
 import showToast from '../../components/Toast.js';
-import '../../components/LoadingSpinner.js';
 import { refreshPartnerAccountState, updatePartnerAccountState } from '../../scripts/partnerStateUtils.js';
 import {
   getLibs,
@@ -179,17 +178,12 @@ export default async function init(el) {
   const inlineChildren = Array.from(el.children);
   el.innerHTML = '';
   const calendlyEmbed = document.createElement('div');
-  const calendlyLoader = createCalendlyLoader(localizedText);
-
-  el.setAttribute('aria-busy', 'true');
-  el.append(calendlyLoader);
 
   // if cookie state already shows calendly booked, we just display already booked fragment
   if (hasCalendlyBooked()) {
     keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
     el.innerHTML = '';
     el.append(calendlyEmbed);
-    el.removeAttribute('aria-busy');
     return;
   }
 
@@ -198,6 +192,12 @@ export default async function init(el) {
     try {
       // loadStyle import resolves from cache instantly (milo/utils already loaded)
       const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+      await Promise.all([
+        import('../../components/LoadingSpinner.js'),
+        loadStyle('/eds/components/LoadingSpinner.css'),
+      ]);
+      const calendlyLoader = createCalendlyLoader(localizedText);
+      el.append(calendlyLoader);
       await Promise.all([
         loadStyle('/eds/components/Toast.css'),
         refreshPartnerAccountState().catch((err) => {
@@ -210,7 +210,6 @@ export default async function init(el) {
         keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
         el.innerHTML = '';
         el.append(calendlyEmbed);
-        el.removeAttribute('aria-busy');
         return;
       }
 
@@ -221,11 +220,9 @@ export default async function init(el) {
       await loadCalendlyScript();
       initCalendly(schedulingLink, calendlyEmbed, companyQuestionKey);
       window.addEventListener('message', trackCalendlyEvent);
-      el.removeAttribute('aria-busy');
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('Calendly widget failed to load', e);
-      el.removeAttribute('aria-busy');
     }
   }, 1);
 }

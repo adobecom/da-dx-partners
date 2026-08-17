@@ -15,7 +15,11 @@ import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
-await import('../../components/LoadingSpinner.js');
+const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+await Promise.all([
+  import('../../components/LoadingSpinner.js'),
+  loadStyle('/eds/components/LoadingSpinner.css'),
+]);
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
 export default class AssetPreview extends LitElement {

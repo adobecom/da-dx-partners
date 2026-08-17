@@ -1,33 +1,18 @@
-import { getLibs } from '../scripts/utils.js';
-
-const miloLibs = getLibs();
-const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
-
-export default class LoadingSpinner extends LitElement {
-  static properties = {
-    text: { type: String },
-    theme: { type: String },
-  };
-
-  createRenderRoot() {
-    return this;
-  }
+export default class LoadingSpinner extends HTMLElement {
+  static observedAttributes = ['text', 'theme'];
 
   connectedCallback() {
-    super.connectedCallback();
-    LoadingSpinner.loadStyles();
+    this.applyTheme();
+    this.render();
   }
 
-  static loadStyles() {
-    if (document.querySelector('link[href="/eds/components/LoadingSpinner.css"]')) return;
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = '/eds/components/LoadingSpinner.css';
-    document.head.appendChild(link);
+  attributeChangedCallback() {
+    this.applyTheme();
+    this.render();
   }
 
-  willUpdate() {
-    const theme = this.theme || 'light';
+  applyTheme() {
+    const theme = this.getAttribute('theme') || 'light';
     const trackColor = theme === 'dark' ? 'rgb(255 255 255 / 30%)' : 'rgb(0 0 0 / 10%)';
     const activeColor = theme === 'dark' ? 'var(--asset-preview-white, #fff)' : '#006bff';
     const textColor = theme === 'dark' ? 'var(--asset-preview-white, #fff)' : '#4b4b4b';
@@ -37,9 +22,10 @@ export default class LoadingSpinner extends LitElement {
   }
 
   render() {
-    return html`
+    const text = this.getAttribute('text');
+    this.innerHTML = `
       <div class="spinner" aria-hidden="true"></div>
-      ${this.text ? html`<p class="spinner-text">${this.text}</p>` : ''}
+      ${text ? `<p class="spinner-text">${text}</p>` : ''}
     `;
   }
 }
