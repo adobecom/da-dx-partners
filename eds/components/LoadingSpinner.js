@@ -14,8 +14,8 @@ export default class LoadingSpinner extends HTMLElement {
   applyTheme() {
     const theme = this.getAttribute('theme') || 'light';
     const trackColor = theme === 'dark' ? 'rgb(255 255 255 / 30%)' : 'rgb(0 0 0 / 10%)';
-    const activeColor = theme === 'dark' ? 'var(--asset-preview-white, #fff)' : '#006bff';
-    const textColor = theme === 'dark' ? 'var(--asset-preview-white, #fff)' : '#4b4b4b';
+    const activeColor = theme === 'dark' ? '#fff' : '#006bff';
+    const textColor = theme === 'dark' ? '#fff' : '#4b4b4b';
     this.style.setProperty('--spinner-track-color', trackColor);
     this.style.setProperty('--spinner-active-color', activeColor);
     this.style.setProperty('--spinner-text-color', textColor);
