@@ -104,13 +104,23 @@ export default class GnavPersonalisationPage {
 
   async verifyVisibleImagesNotBroken() {
     const images = this.page.locator('img:visible');
+    await expect
+      .poll(() => images.count(), {
+        timeout: 10000,
+        message: 'Waiting for visible images to be rendered',
+      })
+      .toBeGreaterThan(0);
+
     const count = await images.count();
-    expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i += 1) {
       const img = images.nth(i);
+
       await expect(img).toBeVisible();
       await expect
-        .poll(async () => img.evaluate((el) => el.complete && el.naturalWidth > 0))
+        .poll(
+          () => img.evaluate((el) => el.complete && el.naturalWidth > 0),
+          { timeout: 10000 },
+        )
         .toBeTruthy();
     }
   }

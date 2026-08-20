@@ -36,7 +36,7 @@ export default class SmokeTest {
     this.loader = page.locator('.progress-circle-wrapper');
     this.feedbackButton = page.locator('.feedback-mechanism');
     this.feedbackTitle = page.locator('.feedback-title');
-    this.feedbackTextArea = page.locator('.feedback-textarea');
+    this.feedbackTextArea = page.locator('textarea.feedback-textarea, textarea.input');
     this.feedbackSendButton = page.locator('.feedback-dialog-button.cta');
     this.feedBackStars3 = page.locator('sp-action-button[data-rating="3"]');
     this.collectionBlock = page.locator('#explore-all-related-product-assets');

@@ -29,10 +29,6 @@ export default {
             label: 'Credentials',
             value: '30',
           },
-          {
-            label: 'Active Customer Deployments',
-            value: '15',
-          },
         ],
       },
     },

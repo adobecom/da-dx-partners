@@ -6,7 +6,17 @@ const miloLibs = getLibs();
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+function validateEmailField(emailField) {
+  const email = emailField.value.trim();
+  const invalid = email !== '' && !emailRegex.test(email);
+  emailField.toggleAttribute('invalid', invalid);
+  return !invalid;
+}
+
 async function renderDialog(feedbackButton, formDefinitionUrl, config) {
+  const isSignedIn = partnerIsSignedIn();
   feedbackButton.classList.add('hidden');
   const feedbackDialog = document.createElement('div');
   feedbackDialog.className = 'feedback-dialog';
@@ -21,6 +31,33 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   const description = document.createElement('span');
   description.className = 'feedback-description';
   description.textContent = config.dialogText;
+
+  let emailContainer;
+  let emailField;
+  if (!isSignedIn) {
+    emailContainer = document.createElement('div');
+    emailContainer.className = 'feedback-email-wrapper';
+    const emailLabel = document.createElement('span');
+    emailLabel.className = 'feedback-label-text';
+    emailLabel.textContent = config.dialogEmail;
+    const emailTheme = document.createElement('sp-theme');
+    emailTheme.setAttribute('system', 'spectrum');
+    emailTheme.setAttribute('color', 'light');
+    emailTheme.setAttribute('scale', 'medium');
+    emailField = document.createElement('sp-textfield');
+    emailField.setAttribute('id', 'feedback-email');
+    emailField.setAttribute('name', 'email');
+    emailField.setAttribute('type', 'email');
+    emailField.setAttribute('autocomplete', 'email');
+    emailField.placeholder = '';
+    emailField.value = config.savedEmail;
+    validateEmailField(emailField);
+    emailField.addEventListener('input', () => { validateEmailField(emailField); });
+    emailTheme.appendChild(emailField);
+    emailContainer.appendChild(emailLabel);
+    emailContainer.appendChild(emailTheme);
+  }
+
   const starContainer = document.createElement('div');
   starContainer.className = 'feedback-stars-wrapper';
   let selectedRating = config.savedRating;
@@ -72,7 +109,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   textareaSection.className = 'feedback-comment-wrapper';
   const textareaHeader = document.createElement('div');
   textareaHeader.className = 'feedback-label-wrapper';
-  const textareaLabel = document.createElement('label');
+  const textareaLabel = document.createElement('span');
   textareaLabel.textContent = config.dialogComment;
   textareaLabel.className = 'feedback-label-text';
   const charCount = document.createElement('span');
@@ -80,9 +117,16 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   charCount.textContent = '500';
   textareaHeader.appendChild(textareaLabel);
   textareaHeader.appendChild(charCount);
-  const textarea = document.createElement('textarea');
-  textarea.className = 'feedback-textarea';
-  textarea.maxLength = 500;
+  const textareaTheme = document.createElement('sp-theme');
+  textareaTheme.setAttribute('system', 'spectrum');
+  textareaTheme.setAttribute('color', 'light');
+  textareaTheme.setAttribute('scale', 'medium');
+  const textarea = document.createElement('sp-textfield');
+  textarea.setAttribute('id', 'feedback-comment');
+  textarea.setAttribute('multiline', '');
+  textarea.setAttribute('rows', '5');
+  textarea.style.width = '100%';
+  textarea.setAttribute('maxlength', 500);
   textarea.placeholder = '';
   textarea.value = config.savedComment;
   const initialRemaining = 500 - config.savedComment.length;
@@ -91,8 +135,15 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     const remaining = 500 - textarea.value.length;
     charCount.textContent = remaining.toString();
   });
+  textareaTheme.appendChild(textarea);
   textareaSection.appendChild(textareaHeader);
-  textareaSection.appendChild(textarea);
+  textareaSection.appendChild(textareaTheme);
+  const honeypotInput = document.createElement('input');
+  honeypotInput.name = 'feedback_context';
+  honeypotInput.type = 'text';
+  honeypotInput.className = 'feedback-context-field';
+  honeypotInput.setAttribute('tabindex', '-1');
+  honeypotInput.setAttribute('autocomplete', 'off');
   const buttonsContainer = document.createElement('div');
   buttonsContainer.className = 'feedback-dialog-actions';
   const cancelButton = document.createElement('button');
@@ -110,6 +161,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   const close = () => {
     config.savedRating = selectedRating;
     config.savedComment = textarea.value;
+    if (!isSignedIn && emailField) config.savedEmail = emailField.value.trim();
     closeDialog();
   };
   cancelButton.addEventListener('click', close);
@@ -119,6 +171,16 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     }
   });
   const submitFeedback = async () => {
+    if (honeypotInput.value.length > 0) {
+      closeDialog();
+      showToast('feedback', true, null, config);
+      return;
+    }
+    if (!isSignedIn) {
+      if (!validateEmailField(emailField)) {
+        return;
+      }
+    }
     document.querySelectorAll('.feedback-dialog-button').forEach((button) => {
       button.disabled = true;
     });
@@ -137,7 +199,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     const timestamp = new Date().toISOString();
     let userName = '';
     let userEmail = '';
-    if (partnerIsSignedIn()) {
+    if (isSignedIn) {
       try {
         const profileData = getPartnerCookieObject(getCurrentProgramType());
         userName = `${profileData.firstName} ${profileData.lastName}`;
@@ -148,6 +210,8 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
         // eslint-disable-next-line no-console
         console.info('Failed to parse profileData from cookie:', error);
       }
+    } else {
+      userEmail = emailField.value.trim();
     }
     const payload = {
       rating,
@@ -177,6 +241,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     await resp.text();
     config.savedRating = 0;
     config.savedComment = '';
+    if (!isSignedIn) config.savedEmail = '';
     closeDialog();
     showToast('feedback', true, null, config);
   };
@@ -187,8 +252,10 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   feedbackDialog.appendChild(title);
   feedbackDialog.appendChild(divider);
   dialogBody.appendChild(description);
+  if (!isSignedIn) dialogBody.appendChild(emailContainer);
   dialogBody.appendChild(starContainer);
   dialogBody.appendChild(textareaSection);
+  dialogBody.appendChild(honeypotInput);
   feedbackDialog.appendChild(dialogBody);
   feedbackDialog.appendChild(buttonsContainer);
   document.body.appendChild(feedbackDialog);
@@ -202,6 +269,7 @@ export default async function init(el) {
     import(`${miloLibs}/features/spectrum-web-components/dist/theme.js`),
     import(`${miloLibs}/features/spectrum-web-components/dist/button.js`),
     import(`${miloLibs}/features/spectrum-web-components/dist/action-button.js`),
+    import(`${miloLibs}/features/spectrum-web-components/dist/textfield.js`),
   ]);
 
   const isProd = prodHosts.includes(window.location.host);
@@ -210,14 +278,17 @@ export default async function init(el) {
     feedbackStickyButton: 'Share Feedback',
     dialogTitle: 'Rate this page',
     dialogText: 'How satisfied were you with this page? Be as candid as you want, all feedback is kept anonymous.',
+    dialogEmail: 'Email (optional)',
     dialogComment: 'Want to share more? (optional)',
     cancel: 'Cancel',
     send: 'Send',
     toastNegative: 'Unable to receive your rating.',
     toastPositive: 'Thank you for your feedback!',
+    toastPositiveIsHtml: false,
     tryAgain: 'Try again',
     savedRating: 0,
     savedComment: '',
+    savedEmail: '',
   };
 
   [...el.children].forEach((row) => {
@@ -230,6 +301,8 @@ export default async function init(el) {
         config.dialogTitle = value;
       } else if (key === 'dialog-text') {
         config.dialogText = value;
+      } else if (key === 'dialog-email') {
+        config.dialogEmail = value;
       } else if (key === 'dialog-comment') {
         config.dialogComment = value;
       } else if (key === 'cancel') {
@@ -239,7 +312,8 @@ export default async function init(el) {
       } else if (key === 'toast-negative') {
         config.toastNegative = value;
       } else if (key === 'toast-positive') {
-        config.toastPositive = value;
+        config.toastPositive = row.children[1].innerHTML.trim();
+        config.toastPositiveIsHtml = true;
       } else if (key === 'try-again') {
         config.tryAgain = value;
       }
