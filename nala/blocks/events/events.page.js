@@ -8,6 +8,7 @@ export default class EventsPage {
     this.filterRegion = page.getByRole('button', { name: 'Region' });
     this.japanRegion = page.getByRole('checkbox', { name: 'Japan' });
     this.partnerCradCollection = page.locator('.partner-cards-collection ');
+    this.searchField = page.locator('.input');
   }
 
   async verifyPublicCardTitle(cardTitle) {

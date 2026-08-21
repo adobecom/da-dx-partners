@@ -80,30 +80,28 @@ test.describe('Search Page', () => {
         await test.step('Asset Card Content Validation', async () => {
           await expect(async () => {
             const card = searchPageInstance.getCardByTitle(data.cardTitle);
-            await searchPageInstance.clickCard(card);
-            await getPage().waitForLoadState('domcontentloaded');
-            const expanded = await card.evaluate((el) => el.classList.contains('expanded'));
+            await expect(card).toBeVisible({ timeout: 30000 });
+            await searchPageInstance.clickCard(card, 30000);
+            await expect(card).toHaveClass(/expanded/, { timeout: 30000 });
+            const expandedCard = searchPageInstance
+              .getExpandedCard()
+              .filter({ hasText: data.cardTitle })
+              .first();
+            await expect(expandedCard).toBeVisible({ timeout: 30000 });
 
-            expect(expanded).toBe(true);
-          }).toPass({ timeout: 30000 });
-          const expandedCard = searchPageInstance
-            .getExpandedCard()
-            .filter({ hasText: data.cardTitle })
-            .first();
-          await expect(expandedCard).toBeVisible({ timeout: 30000 });
+            const cardDate = searchPageInstance.getCardDateLocator(expandedCard);
+            await expect(cardDate).toContainText(data.cardDate);
 
-          const cardDate = searchPageInstance.getCardDateLocator(expandedCard);
-          await expect(cardDate).toContainText(data.cardDate);
+            const cardSize = searchPageInstance.getCardSizeLocator(expandedCard);
+            await expect(cardSize).toContainText(data.cardSize);
 
-          const cardSize = searchPageInstance.getCardSizeLocator(expandedCard);
-          await expect(cardSize).toContainText(data.cardSize);
+            for (const tagText of data.cardTags) {
+              const tag = searchPageInstance.getCardTagByText(expandedCard, tagText);
+              await expect(tag).toBeVisible({ timeout: 30000 });
+            }
 
-          for (const tagText of data.cardTags) {
-            const tag = searchPageInstance.getCardTagByText(expandedCard, tagText);
-            await expect(tag).toBeVisible({ timeout: 30000 });
-          }
-
-          await searchPageInstance.verifyCardButtonLink(expandedCard, data.cardButtonLink);
+            await searchPageInstance.verifyCardButtonLink(expandedCard, data.cardButtonLink);
+          });
         });
 
         await test.step('Check Silver Asset', async () => {
@@ -420,18 +418,18 @@ test.describe('Search Page', () => {
 
         await test.step('Expand netstorage asset and verify properties', async () => {
           const card = searchPageInstance.getCardByTitle(data.cardTitle);
+
           await expect(card).toBeVisible({ timeout: 30000 });
 
-          await expect(async () => {
-            await searchPageInstance.clickCard(card, 60000);
-            const classList = await card.evaluate((el) => el.classList.toString());
-            expect(classList).toContain('expanded');
-          }).toPass({ timeout: 60000 });
+          await searchPageInstance.clickCard(card, 30000);
+
+          await expect(card).toHaveClass(/expanded/, { timeout: 30000 });
 
           const expandedCard = searchPageInstance
             .getExpandedCard()
             .filter({ hasText: data.cardTitle })
             .first();
+
           await expect(expandedCard).toBeVisible({ timeout: 30000 });
 
           await searchPageInstance.verifyExpandedNetstorageAsset(expandedCard, data);

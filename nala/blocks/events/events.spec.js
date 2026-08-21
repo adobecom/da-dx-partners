@@ -43,6 +43,7 @@ export default {
       path: '/digitalexperience/drafts/automation/regression/events/attendees-events',
       tags: '@da-dx-events @regression @circleCi',
       data: {
+        keyword: 'QA Content',
         sessionOne: 'QA Content, 2 sessions in future, one displayed',
         sessionOneDaysFromToday: 28,
         sessionTwo: 'QA Content, one session in future displayed',

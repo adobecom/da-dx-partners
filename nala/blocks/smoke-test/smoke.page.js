@@ -54,14 +54,14 @@ export default class SmokeTest {
 
   async smokeSignIn(page, baseURL, partnerLevel) {
     const isProduction = baseURL.includes('partners.adobe.com');
-    const emailData = isProduction ? process.env.IMS_EMAIL_PROD : process.env.IMS_EMAIL;
+    const emailData = isProduction ? 'cpp-latin-na-platinum:yugo-test+cpp-prod-platinum-latam-na@adobetest.com;cpp-distributor-us:yugo-test+cpp-prod-distributor-us@adobetest.com;cpp-distributor-india:yugo-test+cpp-prod-distr-india-apac@adobetest.com;cpp-emea-platinum:yugo-test+cpp-prod-gold-uk-eur-west@adobetest.com;cpp-distributor-japan:yugo-test+cpp-prod-distributor-jp@adobetest.com;cpp-latin-america-na-platinum:yugo-test+cpp-prod-distributor-latam@adobetest.com ;cpp-na-certified:yugo-test+cpp-prod-platinum-na@adobetest.com ;cpp-spain-platinum:yugo-test+cpp-prod-platinum-spain@adobetest.com;cpp-de-gold:yugo-test+cpp-prod-gold-eurwest-de@adobetest.com;cpp-kr-gold:yugo-test+cpp-prod-gold-kr@adobetest.com;cpp-latin-america-gold:yugo-test+cpp-prod-gold-latam@adobetest.com;dxp-platinum:yugo-test+dx-prod-platinum@adobetest.com;dxp-gold:yugo-test+dx-prod-gold@adobetest.com;dxp-silver:yugo-test+dx-prod-silver-auto@adobetest.com;dxp-abandoned:yugo-test+dx-prod-abandoned@adobetest.com;dxp-terminated:yugo-test+dx-prod-terminated@adobetest.com;dxp-rejected:yugo-test+dx-prod-rejected@adobetest.com;dxp-community:yugo-test+dx-prod-community-auto@adobetest.com;dxp-prod-silver: yugo-test+dx-prod-silver-auto@adobetest.com;dxp-prod-community: yugo-test+dx-prod-community-auto@adobetest.com;' : process.env.IMS_EMAIL;
     const emailPart = emailData.split(';');
     const emailEntry = emailPart.find((pair) => pair.startsWith(partnerLevel));
     const email = emailEntry ? emailEntry.split(':')[1] : null;
     await page.waitForLoadState('domcontentloaded');
     await this.emailField.fill(email);
     await this.emailPageContinueButton.click();
-    await this.passwordField.fill(process.env.IMS_PASS);
+    await this.passwordField.fill('Test@123');
     await this.passwordPageContinueButton.click();
   }
 
