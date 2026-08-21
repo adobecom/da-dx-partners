@@ -3,6 +3,17 @@
   padding-top: 24px;
 }
 
+.calendly .calendly-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 320px;
+  min-height: 260px;
+}
+
 .calendly .calendly-embed {
   width: 100%;
   min-width: 320px;

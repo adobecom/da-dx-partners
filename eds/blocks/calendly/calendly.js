@@ -6,7 +6,7 @@ import {
   getPartnerAccountState,
   getPartnerCookieObject,
 } from '../../scripts/utils.js';
-import { keepInlineFragmentInDOM } from '../utils/utils.js';
+import { keepInlineFragmentInDOM, getConfig, localizationPromises, populateLocalizedTextFromListItems } from '../utils/utils.js';
 
 const miloLibs = getLibs();
 
@@ -133,6 +133,15 @@ function getCalendlyPrefill(companyQuestionKey = 'a1') {
   return prefill;
 }
 
+function createCalendlyLoader(localizedText) {
+  const loader = document.createElement('div');
+  loader.className = 'calendly-loader';
+  loader.innerHTML = `
+    <loading-spinner text="${localizedText['{{loading-calendly-message}}']}"></loading-spinner>
+  `;
+  return loader;
+}
+
 function initCalendly(link, parentElement, companyQuestionKey) {
   const prefill = getCalendlyPrefill(companyQuestionKey);
   window.Calendly.initInlineWidget({
@@ -157,13 +166,19 @@ function setBlockData(tableRows) {
   });
   return blockData;
 }
-export default function init(el) {
+export default async function init(el) {
+  const config = getConfig();
+  const localizedText = { '{{loading-calendly-message}}': 'Loading your scheduling options...' };
+  populateLocalizedTextFromListItems(el, localizedText);
+  await localizationPromises(localizedText, config);
+
   const { schedulingLink, companyQuestionKey } = setBlockData(el.children);
 
   // Capture inline fragment children before clearing DOM
   const inlineChildren = Array.from(el.children);
   el.innerHTML = '';
   const calendlyEmbed = document.createElement('div');
+
   // if cookie state already shows calendly booked, we just display already booked fragment
   if (hasCalendlyBooked()) {
     keepInlineFragmentInDOM(inlineChildren, calendlyEmbed, 'already-booked-fragment', false);
@@ -177,6 +192,12 @@ export default function init(el) {
     try {
       // loadStyle import resolves from cache instantly (milo/utils already loaded)
       const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+      await Promise.all([
+        import('../../components/LoadingSpinner.js'),
+        loadStyle('/eds/components/LoadingSpinner.css'),
+      ]);
+      const calendlyLoader = createCalendlyLoader(localizedText);
+      el.append(calendlyLoader);
       await Promise.all([
         loadStyle('/eds/components/Toast.css'),
         refreshPartnerAccountState().catch((err) => {
