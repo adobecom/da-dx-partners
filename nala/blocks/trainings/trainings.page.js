@@ -12,6 +12,7 @@ export default class TrainingPage extends SearchPage {
     this.technicalLevelFilter = page.getByRole('button', { name: 'Technical Level' });
     this.courseCheckBox = page.getByRole('checkbox', { name: 'Course' });
     this.adobeCampaignCheckBox = page.getByRole('checkbox', { name: 'Adobe Campaign' });
+    this.certificationCheckBox = page.getByRole('checkbox', { name: 'Certification' });
     this.businessPractitionerCheckBox = page.getByRole('checkbox', { name: 'Business Practitioner' });
     this.developerCheckBox = page.getByRole('checkbox', { name: 'Developer', exact: true });
     this.technicalSalesCheckBox = page.getByRole('checkbox', { name: 'Technical Sales' });
@@ -250,5 +251,15 @@ export default class TrainingPage extends SearchPage {
     await expect(this.cardCollectionSearchField).toBeVisible();
     await this.cardCollectionSearchField.fill(keyword);
     await this.cardCollectionSearchField.press('Enter');
+  }
+
+  async verifyCardMetadata(data) {
+    const card = this.partnerCollectionCards.first();
+    await expect(card).toBeVisible({ timeout: 30000 });
+    await expect(card.locator('.card-title')).toContainText(data.title);
+    await expect(card.getByText(data.shortDescription, { exact: true })).toBeVisible({ timeout: 30000 });
+    const cardDate = this.getCardDateLocator(card);
+    await expect(cardDate).toContainText(data.lastModifiedDate);
+    await expect(card.getByRole('link', { name: 'See Training' })).toHaveAttribute('href', data.seeTrainingURL);
   }
 }
