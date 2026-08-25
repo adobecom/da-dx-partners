@@ -86,13 +86,13 @@ test.describe('Search Page Trainings', () => {
     });
 
     await test.step('Expand first training accordion and verify details', async () => {
-      const card = trainingPage.getCardByTitle(data.topResultTitle);
+      const card = trainingPage.getCardByTitle(data.secondResultTitle);
       await trainingPage.clickCard(card);
       await page.waitForLoadState('domcontentloaded');
 
       const expandedCard = trainingPage
         .getExpandedCard()
-        .filter({ hasText: data.topResultTitle })
+        .filter({ hasText: data.secondResultTitle })
         .first();
       await expect(expandedCard).toBeVisible({ timeout: 30000 });
 
