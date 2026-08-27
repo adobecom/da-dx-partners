@@ -233,20 +233,10 @@ test.describe('Validate Partner Directory pages', () => {
     });
 
     await test.step('Check contact not found page', async () => {
-      const expectedUrlPattern = new RegExp(data.contactNotFoundUrl);
-      let retries = 3;
-      while (retries > 0) {
-        const currentUrl = page.url();
-        if (expectedUrlPattern.test(currentUrl)) {
-          break;
-        }
-        await page.waitForTimeout(5000);
-        retries--;
-        if (retries === 0) {
-          throw new Error(`Expected URL pattern not found. Current URL: ${currentUrl}`);
-        }
-      }
-      await expect(page).toHaveURL(expectedUrlPattern, { timeout: 60000 });
+      await expect(page).toHaveURL(
+        new RegExp(data.contactNotFoundUrl),
+        { timeout: 60000 },
+      );
       await smokeTest.findAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
     });
   });
