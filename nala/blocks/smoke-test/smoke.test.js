@@ -231,12 +231,12 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
       await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 60000 });
     });
+
     await test.step('Check contact not found page', async () => {
       await expect(page).toHaveURL(
         new RegExp(data.contactNotFoundUrl),
         { timeout: 60000 },
       );
-
       await smokeTest.findAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
     });
   });
