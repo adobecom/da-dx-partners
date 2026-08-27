@@ -10,6 +10,14 @@ describe('yukon-chat block', () => {
 
   beforeEach(async () => {
     setLibs('/libs');
+
+    window.matchMedia = sinon.stub().returns({
+      matches: false,
+      media: '(max-width: 767px)',
+      addEventListener: sinon.stub(),
+      removeEventListener: sinon.stub(),
+    });
+
     window.requestAnimationFrame = sinon.stub().callsFake((cb) => {
       setTimeout(cb, 0);
       return 1;
@@ -19,7 +27,7 @@ describe('yukon-chat block', () => {
     window.crypto.randomUUID = sinon.stub().returns('test-uuid-12345');
 
     fetchStub = sinon.stub(window, 'fetch');
-
+    sinon.stub(console, 'error');
     fetchStub.callsFake(async (url) => {
       const urlStr = typeof url === 'string' ? url : url.toString();
       if (urlStr.includes('placeholders.json')) {
@@ -259,6 +267,8 @@ describe('yukon-chat block', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       const modal = document.querySelector('#yukon-chat-modal');
+      expect(modal).to.exist;
+
       expect(fetchStub.called).to.be.true;
 
       const calledUrl = fetchStub.getCalls().find((call) => {
@@ -476,7 +486,7 @@ describe('yukon-chat block', () => {
       expect(modal).to.exist;
 
       const loadingMessage = modal.querySelector('.chat-loader');
-      expect(loadingMessage).to.not.exist;
+      await expect(loadingMessage).to.not.exist;
 
       const errorMessage = modal.querySelector('.error-message');
       expect(errorMessage).to.exist;
@@ -636,7 +646,7 @@ describe('yukon-chat block', () => {
           2: {
             document_id: 'test-id-2',
             document_name: 'Test Doc',
-            document_url: 'https://partners.stage.adobe.com/digitalexperience/preview/test-doc.pdf',
+            document_url: 'https://test.com/doc.pdf',
             title: 'Test Title PDF',
           },
         },
@@ -695,7 +705,7 @@ describe('yukon-chat block', () => {
       expect(items[0].getAttribute('href')).to.equal('https://test.com/index.html');
 
       expect(items[1].textContent.trim().replace(/\s+/g, ' ')).to.equal('Test Title PDF');
-      expect(items[1].getAttribute('href')).to.equal('https://partners.stage.adobe.com/digitalexperience/preview/test-doc.pdf');
+      expect(items[1].getAttribute('href')).to.equal('https://test.com/doc.pdf');
 
       // The page should have a page icon
       const pageIcon = items[0].querySelector('.yc-page-icon');
@@ -709,6 +719,78 @@ describe('yukon-chat block', () => {
       const citeRefs = accordion.querySelectorAll('.yc-source-citation-refs');
       expect(citeRefs[0].textContent.trim()).to.equal('1');
       expect(citeRefs[1].textContent.trim()).to.equal('2');
+    });
+
+    it('should toggle sources accordion and keep page source when id/url are edge values', async () => {
+      const encoder = new TextEncoder();
+      const mockChunk = JSON.stringify([{
+        generated_text: 'Edge source data.',
+        source: {
+          1: {
+            document_id: ' ',
+            document_name: 'No Extension',
+            document_url: 'https://test.com/',
+            title: 'Edge Page Source',
+          },
+          2: {
+            document_name: 'No Extension Either',
+            document_url: 'not-a-valid-url',
+            title: 'Invalid URL Source',
+          },
+        },
+      }]);
+      const chunk = encoder.encode(`${mockChunk}\n`);
+
+      fetchStub.callsFake(async (url) => {
+        const urlStr = typeof url === 'string' ? url : url.toString();
+        if (urlStr.includes('placeholders.json')) {
+          return {
+            ok: true,
+            json: async () => ({ data: [{ key: 'sources', value: 'Sources' }] }),
+          };
+        }
+        return {
+          ok: true,
+          status: 200,
+          body: new ReadableStream({
+            start(controller) {
+              controller.enqueue(chunk);
+              controller.close();
+            },
+          }),
+        };
+      });
+
+      const block = document.querySelector('.yukon-chat');
+      await init(block);
+
+      const textarea = document.querySelector('#yc-input-field');
+      const sendButton = document.querySelector('.yc-input-field-button');
+      textarea.value = 'Edge source';
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      sendButton.click();
+
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((r) => setTimeout(r, 100));
+
+      const accordion = document.querySelector('#yukon-chat-modal .yc-sources-accordion');
+      const header = accordion.querySelector('.yc-accordion-header');
+      const content = accordion.querySelector('.yc-accordion-content');
+      expect(header.getAttribute('aria-expanded')).to.equal('false');
+      expect(content.style.display).to.equal('none');
+
+      header.click();
+      expect(header.getAttribute('aria-expanded')).to.equal('true');
+      expect(content.style.display).to.equal('block');
+      expect(header.classList.contains('expanded')).to.be.true;
+
+      header.click();
+      expect(header.getAttribute('aria-expanded')).to.equal('false');
+      expect(content.style.display).to.equal('none');
+      expect(header.classList.contains('expanded')).to.be.false;
+
+      const pageIcons = accordion.querySelectorAll('.yc-page-icon');
+      expect(pageIcons.length).to.equal(2);
     });
 
     it('should render modal disclaimer below the input field container', async () => {
