@@ -23,9 +23,8 @@ export default {
       data: {
         partnerLevel: 'dxp-silver:',
         searchKeyword: 'Automation Regression: Test',
-        firstResultTitle: 'Automation Regression: Test Courseh',
-        secondResultTitle: 'Automation Regression: Test Learning Path',
-        topResultTitle: 'Automation Regression: Test Courseh',
+        secondResultTitle: 'Automation Regression: Test Courseh',
+        thirdResultTitle: 'Automation Regression: Test Learning Path',
         lastModifiedDate: ' Jan 12, 2026',
         shortDescription: 'This test training is used in our automation tests.',
         previewUrl: '/digitalexperience/training/courses/coursemock-trainig-2.html',
@@ -51,9 +50,9 @@ export default {
       data: {
         partnerLevel: 'dxp-silver:',
         searchKeyword: 'Automation Regression: Test',
-        expectedResultCount: 2,
-        firstResultTitle: 'Automation Regression: Test Course',
-        secondResultTitle: 'Automation Regression: Test Learning Path',
+        expectedResultCount: 3,
+        secondResultTitle: 'Automation Regression: Test Course',
+        thirdResultTitleResultTitle: 'Automation Regression: Test Learning Path',
         cardThumbnails: [
           {
             title: 'Automation Regression: Test Course',
@@ -78,6 +77,38 @@ export default {
         onDemandTrainingsPath:
           '/digitalexperience/drafts/automation/regression/on-demand-trainings?georouting=off&martech=off#',
         noResultsMessage: 'No Results Found',
+      },
+    },
+    {
+      tcid: '6',
+      name: '@certification-filtering-search-page',
+      path: '/digitalexperience/drafts/automation/regression/search-page',
+      tags: '@da-dx-search-page @da-dx-training @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-silver:',
+        searchKeyword: 'Automation Regression: Test Certification',
+        title: 'Automation Regression: Test Certification',
+        lastModifiedDate: 'Oct 30, 2026',
+        shortDescription: 'This test training is used in our automation tests.',
+        previewUrl: 'https://partners.stage.adobe.com/digitalexperience/training/certifications/certificationmock-trainig-5.html',
+      },
+    },
+    {
+      tcid: '7',
+      name: '@certification-filtering-card-collection',
+      path: '/digitalexperience/drafts/automation/regression/on-demand-trainings#',
+      tags: '@da-dx-search-page @da-dx-training @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-gold:',
+        searchKeyword: 'Automation Regression: Test Certification',
+        title: 'Automation Regression: Test Certification',
+        cardThumbnails: {
+          title: 'Automation Regression: Test Certification',
+          thumbnailUrl: '/eds/partners-shared/images/default-trainings.jpg',
+        },
+        lastModifiedDate: 'Oct 30, 2026',
+        shortDescription: 'This test training is used in our automation tests.',
+        seeTrainingURL: 'https://partners.stage.adobe.com/digitalexperience/training/certifications/certificationmock-trainig-5.html',
       },
     },
   ],
