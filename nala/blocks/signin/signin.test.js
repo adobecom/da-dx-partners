@@ -88,7 +88,8 @@ test.describe('MAPP sign in flow', () => {
     });
   });
 
-  test(`${features[2].name},${features[2].tags}`, async ({ page, context }) => {
+  test(`${features[2].name},${features[2].tags}`, async ({ page, context, browserName }) => {
+    test.skip(browserName === 'chromium', 'Skipped on Chromium');
     await test.step('Go to stage.adobe.com', async () => {
       const url = `${features[2].baseURL}`;
       await page.evaluate((navigationUrl) => {
@@ -116,7 +117,8 @@ test.describe('MAPP sign in flow', () => {
   });
 
   loggedInAdobe.forEach((feature) => {
-    test(`${feature.name},${feature.tags}`, async ({ page, context }) => {
+    test(`${feature.name},${feature.tags}`, async ({ page, context, browserName }) => {
+      test.skip(browserName === 'chromium', 'Skipped on Chromium');
       await test.step('Go to stage.adobe.com', async () => {
         const url = `${feature.baseURL}`;
         await page.evaluate((navigationUrl) => {

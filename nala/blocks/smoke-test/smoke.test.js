@@ -231,12 +231,12 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
       await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 60000 });
     });
+
     await test.step('Check contact not found page', async () => {
       await expect(page).toHaveURL(
         new RegExp(data.contactNotFoundUrl),
         { timeout: 60000 },
       );
-
       await smokeTest.findAPartnerButton.waitFor({ state: 'visible', timeout: 30000 });
     });
   });
@@ -275,8 +275,8 @@ test.describe('Validate Partner Directory pages', () => {
       await page.goto(`${baseURL}${path}`);
       await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await smokeTest.feedbackButton.waitFor({ state: 'visible', timeout: 30000 });
-      expect(smokeTest.feedbackButton).toBeVisible();
-      expect(smokeTest.feedbackButton).toBeEnabled();
+      await expect(smokeTest.feedbackButton).toBeVisible();
+      await expect(smokeTest.feedbackButton).toBeEnabled();
       await smokeTest.feedbackButton.click();
     });
     await test.step('Check Feedback Dialog', async () => {
@@ -284,6 +284,7 @@ test.describe('Validate Partner Directory pages', () => {
       await expect(smokeTest.feedbackTitle).toBeVisible();
       await expect(smokeTest.feedbackTitle).toHaveText(data.feedbackTitle);
 
+      await smokeTest.feedbackEmailField.waitFor({ state: 'visible', timeout: 30000 });
       await smokeTest.feedbackTextArea.waitFor({ state: 'visible', timeout: 30000 });
 
       await smokeTest.feedbackTextArea.fill(data.feedbackTextArea);
@@ -343,14 +344,15 @@ test.describe('Validate Partner Directory pages', () => {
     });
     await test.step('Check Feedback Dialog', async () => {
       await smokeTest.feedbackButton.waitFor({ state: 'visible', timeout: 30000 });
-      expect(smokeTest.feedbackButton).toBeVisible();
-      expect(smokeTest.feedbackButton).toBeEnabled();
+      await expect(smokeTest.feedbackButton).toBeVisible();
+      await expect(smokeTest.feedbackButton).toBeEnabled();
       await smokeTest.feedbackButton.click();
 
       await smokeTest.feedbackTitle.waitFor({ state: 'visible', timeout: 30000 });
       await expect(smokeTest.feedbackTitle).toBeVisible();
       await expect(smokeTest.feedbackTitle).toHaveText(data.feedbackTitle);
 
+      await expect(smokeTest.feedbackEmailField).not.toBeVisible();
       await smokeTest.feedbackTextArea.waitFor({ state: 'visible', timeout: 30000 });
 
       await smokeTest.feedbackTextArea.fill(data.feedbackTextArea);
@@ -376,6 +378,7 @@ test.describe('Validate Partner Directory pages', () => {
       await expect(smokeTest.feedbackTitle).toBeVisible();
       await expect(smokeTest.feedbackTitle).toHaveText(data.feedbackTitle);
 
+      await smokeTest.feedbackEmailField.waitFor({ state: 'visible', timeout: 30000 });
       await smokeTest.feedbackTextArea.waitFor({ state: 'visible', timeout: 30000 });
 
       await smokeTest.feedbackTextArea.fill(data.feedbackTextArea);
