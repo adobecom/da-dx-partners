@@ -284,11 +284,7 @@ describe('AssetPreview - findTagByPath()', () => {
         video: { tagId: 'caas:file-format/video', title: 'Video' },
       },
     },
-    audience: {
-      tags: {
-        enterprise: { tagId: 'caas:audience/enterprise', title: 'Enterprise' },
-      },
-    },
+    audience: { tags: { enterprise: { tagId: 'caas:audience/enterprise', title: 'Enterprise' } } },
   };
 
   it('finds a shallow tag (one level deep)', () => {
@@ -319,9 +315,8 @@ describe('AssetPreview - getTagsDisplayValues()', () => {
         caas: {
           tags: {
             'file-format': {
-              tags: {
-                pdf: { tagId: 'caas:file-format/pdf', title: 'PDF' },
-              },
+              // eslint-disable-next-line object-curly-newline
+              tags: { pdf: { tagId: 'caas:file-format/pdf', title: 'PDF' } },
             },
           },
         },
@@ -357,9 +352,8 @@ describe('AssetPreview - getTagChildTagsObjects()', () => {
         caas: {
           tags: {
             'file-format': {
-              tags: {
-                pdf: { tagId: 'caas:file-format/pdf', title: 'PDF' },
-              },
+              // eslint-disable-next-line object-curly-newline
+              tags: { pdf: { tagId: 'caas:file-format/pdf', title: 'PDF' } },
             },
           },
         },
