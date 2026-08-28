@@ -235,3 +235,256 @@ describe('AssetPreview - utility methods', () => {
     document.body.removeChild(img);
   });
 });
+
+// ---------------------------------------------------------------------------
+describe('AssetPreview - getSizeInMb()', () => {
+  it('returns size in MB when >= 1 MB', () => {
+    const el = makeInstance();
+    expect(el.getSizeInMb(2500000)).to.equal('2.5 MB');
+  });
+
+  it('returns size in KB when < 1 MB', () => {
+    const el = makeInstance();
+    expect(el.getSizeInMb(512000)).to.equal('512.0 KB');
+  });
+
+  it('returns exactly 1.0 MB at the 1 000 000-byte boundary', () => {
+    const el = makeInstance();
+    expect(el.getSizeInMb(1000000)).to.equal('1.0 MB');
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('AssetPreview - getFileTypeFromTag()', () => {
+  it('returns the title of the first file-format tag', () => {
+    const el = makeInstance();
+    el.fileFormatTags = [{ tagId: 'caas:file-format/pdf', title: 'PDF' }];
+    expect(el.getFileTypeFromTag()).to.equal('PDF');
+  });
+
+  it('returns empty string when fileFormatTags is empty', () => {
+    const el = makeInstance();
+    el.fileFormatTags = [];
+    expect(el.getFileTypeFromTag()).to.equal('');
+  });
+
+  it('returns empty string when fileFormatTags is undefined', () => {
+    const el = makeInstance();
+    el.fileFormatTags = undefined;
+    expect(el.getFileTypeFromTag()).to.equal('');
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('AssetPreview - findTagByPath()', () => {
+  const mockCaasTags = {
+    'file-format': {
+      tags: {
+        pdf: { tagId: 'caas:file-format/pdf', title: 'PDF' },
+        video: { tagId: 'caas:file-format/video', title: 'Video' },
+      },
+    },
+    audience: {
+      tags: {
+        enterprise: { tagId: 'caas:audience/enterprise', title: 'Enterprise' },
+      },
+    },
+  };
+
+  it('finds a shallow tag (one level deep)', () => {
+    const el = makeInstance();
+    const result = el.findTagByPath(mockCaasTags, 'caas:file-format');
+    expect(result).to.deep.equal(mockCaasTags['file-format']);
+  });
+
+  it('finds a nested tag (two levels deep)', () => {
+    const el = makeInstance();
+    const result = el.findTagByPath(mockCaasTags, 'caas:file-format/pdf');
+    expect(result).to.deep.equal({ tagId: 'caas:file-format/pdf', title: 'PDF' });
+  });
+
+  it('returns undefined for an unknown tag', () => {
+    const el = makeInstance();
+    const result = el.findTagByPath(mockCaasTags, 'caas:nonexistent/tag');
+    expect(result).to.be.undefined;
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('AssetPreview - getTagsDisplayValues()', () => {
+  it('returns tag objects with title from allCaaSTags when found', () => {
+    const el = makeInstance();
+    el.allCaaSTags = {
+      namespaces: {
+        caas: {
+          tags: {
+            'file-format': {
+              tags: {
+                pdf: { tagId: 'caas:file-format/pdf', title: 'PDF' },
+              },
+            },
+          },
+        },
+      },
+    };
+    const result = el.getTagsDisplayValues(el.allCaaSTags, ['caas:file-format/pdf']);
+    expect(result).to.have.lengthOf(1);
+    expect(result[0].title).to.equal('PDF');
+    expect(result[0].tagId).to.equal('caas:file-format/pdf');
+  });
+
+  it('falls back to the raw tag id as title when tag is not found', () => {
+    const el = makeInstance();
+    el.allCaaSTags = { namespaces: { caas: { tags: {} } } };
+    const result = el.getTagsDisplayValues(el.allCaaSTags, ['caas:unknown/tag']);
+    expect(result[0].title).to.equal('caas:unknown/tag');
+    expect(result[0].tagId).to.equal('caas:unknown/tag');
+  });
+
+  it('returns an empty array for an empty tags list', () => {
+    const el = makeInstance();
+    el.allCaaSTags = { namespaces: { caas: { tags: {} } } };
+    expect(el.getTagsDisplayValues(el.allCaaSTags, [])).to.deep.equal([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('AssetPreview - getTagChildTagsObjects()', () => {
+  it('filters and returns only tags starting with the rootTag', () => {
+    const el = makeInstance();
+    el.allCaaSTags = {
+      namespaces: {
+        caas: {
+          tags: {
+            'file-format': {
+              tags: {
+                pdf: { tagId: 'caas:file-format/pdf', title: 'PDF' },
+              },
+            },
+          },
+        },
+      },
+    };
+    const result = el.getTagChildTagsObjects(
+      ['caas:file-format/pdf', 'caas:audience/enterprise'],
+      el.allCaaSTags,
+      'caas:file-format',
+    );
+    expect(result).to.have.lengthOf(1);
+    expect(result[0].tagId).to.equal('caas:file-format/pdf');
+    expect(result[0].title).to.equal('PDF');
+  });
+
+  it('returns empty array for null tags argument', () => {
+    const el = makeInstance();
+    el.allCaaSTags = { namespaces: { caas: { tags: {} } } };
+    expect(el.getTagChildTagsObjects(null, el.allCaaSTags, 'caas:file-format')).to.deep.equal([]);
+  });
+
+  it('returns empty array when no tags match rootTag', () => {
+    const el = makeInstance();
+    el.allCaaSTags = { namespaces: { caas: { tags: {} } } };
+    const result = el.getTagChildTagsObjects(
+      ['caas:audience/enterprise'],
+      el.allCaaSTags,
+      'caas:file-format',
+    );
+    expect(result).to.deep.equal([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('AssetPreview - addDynamicKeyForLocalization()', () => {
+  it('adds a missing localization key with the key itself as its value', () => {
+    const el = makeInstance();
+    el.addDynamicKeyForLocalization('Search All Assets');
+    expect(el.blockData.localizedText['{{Search All Assets}}']).to.equal('Search All Assets');
+  });
+
+  it('does not overwrite an already-set localization key', () => {
+    const el = makeInstance();
+    el.blockData.localizedText['{{Back to previous}}'] = 'Zurück';
+    el.addDynamicKeyForLocalization('Back to previous');
+    expect(el.blockData.localizedText['{{Back to previous}}']).to.equal('Zurück');
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('AssetPreview - setBlockData()', () => {
+  function makeRow(label, value) {
+    const row = document.createElement('div');
+    const labelCell = document.createElement('div');
+    labelCell.innerText = label;
+    const valueCell = document.createElement('div');
+    valueCell.innerText = value;
+    row.appendChild(labelCell);
+    row.appendChild(valueCell);
+    return row;
+  }
+
+  it('reads back-button-url from tableData', () => {
+    const el = makeInstance();
+    el.blockData.localizedText = {};
+    el.blockData.tableData = [makeRow('Back button url', '/search/')];
+    el.setBlockData();
+    expect(el.blockData.backButtonUrl).to.equal('/search/');
+  });
+
+  it('reads back-button-label from tableData', () => {
+    const el = makeInstance();
+    el.blockData.localizedText = {};
+    el.blockData.tableData = [makeRow('Back button label', 'Go Back')];
+    el.setBlockData();
+    expect(el.blockData.backButtonLabel).to.equal('Go Back');
+  });
+
+  it('reads pdf-embed-mode from tableData and normalises whitespace/case', () => {
+    const el = makeInstance();
+    el.blockData.localizedText = {};
+    el.blockData.tableData = [makeRow('PDF embed mode', 'Sized Container')];
+    el.setBlockData();
+    expect(el.blockData.pdfEmbedMode).to.equal('sized-container');
+  });
+
+  it('ignores unknown row labels without throwing', () => {
+    const el = makeInstance();
+    el.blockData.localizedText = {};
+    el.blockData.tableData = [makeRow('unknown row', 'some value')];
+    expect(() => el.setBlockData()).to.not.throw();
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('AssetPreview - getRealAssetUrl()', () => {
+  it('returns a URL object or null (never throws)', () => {
+    const el = makeInstance();
+    const result = el.getRealAssetUrl();
+    expect(result === null || result instanceof URL).to.be.true;
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('AssetPreview - playVideo()', () => {
+  afterEach(() => {
+    sinon.restore();
+    document.body.innerHTML = '';
+  });
+
+  it('plays and scrolls to the video when a video element is present in the DOM', () => {
+    const container = document.createElement('div');
+    container.className = 'asset-preview-block-video';
+    const video = document.createElement('video');
+    const playStub = sinon.stub(video, 'play');
+    container.appendChild(video);
+    document.body.appendChild(container);
+
+    const el = makeInstance();
+    el.playVideo();
+    expect(playStub.calledOnce).to.be.true;
+  });
+
+  it('does nothing when no video element exists in the DOM', () => {
+    const el = makeInstance();
+    expect(() => el.playVideo()).to.not.throw();
+  });
+});
