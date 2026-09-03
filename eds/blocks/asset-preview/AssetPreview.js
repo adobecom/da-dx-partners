@@ -15,6 +15,11 @@ import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
+const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
+await Promise.all([
+  import('../../components/LoadingSpinner.js'),
+  loadStyle('/eds/components/LoadingSpinner.css'),
+]);
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
 export default class AssetPreview extends LitElement {
@@ -296,7 +301,7 @@ export default class AssetPreview extends LitElement {
           <div class="video-container video-holder">
             ${this.isVideoLoading ? html`
               <div class="video-loading-overlay">
-                <div class="video-loading-spinner"></div>
+                <loading-spinner theme="dark"></loading-spinner>
               </div>
             ` : ''}
             <video

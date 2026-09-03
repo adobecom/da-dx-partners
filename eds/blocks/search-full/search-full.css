@@ -63,7 +63,8 @@ search-cards .partner-cards-sidebar {
 }
 
 search-cards .partner-cards-sidebar .sidebar-header {
-  margin-bottom: 5px;
+  margin-bottom: 0px;
+  border-bottom: none;
 }
 
 search-cards .partner-cards-header .partner-cards-title-wrapper {

@@ -80,6 +80,8 @@ test.describe('Validate events block', () => {
       await eventsPage.partnerCradCollection.waitFor({ state: 'visible', timeout: 30000 });
     });
     await test.step('Verify sessions', async () => {
+      await eventsPage.searchField.fill(data.keyword);
+      await eventsPage.searchField.press('Enter');
       await eventsPage.verifyPublicCardTitle(data.sessionOne);
       await eventsPage.verifyCardDateDaysFromToday(data.sessionOne, data.sessionOneDaysFromToday);
       await eventsPage.verifyPublicCardTitle(data.sessionTwo);

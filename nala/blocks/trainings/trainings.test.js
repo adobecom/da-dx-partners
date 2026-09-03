@@ -86,13 +86,13 @@ test.describe('Search Page Trainings', () => {
     });
 
     await test.step('Expand first training accordion and verify details', async () => {
-      const card = trainingPage.getCardByTitle(data.topResultTitle);
+      const card = trainingPage.getCardByTitle(data.secondResultTitle);
       await trainingPage.clickCard(card);
       await page.waitForLoadState('domcontentloaded');
 
       const expandedCard = trainingPage
         .getExpandedCard()
-        .filter({ hasText: data.topResultTitle })
+        .filter({ hasText: data.secondResultTitle })
         .first();
       await expect(expandedCard).toBeVisible({ timeout: 30000 });
 
@@ -187,6 +187,73 @@ test.describe('Search Page Trainings', () => {
       await cardCollectionTrainingPage.verifyPartnerCollectionNoResults(data.noResultsMessage);
 
       await cardCollectionPage.close();
+    });
+  });
+
+  test(`${features[5].name},${features[5].tags}`, async ({ page }) => {
+    const { data } = features[5];
+
+    await test.step('Go to search page', async () => {
+      await page.goto(features[5].path);
+    });
+
+    await test.step('Sign in as Silver user', async () => {
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Search for training in search bar', async () => {
+      await expect(trainingPage.searchField).toBeVisible();
+      await trainingPage.searchField.fill(data.searchKeyword);
+      await trainingPage.searchField.press('Enter');
+      await trainingPage.waitForSearchResultsReady();
+    });
+
+    await test.step('Click Trainings tab, expand and verify card', async () => {
+      await trainingPage.trainingButton.click();
+      await page.waitForLoadState('domcontentloaded');
+      const card = trainingPage.getCardByTitle(data.title);
+      await trainingPage.clickCard(card);
+      await page.waitForLoadState('domcontentloaded');
+
+      const expandedCard = trainingPage
+        .getExpandedCard()
+        .filter({ hasText: data.title })
+        .first();
+      await expect(expandedCard).toBeVisible({ timeout: 30000 });
+      await trainingPage.verifyExpandedTrainingDetails(expandedCard, data);
+    });
+
+    await test.step('Apply filter and validate certification card ', async () => {
+      await trainingPage.contentTypeFilter.click();
+      await trainingPage.selectFilterCheckbox(trainingPage.certificationCheckBox);
+      await expect(trainingPage.cardTitles.first()).toHaveText(data.title, { timeout: 30000 });
+    });
+  });
+
+  test(`${features[6].name},${features[6].tags}`, async ({ page }) => {
+    const { data } = features[6];
+
+    await test.step('Go to trainings page and sign in as Gold user', async () => {
+      await page.goto(features[6].path);
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Search for training keyword in card collection', async () => {
+      await trainingPage.searchCardCollection(data.searchKeyword);
+    });
+
+    await test.step('Verify training search results in card collection', async () => {
+      await expect(trainingPage.getPartnerCollectionCardByTitle(data.title)).toBeVisible({ timeout: 30000 });
+    });
+
+    await test.step('Validated card details', async () => {
+      await trainingPage.verifyCardMetadata(data);
     });
   });
 });

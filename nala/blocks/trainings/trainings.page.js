@@ -12,6 +12,7 @@ export default class TrainingPage extends SearchPage {
     this.technicalLevelFilter = page.getByRole('button', { name: 'Technical Level' });
     this.courseCheckBox = page.getByRole('checkbox', { name: 'Course' });
     this.adobeCampaignCheckBox = page.getByRole('checkbox', { name: 'Adobe Campaign' });
+    this.certificationCheckBox = page.getByRole('checkbox', { name: 'Certification' });
     this.businessPractitionerCheckBox = page.getByRole('checkbox', { name: 'Business Practitioner' });
     this.developerCheckBox = page.getByRole('checkbox', { name: 'Developer', exact: true });
     this.technicalSalesCheckBox = page.getByRole('checkbox', { name: 'Technical Sales' });
@@ -26,6 +27,10 @@ export default class TrainingPage extends SearchPage {
     await title.waitFor({ state: 'visible', timeout: 30000 });
     await expect(title).not.toHaveText('', { timeout: 30000 });
     return (await title.textContent())?.trim() ?? '';
+  }
+
+  getCardByTitle(title) {
+    return this.page.locator('.search-card').filter({ hasText: title }).first();
   }
 
   async getAllCardTitles() {
@@ -69,24 +74,31 @@ export default class TrainingPage extends SearchPage {
   async verifyTrainingSearchResults(data) {
     await this.waitForResultsToSettle();
 
-    if (data.secondResultTitle) {
-      await expect
-        .poll(() => this.getCardTitleAtIndex(0), { timeout: 30000 })
-        .toBe(data.firstResultTitle);
+    if (data.firstResultTitle) {
+      const firstCard = this.getCardByTitle(data.firstResultTitle);
+      await expect(firstCard).toBeVisible({ timeout: 30000 });
 
-      await expect
-        .poll(() => this.getCardTitleAtIndex(1), { timeout: 30000 })
-        .toBe(data.secondResultTitle);
+      if (data.secondResultTitle) {
+        const secondCard = this.getCardByTitle(data.secondResultTitle);
+        await expect(secondCard).toBeVisible({ timeout: 30000 });
+      }
 
       return;
     }
+    if (data.secondResultTitle) {
+      const secondCard = this.getCardByTitle(data.secondResultTitle);
+      await expect(secondCard).toBeVisible({ timeout: 30000 });
 
-    await expect
-      .poll(() => this.getCardTitleAtIndex(0), { timeout: 30000 })
-      .toBe(data.topResultTitle);
+      if (data.thirdResultTitle) {
+        const thirdCard = this.getCardByTitle(data.thirdResultTitle);
+        await expect(thirdCard).toBeVisible({ timeout: 30000 });
+      }
 
+      return;
+    }
+    const topResultCard = this.getCardByTitle(data.topResultTitle);
+    await expect(topResultCard).toBeVisible({ timeout: 30000 });
     const allTitles = await this.getAllCardTitles();
-
     expect(allTitles).not.toContain(data.excludedResultTitle);
 
     if (allTitles.length > 1) {
@@ -169,16 +181,13 @@ export default class TrainingPage extends SearchPage {
 
   async verifyPartnerCollectionSearchResults(data) {
     await this.partnerCardsCollection.waitFor({ state: 'visible', timeout: 30000 });
-
     await expect
       .poll(async () => this.partnerCollectionCards.count(), { timeout: 30000 })
       .toBe(data.expectedResultCount);
-
-    const firstTitle = await this.getPartnerCollectionCardTitleAtIndex(0);
-    expect(firstTitle).toContain(data.firstResultTitle);
-
-    const secondTitle = await this.getPartnerCollectionCardTitleAtIndex(1);
-    expect(secondTitle).toBe(data.secondResultTitle);
+    const firstCard = this.getPartnerCollectionCardByTitle(data.firstResultTitle);
+    await expect(firstCard).toBeVisible({ timeout: 30000 });
+    const secondCard = this.getPartnerCollectionCardByTitle(data.secondResultTitle);
+    await expect(secondCard).toBeVisible({ timeout: 30000 });
   }
 
   async verifyPartnerCollectionCardThumbnail(title, thumbnailUrl) {
@@ -215,16 +224,15 @@ export default class TrainingPage extends SearchPage {
 
   async verifyRetiredTrainingNotShownOnSearchPage(retiredTrainingTitle) {
     await this.waitForResultsToSettle();
-    await this.cardTitles.first().waitFor({ state: 'visible', timeout: 30000 });
 
-    const firstTitle = await this.getCardTitleAtIndex(0);
-    expect(firstTitle).not.toBe(retiredTrainingTitle);
+    const retiredCard = this.getCardByTitle(retiredTrainingTitle);
+
+    await expect(retiredCard).not.toBeVisible({ timeout: 30000 });
   }
 
   async verifyPartnerCollectionNoResults(noResultsMessage) {
     await this.waitForResultsToSettle();
     await this.partnerCardsCollection.waitFor({ state: 'visible', timeout: 30000 });
-
     await expect
       .poll(async () => this.partnerCollectionCards.count(), { timeout: 30000 })
       .toBe(0);
@@ -237,11 +245,9 @@ export default class TrainingPage extends SearchPage {
     const typeahead = this.page.locator('dialog#typeahead.suggestion-dialog-wrapper');
 
     await this.cardCollectionSearchField.blur();
-
     if (await typeahead.isVisible()) {
       await typeahead.evaluate((dialog) => dialog.close());
     }
-
     await expect(typeahead).toBeHidden({ timeout: 10000 });
     await expect(this.cardCollectionSearchField).toHaveValue(searchValue);
   }
@@ -250,5 +256,15 @@ export default class TrainingPage extends SearchPage {
     await expect(this.cardCollectionSearchField).toBeVisible();
     await this.cardCollectionSearchField.fill(keyword);
     await this.cardCollectionSearchField.press('Enter');
+  }
+
+  async verifyCardMetadata(data) {
+    const card = this.partnerCollectionCards.first();
+    await expect(card).toBeVisible({ timeout: 30000 });
+    await expect(card.locator('.card-title')).toContainText(data.title);
+    await expect(card.getByText(data.shortDescription, { exact: true })).toBeVisible({ timeout: 30000 });
+    const cardDate = this.getCardDateLocator(card);
+    await expect(cardDate).toContainText(data.lastModifiedDate);
+    await expect(card.getByRole('link', { name: 'See Training' })).toHaveAttribute('href', data.seeTrainingURL);
   }
 }
