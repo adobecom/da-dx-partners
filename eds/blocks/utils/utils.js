@@ -144,3 +144,14 @@ export function keepInlineFragmentInDOM(tableRows, blockElement, fragmentRowTitl
     }
   });
 }
+
+export function startsWithPath(url, path) {
+  const { pathname } = new URL(url, window.location.origin);
+
+  const normalizedPath = path.replace(/\/+$/, '');
+
+  return (
+    pathname === normalizedPath
+    || pathname.startsWith(`${normalizedPath}/`)
+  );
+}

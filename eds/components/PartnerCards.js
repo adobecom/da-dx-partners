@@ -1,4 +1,4 @@
-import { CAAS_TAGS_URL, getLibs, prodHosts, loadPageToAnchor } from '../scripts/utils.js';
+import { CAAS_TAGS_URL, getLibs, loadPageToAnchor } from '../scripts/utils.js';
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
@@ -284,79 +284,11 @@ export default class PartnerCards extends LitElement {
   // eslint-disable-next-line class-methods-use-this
   additionalFirstUpdated() { }
 
-  mergeTagAndArbitraryFilters(card) {
-    const filterTagMap = new Map(
-      this.blockData.filters.flatMap((filter) => filter.tags
-        .map((tag) => [tag.hash, { [tag.parentKey]: tag.key }])),
-    );
-
-    card.arbitrary = card.arbitrary
-      .concat(card.tags.map((cardTag) => filterTagMap.get(cardTag.id)).filter(Boolean));
-  }
-
-  removeFiltersWithoutCards() {
-    this.blockData.filters.forEach((filter) => {
-      filter.tags = filter.tags.filter((tag) => this.cardFiltersSet.has(`${tag.parentKey}:${tag.key}`));
-    });
-    this.blockData.filters = this.blockData.filters
-      .filter((filter) => filter.tags.length);
-  }
-
-  async fetchData() {
-    try {
-      let apiData;
-
-      setTimeout(() => {
-        this.hasResponseData = !!apiData?.cards;
-        this.fetchedData = true;
-      }, 5);
-
-      const response = await fetch(
-        this.blockData.caasUrl,
-        this.getFetchOptions(),
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      apiData = await response.json();
-      const cardsEvent = new Event('partner-cards-loaded');
-      document.dispatchEvent(cardsEvent);
-      if (apiData?.cards) {
-        if (prodHosts.includes(window.location.host)) {
-          apiData.cards = apiData.cards.filter((card) => !card.contentArea.url?.includes('/drafts/'));
-        }
-
-        apiData.cards.forEach((card, index) => {
-          card.orderNum = index + 1;
-          this.mergeTagAndArbitraryFilters(card);
-          card.arbitrary?.forEach((filter) => {
-            if (Object.keys(filter).length === 0) {
-              return;
-            }
-            const [key, value] = Object.entries(filter)[0]; // Extract key-value pair
-            this.cardFiltersSet.add(`${key}:${value}`);
-          });
-        });
-
-        this.onDataFetched(apiData);
-        this.allCards = apiData.cards;
-        this.removeFiltersWithoutCards();
-        this.cards = apiData.cards;
-        this.paginatedCards = this.cards.slice(0, this.cardsPerPage);
-        this.hasResponseData = !!apiData.cards;
-      }
-    } catch (error) {
-      this.hasResponseData = true;
-      // eslint-disable-next-line no-console
-      console.error('Error fetching data:', error);
-    }
-  }
-
-  // eslint-disable-next-line class-methods-use-this, no-unused-vars
-  onDataFetched(apiData) { }
-
   // eslint-disable-next-line class-methods-use-this
-  getFetchOptions() { return {}; }
+  async fetchData() {
+    // override in order to do nothing since
+    // we will fetch data in handleActions which is called on each user action
+  }
 
   initUrlSearchParams() {
     // eslint-disable-next-line no-restricted-globals
@@ -966,99 +898,6 @@ export default class PartnerCards extends LitElement {
     window.removeEventListener('resize', this.updateView);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  getSlider() { }
-
-  get filtersLabel() {
-    return Object.keys(this.selectedFilters).length > 0
-      ? Object.values(this.selectedFilters).flat().map((item) => item.value).join(', ')
-      : 'No Filters';
-  }
-
-  /* eslint-disable indent */
-  render() {
-    return html`
-      ${this.fetchedData
-        ? html`
-          <div class="partner-cards ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled' : ''}"
-            daa-lh="Card Collection | Filters: ${processTrackingLabels(this.filtersLabel)} | Search Query: ${processTrackingLabels(this.searchTerm.trim() ? this.searchTerm : 'None')}"
-          >
-          ${this.blockData.filtersPanel === 'disable'
-            ? ''
-            : html`
-                <div class="partner-cards-sidebar-wrapper">
-                  <div class="partner-cards-sidebar">
-                    <sp-theme class="search-wrapper" theme="spectrum" color="light" scale="medium">
-                      ${this.searchInputLabel && !this.mobileView ? html`<sp-field-label for="search" size="m">${this.blockData.localizedText[this.searchInputLabel]}</sp-field-label>` : ''}
-                      <sp-search id="search" size="m" value="${this.searchTerm}" @input="${this.handleSearch}"
-                                 @submit="${(event) => event.preventDefault()}"
-                                 placeholder="${this.blockData.localizedText[this.searchInputPlaceholder]}"></sp-search>
-                    </sp-theme>
-                    ${!this.mobileView
-                ? html`
-                          ${this.getSlider()}
-                          <div class="sidebar-header">
-                            <h3 class="sidebar-title">${this.blockData.localizedText['{{filter}}']}</h3>
-                            <button class="sidebar-clear-btn" @click="${this.handleResetActions}"
-                                    aria-label="${this.blockData.localizedText['{{clear-all}}']}">
-                              ${this.blockData.localizedText['{{clear-all}}']}
-                            </button>
-                          </div>
-                          <div class="sidebar-chosen-filters-wrapper">
-                            ${this.chosenFilters && this.chosenFilters.htmlContent}
-                          </div>
-                          <div class="sidebar-filters-wrapper">
-                            ${this.filters}
-                          </div>
-                          ${this.blockData.filterInfoBox.title ? html`
-                            <div class="sidebar-info-box">
-                              <div class="title">${unsafeHTML(this.blockData.filterInfoBox.title)}</div>
-                              ${unsafeHTML(this.blockData.filterInfoBox.description)}
-                            </div>` : ''
-                  }
-                        `
-                : ''
-              }
-                  </div>
-                </div>
-              `
-          }
-          <div class="partner-cards-content">
-            ${this.getPartnerCardsHeader()}
-            <div class="partner-cards-collection ${this.blockData.filtersPanel === 'disable' ? 'layout-4-up' : ''}">
-              ${this.hasResponseData
-            ? this.partnerCards
-            : html`
-                    <div class="progress-circle-wrapper">
-                      <sp-theme theme="spectrum" color="light" scale="medium">
-                        <sp-progress-circle label="Cards loading" indeterminate="" size="l"
-                                            role="progressbar"></sp-progress-circle>
-                      </sp-theme>
-                    </div>
-                  `
-          }
-            </div>
-            ${this.shouldDisplayPagination()
-            ? html`
-                  <div
-                    class="pagination-wrapper ${this.blockData?.pagination === 'load-more' ? 'pagination-wrapper-load-more' : 'pagination-wrapper-default'}">
-                    ${this.pagination}
-                    <span
-                      class="pagination-total-results">${this.cardsCounter} ${this.blockData.localizedText['{{of}}']} ${this.cards.length} ${this.blockData.localizedText['{{results}}']}</span>
-                  </div>
-                `
-            : ''
-          }
-          </div>
-        </div>` : ''}
-      ${this.getFilterFullScreenView(this.mobileView && this.fetchData)}
-    `;
-  }
-
-  shouldDisplayPagination() {
-    return this.cards.length && this.blockData?.pagination !== 'disable';
-  }
-
   getFilterFullScreenView(condition) {
     return condition ? html`
           <div class="all-filters-wrapper-mobile">
@@ -1082,51 +921,4 @@ export default class PartnerCards extends LitElement {
         `
       : '';
   }
-
-  getPartnerCardsHeader() {
-    return html`
-      <div class="partner-cards-header">
-        <div class="partner-cards-title-wrapper">
-          <h3 class="partner-cards-title">${this.blockData.title}</h3>
-          ${this.blockData.pagination !== 'disable'
-        ? html`<span
-            class="partner-cards-cards-results"><strong>${this.cards?.length}</strong> ${this.blockData.localizedText['{{results}}']}</span>`
-        : ''
-      }
-
-        </div>
-        <div class="partner-cards-sort-wrapper ${this.blockData.filtersPanel === 'disable' ? 'filters-disabled' : ''}">
-          ${this.mobileView && this.blockData.filtersPanel !== 'disable'
-        ? html`
-              <button class="filters-btn-mobile" @click="${this.openFiltersMobile}"
-                      aria-label="${this.blockData.localizedText['{{filters}}']}">
-                <span class="filters-btn-mobile-icon"></span>
-                <span class="filters-btn-mobile-title">${this.blockData.localizedText['{{filters}}']}</span>
-                ${this.chosenFilters?.tagsCount
-            ? html`<span class="filters-btn-mobile-total">${this.chosenFilters.tagsCount}</span>`
-            : ''
-          }
-              </button>
-            `
-        : ''
-      }
-          ${this.blockData.sort.items.length
-        ? html`
-              <div class="sort-wrapper ${this.blockData.pagination === 'disable' ? 'border-disabled' : ''}">
-                <button class="sort-btn" @click="${this.toggleSort}">
-                  <span class="sort-btn-text">${this.selectedSortOrder.value}</span>
-                  <span class="filter-chevron-icon"></span>
-                </button>
-                <div class="sort-list">
-                  ${this.sortItems}
-                </div>
-              </div>`
-        : ''
-      }
-        </div>
-      </div>
-    `;
-  }
-
-  /* eslint-enable indent */
 }

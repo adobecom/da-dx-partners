@@ -37,12 +37,6 @@ export default class Search extends PartnerCards {
     this.numOfLoadedCards = 0;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async fetchData() {
-    // override in order to do nothing since
-    // we will fetch data in handleActions which is called on each user action
-  }
-
   get _typeaheadDialog() {
     return this.querySelector('dialog#typeahead');
   }
