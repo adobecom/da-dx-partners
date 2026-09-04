@@ -1,4 +1,4 @@
-import { CAAS_TAGS_URL, getLibs, loadPageToAnchor } from '../scripts/utils.js';
+import { getCaasTags, getLibs, loadPageToAnchor } from '../scripts/utils.js';
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
@@ -57,6 +57,7 @@ export default class PartnerCards extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
+    // consider fetching tags only if there is caas- filter set on compnent because it is used only for that case
     await this.fetchTags();
     this.setBlockData();
     window.addEventListener('resize', this.updateView);
@@ -64,15 +65,12 @@ export default class PartnerCards extends LitElement {
 
   async fetchTags() {
     try {
-      // todo milo have some default response stored if this fetch is not succesfull, do we need it
-      const caasTagsResponse = await fetch(
-        CAAS_TAGS_URL,
-      );
-      if (!caasTagsResponse.ok) {
-        throw new Error(`Get caas tags HTTP error! Status: ${caasTagsResponse.status}`);
-      }
-      this.allTags = await caasTagsResponse.json();
+      this.allTags = await getCaasTags();
       const allTagsObj = this.allTags.namespaces.caas.tags;
+      if (!allTagsObj) {
+        console.log('CAAS tags missing:', this.allTags);
+        return;
+      }
       this.allTagsFlatMap = this.flattenTagsToMap(allTagsObj);
     } catch (error) {
       // eslint-disable-next-line no-console

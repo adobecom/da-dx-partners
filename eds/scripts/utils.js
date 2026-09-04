@@ -558,8 +558,23 @@ export async function preloadResources(locales, miloLibs) {
     };
     const caasUrl = getCaasUrl(block);
     preload(caasUrl);
-    preload(CAAS_TAGS_URL);
   });
+}
+
+let caasTagsPromise;
+export function getCaasTags() {
+  if (!caasTagsPromise) {
+    caasTagsPromise = fetch(CAAS_TAGS_URL)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Get caas tags HTTP error! Status: ${response.status}`,
+          );
+        }
+        return response.json();
+      });
+  }
+  return caasTagsPromise;
 }
 
 export function updateNavigation() {
