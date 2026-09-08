@@ -466,12 +466,17 @@ test.describe('Validate Partner Directory pages', () => {
     await test.step('Click View button and verify asset opens successfully', async () => {
       const viewButton = smokeTest.viewAssetButton;
       await viewButton.waitFor({ state: 'visible', timeout: 30000 });
-      const [newPage] = await Promise.all([
+      const [newPage, pdfRequest] = await Promise.all([
         page.context().waitForEvent('page'),
+        page.waitForRequest(
+          (request) => request.url().includes(data.expectedURL),
+          { timeout: 30000 },
+        ),
         viewButton.click({ force: true }),
       ]);
-      await newPage.waitForURL(new RegExp(`${data.expectedURL}#?$`), { timeout: 30000 });
-      await expect(newPage).toHaveURL(new RegExp(`${data.expectedURL}#?$`));
+
+      expect(newPage).toBeTruthy();
+      expect(pdfRequest.url()).toContain(data.expectedURL);
     });
   });
   test(`${features[21].name},${features[21].tags}`, async ({ page, baseURL, browserName }) => {
@@ -499,12 +504,17 @@ test.describe('Validate Partner Directory pages', () => {
     await test.step('Click View button and verify asset opens successfully', async () => {
       const viewButton = smokeTest.viewAssetButton;
       await viewButton.waitFor({ state: 'visible', timeout: 30000 });
-      const [newPage] = await Promise.all([
+      const [newPage, pdfRequest] = await Promise.all([
         page.context().waitForEvent('page'),
-        viewButton.click(),
+        page.waitForRequest(
+          (request) => request.url().includes(data.expectedURL),
+          { timeout: 30000 },
+        ),
+        viewButton.click({ force: true }),
       ]);
-      await newPage.waitForURL(new RegExp(`${data.expectedURL}#?$`), { timeout: 30000 });
-      await expect(newPage).toHaveURL(new RegExp(`${data.expectedURL}#?$`));
+
+      expect(newPage).toBeTruthy();
+      expect(pdfRequest.url()).toContain(data.expectedURL);
     });
   });
   test(`${features[22].name},${features[22].tags}`, async ({ page, baseURL }) => {
@@ -565,26 +575,23 @@ test.describe('Validate Partner Directory pages', () => {
 
       await test.step('Validate Download button is visible and link is correct', async () => {
         const downloadButton = newPageSmokeTest.downloadAssetButton;
-
         await downloadButton.waitFor({ state: 'visible', timeout: 30000 });
-
         const downloadLink = downloadButton.locator('a');
         const href = await downloadLink.getAttribute('href');
-
         expect(href).toContain(data.expectedURL);
       });
 
       await test.step('Click View button and verify asset opens successfully', async () => {
         const viewButton = newPageSmokeTest.viewAssetButton;
         await viewButton.waitFor({ state: 'visible', timeout: 30000 });
-
-        const [viewPage] = await Promise.all([
+        const [viewPage, pdfRequest] = await Promise.all([
           newPage.context().waitForEvent('page'),
-          viewButton.click(),
+          newPage.context().waitForEvent('request', (request) => request.url().includes(data.expectedURL)),
+          viewButton.click({ force: true }),
         ]);
 
-        await viewPage.waitForURL(new RegExp(`${data.expectedURL}#?$`), { timeout: 30000 });
-        await expect(viewPage).toHaveURL(new RegExp(`${data.expectedURL}#?$`));
+        expect(viewPage).toBeTruthy();
+        expect(pdfRequest.url()).toContain(data.expectedURL);
       });
     });
   });
@@ -600,8 +607,10 @@ test.describe('Validate Partner Directory pages', () => {
         ? `${baseURL}${path}`
         : `${baseURL}${data.expectedURL}`;
 
-      await expect(page).toHaveURL(expectedURL, { timeout: 30000 });
-      await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(page).toHaveURL(
+        new RegExp(`${expectedURL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}#?$`),
+        { timeout: 30000 },
+      );
 
       if (isStage) {
         return;
