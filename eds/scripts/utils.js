@@ -330,7 +330,7 @@ function getUserRegionParams(portal) {
   if (!userRegion) {
     return null;
   }
-  const regionTagBase = 'caas:region/';
+  const regionTagBase = 'caas:adobe-partners/px/region/';
 
   const regions = [...new Set(Object.values(countryToCaasRegion))];
   // Build the NOT conditions for all partner levels (excluding the target one)
