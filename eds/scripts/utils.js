@@ -221,6 +221,126 @@ function getPartnerLevelParams(portal) {
   return `(${notConditions})`;
 }
 
+const countryToCaasRegion = {
+  australia: 'australia-and-new-zealand',
+  'british indian ocean territory': 'australia-and-new-zealand',
+  'new zealand': 'australia-and-new-zealand',
+  samoa: 'australia-and-new-zealand',
+
+  belgium: 'europe',
+  luxembourg: 'europe',
+  netherlands: 'europe',
+
+  brazil: 'latin-america',
+  canada: 'north-america',
+  china: 'china',
+
+  croatia: 'europe',
+  cyprus: 'europe',
+  'czech republic': 'europe',
+  estonia: 'europe',
+  greece: 'europe',
+  hungary: 'europe',
+  latvia: 'europe',
+  lithuania: 'europe',
+  malta: 'europe',
+  poland: 'europe',
+  romania: 'europe',
+  serbia: 'europe',
+  slovakia: 'europe',
+  slovenia: 'europe',
+  turkey: 'europe',
+
+  france: 'europe',
+  austria: 'europe',
+  germany: 'europe',
+
+  macao: 'hong-kong',
+
+  andorra: 'europe',
+  portugal: 'europe',
+  spain: 'europe',
+
+  bangladesh: 'india',
+  india: 'india',
+  nepal: 'india',
+  'sri lanka': 'india',
+
+  italy: 'europe',
+  japan: 'japan',
+  'korea, republic of': 'korea',
+  mexico: 'latin-america',
+
+  denmark: 'europe',
+  finland: 'europe',
+  iceland: 'europe',
+  norway: 'europe',
+  sweden: 'europe',
+
+  'burkina faso': 'south-east-asia',
+  cambodia: 'south-east-asia',
+  indonesia: 'south-east-asia',
+  malaysia: 'south-east-asia',
+  myanmar: 'south-east-asia',
+  pakistan: 'south-east-asia',
+  philippines: 'south-east-asia',
+  singapore: 'south-east-asia',
+  thailand: 'south-east-asia',
+  vietnam: 'south-east-asia',
+
+  antarctica: 'latin-america',
+  argentina: 'latin-america',
+  bermuda: 'latin-america',
+  bolivia: 'latin-america',
+  'cayman islands': 'latin-america',
+  chile: 'latin-america',
+  colombia: 'latin-america',
+  'costa rica': 'latin-america',
+  'dominican republic': 'latin-america',
+  ecuador: 'latin-america',
+  'el salvador': 'latin-america',
+  guatemala: 'latin-america',
+  guyana: 'latin-america',
+  honduras: 'latin-america',
+  jamaica: 'latin-america',
+  nicaragua: 'latin-america',
+  panama: 'latin-america',
+  paraguay: 'latin-america',
+  peru: 'latin-america',
+  'puerto rico': 'latin-america',
+  'trinidad and tobago': 'latin-america',
+  uruguay: 'latin-america',
+  venezuela: 'latin-america',
+
+  switzerland: 'europe',
+
+  gibraltar: 'uk',
+  'great britain': 'uk',
+  guernsey: 'uk',
+  ireland: 'uk',
+  'isle of man': 'uk',
+  jersey: 'uk',
+
+  'united states': 'north-america',
+};
+
+function getUserRegionParams(portal) {
+  const userCountry = getPartnerCookieValue('country', portal);
+  const userRegion = countryToCaasRegion[userCountry.trim().toLowerCase()];
+  const regionTagBase = 'caas:region/';
+
+  const regions = [...new Set(Object.values(countryToCaasRegion))];
+  // Build the NOT conditions for all partner levels (excluding the target one)
+  const notConditions = regions
+    .map((region) => `NOT+"${regionTagBase}${region}"`)
+    .join('+AND+');
+
+  if (userRegion) {
+    return `("${regionTagBase}${userRegion}"+OR+(${notConditions}))`;
+  }
+  return `(${notConditions})`;
+}
+
 function checkForQaContent(el) {
   if (!el.children) return false;
 
@@ -256,6 +376,9 @@ function getComplexQueryParams(el) {
 
   const partnerLevelParams = getPartnerLevelParams(DX_PROGRAM_TYPE);
   if (partnerLevelParams) fullQuery += `${fullQuery.length > 0 ? '+AND+' : ''}${partnerLevelParams}`;
+
+  const regionParm = getUserRegionParams(DX_PROGRAM_TYPE);
+  if (regionParm) fullQuery += `${fullQuery.length > 0 ? '+AND+' : ''}${regionParm}`;
 
   return fullQuery;
 }
