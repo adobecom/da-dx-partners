@@ -327,6 +327,9 @@ const countryToCaasRegion = {
 function getUserRegionParams(portal) {
   const userCountry = getPartnerCookieValue('country', portal);
   const userRegion = countryToCaasRegion[userCountry.trim().toLowerCase()];
+  if (!userRegion) {
+    return null;
+  }
   const regionTagBase = 'caas:region/';
 
   const regions = [...new Set(Object.values(countryToCaasRegion))];
@@ -335,10 +338,7 @@ function getUserRegionParams(portal) {
     .map((region) => `NOT+"${regionTagBase}${region}"`)
     .join('+AND+');
 
-  if (userRegion) {
-    return `("${regionTagBase}${userRegion}"+OR+(${notConditions}))`;
-  }
-  return `(${notConditions})`;
+  return `("${regionTagBase}${userRegion}"+OR+(${notConditions}))`;
 }
 
 function checkForQaContent(el) {
