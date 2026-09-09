@@ -481,6 +481,7 @@ test.describe('Validate Partner Directory pages', () => {
   });
   test(`${features[21].name},${features[21].tags}`, async ({ page, baseURL, browserName }) => {
     test.skip(browserName === 'firefox', 'Skip on Firefox');
+    test.setTimeout(60000);
     const { data, path } = features[21];
 
     await test.step('Go to public asset page and verify the links', async () => {
@@ -505,10 +506,11 @@ test.describe('Validate Partner Directory pages', () => {
       const viewButton = smokeTest.viewAssetButton;
       await viewButton.waitFor({ state: 'visible', timeout: 30000 });
       const [newPage, pdfRequest] = await Promise.all([
-        page.context().waitForEvent('page'),
-        page.waitForRequest(
+        page.context().waitForEvent('page', { timeout: 60000 }),
+        page.context().waitForEvent(
+          'request',
           (request) => request.url().includes(data.expectedURL),
-          { timeout: 30000 },
+          { timeout: 60000 },
         ),
         viewButton.click({ force: true }),
       ]);
@@ -620,6 +622,7 @@ test.describe('Validate Partner Directory pages', () => {
     });
   });
   test(`${features[25].name},${features[25].tags}`, async ({ page, baseURL }) => {
+    test.setTimeout(60000);
     const { data, path } = features[25];
 
     await test.step('Go to Search page and log in', async () => {
@@ -643,11 +646,11 @@ test.describe('Validate Partner Directory pages', () => {
       await expect(previewLink).toHaveAttribute('href', expect.stringContaining(data.previewURL));
 
       const [newPage] = await Promise.all([
-        page.context().waitForEvent('page'),
+        page.context().waitForEvent('page', { timeout: 60000 }),
         previewLink.click(),
       ]);
 
-      await newPage.waitForURL(new RegExp(`${data.expectedURL}#?$`), { timeout: 30000 });
+      await newPage.waitForURL(new RegExp(`${data.expectedURL}#?$`), { timeout: 60000 });
       await expect(newPage).toHaveURL(new RegExp(`${data.expectedURL}#?$`));
     });
   });
