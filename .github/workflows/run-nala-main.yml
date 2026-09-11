@@ -10,7 +10,7 @@ on:
 jobs:
   action:
     name: Running E2E & IT
-     if: |
+    if: |
       github.event_name == 'push' ||
       github.event.label.name == 'run-on-da-dx-main' ||
       (github.event.action == 'synchronize' && contains(join(github.event.pull_request.labels.*.name, ','), 'run-on-da-dx-main')) ||
