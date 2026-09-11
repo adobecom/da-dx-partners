@@ -453,4 +453,205 @@ test.describe('Validate Partner Directory pages', () => {
       await expect(page).toHaveURL(new RegExp(`${path}#?$`));
     });
   });
+  test(`${features[20].name},${features[20].tags}`, async ({ page, baseURL, browserName }) => {
+    test.skip(browserName === 'firefox', 'Skip on Firefox');
+    const { data, path } = features[20];
+
+    await test.step('Go to public asset page and verify the links', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Click View button and verify asset opens successfully', async () => {
+      const viewButton = smokeTest.viewAssetButton;
+      await viewButton.waitFor({ state: 'visible', timeout: 30000 });
+      const [newPage, pdfRequest] = await Promise.all([
+        page.context().waitForEvent('page'),
+        page.waitForRequest(
+          (request) => request.url().includes(data.expectedURL),
+          { timeout: 30000 },
+        ),
+        viewButton.click({ force: true }),
+      ]);
+
+      expect(newPage).toBeTruthy();
+      expect(pdfRequest.url()).toContain(data.expectedURL);
+    });
+  });
+  test(`${features[21].name},${features[21].tags}`, async ({ page, baseURL, browserName }) => {
+    test.skip(browserName === 'firefox', 'Skip on Firefox');
+    test.setTimeout(60000);
+    const { data, path } = features[21];
+
+    await test.step('Go to public asset page and verify the links', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.getByRole('button', { name: 'Sign In' }).click();
+      await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
+      await page.waitForLoadState('domcontentloaded');
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(smokeTest.viewAssetButton).toBeVisible();
+    });
+
+    await test.step('Validate Download button is visible and link is correct', async () => {
+      const downloadButton = smokeTest.downloadAssetButton;
+      await downloadButton.waitFor({ state: 'visible', timeout: 30000 });
+
+      const downloadLink = downloadButton.locator('a');
+      const href = await downloadLink.getAttribute('href');
+      expect(href).toContain(data.expectedURL);
+    });
+
+    await test.step('Click View button and verify asset opens successfully', async () => {
+      const viewButton = smokeTest.viewAssetButton;
+      await viewButton.waitFor({ state: 'visible', timeout: 30000 });
+      const [newPage, pdfRequest] = await Promise.all([
+        page.context().waitForEvent('page', { timeout: 60000 }),
+        page.context().waitForEvent(
+          'request',
+          (request) => request.url().includes(data.expectedURL),
+          { timeout: 60000 },
+        ),
+        viewButton.click({ force: true }),
+      ]);
+
+      expect(newPage).toBeTruthy();
+      expect(pdfRequest.url()).toContain(data.expectedURL);
+    });
+  });
+  test(`${features[22].name},${features[22].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[22];
+
+    await test.step('Go to Search page and log in', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.searchField.waitFor({ state: 'visible', timeout: 30000 });
+    });
+    await test.step('Search for keyword', async () => {
+      await smokeTest.waitForSearchResults();
+      await smokeTest.searchFor(data.searchKeyword);
+      await smokeTest.searchField.press('Enter');
+      await smokeTest.waitForSearchResults();
+    });
+    await test.step('Verify asset preview link', async () => {
+      const matchingCards = smokeTest.assetPreviewCards.filter({ has: page.locator('.card-title', { hasText: data.searchKeyword }) });
+      await expect(matchingCards).toHaveCount(2);
+      const expectedPreviewLink = matchingCards.locator(`a.card-btn[href*="${data.previewURL}"]`);
+      await expect(expectedPreviewLink).toHaveCount(1);
+    });
+  });
+  test(`${features[23].name},${features[23].tags}`, async ({ page, baseURL, browserName }) => {
+    test.skip(browserName === 'firefox', 'Skip on Firefox');
+    const { data, path } = features[23];
+
+    await test.step('Go to Search page and log in', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.searchField.waitFor({ state: 'visible', timeout: 30000 });
+    });
+    await test.step('Search for keyword', async () => {
+      await smokeTest.waitForSearchResults();
+      await smokeTest.searchFor(data.searchKeyword);
+      await smokeTest.searchField.press('Enter');
+      await smokeTest.waitForSearchResults();
+    });
+    await test.step('Verify asset preview link', async () => {
+      const card = smokeTest.getCardByTitle(data.title);
+      const previewLink = card.locator('a.card-btn');
+
+      await card.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(previewLink).toHaveCount(1);
+      await expect(previewLink).toHaveAttribute('href', expect.stringContaining(data.previewURL));
+
+      const [newPage] = await Promise.all([
+        page.context().waitForEvent('page'),
+        previewLink.click(),
+      ]);
+
+      await newPage.waitForURL(new RegExp(`${data.previewURL}#?$`), { timeout: 30000 });
+      await expect(newPage).toHaveURL(new RegExp(`${data.previewURL}#?$`));
+
+      const newPageSmokeTest = new SmokeTest(newPage);
+
+      await test.step('Validate Download button is visible and link is correct', async () => {
+        const downloadButton = newPageSmokeTest.downloadAssetButton;
+        await downloadButton.waitFor({ state: 'visible', timeout: 30000 });
+        const downloadLink = downloadButton.locator('a');
+        const href = await downloadLink.getAttribute('href');
+        expect(href).toContain(data.expectedURL);
+      });
+
+      await test.step('Click View button and verify asset opens successfully', async () => {
+        const viewButton = newPageSmokeTest.viewAssetButton;
+        await viewButton.waitFor({ state: 'visible', timeout: 30000 });
+        const [viewPage, pdfRequest] = await Promise.all([
+          newPage.context().waitForEvent('page'),
+          newPage.context().waitForEvent('request', (request) => request.url().includes(data.expectedURL)),
+          viewButton.click({ force: true }),
+        ]);
+
+        expect(viewPage).toBeTruthy();
+        expect(pdfRequest.url()).toContain(data.expectedURL);
+      });
+    });
+  });
+  test(`${features[24].name},${features[24].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[24];
+
+    await test.step('Go to public asset page and verify the links', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+
+      const isStage = baseURL.includes('stage');
+      const expectedURL = isStage
+        ? `${baseURL}${path}`
+        : `${baseURL}${data.expectedURL}`;
+
+      await expect(page).toHaveURL(
+        new RegExp(`${expectedURL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}#?$`),
+        { timeout: 30000 },
+      );
+
+      if (isStage) {
+        return;
+      }
+      await smokeTest.registerButton.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(smokeTest.registerButton).toHaveAttribute('href', expect.stringContaining(data.registedURL));
+    });
+  });
+  test(`${features[25].name},${features[25].tags}`, async ({ page, baseURL }) => {
+    test.setTimeout(60000);
+    const { data, path } = features[25];
+
+    await test.step('Go to Search page and log in', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.searchField.waitFor({ state: 'visible', timeout: 30000 });
+    });
+    await test.step('Search for keyword', async () => {
+      await smokeTest.waitForSearchResults();
+      await smokeTest.searchFor(data.searchKeyword);
+      await smokeTest.searchField.press('Enter');
+      await smokeTest.waitForSearchResults();
+    });
+    await test.step('Verify asset preview link', async () => {
+      const card = smokeTest.getCardByTitle(data.title);
+      const previewLink = card.locator('a.card-btn');
+
+      await card.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(previewLink).toHaveCount(1);
+      await expect(previewLink).toHaveAttribute('href', expect.stringContaining(data.previewURL));
+
+      const [newPage] = await Promise.all([
+        page.context().waitForEvent('page', { timeout: 60000 }),
+        previewLink.click(),
+      ]);
+
+      await newPage.waitForURL(new RegExp(`${data.expectedURL}#?$`), { timeout: 60000 });
+      await expect(newPage).toHaveURL(new RegExp(`${data.expectedURL}#?$`));
+    });
+  });
 });
