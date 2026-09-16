@@ -290,7 +290,7 @@ describe('Test utils.js', () => {
     expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&featuredCards=c2608c6f-1727-5d62-8094-a225bdc701stage%2Cc2608c6f-1727-5d62-8094-a225bdc701stage&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
   });
   it('Get caas url with user region', () => {
-    document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true,"country":"Japan"}}';
+    document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true,"region":"japan"}}';
     document.cookie = 'partner_info={"firstName":"DXP Stage"%2C"lastName":"Spain Platinum"%2C"company":"Yugo DXP Stage Platinum Spain"}';
     const locales = {
       '': { ietf: 'en-US', tk: 'hah7vzn.css' },
