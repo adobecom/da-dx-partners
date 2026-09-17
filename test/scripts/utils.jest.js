@@ -35,6 +35,7 @@ import {
   getPartnerAccountState,
   getPartnerUserState,
   hasPartnerAccountStateCalendly,
+  getUserRegionParams,
 } from '../../eds/scripts/utils.js';
 import {DX_PROGRAM_TYPE} from "../../eds/blocks/utils/dxConstants.js";
 
@@ -160,6 +161,14 @@ describe('Test utils.js', () => {
     const cookieObject = { DXP: { test: 'value' } };
     document.cookie = `partner_user_state=${encodeURIComponent(JSON.stringify(cookieObject))}`;
     expect(getPartnerUserState()).toStrictEqual(cookieObject.DXP);
+  });
+  it('Should build region params from user region cookie', () => {
+    document.cookie = `partner_data=${JSON.stringify({ DXP: { region: 'europe' } })}`;
+    expect(getUserRegionParams(DX_PROGRAM_TYPE)).toEqual('("caas:adobe-partners/px/region/europe"+OR+(NOT+"caas:adobe-partners/px/region/australia-and-new-zealand"+AND+NOT+"caas:adobe-partners/px/region/europe"+AND+NOT+"caas:adobe-partners/px/region/latin-america"+AND+NOT+"caas:adobe-partners/px/region/north-america"+AND+NOT+"caas:adobe-partners/px/region/china"+AND+NOT+"caas:adobe-partners/px/region/hong-kong"+AND+NOT+"caas:adobe-partners/px/region/india"+AND+NOT+"caas:adobe-partners/px/region/japan"+AND+NOT+"caas:adobe-partners/px/region/korea"+AND+NOT+"caas:adobe-partners/px/region/south-east-asia"+AND+NOT+"caas:adobe-partners/px/region/uk"))');
+  });
+  it('Should return null when region is missing', () => {
+    document.cookie = `partner_data=${JSON.stringify({ DXP: {} })}`;
+    expect(getUserRegionParams(DX_PROGRAM_TYPE)).toBeNull();
   });
   it('Check if user is a member', () => {
     const cookieObjectMember = { DXP: { status: 'MEMBER' } };
@@ -288,6 +297,29 @@ describe('Test utils.js', () => {
     };
     const caasUrl = getCaasUrl(block);
     expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&featuredCards=c2608c6f-1727-5d62-8094-a225bdc701stage%2Cc2608c6f-1727-5d62-8094-a225bdc701stage&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29&language=en&country=US');
+  });
+  it('Get caas url with user region', () => {
+    document.cookie = 'partner_data={"DXP":{"accountAnniversary":1890777600000%2C"permissionRegion":"Europe West"%2C"status":"MEMBER"%2C"level":"Platinum"%2C"primaryContact":true%2C"salesCenterAccess":true,"region":"japan"}}';
+    document.cookie = 'partner_info={"firstName":"DXP Stage"%2C"lastName":"Spain Platinum"%2C"company":"Yugo DXP Stage Platinum Spain"}';
+    const locales = {
+      '': { ietf: 'en-US', tk: 'hah7vzn.css' },
+      de: { ietf: 'de-DE', tk: 'hah7vzn.css' },
+    };
+    const locale = getLocale(locales, '/digitalexperience/');
+    document.body.innerHTML = fs.readFileSync(
+      path.resolve(__dirname, './mocks/dx-card-collection.html'),
+      'utf8',
+    );
+    const el = document.querySelector('.dx-card-collection');
+
+    const block = {
+      el,
+      name: 'dx-card-collection',
+      // collectionTag: '"caas:adobe-partners/collections/news"',
+      ietf: locale.ietf,
+    };
+    const caasUrl = getCaasUrl(block);
+    expect(caasUrl).toEqual('https://14257-chimera-stage.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=da-dx-partners&featuredCards=c2608c6f-1727-5d62-8094-a225bdc701stage%2Cc2608c6f-1727-5d62-8094-a225bdc701stage&draft=false&flatFile=false&expanded=true&complexQuery=%28%28%22caas%3Aadobe-partners%2Fqa-content%22%29%29%2BAND%2B%28%2BNOT%2B%22caas%3Aadobe-partners%2Fqa-content%22%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fgold%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fsilver%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fplatinum%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fpartner-level%2Fcommunity%22%29%29%2BAND%2B%28%22caas%3Aadobe-partners%2Fpx%2Fregion%2Fjapan%22%2BOR%2B%28NOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Faustralia-and-new-zealand%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Feurope%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Flatin-america%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Fnorth-america%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Fchina%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Fhong-kong%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Findia%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Fjapan%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Fkorea%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Fsouth-east-asia%22%2BAND%2BNOT%2B%22caas%3Aadobe-partners%2Fpx%2Fregion%2Fuk%22%29%29&language=en&country=US');
   });
   it('Get caas url prod', () => {
     const originalProdHosts = [...prodHosts];
