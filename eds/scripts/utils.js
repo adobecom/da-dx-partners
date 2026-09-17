@@ -222,7 +222,7 @@ function getPartnerLevelParams(portal) {
   return `(${notConditions})`;
 }
 
-function getUserRegionParams(portal) {
+export function getUserRegionParams(portal) {
   const userRegion = getPartnerCookieValue('region', portal);
   if (!userRegion) {
     return null;

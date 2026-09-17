@@ -35,6 +35,7 @@ import {
   getPartnerAccountState,
   getPartnerUserState,
   hasPartnerAccountStateCalendly,
+  getUserRegionParams,
 } from '../../eds/scripts/utils.js';
 import {DX_PROGRAM_TYPE} from "../../eds/blocks/utils/dxConstants.js";
 
@@ -160,6 +161,14 @@ describe('Test utils.js', () => {
     const cookieObject = { DXP: { test: 'value' } };
     document.cookie = `partner_user_state=${encodeURIComponent(JSON.stringify(cookieObject))}`;
     expect(getPartnerUserState()).toStrictEqual(cookieObject.DXP);
+  });
+  it('Should build region params from user region cookie', () => {
+    document.cookie = `partner_data=${JSON.stringify({ DXP: { region: 'europe' } })}`;
+    expect(getUserRegionParams(DX_PROGRAM_TYPE)).toEqual('("caas:adobe-partners/px/region/europe"+OR+(NOT+"caas:adobe-partners/px/region/australia-and-new-zealand"+AND+NOT+"caas:adobe-partners/px/region/europe"+AND+NOT+"caas:adobe-partners/px/region/latin-america"+AND+NOT+"caas:adobe-partners/px/region/north-america"+AND+NOT+"caas:adobe-partners/px/region/china"+AND+NOT+"caas:adobe-partners/px/region/hong-kong"+AND+NOT+"caas:adobe-partners/px/region/india"+AND+NOT+"caas:adobe-partners/px/region/japan"+AND+NOT+"caas:adobe-partners/px/region/korea"+AND+NOT+"caas:adobe-partners/px/region/south-east-asia"+AND+NOT+"caas:adobe-partners/px/region/uk"))');
+  });
+  it('Should return null when region is missing', () => {
+    document.cookie = `partner_data=${JSON.stringify({ DXP: {} })}`;
+    expect(getUserRegionParams(DX_PROGRAM_TYPE)).toBeNull();
   });
   it('Check if user is a member', () => {
     const cookieObjectMember = { DXP: { status: 'MEMBER' } };
