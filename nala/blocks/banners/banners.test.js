@@ -50,4 +50,63 @@ test.describe('Validate banners block', () => {
       expect(href).toContain(data.completeComplianceButtonLink);
     });
   });
+
+  test(`${features[1].name},${features[1].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[1];
+    await test.step('Go to the page', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+    });
+    await test.step('Verify global banner is present', async () => {
+      await expect(bannersPage.globalBanner).toBeVisible();
+      await expect(bannersPage.globalBanner).toContainText(data.globalBannerText);
+    });
+    await test.step('Click global banner CTA and verify page loads in a new tab', async () => {
+      await expect(bannersPage.globalBannerCta).toBeVisible();
+      const href = await bannersPage.globalBannerCta.getAttribute('href');
+      expect(href).toContain(data.globalBannerCtaLink);
+
+      const [newPage] = await Promise.all([
+        context.waitForEvent('page'),
+        bannersPage.globalBannerCta.click(),
+      ]);
+
+      await newPage.waitForLoadState('domcontentloaded');
+      await expect(newPage).toHaveURL(new RegExp(data.globalBannerCtaLink), { timeout: 30000 });
+      await newPage.close();
+    });
+  });
+
+  test(`${features[2].name},${features[2].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[2];
+    await test.step('Go to the page', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+    });
+    await test.step('Partner compliance expiry in the next 90 days', async () => {
+      const complianceExpiryDate = bannersPage.generateDateWithDaysOffset(data.partnerData.daysToComplianceExpiry);
+      await signInPage.addCookie(
+        data.partnerData.partnerPortal,
+        data.partnerData.partnerLevel,
+        `${baseURL}${path}`,
+        context,
+        { ...data.partnerData, complianceExpiryDate: complianceExpiryDate.getTime().toString() },
+      );
+      await page.reload();
+      await page.waitForLoadState('domcontentloaded');
+    });
+    await test.step('Verify global banner is displayed under the BCTQ banner', async () => {
+      await expect(bannersPage.bctqBannerSection).toBeVisible({ timeout: 30000 });
+      await expect(bannersPage.globalBannerSection).toBeVisible({ timeout: 30000 });
+      await expect(bannersPage.globalBannerSection).toContainText(data.globalBannerText);
+
+      await expect.poll(async () => {
+        const bctqSectionNumber = await bannersPage.getDaaLhSectionNumber(bannersPage.bctqBannerSection);
+        const globalSectionNumber = await bannersPage.getDaaLhSectionNumber(bannersPage.globalBannerSection);
+        return bctqSectionNumber !== null
+          && globalSectionNumber !== null
+          && globalSectionNumber > bctqSectionNumber;
+      }, { timeout: 30000 }).toBe(true);
+    });
+  });
 });
