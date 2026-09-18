@@ -721,7 +721,7 @@ const webinarRecordingWinningProductDiscoveryAiPoweredCommerce = [
     }
   ];
 const mapChaptersToWebinar = {
-  'https://partners.adobe.com/digitalexperience/preview/netstorage-assets/restricted/we/webinar-recording-getting-started-aem-assets-content-hub.mp4': webinarRecordingGettingStartedAemAssetsContentHub,
+  'https://partners.adobe.com/digitalexperience/preview/netstorage-assets/restricted/we/webinar-recording-getting-started-aem-assets-content-hub.mp4.html': webinarRecordingGettingStartedAemAssetsContentHub,
   'https://partners.adobe.com/digitalexperience/preview/netstorage-assets/restricted/we/webinar-recording-winning-product-discovery-ai-powered-commerce.mp4.html': webinarRecordingWinningProductDiscoveryAiPoweredCommerce,
   'https://partners.adobe.com/digitalexperience/preview/netstorage-assets/restricted/we/webinar-recording-r2s-ajo-email-marketing.mp4.html':marketing,
   'https://partners.adobe.com/digitalexperience/preview/netstorage-assets/restricted/we/webinar-recording-brand-visibility-partner-enablement.mp4.html': webinarRecordingBrandVisibilityPartnerE,
