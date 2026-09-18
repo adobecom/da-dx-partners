@@ -100,6 +100,74 @@ describe('partnerStateUtils', () => {
     });
   });
 
+  it('returns the response body for other error statuses', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => ({ error: 'Internal server error' }),
+    });
+
+    const result = await updatePartnerAccountState({ calendly: 'event-id' });
+
+    expect(result).toEqual({
+      success: false,
+      status: 500,
+      body: { error: 'Internal server error' },
+    });
+  });
+
+  it('returns an empty body when an error response is not valid JSON', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => { throw new Error('invalid JSON'); },
+    });
+
+    const result = await updatePartnerAccountState({ calendly: 'event-id' });
+
+    expect(result).toEqual({
+      success: false,
+      status: 500,
+      body: null,
+    });
+  });
+
+  it('uses an error message from a 400 response', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: { message: 'Missing state updates' } }),
+    });
+
+    const result = await updatePartnerAccountState({});
+
+    expect(result).toEqual({
+      status: 400,
+      errorText: 'Missing state updates',
+    });
+  });
+
+  it('returns empty error text when a 400 response has no error detail', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => ({}),
+    });
+
+    const result = await updatePartnerAccountState({});
+
+    expect(result).toEqual({ status: 400, errorText: '' });
+  });
+
+  it('returns the rejected fetch error', async () => {
+    const error = new Error('network unavailable');
+    global.fetch.mockRejectedValue(error);
+
+    const result = await updatePartnerAccountState({ calendly: 'event-id' });
+
+    expect(result).toEqual({ success: false, error });
+  });
+
   it('refreshes partner account state cookie via runtime action', async () => {
     global.fetch.mockResolvedValue({
       ok: true,

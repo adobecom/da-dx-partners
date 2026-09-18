@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { getUpdatedHref, rewriteLinks } from '../../eds/scripts/rewriteLinks.js';
+import { getUpdatedHref, rewriteLinks, rewriteUrlOnNonProd } from '../../eds/scripts/rewriteLinks.js';
 import { getConfig } from '../../eds/blocks/utils/utils.js';
 import { partnerIsSignedIn } from '../../eds/scripts/utils.js';
 
@@ -76,5 +76,32 @@ describe('Test rewrite links', () => {
     const result = getUpdatedHref(href);
 
     expect(result).toBe(href);
+  });
+
+  test('should return invalid href unchanged', () => {
+    expect(getUpdatedHref('not a url')).toBe('not a url');
+  });
+
+  test('should leave links unchanged in production', () => {
+    getConfig.mockReturnValue({ env: { name: 'prod' }, codeRoot: 'https://stage--da-dx-partners--adobecom.aem.page/edsdme' });
+
+    const url = new URL('https://partners.adobe.com/path');
+    rewriteUrlOnNonProd(url);
+
+    expect(url.href).toBe('https://partners.adobe.com/path');
+  });
+
+  test('should leave unmapped domains unchanged', () => {
+    const url = new URL('https://example.com/path');
+    rewriteUrlOnNonProd(url);
+
+    expect(url.href).toBe('https://example.com/path');
+  });
+
+  test('should rewrite partner benefits links on stage', () => {
+    const url = new URL('https://partnerbenefitscenter.adobe.com/benefits');
+    rewriteUrlOnNonProd(url);
+
+    expect(url.hostname).toBe('pp-staging.adobe.com');
   });
 });

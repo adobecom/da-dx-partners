@@ -37,7 +37,7 @@ jest.mock('../../../eds/scripts/utils.js', () => {
 jest.mock('../../../eds/blocks/utils/utils.js', () => ({
   getConfig: () => ({ env: { name: 'stage' }, locales: { '': { ietf: 'en-US' } } }),
   populateLocalizedTextFromListItems: () => {},
-  replaceText: (key) => key,
+  replaceText: jest.fn((key) => key),
 }));
 
 jest.mock('../../../eds/blocks/partnership-progress/PartnershipProgress.js', () => {
@@ -137,6 +137,28 @@ describe('partnership-progress block', () => {
     expect(app).toBeTruthy();
     expect(app.blockData).toBeTruthy();
     expect(app.className).toBe('partnership-progress-block');
+  });
+
+  it('preserves section metadata and additional block classes', async () => {
+    const el = document.querySelector('.partnership-progress');
+    el.classList.add('compact', 'featured');
+    el.parentNode.setAttribute('data-idx', 'section-2');
+
+    const app = await init(el);
+
+    expect(app.getAttribute('data-idx')).toBe('section-2');
+    expect(app.classList.contains('compact')).toBe(true);
+    expect(app.classList.contains('featured')).toBe(true);
+  });
+
+  it('keeps default text when localization returns an empty value', async () => {
+    const { replaceText } = jest.requireMock('../../../eds/blocks/utils/utils.js');
+    replaceText.mockImplementation(() => '');
+
+    const el = document.querySelector('.partnership-progress');
+    const app = await init(el);
+
+    expect(app.blockData.localizedText['{{Solution}}']).toBe('Solution');
   });
 
   it('fetches data on imsReady and populates component state', async () => {

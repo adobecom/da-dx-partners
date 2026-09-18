@@ -760,8 +760,7 @@ describe('Test personalization.js', () => {
     describe('getDaysUntilComplianceExpiration', () => {
       it('should return correct days remaining for future expiration date', () => {
         jest.isolateModules(() => {
-          const futureDate = new Date();
-          futureDate.setDate(futureDate.getDate() + 45);
+          const futureDate = new Date(Date.now() + (45 * 24 * 60 * 60 * 1000));
           const cookieObject = {
             DXP: {
               status: 'MEMBER',
@@ -1239,8 +1238,7 @@ describe('Test personalization.js', () => {
     describe('bctqExpirationDays placeholder', () => {
       it('should populate bctqExpirationDays placeholder with correct days', () => {
         jest.isolateModules(() => {
-          const futureDate = new Date();
-          futureDate.setDate(futureDate.getDate() + 45);
+          const futureDate = new Date(Date.now() + (45 * 24 * 60 * 60 * 1000));
           const cookieObject = {
             DXP: {
               status: 'MEMBER',

@@ -36,6 +36,20 @@ import {
   getPartnerUserState,
   hasPartnerAccountStateCalendly,
   getUserRegionParams,
+  getLibs,
+  getPartnerStateCookieObject,
+  hasPartnerAccountStateProperty,
+  isAdminUser,
+  isAccountLocked,
+  isPartnerNewlyRegistered,
+  isPartnerNewlyApproved,
+  getDaysUntilComplianceExpiration,
+  isBctqExpiring,
+  deleteCookieValue,
+  setFeedback,
+  invokeAfterImsIsReady,
+  loadPageToAnchor,
+  preventModalClose,
 } from '../../eds/scripts/utils.js';
 import {DX_PROGRAM_TYPE} from "../../eds/blocks/utils/dxConstants.js";
 
@@ -118,6 +132,20 @@ describe('Test utils.js', () => {
     const cardDate = '2024-07-09T12:35:03.000Z';
     expect(formatDate(cardDate)).toEqual('Jul 9, 2024');
   });
+  it('formatDate should return event date and time or undefined for missing dates', () => {
+    expect(formatDate('2024-07-09T12:35:03.000Z', 'en-US', true)).toContain('Jul 9, 2024 |');
+    expect(formatDate()).toBeUndefined();
+  });
+  it('setLibs should support local and reject invalid branches', () => {
+    const location = {
+      origin: 'http://localhost:3000',
+      hostname: 'localhost',
+      search: '?milolibs=local',
+    };
+    expect(setLibs('/libs', location)).toBe('http://localhost:6456/libs');
+    expect(() => setLibs('/libs', { ...location, search: '?milolibs=bad%20branch' })).toThrow('Invalid branch name.');
+    expect(getLibs()).toBe('http://localhost:6456/libs');
+  });
   it('Should get correct program based on url path', () => {
     const pathDx = '/digitalexperience/test';
     expect(getProgramType(pathDx)).toEqual(DX_PROGRAM_TYPE);
@@ -161,6 +189,41 @@ describe('Test utils.js', () => {
     const cookieObject = { DXP: { test: 'value' } };
     document.cookie = `partner_user_state=${encodeURIComponent(JSON.stringify(cookieObject))}`;
     expect(getPartnerUserState()).toStrictEqual(cookieObject.DXP);
+  });
+  it('returns null for malformed or invalid partner state cookies', () => {
+    document.cookie = 'partner_user_state=not-json';
+    expect(getPartnerStateCookieObject('partner_user_state')).toBeNull();
+    document.cookie = `partner_user_state=${encodeURIComponent(JSON.stringify({ DXP: [] }))}`;
+    expect(getPartnerStateCookieObject('partner_user_state')).toBeNull();
+    document.cookie = `partner_user_state=${encodeURIComponent(JSON.stringify({ DXP: { role: 'admin' } }))}`;
+    expect(hasPartnerAccountStateProperty('role')).toBe(false);
+  });
+  it('checks admin, locked, and newly registered or approved partner states', () => {
+    const now = Date.now();
+    const cookieObject = {
+      DXP: {
+        isAdmin: true,
+        status: 'MEMBER',
+        specialState: 'locked',
+        createddate: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        newlyapproveddate: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    };
+    document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+    expect(isAdminUser()).toBe(true);
+    expect(isAccountLocked()).toBe(true);
+    expect(isPartnerNewlyRegistered()).toBe(true);
+    expect(isPartnerNewlyApproved()).toBe(true);
+  });
+  it('handles compliance expiration and locked partner state', () => {
+    const future = Date.now() + (30 * 24 * 60 * 60 * 1000);
+    document.cookie = `partner_data=${JSON.stringify({ DXP: { status: 'MEMBER', complianceExpiryDate: future } })}`;
+    expect(getDaysUntilComplianceExpiration()).toBe(30);
+    expect(isBctqExpiring(30)).toBe(true);
+    document.cookie = `partner_data=${JSON.stringify({ DXP: { status: 'locked', complianceExpiryDate: future } })}`;
+    expect(isBctqExpiring(30)).toBe(false);
+    document.cookie = `partner_data=${JSON.stringify({ DXP: { status: 'MEMBER', complianceExpiryDate: Date.now() - 1 } })}`;
+    expect(getDaysUntilComplianceExpiration()).toBeNull();
   });
   it('Should build region params from user region cookie', () => {
     document.cookie = `partner_data=${JSON.stringify({ DXP: { region: 'europe' } })}`;
@@ -495,5 +558,60 @@ describe('Test utils.js', () => {
 
     expect(fakeWindow.location.assign).not.toHaveBeenCalled();
     expect(getCookieValue('partner_redirects_count')).toBeUndefined();
+  });
+  it('loads a feedback fragment and handles feedback opt-out', async () => {
+    const main = document.createElement('main');
+    document.body.appendChild(main);
+    const metaTag = document.createElement('meta');
+    metaTag.name = 'feedback';
+    metaTag.content = 'true';
+    document.head.appendChild(metaTag);
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      text: async () => '<div><div class="feedback">Feedback</div></div>',
+    });
+
+    await setFeedback(() => ({ locale: { prefix: '/de' } }));
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost/de/eds/partners-shared/fragments/feedback.plain.html');
+    expect(main.querySelector('.feedback')).not.toBeNull();
+  });
+  it('waits for IMS readiness before invoking callbacks', async () => {
+    const callback = jest.fn();
+    window.dxpImsReady = true;
+    await invokeAfterImsIsReady(callback);
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    window.dxpImsReady = null;
+    const pending = invokeAfterImsIsReady(callback);
+    window.dispatchEvent(new Event('dxpImsReady'));
+    await pending;
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+  it('scrolls to an existing hash anchor and deletes cookies', () => {
+    const anchor = document.createElement('div');
+    anchor.id = 'target';
+    Object.defineProperty(anchor, 'offsetTop', { value: 120 });
+    document.body.appendChild(anchor);
+    window.history.pushState({}, '', '/digitalexperience/#target');
+    window.scrollTo = jest.fn();
+
+    loadPageToAnchor();
+    expect(window.scrollTo).toHaveBeenCalledWith({ top: 120, behavior: 'smooth' });
+
+    document.cookie = 'temporary=value; Path=/';
+    deleteCookieValue('temporary');
+    expect(getCookieValue('temporary')).toBeUndefined();
+  });
+  it('prevents clicks on an open modal curtain', () => {
+    const curtain = document.createElement('div');
+    curtain.className = 'modal-curtain';
+    document.body.appendChild(curtain);
+    preventModalClose();
+    const event = new Event('click', { bubbles: true, cancelable: true });
+    const stopSpy = jest.spyOn(event, 'stopImmediatePropagation');
+    curtain.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(stopSpy).toHaveBeenCalled();
   });
 });
