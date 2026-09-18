@@ -1,3 +1,8 @@
+const ASSET_REDIRECT_TARGET = {
+  stage: '/digitalexperience/preview/restricted/1/program-guide.pdf.html',
+  main: '/digitalexperience/preview/public/1/program-guide.pdf.html',
+};
+
 export default {
   FeatureName: 'DX Smoke Tests',
   features: [
@@ -269,6 +274,16 @@ export default {
         title: 'Webinar Recording: LLM Optimizer Technical Enablement',
         previewURL: '/digitalexperience/preview/netstorage-assets/restricted/we/webinar-recording-llm-site-optimizer.mp4.html',
         expectedURL: '/digitalexperience/preview/netstorage-assets/restricted/we/webinar-recording-llm-optimizer-technical-enablement.mp4.html',
+      },
+    },
+    {
+      tcid: '27',
+      name: '@redirects-asset-redirect-stage-prod',
+      path: '/digitalexperience/about',
+      tags: '@da-dx-redirects @regression @circleCi @anonymous @da-dx-main',
+      data: {
+        assetRedirectCtaHref: '/digitalexperience/preview/restricted/1/program-guide.pdf.html',
+        expectedLandingPath: ASSET_REDIRECT_TARGET,
       },
     },
   ],

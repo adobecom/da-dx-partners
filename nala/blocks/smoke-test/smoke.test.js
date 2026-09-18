@@ -6,6 +6,22 @@ let smokeTest;
 const { features } = SmokeSpec;
 const errorFlowCases = features.slice(10, 13);
 
+function isMainBaseUrl(baseURL = '') {
+  return (
+    baseURL.includes('main--da-dx-partners--adobecom')
+    || (baseURL.includes('partners.adobe.com') && !baseURL.includes('stage'))
+  );
+}
+
+function resolveEnvLink(link, baseURL) {
+  if (typeof link === 'string') return link;
+  return isMainBaseUrl(baseURL) ? link.main : link.stage;
+}
+
+function expectHrefPath(href, expectedPath) {
+  expect(new URL(href, 'https://example.com').pathname).toBe(expectedPath);
+}
+
 test.describe('Validate Partner Directory pages', () => {
   test.beforeEach(async ({ page, browserName, baseURL }) => {
     smokeTest = new SmokeTest(page);
@@ -652,6 +668,35 @@ test.describe('Validate Partner Directory pages', () => {
 
       await newPage.waitForURL(new RegExp(`${data.expectedURL}#?$`), { timeout: 60000 });
       await expect(newPage).toHaveURL(new RegExp(`${data.expectedURL}#?$`));
+    });
+  });
+  test(`${features[26].name},${features[26].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[26];
+
+    await test.step('Go to page and find asset redirect CTA', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await smokeTest.assetRedirectCta.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Verify CTA href points to restricted preview URL', async () => {
+      const href = await smokeTest.assetRedirectCta.getAttribute('href');
+      expectHrefPath(href, data.assetRedirectCtaHref);
+    });
+
+    await test.step('Click CTA and validate new tab stage and prod behavior', async () => {
+      const [assetPage] = await Promise.all([
+        context.waitForEvent('page'),
+        smokeTest.assetRedirectCta.click(),
+      ]);
+
+      await assetPage.waitForLoadState('domcontentloaded');
+      await expect
+        .poll(
+          () => new URL(assetPage.url()).pathname,
+          { timeout: 30000 },
+        )
+        .toBe(resolveEnvLink(data.expectedLandingPath, baseURL));
+      await assetPage.close();
     });
   });
 });
