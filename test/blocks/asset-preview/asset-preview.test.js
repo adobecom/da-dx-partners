@@ -58,6 +58,17 @@ describe('asset-preview block', () => {
     expect(app.blockData.localizedText['{{Download}}']).to.be.a('string');
     expect(app.blockData.localizedText['{{View}}']).to.be.a('string');
   });
+
+  it('keeps authored fragment links in the replacement component', async () => {
+    const { default: init } = await import('../../../eds/blocks/asset-preview/asset-preview.js');
+    const block = document.querySelector('.asset-preview');
+    const fragmentLink = block.querySelector('a[href="/fragments/restricted-fragment"]');
+    block.parentNode.setAttribute('data-idx', '0');
+
+    const app = await init(block);
+
+    expect(app.querySelector('a[href="/fragments/restricted-fragment"]')).to.equal(fragmentLink);
+  });
 });
 
 describe('AssetPreview - updated()', () => {
