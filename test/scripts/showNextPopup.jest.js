@@ -76,6 +76,14 @@ describe('showNextPopup', () => {
       expect(partnerAgreement).not.toHaveBeenCalled();
       expect(mockPortalMessaging).not.toHaveBeenCalled();
     });
+
+    it('should return undefined for a non-member', async () => {
+      isMember.mockReturnValue(false);
+
+      const result = await showNextPopup('https://test-milo-libs.com', 'test-client-id');
+
+      expect(result).toBeUndefined();
+    });
   });
 
   describe('when user is a member', () => {
@@ -211,6 +219,23 @@ describe('showNextPopup', () => {
       expect(mockCertificationExpiresPopup).toHaveBeenCalled();
     });
 
+    it('should pass false state flags when starting at the portal popup', async () => {
+      await showNextPopup('https://test-milo-libs.com', 'test-client-id', PORTAL_MESSAGING_POPUP);
+
+      expect(mockPortalMessaging).toHaveBeenCalledWith('https://test-milo-libs.com', false);
+    });
+
+    it('should pass false state flags and the client id when starting at certification', async () => {
+      await showNextPopup('https://test-milo-libs.com', 'client-id', CERTIFICATION_POPUP);
+
+      expect(mockCertificationExpiresPopup).toHaveBeenCalledWith(
+        'https://test-milo-libs.com',
+        false,
+        false,
+        'client-id',
+      );
+    });
+
     it('should skip all popups for an unknown nextPopup value', async () => {
       await showNextPopup('https://test-milo-libs.com', 'test-client-id', 'unknown-popup');
 
@@ -269,6 +294,26 @@ describe('showNextPopup', () => {
         true, // partnerAgreementDisplayed
         'test-client-id',
       );
+    });
+
+    it('should await each popup in order', async () => {
+      const calls = [];
+      partnerAgreement.mockImplementation(async () => {
+        calls.push('agreement');
+        return false;
+      });
+      mockPortalMessaging.mockImplementation(async () => {
+        calls.push('portal');
+        return false;
+      });
+      mockCertificationExpiresPopup.mockImplementation(async () => {
+        calls.push('certification');
+        return false;
+      });
+
+      await showNextPopup('https://test-milo-libs.com', 'test-client-id');
+
+      expect(calls).toEqual(['agreement', 'portal', 'certification']);
     });
   });
 });

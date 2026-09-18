@@ -18,10 +18,10 @@ const PERSONALIZATION_HIDE_CLASS = 'personalization-hide';
 
 function importModules() {
   // eslint-disable-next-line global-require
-  const { applyPagePersonalization, applyGnavPersonalization } = require('../../eds/scripts/personalization.js');
+  const { applyPagePersonalization, applyGnavPersonalization, personalizePlaceholders } = require('../../eds/scripts/personalization.js');
   jest.mock('../../eds/blocks/utils/utils.js', () => ({ getConfig: jest.fn(() => ({ env: { name: 'stage' } })) }));
 
-  return { applyPagePersonalization, applyGnavPersonalization };
+  return { applyPagePersonalization, applyGnavPersonalization, personalizePlaceholders };
 }
 
 describe('Test personalization.js', () => {
@@ -569,6 +569,38 @@ describe('Test personalization.js', () => {
 
     expect(shouldHideLinkGroup(personalizedGroup)).toBe(true);
     expect(shouldHideLinkGroup(regularGroup)).toBe(false);
+  });
+
+  it('ignores placeholders when the XPath matches no elements', () => {
+    const { personalizePlaceholders } = require('../../eds/scripts/personalization.js');
+
+    expect(() => personalizePlaceholders({ name: '//*[contains(text(), "missing")]' }, document, 'dxp')).not.toThrow();
+  });
+
+  it('removes a profile image placeholder when replacement fails', async () => {
+    const placeholder = document.createElement('p');
+    placeholder.textContent = '$profileImage';
+    document.body.appendChild(placeholder);
+    Object.defineProperty(placeholder, 'textContent', {
+      configurable: true,
+      get() {
+        throw new Error('placeholder read failed');
+      },
+    });
+    window.adobeIMS = { isSignedInUser: () => true };
+    const avatar = document.createElement('img');
+    avatar.className = 'feds-profile-img';
+    avatar.src = 'https://example.com/avatar.jpg';
+    document.body.appendChild(avatar);
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const { personalizePlaceholders } = require('../../eds/scripts/personalization.js');
+
+    personalizePlaceholders({ profileImage: '//*[contains(text(), "$profileImage")]' }, document, 'dxp');
+    await Promise.resolve();
+
+    expect(warnSpy).toHaveBeenCalledWith('Failed to replace profile image placeholders:', expect.any(Error));
+    expect(placeholder.isConnected).toBe(false);
+    warnSpy.mockRestore();
   });
 
   describe('Profile Image and Company Logo Personalization', () => {

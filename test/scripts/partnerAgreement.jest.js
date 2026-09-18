@@ -328,6 +328,32 @@ describe('Test partnerAgreement.js', () => {
       expect(wrapper.querySelector('.agreement-footer')).toBeTruthy();
       expect(wrapper.querySelector('.agreement-cta')).toBeTruthy();
     });
+
+    it('uses fallback labels when agreement metadata is incomplete', async () => {
+      isMember.mockReturnValue(false);
+      getPartnerCookieValue.mockReturnValue(null);
+      getMetadataContent.mockReturnValue('/digitalexperience/fragments/partner-agreement-meta');
+
+      let call = 0;
+      global.fetch.mockImplementation(() => {
+        call += 1;
+        if (call === 1) {
+          return Promise.resolve({
+            ok: true,
+            text: () => Promise.resolve('<html><head><meta name="agreementtitle" content="Custom title" /></head></html>'),
+          });
+        }
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: ['Terms'] }) });
+      });
+
+      const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
+      await partnerAgreement('https://test-milo-libs.com');
+
+      const wrapper = document.querySelector('.agreement-wrapper');
+      expect(wrapper.textContent).toContain('Custom title');
+      expect(wrapper.textContent).toContain('Agreement Description');
+      expect(wrapper.querySelector('.agreement-cta').textContent).toContain('Agreement CTA label');
+    });
   });
 
   describe('accept flow', () => {
@@ -356,7 +382,9 @@ describe('Test partnerAgreement.js', () => {
       global.fetch.mockImplementation(() => {
         call += 1;
         if (call === 1) return Promise.resolve({ ok: true, text: () => Promise.resolve(metaHtml) });
-        if (call === 2) return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: ['<p>Terms</p>'] }) });
+        if (call === 2) {
+          return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: ['<p>Terms</p>'] }) });
+        }
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true }) });
       });
 
@@ -411,6 +439,20 @@ describe('Test partnerAgreement.js', () => {
       };
       const { handleRedirects } = require('../../eds/scripts/partnerAgreement.js');
 
+      handleRedirects('test.tidwit.domain.com', fakeWindow);
+
+      expect(fakeWindow.location.href).toBe('https://partners.stage.adobe.com/digitalexperience/home/');
+    });
+    it('ignores redirects when domains or query parameters are missing', () => {
+      const fakeWindow = {
+        location: {
+          href: 'https://partners.stage.adobe.com/digitalexperience/home/',
+          search: '',
+        },
+      };
+      const { handleRedirects } = require('../../eds/scripts/partnerAgreement.js');
+
+      handleRedirects('', fakeWindow);
       handleRedirects('test.tidwit.domain.com', fakeWindow);
 
       expect(fakeWindow.location.href).toBe('https://partners.stage.adobe.com/digitalexperience/home/');
@@ -477,6 +519,28 @@ describe('Test partnerAgreement.js', () => {
       expect(document.querySelector('.agreement-spinner').innerHTML).toBe('Error!');
       errorSpy.mockRestore();
     });
+    it('treats an already accepted agreement as a successful accept', async () => {
+      isMember.mockReturnValue(false);
+      getPartnerCookieValue.mockReturnValue(null);
+      getMetadataContent.mockReturnValue('/path/meta.html');
+
+      let call = 0;
+      global.fetch.mockImplementation(() => {
+        call += 1;
+        if (call === 1) return Promise.resolve({ ok: true, text: () => Promise.resolve(metaHtml) });
+        if (call === 2) return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: ['<p>Terms</p>'] }) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ errorCode: '41012' }) });
+      });
+
+      const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
+      await partnerAgreement('https://test-milo-libs.com');
+      document.querySelector('.agreement-cta').click();
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(document.querySelector('.agreement-spinner').innerHTML).toContain('Success!');
+    });
     it('accept error logs and does not close modal', async () => {
       isMember.mockReturnValue(false);
       getPartnerCookieValue.mockReturnValue(null);
@@ -531,6 +595,26 @@ describe('Test partnerAgreement.js', () => {
       curtain.dispatchEvent(clickEvt);
 
       expect(document.querySelector('#partner-agreement-modal')).toBeTruthy();
+    });
+
+    it('blocks Escape keydown events on the modal', async () => {
+      isMember.mockReturnValue(false);
+      getPartnerCookieValue.mockReturnValue(null);
+      getMetadataContent.mockReturnValue('/digitalexperience/fragments/partner-agreement-meta');
+      global.fetch.mockImplementation((url) => {
+        if (url === '/digitalexperience/fragments/partner-agreement-meta') return Promise.resolve({ ok: true, text: () => Promise.resolve('<html><head><meta name="agreementtitle" content="T" /></head></html>') });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: ['<p>Terms</p>'] }) });
+      });
+
+      const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
+      await partnerAgreement('https://test-milo-libs.com');
+
+      const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+      const stopSpy = jest.spyOn(event, 'stopImmediatePropagation');
+      document.querySelector('#partner-agreement-modal').dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(stopSpy).toHaveBeenCalled();
     });
   });
 });

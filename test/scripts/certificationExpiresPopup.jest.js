@@ -325,6 +325,36 @@ describe('Test certificationExpiresPopup.js', () => {
       expect(mockGetModal).not.toHaveBeenCalled();
     });
 
+    it('should skip certifications with invalid non-standard date formats', async () => {
+      global.fetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ credentials: [{ expirationDate: '31-31-9999' }] }),
+      });
+
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
+
+      expect(mockGetModal).not.toHaveBeenCalled();
+    });
+
+    it('should skip when the credentials response is malformed', async () => {
+      global.fetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({}),
+      });
+
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
+
+      expect(mockGetModal).not.toHaveBeenCalled();
+      expect(errorSpy).toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith('certification popup skipped');
+      errorSpy.mockRestore();
+      warnSpy.mockRestore();
+    });
+
     describe('180-90 days range (every 30 days)', () => {
       it('should display modal at 180-day milestone', async () => {
         const expirationDate = daysFromToday(180);
@@ -361,6 +391,20 @@ describe('Test certificationExpiresPopup.js', () => {
         const lastShown = daysFromToday(-5); // 5 days ago
         mockGetItem.mockReturnValue(lastShown.toISOString());
 
+        global.fetch.mockResolvedValue({
+          ok: true,
+          json: () => Promise.resolve({ credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),
+        });
+
+        const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+        await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
+
+        expect(mockGetModal).not.toHaveBeenCalled();
+      });
+
+      it('should not display a milestone that was already shown after the milestone date', async () => {
+        const expirationDate = daysFromToday(90);
+        mockGetItem.mockReturnValue(daysFromToday(1).toISOString());
         global.fetch.mockResolvedValue({
           ok: true,
           json: () => Promise.resolve({ credentials: [{ expirationDate: toDDMMYYYY(expirationDate) }] }),

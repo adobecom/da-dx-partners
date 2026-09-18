@@ -91,6 +91,18 @@ describe('Test rewrite links', () => {
     expect(url.href).toBe('https://partners.adobe.com/path');
   });
 
+  test('should leave links unchanged when the configured code root is a production host', () => {
+    getConfig.mockReturnValue({
+      env: { name: 'stage' },
+      codeRoot: 'https://partners.adobe.com/eds',
+    });
+
+    const url = new URL('https://partners.adobe.com/path?source=test#section');
+    rewriteUrlOnNonProd(url);
+
+    expect(url.href).toBe('https://partners.adobe.com/path?source=test#section');
+  });
+
   test('should leave unmapped domains unchanged', () => {
     const url = new URL('https://example.com/path');
     rewriteUrlOnNonProd(url);
@@ -103,6 +115,12 @@ describe('Test rewrite links', () => {
     rewriteUrlOnNonProd(url);
 
     expect(url.hostname).toBe('pp-staging.adobe.com');
+  });
+
+  test('should preserve query parameters and hash while rewriting a domain', () => {
+    const result = getUpdatedHref('https://partners.adobe.com/path?source=test#section');
+
+    expect(result).toBe('https://partners.stage.adobe.com/path?source=test#section');
   });
 
   test('should return the element and ignore elements without hrefs', () => {
