@@ -1,9 +1,20 @@
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { loadPopupFragment } from '../../eds/scripts/portalMessaging.js';
+import {
+  getBctqBanner,
+  getGlobalBanner,
+  loadPopupFragment,
+  portalMessaging,
+  prependContent,
+} from '../../eds/scripts/portalMessaging.js';
 
 describe('portalMessaging browser coverage', () => {
-  afterEach(() => sinon.restore());
+  afterEach(() => {
+    sinon.restore();
+    document.body.innerHTML = '';
+    document.head.innerHTML = '';
+    sessionStorage.clear();
+  });
 
   it('returns the first element from a popup fragment main', async () => {
     sinon.stub(window, 'fetch').resolves({
@@ -20,5 +31,58 @@ describe('portalMessaging browser coverage', () => {
     sinon.stub(window, 'fetch').resolves({ ok: false, status: 404 });
 
     expect(await loadPopupFragment('/missing.html')).to.equal(null);
+  });
+
+  it('returns null when BCTQ personalization is not enabled', async () => {
+    expect(await getBctqBanner()).to.equal(null);
+  });
+
+  it('skips portal messaging when the agreement was displayed', async () => {
+    expect(await portalMessaging('/libs', true)).to.equal(false);
+  });
+
+  it('skips portal messaging after it was closed', async () => {
+    sessionStorage.setItem('portal-messaging-popup-closed', 'true');
+
+    expect(await portalMessaging('/libs', false)).to.equal(false);
+  });
+
+  it('skips portal messaging when no special state is present', async () => {
+    expect(await portalMessaging('/libs', false)).to.equal(false);
+  });
+
+  it('skips global banners with NONE metadata', async () => {
+    const meta = document.createElement('meta');
+    meta.name = 'global-banner';
+    meta.content = ' none ';
+    document.head.appendChild(meta);
+
+    expect(await getGlobalBanner()).to.equal(undefined);
+  });
+
+  it('skips global banners with invalid paths', async () => {
+    const meta = document.createElement('meta');
+    meta.name = 'global-banner';
+    meta.content = 'invalid/path';
+    document.head.appendChild(meta);
+
+    expect(await getGlobalBanner()).to.equal(undefined);
+  });
+
+  it('adds a notification ribbon when a main element exists', async () => {
+    document.body.innerHTML = '<main><p>Content</p></main>';
+
+    await prependContent();
+
+    expect(document.querySelector('#notificationRibbon')).to.exist;
+    expect(document.querySelector('main').firstElementChild.id).to.equal('notificationRibbon');
+  });
+
+  it('does nothing when no main element exists', async () => {
+    document.body.innerHTML = '<section>Content</section>';
+
+    await prependContent();
+
+    expect(document.querySelector('#notificationRibbon')).to.equal(null);
   });
 });
