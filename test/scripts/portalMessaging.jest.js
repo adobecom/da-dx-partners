@@ -376,6 +376,41 @@ describe('Test portalMessaging.js', () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
+  it('getGlobalBanner warns when metadata is missing', async () => {
+    getMetadataContent.mockReturnValue(null);
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { getGlobalBanner } = require('../../eds/scripts/portalMessaging.js');
+    const banner = await getGlobalBanner();
+
+    expect(banner).toBeUndefined();
+    expect(warnSpy).toHaveBeenCalledWith(
+      'global-banner should be displayed but popup fragment path is not found',
+    );
+    expect(global.fetch).not.toHaveBeenCalled();
+
+    warnSpy.mockRestore();
+  });
+
+  it('getGlobalBanner warns when the fragment has no content', async () => {
+    getMetadataContent.mockReturnValue('/fragments/global-banner');
+    global.fetch.mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve('<html><body><main></main></body></html>'),
+    });
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { getGlobalBanner } = require('../../eds/scripts/portalMessaging.js');
+    const banner = await getGlobalBanner();
+
+    expect(banner).toBeUndefined();
+    expect(warnSpy).toHaveBeenCalledWith(
+      'Popup fragment for /fragments/global-banner not found',
+    );
+
+    warnSpy.mockRestore();
+  });
+
   it('getGlobalBanner warns and skips invalid relative paths', async () => {
     getMetadataContent.mockReturnValue('fragments/global-banner');
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});

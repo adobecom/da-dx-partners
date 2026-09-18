@@ -539,6 +539,36 @@ describe('Test personalization.js', () => {
         expect(heading).not.toBeNull();
       });
     });
+
+    it('returns the original gnav when the user is not a member', () => {
+      jest.isolateModules(() => {
+        document.cookie = `partner_data=${JSON.stringify({ DXP: { status: 'NOT_MEMBER' } })}`;
+        const { applyGnavPersonalization } = importModules();
+
+        expect(applyGnavPersonalization(gnav)).toBe(gnav);
+      });
+    });
+  });
+
+  it('replaces direct text nodes without changing child elements', () => {
+    const element = document.createElement('div');
+    element.append('Hello $name', document.createElement('strong'));
+    const { replaceDirectText } = require('../../eds/scripts/personalization.js');
+
+    replaceDirectText(element, '$name', 'Ada');
+
+    expect(element.textContent).toBe('Hello Ada');
+    expect(element.querySelector('strong')).not.toBeNull();
+  });
+
+  it('evaluates whether a link group has a personalization condition', () => {
+    const { shouldHideLinkGroup } = require('../../eds/scripts/personalization.js');
+    const personalizedGroup = document.createElement('div');
+    personalizedGroup.className = 'partner-personalization partner-level-platinum';
+    const regularGroup = document.createElement('div');
+
+    expect(shouldHideLinkGroup(personalizedGroup)).toBe(true);
+    expect(shouldHideLinkGroup(regularGroup)).toBe(false);
   });
 
   describe('Profile Image and Company Logo Personalization', () => {

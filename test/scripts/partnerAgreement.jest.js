@@ -383,6 +383,10 @@ describe('Test partnerAgreement.js', () => {
       const spinner = document.querySelector('.agreement-spinner');
       expect(spinner).toBeTruthy();
       expect(spinner.innerHTML).toContain('Success!');
+
+      jest.runAllTimers();
+      await Promise.resolve();
+      expect(mockCloseModal).toHaveBeenCalled();
     });
     it('redirects user if redirectUrl param is allowed', async () => {
       const fakeWindow = {
@@ -397,6 +401,19 @@ describe('Test partnerAgreement.js', () => {
       handleRedirects(allowedDomains, fakeWindow);
 
       expect(fakeWindow.location.href).toBe('https://test.tidwit.domain.com?testparam=test');
+    });
+    it('ignores invalid redirect URLs', () => {
+      const fakeWindow = {
+        location: {
+          href: 'https://partners.stage.adobe.com/digitalexperience/home/',
+          search: '?redirectUrl=not-a-url',
+        },
+      };
+      const { handleRedirects } = require('../../eds/scripts/partnerAgreement.js');
+
+      handleRedirects('test.tidwit.domain.com', fakeWindow);
+
+      expect(fakeWindow.location.href).toBe('https://partners.stage.adobe.com/digitalexperience/home/');
     });
     it('accept success  do not redirects user if there is redirectUrl param but it is not allowed domain', async () => {
       const fakeWindow = {
@@ -435,6 +452,30 @@ describe('Test partnerAgreement.js', () => {
       // let any post-timeout microtasks flush
       await Promise.resolve();
       expect(fakeWindow.location.href).toEqual('https://partners.stage.adobe.com/digitalexperience/home/?redirectUrl=https://test.nottidwit.domain.com?testparam=test');
+    });
+    it('handles an accept request exception', async () => {
+      isMember.mockReturnValue(false);
+      getPartnerCookieValue.mockReturnValue(null);
+      getMetadataContent.mockReturnValue('/path/meta.html');
+
+      let call = 0;
+      global.fetch.mockImplementation(() => {
+        call += 1;
+        if (call === 1) return Promise.resolve({ ok: true, text: () => Promise.resolve(metaHtml) });
+        if (call === 2) return Promise.resolve({ ok: true, json: () => Promise.resolve({ terms: ['<p>Terms</p>'] }) });
+        return Promise.reject(new Error('Accept request failed'));
+      });
+
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const { partnerAgreement } = require('../../eds/scripts/partnerAgreement.js');
+      await partnerAgreement('https://test-milo-libs.com');
+      document.querySelector('.agreement-cta').click();
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(errorSpy).toHaveBeenCalledWith('Partner Agreement accept error', expect.any(Error));
+      expect(document.querySelector('.agreement-spinner').innerHTML).toBe('Error!');
+      errorSpy.mockRestore();
     });
     it('accept error logs and does not close modal', async () => {
       isMember.mockReturnValue(false);

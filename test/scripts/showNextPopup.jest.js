@@ -210,6 +210,14 @@ describe('showNextPopup', () => {
       expect(mockPortalMessaging).not.toHaveBeenCalled();
       expect(mockCertificationExpiresPopup).toHaveBeenCalled();
     });
+
+    it('should skip all popups for an unknown nextPopup value', async () => {
+      await showNextPopup('https://test-milo-libs.com', 'test-client-id', 'unknown-popup');
+
+      expect(partnerAgreement).not.toHaveBeenCalled();
+      expect(mockPortalMessaging).not.toHaveBeenCalled();
+      expect(mockCertificationExpiresPopup).not.toHaveBeenCalled();
+    });
   });
 
   describe('full popup chain', () => {

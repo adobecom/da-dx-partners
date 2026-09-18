@@ -104,4 +104,15 @@ describe('Test rewrite links', () => {
 
     expect(url.hostname).toBe('pp-staging.adobe.com');
   });
+
+  test('should return the element and ignore elements without hrefs', () => {
+    const element = document.createElement('div');
+    element.innerHTML = '<span>Not a link</span><a href="https://example.com/path">Unmapped</a>';
+
+    const result = rewriteLinks(element);
+
+    expect(result).toBe(element);
+    expect(result.querySelector('span').textContent).toBe('Not a link');
+    expect(result.querySelector('a').href).toBe('https://example.com/path');
+  });
 });

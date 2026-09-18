@@ -127,6 +127,21 @@ describe('Test utils.js', () => {
       const protectedGnavPath = document.querySelector('meta[name="gnav-loggedin-source"]')?.content;
       expect(gnavPathModified).toEqual(protectedGnavPath);
     });
+    it('uses default protected navigation and footer when fallback metadata is missing', () => {
+      const cookieObject = { DXP: { status: 'MEMBER' } };
+      document.cookie = `partner_data=${JSON.stringify(cookieObject)}`;
+      document.cookie = `partner_info=${JSON.stringify({})}`;
+      document.querySelector('meta[name="gnav-loggedin-source"]').remove();
+      document.querySelector('meta[name="footer-loggedin-source"]').remove();
+
+      updateNavigation();
+      updateFooter();
+
+      expect(document.querySelector('meta[name="gnav-source"]').content)
+        .toBe('/eds/partners-shared/dx-loggedin-gnav');
+      expect(document.querySelector('meta[name="footer-source"]').content)
+        .toBe('/eds/partners-shared/dx-loggedin-footer');
+    });
   });
   it('formatDate should return correct locale date string', () => {
     const cardDate = '2024-07-09T12:35:03.000Z';
