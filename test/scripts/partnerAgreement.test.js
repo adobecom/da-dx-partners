@@ -88,4 +88,56 @@ describe('partnerAgreement browser coverage', () => {
 
     expect(result).to.equal(false);
   });
+
+  it('skips when the agreement API returns a non-success response', async () => {
+    const meta = document.createElement('meta');
+    meta.name = 'partner-agreement-meta';
+    meta.content = '/fragments/agreement-meta';
+    document.head.appendChild(meta);
+    sinon.stub(window, 'fetch').callsFake(async (url) => {
+      if (String(url).includes('agreement-meta')) {
+        return { ok: true, text: async () => '<html><head></head></html>' };
+      }
+      return { ok: false, status: 500 };
+    });
+
+    expect(await partnerAgreement(miloLibs)).to.equal(false);
+  });
+
+  it('skips when the agreement API request rejects', async () => {
+    const meta = document.createElement('meta');
+    meta.name = 'partner-agreement-meta';
+    meta.content = '/fragments/agreement-meta';
+    document.head.appendChild(meta);
+    sinon.stub(window, 'fetch').callsFake(async (url) => {
+      if (String(url).includes('agreement-meta')) {
+        return { ok: true, text: async () => '<html><head></head></html>' };
+      }
+      throw new Error('agreement unavailable');
+    });
+
+    expect(await partnerAgreement(miloLibs)).to.equal(false);
+  });
+
+  it('renders a partner agreement modal from metadata and terms', async () => {
+    const meta = document.createElement('meta');
+    meta.name = 'partner-agreement-meta';
+    meta.content = '/fragments/agreement-meta';
+    document.head.appendChild(meta);
+    sinon.stub(window, 'fetch').callsFake(async (url) => {
+      if (String(url).includes('agreement-meta')) {
+        return {
+          ok: true,
+          text: async () => '<html><head><meta name="agreementtitle" content="Agreement" /><meta name="agreementctalabel" content="Accept" /></head></html>',
+        };
+      }
+      return { ok: true, json: async () => ({ terms: ['<p>Terms</p>'] }) };
+    });
+
+    const result = await partnerAgreement(miloLibs);
+
+    expect(result).to.equal(true);
+    expect(document.querySelector('.agreement-wrapper')).to.exist;
+    expect(document.querySelector('.agreement-cta')).to.exist;
+  });
 });
