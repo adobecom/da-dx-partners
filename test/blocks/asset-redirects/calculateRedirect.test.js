@@ -1,4 +1,5 @@
 import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
 import calculateRedirect from '../../../eds/blocks/asset-redirects/calculateRedirect.js';
 
 function setWindowLocation(pathname) {
@@ -86,6 +87,45 @@ describe('calculateRedirect', () => {
     const result = calculateRedirect(redirectRules);
 
     expect(result).to.be.null; // First rule is skipped, second doesn't match
+  });
+
+  it('should log invalid URLs and continue evaluating later rules', () => {
+    setWindowLocation(`${baseOrigin()}${previewPath}restricted/1/program-guide.pdf.html`);
+    const consoleStub = sinon.stub(console, 'error');
+    const redirectRules = [
+      ['not a valid url', '/target.html'],
+      [
+        `${baseOrigin()}${previewPath}restricted/1/program-guide.pdf.html`,
+        `${baseOrigin()}${previewPath}restricted/1/valid-target.html`,
+      ],
+    ];
+
+    const result = calculateRedirect(redirectRules);
+
+    expect(consoleStub.calledOnce).to.be.true;
+    expect(result.pathname).to.equal(`${previewPath}restricted/1/valid-target.html`);
+  });
+
+  it('matches by origin and pathname while ignoring query and hash', () => {
+    setWindowLocation(`${baseOrigin()}${previewPath}source.html?current=true#section`);
+    const redirectRules = [[
+      `${baseOrigin()}${previewPath}source.html?rule=true#other`,
+      `${baseOrigin()}${previewPath}target.html?redirect=true#destination`,
+    ]];
+
+    const result = calculateRedirect(redirectRules);
+
+    expect(result.toString()).to.equal(`${baseOrigin()}${previewPath}target.html?redirect=true#destination`);
+  });
+
+  it('does not redirect when the matching path belongs to another origin', () => {
+    setWindowLocation(`${baseOrigin()}${previewPath}source.html`);
+    const redirectRules = [[
+      `https://other.example.com${previewPath}source.html`,
+      `${baseOrigin()}${previewPath}target.html`,
+    ]];
+
+    expect(calculateRedirect(redirectRules)).to.be.null;
   });
 
   it('when more than one rule defined per domain, first defined will be used ', () => {

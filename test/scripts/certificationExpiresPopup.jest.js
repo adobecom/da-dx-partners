@@ -17,6 +17,8 @@ jest.mock('../../eds/scripts/utils.js', () => ({
   isMember: jest.fn(),
   invokeAfterImsIsReady: jest.fn((callback) => callback()), // Immediately invoke callback and await result
   preventModalClose: jest.fn(),
+  NEXT_POPUP_PLACEHOLDER: 'dxp:nextPopupPlaceholder',
+  SHOW_NEXT_POPUP: 'dxp:showNextPopup',
 }));
 
 jest.mock('../../eds/scripts/portalMessaging.js', () => ({ loadPopupFragment: jest.fn() }));
@@ -179,6 +181,34 @@ describe('Test certificationExpiresPopup.js', () => {
       expect(global.fetch).not.toHaveBeenCalled();
       expect(mockGetModal).not.toHaveBeenCalled();
     });
+
+    it('should recognize a stored local YYYY-MM-DD date as already shown today', async () => {
+      const today = normalizeDate(new Date());
+      const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      mockGetItem.mockReturnValue(localDate);
+
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
+
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(mockGetModal).not.toHaveBeenCalled();
+    });
+
+    it('should parse a stored date at local midnight rather than UTC time', async () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const localDate = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+      mockGetItem.mockReturnValue(localDate);
+      global.fetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ credentials: [] }),
+      });
+
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
+
+      expect(global.fetch).toHaveBeenCalled();
+    });
   });
 
   describe('API calls', () => {
@@ -215,6 +245,7 @@ describe('Test certificationExpiresPopup.js', () => {
           },
         }),
       );
+      window.adobeIMS = { getAccessToken: jest.fn(() => ({ token: 'test-token' })) };
     });
 
     it('should use stage URL when isProd returns false', async () => {
@@ -241,6 +272,27 @@ describe('Test certificationExpiresPopup.js', () => {
         expect.objectContaining({
           headers: {
             Authorization: 'Bearer test-token',
+            'x-api-key': 'test-client-id',
+          },
+        }),
+      );
+    });
+
+    it('should send an undefined bearer token when IMS is unavailable', async () => {
+      delete window.adobeIMS;
+      global.fetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ credentials: [] }),
+      });
+
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://partner-directory-stage.adobe.io/v1/dxp/contact/credentials',
+        expect.objectContaining({
+          headers: {
+            Authorization: 'Bearer undefined',
             'x-api-key': 'test-client-id',
           },
         }),
@@ -329,6 +381,18 @@ describe('Test certificationExpiresPopup.js', () => {
       global.fetch.mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ credentials: [{ expirationDate: '31-31-9999' }] }),
+      });
+
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
+
+      expect(mockGetModal).not.toHaveBeenCalled();
+    });
+
+    it('should skip certifications with an empty expiration date', async () => {
+      global.fetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ credentials: [{ expirationDate: '' }] }),
       });
 
       const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
@@ -645,10 +709,28 @@ describe('Test certificationExpiresPopup.js', () => {
       const { closeCallback } = mockGetModal.mock.calls[0][1];
       closeCallback();
 
-      expect(mockSetItem).toHaveBeenCalledWith(
-        'last-certification-popup-shown',
-        expect.any(String),
-      );
+      expect(mockSetItem).toHaveBeenCalledWith('last-certification-popup-shown', expect.any(String));
+      expect(mockSetItem.mock.calls[0][1]).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    });
+
+    it('should dispatch the next-popup event when the modal closes', async () => {
+      const popupContent = document.createElement('div');
+      getMetadataContent.mockReturnValue('/digitalexperience/fragments/modals/certification-modal');
+      loadPopupFragment.mockResolvedValue(popupContent);
+      const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+
+      const { certificationExpiresPopup } = require('../../eds/scripts/certificationExpiresPopup.js');
+      await certificationExpiresPopup('https://test-milo-libs.com', false, false, 'test-client-id');
+
+      const { closeCallback } = mockGetModal.mock.calls[0][1];
+      closeCallback();
+
+      const dispatchedEvent = dispatchEventSpy.mock.calls
+        .map(([event]) => event)
+        .find((event) => event.type === 'dxp:showNextPopup');
+      expect(dispatchedEvent).toBeDefined();
+      expect(dispatchedEvent.detail).toEqual({ next: 'dxp:nextPopupPlaceholder' });
+      dispatchEventSpy.mockRestore();
     });
 
     it('should not create modal if getModal returns null', async () => {
