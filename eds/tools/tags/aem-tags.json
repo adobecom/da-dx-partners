@@ -4635,13 +4635,13 @@
         "jcr:primaryType": "cq:Tag",
         "jcr:title": "BACOM Webinars - Dark Hero"
       },
-      "pearson-enablement": {
-        "jcr:primaryType": "cq:Tag",
-        "jcr:title": "Pearson Enablement"
-      },
       "adobe-ai-forum": {
         "jcr:primaryType": "cq:Tag",
         "jcr:title": "Adobe AI Forum"
+      },
+      "solution-ready-enablement": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "Solution Ready Enablement"
       }
     },
     "conference": {
@@ -8151,7 +8151,7 @@
         },
         "australia-and-new-zealand": {
           "jcr:primaryType": "cq:Tag",
-          "jcr:title": "Australia and New-Zealand"
+          "jcr:title": "Australia and New Zealand"
         },
         "europe": {
           "jcr:primaryType": "cq:Tag",
@@ -11001,15 +11001,15 @@
     },
     "sneha-chowdhary": {
       "jcr:primaryType": "cq:Tag",
-      "jcr:title": "sneha-chowdhary"
+      "jcr:title": "Sneha Chowdhary"
     },
     "reid-carlberg": {
       "jcr:primaryType": "cq:Tag",
-      "jcr:title": "reid-carlberg"
+      "jcr:title": "Reid Carlberg"
     },
     "ravi-duddukuru": {
       "jcr:primaryType": "cq:Tag",
-      "jcr:title": "ravi-duddukuru"
+      "jcr:title": "Ravi Duddukuru"
     },
     "paul-vaughn": {
       "jcr:primaryType": "cq:Tag",
@@ -11030,6 +11030,70 @@
     "lisa-croft": {
       "jcr:primaryType": "cq:Tag",
       "jcr:title": "Lisa Croft"
+    },
+    "john-mackenney": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "John Mackenney"
+    },
+    "katsue-koiwa": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Katsue Koiwa"
+    },
+    "nabila-coovadi": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Nabila Coovadi"
+    },
+    "adam-justis": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adam Justis"
+    },
+    "tyler-hogue": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Tyler Hogue"
+    },
+    "brian-glover": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Brian Glover"
+    },
+    "toni-van-winkle": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Toni Van Winkle"
+    },
+    "claudia-de-lavelle": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Claudia de Lavelle"
+    },
+    "mitch-folks": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Mitch Folks"
+    },
+    "camille-fabre": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Camille Fabre"
+    },
+    "shweta-ahooja": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Shweta Ahooja"
+    },
+    "michi-alexander": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Michi Alexander"
+    },
+    "amanda-cabrera": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Amanda Cabrera"
+    },
+    "pat-toothaker": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Pat Toothaker"
+    },
+    "patrick-brown": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Patrick Brown"
+    },
+    "stacy-martinet": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Stacy Martinet"
     }
   },
   "services": {
