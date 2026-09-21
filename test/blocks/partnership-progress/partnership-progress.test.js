@@ -85,7 +85,7 @@ describe('partnership-progress', () => {
     const app = await init(el);
 
     window.dispatchEvent(new Event('dxpImsReady'));
-  await waitFor(() => app.data && app.loading === false, 1000, 10);
+    await waitFor(() => app.data && app.loading === false, 1000, 10);
     await app.updateComplete;
 
     expect(fetchStub.calledOnce).to.equal(true);
