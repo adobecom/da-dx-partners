@@ -58,6 +58,17 @@ describe('asset-preview block', () => {
     expect(app.blockData.localizedText['{{Download}}']).to.be.a('string');
     expect(app.blockData.localizedText['{{View}}']).to.be.a('string');
   });
+
+  it('keeps authored fragment links in the replacement component', async () => {
+    const { default: init } = await import('../../../eds/blocks/asset-preview/asset-preview.js');
+    const block = document.querySelector('.asset-preview');
+    const fragmentLink = block.querySelector('a[href="/fragments/restricted-fragment"]');
+    block.parentNode.setAttribute('data-idx', '0');
+
+    const app = await init(block);
+
+    expect(app.querySelector('a[href="/fragments/restricted-fragment"]')).to.equal(fragmentLink);
+  });
 });
 
 describe('AssetPreview - updated()', () => {
@@ -113,6 +124,71 @@ describe('AssetPreview - loadPdfViewer()', () => {
 
     expect(consoleStub.calledWithMatch('PDF viewer failed to load')).to.be.true;
   });
+
+  it('clears the preview URL when the HEAD response is not a PDF', async () => {
+    const el = makeInstance();
+    el.pdfPreviewUrl = 'https://example.com/file.pdf';
+    sinon.stub(window, 'fetch').resolves({
+      ok: true,
+      headers: { get: () => 'text/html' },
+    });
+
+    await el.loadPdfViewer();
+
+    expect(el.pdfPreviewUrl).to.equal('');
+  });
+
+  it('clears the preview URL when the HEAD response is not ok', async () => {
+    const el = makeInstance();
+    el.pdfPreviewUrl = 'https://example.com/file.pdf';
+    sinon.stub(window, 'fetch').resolves({
+      ok: false,
+      headers: { get: () => 'application/pdf' },
+    });
+
+    await el.loadPdfViewer();
+
+    expect(el.pdfPreviewUrl).to.equal('');
+  });
+});
+
+describe('AssetPreview - getAssetMetadata()', () => {
+  afterEach(() => sinon.restore());
+
+  it('sets data and clears loading after a successful metadata response', async () => {
+    const el = makeInstance();
+    el.getRealAssetUrl = () => new URL('https://partners.stage.adobe.com/asset.json');
+    const setDataStub = sinon.stub(el, 'setData').resolves();
+    sinon.stub(window, 'fetch').resolves({
+      status: 200,
+      json: async () => ({ title: 'Asset' }),
+    });
+
+    await el.getAssetMetadata();
+
+    expect(setDataStub.calledOnce).to.be.true;
+    expect(el.isLoading).to.be.false;
+  });
+
+  it('clears loading when metadata fetching fails', async () => {
+    const el = makeInstance();
+    el.getRealAssetUrl = () => new URL('https://partners.stage.adobe.com/asset.json');
+    sinon.stub(window, 'fetch').rejects(new Error('metadata unavailable'));
+
+    await el.getAssetMetadata();
+
+    expect(el.isLoading).to.be.false;
+  });
+
+  it('does not fetch metadata when no real asset URL can be built', async () => {
+    const el = makeInstance();
+    el.getRealAssetUrl = () => null;
+    const fetchStub = sinon.stub(window, 'fetch');
+
+    await el.getAssetMetadata();
+
+    expect(fetchStub.called).to.be.false;
+  });
 });
 
 describe('AssetPreview - setData() pdfPreviewUrl', () => {
@@ -143,6 +219,32 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
     sinon.stub(el, 'loadPdfViewer');
     await el.setData({ title: 'Test', url: 'https://example.com/file.pdf', tags: [] });
     expect(el.blockData.pdfEmbedMode).to.equal('full-window');
+  });
+
+  it('falls back from missing summary to description and marks complete data', async () => {
+    const el = makeInstance();
+    await el.setData({
+      title: 'Test',
+      description: 'Description',
+      url: 'https://example.com/file.pdf',
+      size: 1000000,
+      createdDate: '2025-01-15T00:00:00.000Z',
+      partnerLevel: ['Gold'],
+      tags: [],
+    });
+
+    expect(el.summary).to.equal('Description');
+    expect(el.size).to.equal('1.0 MB');
+    expect(el.createdDate).to.equal('1/15/2025');
+    expect(el.assetPartnerLevel).to.deep.equal(['gold']);
+    expect(el.assetHasData).to.be.true;
+  });
+
+  it('marks data incomplete when title or URL is missing', async () => {
+    const el = makeInstance();
+    await el.setData({ title: '', url: '', tags: [] });
+
+    expect(el.assetHasData).to.be.false;
   });
 });
 
