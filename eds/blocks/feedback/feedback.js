@@ -147,6 +147,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   honeypotInput.className = 'feedback-context-field';
   honeypotInput.setAttribute('tabindex', '-1');
   honeypotInput.setAttribute('autocomplete', 'off');
+  honeypotInput.setAttribute('aria-hidden', 'true');
   const buttonsContainer = document.createElement('div');
   buttonsContainer.className = 'feedback-dialog-actions';
   const cancelButton = document.createElement('button');
