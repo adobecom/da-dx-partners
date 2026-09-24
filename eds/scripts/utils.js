@@ -332,6 +332,11 @@ export function hasPartnerAccountStateCalendly() {
   return hasPartnerAccountStateProperty('calendly');
 }
 
+export function isAdobeAccount() {
+  if (!isMember()) return false;
+  return getPartnerCookieObject(getCurrentProgramType())?.email?.endsWith('@adobe.com');
+}
+
 export function isPartnerNewlyRegistered() {
   if (!isMember()) return false;
 
