@@ -13,6 +13,7 @@ describe('personalizationConfigDX', () => {
 
   it('defines personalization conditions and profile actions', () => {
     expect(PERSONALIZATION_CONDITIONS).to.have.property('partner-member');
+    expect(PERSONALIZATION_CONDITIONS).to.have.property('partner-adobe-account');
     expect(PROFILE_PERSONALIZATION_ACTIONS).to.have.property('partner-primary');
     expect(PROFILE_PERSONALIZATION_ACTIONS).to.have.property('partner-sales-access');
   });
