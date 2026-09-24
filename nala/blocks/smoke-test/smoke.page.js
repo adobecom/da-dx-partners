@@ -51,6 +51,13 @@ export default class SmokeTest {
     this.cardCollectionSortButton = page.getByRole('button', { name: 'date: newest' });
     this.globalFooter = page.locator('.global-footer');
     this.signOutButton = page.getByRole('link', { name: 'Sign Out' });
+    this.viewAssetButton = page.getByRole('button', { name: 'View' });
+    this.downloadAssetButton = page.getByRole('button', { name: 'Download PDF' });
+    this.downloadAssetLink = this.downloadAssetButton.getByRole('link', { name: 'Download PDF' });
+    this.assetPreviewCards = page.locator('search-card.card-wrapper');
+    this.assetTitlePreview = page.locator('.asset-preview-block-header');
+    this.registerButton = page.getByRole('link', { name: 'register now' });
+    this.assetRedirectCta = page.locator('a[href*="/digitalexperience/preview/restricted/1/program-guide.pdf.html"]').first();
   }
 
   async smokeSignIn(page, baseURL, partnerLevel) {
@@ -137,5 +144,9 @@ export default class SmokeTest {
 
     await expect(typeahead).toBeHidden({ timeout: 10000 });
     await expect(this.searchField).toHaveValue(searchValue);
+  }
+
+  getCardByTitle(title) {
+    return this.page.locator('.search-card').filter({ hasText: title }).first();
   }
 }

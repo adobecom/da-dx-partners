@@ -339,6 +339,39 @@ describe('yukon-chat block', () => {
       expect(errorMessage.textContent).to.include('We’re having trouble processing your request right now. Please try again later');
     });
 
+    it('should show the timeout message for a 504 response', async () => {
+      fetchStub.callsFake(async (url) => {
+        const urlStr = typeof url === 'string' ? url : url.toString();
+        if (urlStr.includes('placeholders.json')) {
+          return {
+            ok: true,
+            json: async () => ({
+              data: [
+                { key: 'send-message', value: 'Send Message' },
+                { key: 'open-chat', value: 'Open Chat' },
+                { key: 'scroll-to-bottom', value: 'Scroll to bottom' },
+                { key: 'timeout-error', value: 'Request timed out.' },
+              ],
+            }),
+          };
+        }
+        if (urlStr.includes('yukonAIAssistant')) return { ok: false, status: 504 };
+        return { ok: false, status: 404 };
+      });
+
+      const block = document.querySelector('.yukon-chat');
+      await init(block);
+      const textarea = document.querySelector('#yc-input-field');
+      textarea.value = 'Trigger timeout';
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      document.querySelector('.yc-input-field-button').click();
+
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      expect(document.querySelector('#yukon-chat-modal .error-message').textContent)
+        .to.include('This is taking longer than expected. Please try again in a moment.');
+    });
+
     it('should handle network errors (TypeError) and re-enable button', async () => {
       const block = document.querySelector('.yukon-chat');
       await init(block);
