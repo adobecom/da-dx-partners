@@ -25,7 +25,7 @@ export default {
       data: {
         partnerLevel: 'dxp-silver:',
         searchKeyword: 'dxRegressionTest25',
-        assetTitle1: 'Asset preview Public PDF Regular  Automation',
+        assetTitle1: 'Asset preview Public PDF Regular Automation',
         assetTitle2: 'Asset preview Community JPG Regular Automation',
         assetTitle3: 'Asset preview Silver PPTX Regular Automation',
         assetTitle4: 'Asset preview Public ZIP Netstorage Automation',

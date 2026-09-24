@@ -280,7 +280,7 @@ export default {
       tcid: '27',
       name: '@redirects-asset-redirect-stage-prod',
       path: '/digitalexperience/about',
-      tags: '@da-dx-redirects @regression @circleCi @anonymous @da-dx-main',
+      tags: '@da-dx-smoke-test',
       data: {
         assetRedirectCtaHref: '/digitalexperience/preview/restricted/1/program-guide.pdf.html',
         expectedLandingPath: ASSET_REDIRECT_TARGET,
