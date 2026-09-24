@@ -1,9 +1,9 @@
 
-name: Testing DA-DX-Partners Nala Tests
+name: TESTING DA-DX-Partners Nala Tests
 
 on:
   pull_request:
-    types: [ labeled, opened, synchronize, reopened ]
+    types: [ labeled ]
 
 jobs:
   action:
