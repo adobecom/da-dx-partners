@@ -537,14 +537,16 @@ class Gnav {
     // PARTNERS_NAVIGATION START
     // MWPW-168681 - GNAV Links & Authorable Icons
     // MWPW-186006 - Short cut icons - External links open in the same tab instead of a new tab
+    // MWPW-208151 - Add authorable hover tooltips to Partner Hub shortcut icons
     const shortcutIcons = [];
     const MAX_GNAV_ICONS_COUNT = 8;
     Array.from(this.content.querySelectorAll('.shortcut-icons > div')).slice(0, MAX_GNAV_ICONS_COUNT).forEach((icon) => {
-      if (icon.querySelectorAll('div').length !== 2) {
+      if (icon.querySelectorAll('div').length !== 3) {
         return;
       }
 
       const iconText = icon.querySelectorAll('div')[0]?.textContent?.trim(); // for example: 'search, bell (partner-personalization, partner-member)'
+      const iconTooltip = icon.querySelectorAll('div')[2]?.textContent?.trim();
       let iconKey = iconText.replace(/\s*\(.*\)/, '').trim(); // outside of parenthesis
       const personalizationMarkersInParenthesis = iconText.match(/\(([^)]+)\)/); // inside parenthesis
       const personalizationMarkers = personalizationMarkersInParenthesis ? personalizationMarkersInParenthesis[1] : ''; // for example: 'partner-personalization, partner-member'
@@ -556,6 +558,7 @@ class Gnav {
         mobileIconKey: iconKey[1]?.trim(),
         iconLink: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('href'),
         target: icon.querySelectorAll('div')[1]?.querySelector('a')?.getAttribute('target'),
+        iconTooltip,
       });
     });
     // PARTNERS_NAVIGATION END
@@ -599,12 +602,24 @@ class Gnav {
   // PARTNERS_NAVIGATION START
   // MWPW-168681 - GNAV Links & Authorable Icons
   // MWPW-186006 - Short cut icons - External links open in the same tab instead of a new tab
+  // MWPW-208151 - Add authorable hover tooltips to Partner Hub shortcut icons
   decorateShortcutIcons = (isMobile) => {
-    let html = this.blocks.shortcutIcons.filter((el) => el.iconLink && el.iconKey).map((obj) => `
-    <a href="${obj.iconLink}" class="shortcut-icons-link" ${obj.target ? `target="${obj.target}" rel="noopener noreferrer"` : ''}>
-      <img src="/eds/partners-shared/mnemonics/${isMobile && obj.mobileIconKey ? obj.mobileIconKey : obj.iconKey}.svg" alt="Image" class="shortcut-icons-img" />
-    </a>
-  `).join('');
+    let html = this.blocks.shortcutIcons
+      .filter((el) => el.iconLink && el.iconKey)
+      .map((obj) => `
+        <a
+          href="${obj.iconLink}"
+          class="shortcut-icons-link"
+          ${obj.target ? `target="${obj.target}" rel="noopener noreferrer"` : ''}
+          ${obj.iconTooltip ? `data-tooltip="${obj.iconTooltip}" aria-label="${obj.iconTooltip}"` : ''}
+        >
+          <img
+            src="/eds/partners-shared/mnemonics/${isMobile && obj.mobileIconKey ? obj.mobileIconKey : obj.iconKey}.svg"
+            alt="${obj.iconTooltip || 'Image'}"
+            class="shortcut-icons-img"
+          />
+        </a>
+    `).join('');
     if (!isMobile) {
       html = `<div class="icons-wrapper"> ${html}</div>`;
     }
