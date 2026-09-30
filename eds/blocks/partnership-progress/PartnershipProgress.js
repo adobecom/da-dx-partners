@@ -97,18 +97,25 @@ export default class PartnershipProgress extends LitElement {
     `;
   }
 
-  renderMetricRow(label, metric) {
-    if (!metric) return html``;
+  renderMetricRow(label, metric, helperText = '') {
+    if (metric === null || metric === undefined) return html``;
 
-    const value = typeof metric.percentage === 'number'
-      ? Math.max(0, Math.min(metric.percentage, 100))
-      : 0;
+    const value = typeof metric === 'number'
+      ? Math.max(0, Math.min(metric, 100))
+      : typeof metric.percentage === 'number'
+        ? Math.max(0, Math.min(metric.percentage, 100))
+        : 0;
 
     return html`
       <div class="partnership-progress-metric-row">
         <div class="partnership-progress-metric-label">${label}</div>
         <div class="partnership-progress-metric-bar">
-          ${this.renderProgressBar(value, label)}
+          <div class="partnership-progress-metric-bar-inner">
+            ${this.renderProgressBar(value, label)}
+          </div>
+          ${helperText
+            ? html`<span class="partnership-progress-metric-helper-text" style="white-space: nowrap; flex: 0 0 auto;">${helperText}</span>`
+            : html``}
         </div>
       </div>
     `;
@@ -118,11 +125,25 @@ export default class PartnershipProgress extends LitElement {
     const programData = this.getProgramData(programType.toLowerCase());
     if (!programData) return html``;
 
+    const getRequiredHelperText = (metric) => {
+      const total = Number(metric?.total);
+      const required = Number(metric?.required);
+      if (!Number.isFinite(total) || !Number.isFinite(required)) return '';
+      return `${total} of ${required} required`;
+    };
+
     const requiredLevelLabel = (programData.level || '').toUpperCase();
+    const isTechnology = programType.toLowerCase() === DX_PRIMARY_BUSINESS.TECHNOLOGY.toLowerCase();
 
     const specializationsMetric = programData.specializations || programData.solutions;
     const credentialsMetric = programData.credentials;
     const deploymentsMetric = programData.customerDeployments;
+    const appAssuredMetric = programData.appAssurances ?? { total: 0, required: 0, percentage: 0 };
+    const appAssuredLabel = this.blockData.localizedText['{{App Assured}}'] || 'App Assured';
+    const specializationsHelperText = getRequiredHelperText(specializationsMetric);
+    const credentialsHelperText = getRequiredHelperText(credentialsMetric);
+    const deploymentsHelperText = getRequiredHelperText(deploymentsMetric);
+    const appAssuredHelperText = getRequiredHelperText(appAssuredMetric);
 
     return html`
       <section class="partnership-progress-track">
@@ -141,9 +162,11 @@ export default class PartnershipProgress extends LitElement {
       ? this.blockData.localizedText['{{Specializations}}']
       : this.blockData.localizedText['{{Exchange Marketplace listings}}'],
     specializationsMetric,
+    specializationsHelperText,
   )}
-          ${this.renderMetricRow(this.blockData.localizedText['{{Credentials}}'], credentialsMetric)}
-          ${this.renderMetricRow(this.blockData.localizedText['{{Active Customer Deployments}}'], deploymentsMetric)}
+          ${this.renderMetricRow(this.blockData.localizedText['{{Credentials}}'], credentialsMetric, credentialsHelperText)}
+          ${this.renderMetricRow(this.blockData.localizedText['{{Active Customer Deployments}}'], deploymentsMetric, deploymentsHelperText)}
+          ${isTechnology ? this.renderMetricRow(appAssuredLabel, appAssuredMetric, appAssuredHelperText) : html``}
         </div>
       </section>
     `;
