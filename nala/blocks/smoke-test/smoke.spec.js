@@ -286,5 +286,12 @@ export default {
         expectedLandingPath: ASSET_REDIRECT_TARGET,
       },
     },
+    {
+      tcid: '28',
+      name: '@smoke-test-partner-agreement-popup',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: { partnerLevel: 'dxp-agreement:' },
+    },
   ],
 };
