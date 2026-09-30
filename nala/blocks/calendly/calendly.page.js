@@ -18,6 +18,5 @@ export default class CalendlyPage {
 
     this.alreadyBookedFragment = this.page.locator('#already-booked-fragment');
     this.calendlyEmbed = this.page.locator('.calendly-embed');
-
   }
 }

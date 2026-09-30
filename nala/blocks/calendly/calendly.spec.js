@@ -1,27 +1,6 @@
 const DAY_MS = 24 * 60 * 60 * 1000;
 const newlyApprovedDate = Math.floor((Date.now() - 15 * DAY_MS) / 1000) * 1000;
 
-const basePartnerData = {
-  partnerPortal: 'DXP',
-  accessType: ['Billing Admin', 'Sales Center Admin', 'Admin'],
-  complianceStatus: 'Not Completed',
-  createdDate: 1788782768000,
-  designationType: ['Legal and Compliance', 'Learning & Development'],
-  isAdmin: true,
-  latestAgreementAccepted: true,
-  latestAgreementAcceptedVersion: 'Feb 6, 2026',
-  level: 'Silver',
-  newlyApprovedDate,
-  primaryBusiness: ['Solution'],
-  primaryContact: true,
-  primaryJobRole: 'Finance/Business Operations',
-  purchasedPartnerLevel: 'Silver',
-  region: 'north-america',
-  salesCenterAccess: true,
-  status: 'MEMBER',
-  partnerLevel: 'Silver',
-};
-
 export default {
   FeatureName: 'Calendly Feature',
   features: [
