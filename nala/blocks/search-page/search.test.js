@@ -101,7 +101,7 @@ test.describe('Search Page', () => {
             }
 
             await searchPageInstance.verifyCardButtonLink(expandedCard, data.cardButtonLink);
-          });
+          }).toPass({ timeout: 30000 });
         });
 
         await test.step('Check Silver Asset', async () => {
