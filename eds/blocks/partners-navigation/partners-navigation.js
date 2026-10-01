@@ -541,7 +541,7 @@ class Gnav {
     const shortcutIcons = [];
     const MAX_GNAV_ICONS_COUNT = 8;
     Array.from(this.content.querySelectorAll('.shortcut-icons > div')).slice(0, MAX_GNAV_ICONS_COUNT).forEach((icon) => {
-      if (icon.querySelectorAll('div').length !== 3) {
+      if (icon.querySelectorAll('div').length < 2) {
         return;
       }
 
