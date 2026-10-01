@@ -278,7 +278,7 @@ export default {
     },
     {
       tcid: '27',
-      name: '@redirects-asset-redirect-stage-prod',
+      name: '@smoke-test-redirects-asset-redirect-stage-prod',
       path: '/digitalexperience/about',
       tags: '@da-dx-smoke-test',
       data: {

@@ -66,6 +66,7 @@ export default class SignInPage {
       salesCenterAccess,
       specialState,
       status,
+      newlyApprovedDate,
     } = partnerData;
 
     const cookieData = {
@@ -87,6 +88,7 @@ export default class SignInPage {
         salesCenterAccess: salesCenterAccess === 'true',
         specialState,
         status,
+        newlyApprovedDate: parseInt(newlyApprovedDate, 10),
       },
     };
 
