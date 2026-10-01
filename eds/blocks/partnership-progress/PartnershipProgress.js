@@ -100,11 +100,15 @@ export default class PartnershipProgress extends LitElement {
   renderMetricRow(label, metric, helperText = '') {
     if (metric === null || metric === undefined) return html``;
 
-    const value = typeof metric === 'number'
-      ? Math.max(0, Math.min(metric, 100))
-      : typeof metric.percentage === 'number'
-        ? Math.max(0, Math.min(metric.percentage, 100))
-        : 0;
+    let percentage = 0;
+
+    if (typeof metric === 'number') {
+      percentage = metric;
+    } else if (typeof metric?.percentage === 'number') {
+      percentage = metric.percentage;
+    }
+
+    const value = Math.max(0, Math.min(percentage, 100));
 
     return html`
       <div class="partnership-progress-metric-row">
@@ -114,8 +118,8 @@ export default class PartnershipProgress extends LitElement {
             ${this.renderProgressBar(value, label)}
           </div>
           ${helperText
-            ? html`<span class="partnership-progress-metric-helper-text" style="white-space: nowrap; flex: 0 0 auto;">${helperText}</span>`
-            : html``}
+    ? html`<span class="partnership-progress-metric-helper-text" style="white-space: nowrap; flex: 0 0 auto;">${helperText}</span>`
+    : html``}
         </div>
       </div>
     `;
