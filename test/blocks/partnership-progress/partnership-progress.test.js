@@ -45,6 +45,7 @@ describe('partnership-progress', () => {
   it('replaces the authored block with a partnership-progress element', async () => {
     const section = document.createElement('div');
     section.setAttribute('data-idx', '0');
+
     const block = document.createElement('div');
     block.className = 'partnership-progress';
     section.appendChild(block);
@@ -71,8 +72,18 @@ describe('partnership-progress', () => {
 
   it('fetches data on imsReady and populates component state', async () => {
     const apiResponse = {
-      solution: [{ level: 'gold', customerDeployments: { percentage: 50 }, credentials: { percentage: 20 }, specializations: { percentage: 75 } }],
-      technology: [{ level: 'gold', customerDeployments: { percentage: 30 }, credentials: { percentage: 10 }, solutions: { percentage: 50 } }],
+      solution: [{
+        level: 'gold',
+        customerDeployments: { percentage: 50 },
+        credentials: { percentage: 20 },
+        specializations: { percentage: 75 },
+      }],
+      technology: [{
+        level: 'gold',
+        customerDeployments: { percentage: 30 },
+        credentials: { percentage: 10 },
+        solutions: { percentage: 50 },
+      }],
     };
 
     const fetchStub = sinon.stub(window, 'fetch').resolves({
@@ -93,7 +104,7 @@ describe('partnership-progress', () => {
     expect(app.loading).to.equal(false);
   });
 
-  it('getProgramData returns target level data based on partner level', async () => {
+  it('getProgramData returns target level data based on partner level', () => {
     const instance = new PartnershipProgress();
     instance.blockData = { localizedText: {} };
     instance.data = {
@@ -110,7 +121,7 @@ describe('partnership-progress', () => {
     expect(res.level.toLowerCase()).to.equal('gold');
   });
 
-  it('renderProgressBar clamps values between 0 and 100', async () => {
+  it('renderProgressBar clamps values between 0 and 100', () => {
     const instance = new PartnershipProgress();
 
     const low = renderToNode(instance.renderProgressBar(-10, 'low'));
@@ -121,5 +132,84 @@ describe('partnership-progress', () => {
 
     const mid = renderToNode(instance.renderProgressBar(42, 'mid'));
     expect(mid.getAttribute('aria-valuenow')).to.equal('42');
+  });
+});
+
+describe('App Assured progress', () => {
+  const localizedText = {
+    '{{Requirements}}': 'Requirements',
+    '{{Technology}}': 'Technology',
+    '{{Solution}}': 'Solution',
+    '{{Specializations}}': 'Specializations',
+    '{{Credentials}}': 'Credentials',
+    '{{Active Customer Deployments}}': 'Active Customer Deployments',
+    '{{App Assured}}': 'App Assured (localized)',
+  };
+
+  beforeEach(() => {
+    clearPartnerCookies();
+    setPartnerLevelCookie('Silver');
+  });
+
+  afterEach(() => {
+    clearPartnerCookies();
+    document.body.innerHTML = '';
+  });
+
+  const createElement = (programData, programType = 'technology') => {
+    const element = new PartnershipProgress();
+    element.blockData = { localizedText };
+    element.data = { [programType]: [programData] };
+    return element;
+  };
+
+  it('renders the localized App Assured metric for technology programs', () => {
+    const element = createElement({
+      level: 'gold',
+      appAssurances: {
+        total: 2,
+        required: 4,
+        percentage: 50,
+      },
+    });
+
+    const node = renderToNode(element.renderProgramProgress('Technology', 'technology'));
+    const progressBar = node.querySelector('[aria-label="App Assured (localized)"]');
+
+    expect(node.textContent).to.contain('App Assured (localized)');
+    expect(node.textContent).to.contain('2 of 4 required');
+    expect(progressBar).to.exist;
+    expect(progressBar.getAttribute('aria-valuenow')).to.equal('50');
+  });
+
+  it('uses zero-valued App Assured data when the metric is missing', () => {
+    const element = createElement({
+      level: 'gold',
+      credentials: { percentage: 25 },
+    });
+
+    const node = renderToNode(element.renderProgramProgress('Technology', 'technology'));
+    const progressBar = node.querySelector('[aria-label="App Assured (localized)"]');
+
+    expect(node.textContent).to.contain('App Assured (localized)');
+    expect(node.textContent).to.contain('0 of 0 required');
+    expect(progressBar).to.exist;
+    expect(progressBar.getAttribute('aria-valuenow')).to.equal('0');
+  });
+
+  it('does not render App Assured for solution programs', () => {
+    const element = createElement({
+      level: 'gold',
+      appAssurances: {
+        total: 2,
+        required: 4,
+        percentage: 50,
+      },
+    }, 'solution');
+
+    const node = renderToNode(element.renderProgramProgress('Solution', 'solution'));
+
+    expect(node.textContent).not.to.contain('App Assured (localized)');
+    expect(node.querySelector('[aria-label="App Assured (localized)"]')).to.equal(null);
   });
 });
