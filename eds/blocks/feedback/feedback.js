@@ -37,7 +37,8 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   if (!isSignedIn) {
     emailContainer = document.createElement('div');
     emailContainer.className = 'feedback-email-wrapper';
-    const emailLabel = document.createElement('span');
+    const emailLabel = document.createElement('sp-field-label');
+    emailLabel.setAttribute('for', 'feedback-email');
     emailLabel.className = 'feedback-label-text';
     emailLabel.textContent = config.dialogEmail;
     const emailTheme = document.createElement('sp-theme');
