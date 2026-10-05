@@ -9,11 +9,11 @@ export default class GnavPersonalisationPage {
     this.logo = page.locator('a.feds-brand').filter({ has: page.locator('img[src*="px-hub-logo"]') });
     this.personalisationButton = page.getByRole('button', { name: 'Personalization' });
     this.gnavDropdown = page.locator('#feds-popup-1');
-    this.handshakeIcon = page.getByRole('link', { name: 'Image' }).first();
-    this.globeIcon = page.getByRole('link', { name: 'Image' }).nth(1);
-    this.searchIcon = page.getByRole('link', { name: 'Image' }).nth(2);
-    this.menageUserIcon = page.getByRole('link', { name: 'Image' }).nth(3);
-    this.homeIcon = page.getByRole('link', { name: 'Image' }).nth(4);
+    this.handshakeIcon = page.getByRole('link', { name: 'Deal Registration' });
+    this.globeIcon = page.getByRole('link', { name: 'Partner Directory' });
+    this.searchIcon = page.getByRole('link', { name: 'Search' });
+    this.menageUserIcon = page.getByRole('link', { name: 'Manage Profile' });
+    this.homeIcon = page.getByRole('link', { name: 'Home' });
     this.navigationMenuButton = page.getByRole('button', { name: 'Navigation menu' });
     this.mainMenuButton = page.getByLabel('About').locator('div').filter({ hasText: 'Main menu' });
     this.newlyApprovedBanner = page.locator('.partner-newly-approved');
