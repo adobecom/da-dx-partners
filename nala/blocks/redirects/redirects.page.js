@@ -4,13 +4,13 @@ export default class RedirectsPage {
     this.signInButton = page.locator('.feds-signIn');
     this.gnav = page.locator('.feds-topnav-wrapper');
     this.benefitsCenter = page.getByRole('link', { name: 'Benefits Center' });
-    this.experienceLeague = page.getByRole('link', { name: 'Experience League' });
+    this.experienceLeague = page.getByRole('main').getByRole('link', { name: 'Experience League' }).filter({ hasNot: page.locator('.shortcut-icons-link') });
     this.menageUser = page.getByRole('link', { name: 'Manage user' });
     this.demo = page.getByRole('link', { name: 'Demo' });
     this.adobe = page.getByRole('link', { name: 'Adobe.com' });
     this.linksGnav = page.getByRole('button', { name: 'Links on gnav' });
     this.benefitsCenterGnav = page.getByLabel('Main', { exact: true }).getByRole('link', { name: 'Benefits Center' });
-    this.experienceLeagueGnav = page.getByLabel('Main', { exact: true }).getByRole('link', { name: 'Experience League' });
+    this.experienceLeagueGnav = page.locator('.feds-cta-wrapper').getByRole('link', { name: 'Experience League' });
     this.menageUserGnav = page.getByLabel('Main', { exact: true }).getByRole('link', { name: 'Manage user' });
     this.demoGnav = page.getByLabel('Main', { exact: true }).getByRole('link', { name: 'Demo' });
     this.adobeGnav = page.getByLabel('Main', { exact: true }).getByRole('link', { name: 'Adobe.com' });
