@@ -30,11 +30,11 @@ export default {
       path: '/digitalexperience/drafts/automation/regression/links-rewrite/page-with-gnav',
       tags: '@da-dx-redirects @regression @circleCi @anonymous @da-dx-main',
       data: {
-        benefitsCenterIconLink: '/benefits-center.html',
+        benefitsCenterIconLink: '/digitalexperience/m/salescenter/',
         bellIconLink: '/en/home',
-        worldIconLink: '/digitalexperience/home/manage-user',
-        menageUserIconLink: DEMO_LINK,
-        homeIconLink: ADOBE_LINK,
+        worldIconLink: '/s/directory/solution',
+        menageUserIconLink: '/digitalexperience/home/manage-user',
+        homeIconLink: '/digitalexperience/home/',
       },
     },
     {

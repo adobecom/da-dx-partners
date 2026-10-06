@@ -92,9 +92,9 @@ test.describe('Validate redirects block', () => {
       const hrefworldIcon = await redirectsPage.worldIcon.getAttribute('href');
       expectHrefPath(hrefworldIcon, data.worldIconLink);
       const hrefmenageUserIcon = await redirectsPage.menageUserIcon.getAttribute('href');
-      expectHrefOrigin(hrefmenageUserIcon, resolveEnvLink(data.menageUserIconLink, baseURL));
+      expectHrefPath(hrefmenageUserIcon, data.menageUserIconLink);
       const hrefhomeIcon = await redirectsPage.homeIcon.getAttribute('href');
-      expectHrefOrigin(hrefhomeIcon, resolveEnvLink(data.homeIconLink, baseURL));
+      expectHrefPath(hrefhomeIcon, data.homeIconLink);
     });
   });
   test(`${features[2].name},${features[2].tags}`, async ({ page, baseURL }) => {
