@@ -1,6 +1,7 @@
-import { getLibs, invokeAfterImsIsReady, getMetadataContent } from '../../scripts/utils.js';
+import { getLibs, invokeAfterImsIsReady, getMetadataContent, getPartnerCookieValue } from '../../scripts/utils.js';
 import { getPartnershipData } from '../utils/partnershipDataService.js';
 import { replaceDirectText } from '../../scripts/personalization.js';
+import { DX_PARTNER_LEVEL } from '../utils/dxConstants.js';
 
 const miloLibs = getLibs();
 
@@ -14,16 +15,22 @@ export function getTargetLevel(data) {
   if (currentLevel !== 'silver' && currentLevel !== 'gold') return null;
 
   const targetLevel = LEVEL_MAP[currentLevel];
+  const isSilverPartner = String(getPartnerCookieValue('level')).toLowerCase()
+  === DX_PARTNER_LEVEL.SILVER.toLowerCase();
+
+  const technologyItem = (data.technology || []).find(
+    (item) => item.level?.toLowerCase() === targetLevel,
+  );
+  if (!isSilverPartner && technologyItem && !isFullyCompleted(technologyItem, ['appAssurances'])) return null;
 
   // eslint-disable-next-line max-len
   const solutionItem = (data.solution || []).find((item) => item.level?.toLowerCase() === targetLevel);
   const solutionValid = isFullyCompleted(solutionItem, ['credentials', 'customerDeployments', 'specializations']);
 
   if (!solutionValid) {
-    // eslint-disable-next-line max-len
-    const technologyItem = (data.technology || []).find((item) => item.level?.toLowerCase() === targetLevel);
-    const technologyValid = isFullyCompleted(technologyItem, ['credentials', 'customerDeployments', 'solutions']);
-    if (!technologyValid) return null;
+    const technologyFields = ['credentials', 'customerDeployments', 'solutions'];
+    if (!isSilverPartner) technologyFields.push('appAssurances');
+    if (!isFullyCompleted(technologyItem, technologyFields)) return null;
   }
 
   return targetLevel;
