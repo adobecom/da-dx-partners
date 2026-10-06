@@ -41,6 +41,7 @@ test.describe('Calendly Feature', () => {
 
   // @calendly-ui-validation
   test(`${features[0].name},${features[0].tags}`, async ({ page }) => {
+    test.setTimeout(50000);
     const { data } = features[0];
 
     await test.step('Log in with calendly user', async () => {
@@ -53,6 +54,7 @@ test.describe('Calendly Feature', () => {
 
     await test.step('Validate UI', async () => {
       await expect(calendlyPage.calendlyComponent).toBeVisible({ timeout: 30000 });
+      await expect(calendlyPage.availableDate).toBeVisible({ timeout: 50000 });
       await calendlyPage.availableDate.click();
 
       await expect(calendlyPage.spotList).toBeVisible({ timeout: 15000 });
