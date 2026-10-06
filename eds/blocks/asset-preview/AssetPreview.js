@@ -160,6 +160,7 @@ await Promise.all([
 ]);
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
+
 export default class AssetPreview extends LitElement {
   static properties = {
     blockData: { type: Object },
@@ -470,27 +471,22 @@ export default class AssetPreview extends LitElement {
   async shareChapter(index, event) {
     event.stopPropagation();
 
-    const chapter = chapters[index];
-    const url = this.createChapterUrl(index);
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: chapter.title,
-          text: `${chapter.title} — ${chapter.timerange}`,
-          url,
-        });
-        this.markChapterShared(index);
-        return;
-      } catch (error) {
-        if (error.name === 'AbortError') return;
-      }
-    }
-
-    if (navigator.clipboard) {
-      await navigator.clipboard.writeText(url);
+    try {
+      await navigator.clipboard.writeText(this.createChapterUrl(index));
       this.markChapterShared(index);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to copy chapter URL:', error);
     }
+  }
+
+  handleVideoLoadedMetadata(event) {
+    if (this.selectedChapterIndex === 0) return;
+
+    const chapter = chapters[this.selectedChapterIndex];
+    const startTime = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
+    this.currentTime = startTime;
+    event.currentTarget.currentTime = startTime;
   }
 
   selectChapter(index) {
@@ -504,7 +500,7 @@ export default class AssetPreview extends LitElement {
 
     const startTime = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
     this.currentTime = startTime;
-    video.currentTime = startTime;
+    if (video.readyState >= 1) video.currentTime = startTime;
 
     video.play().catch(() => {
       // Playback may require user interaction in some browsers.
@@ -537,48 +533,66 @@ export default class AssetPreview extends LitElement {
             <span class="start-time">${this.formatTimecode(startTime)}</span>
             <span class="duration-time">${this.formatTimecode(endTime)}</span>
 
-          <div class="chapter-actions">
-            <sp-action-button
-              class="share-button"
-              quiet
-              icon-only
-              label="${this.sharedChapterIndex === index ? 'Chapter shared' : 'Share chapter'}"
-              @click="${(event) => this.shareChapter(index, event)}"
-            >
-              <svg
-                class="share-icon"
-                slot="icon"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                focusable="false"
+            <div class="chapter-actions">
+              <sp-action-button
+                class="share-button"
+                quiet
+                icon-only
+                label="${this.sharedChapterIndex === index ? 'Chapter link copied' : 'Share chapter'}"
+                @click="${(event) => this.shareChapter(index, event)}"
               >
-                <path
-                  d="${this.sharedChapterIndex === index
-                    ? 'M5 12l4 4L19 6'
-                    : 'M12 3v11M8 7l4-4 4 4M5 10v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9'}"
-                  fill="none"
-                  stroke="${this.sharedChapterIndex === index ? '#2e7d32' : 'currentColor'}"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </sp-action-button>
+                ${this.sharedChapterIndex === index ? html`
+                  <svg
+                    slot="icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#268e6c"
+                    style="stroke: #268e6c;"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12l4 4L19 6" />
+                  </svg>
+                ` : html`
+                  <svg
+                    slot="icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#707070"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M3 10v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8" />
+                    <path d="M12 13V3" />
+                    <path d="M7.5 7.5L12 3l4.5 4.5" />
+                  </svg>
+                `}
+              </sp-action-button>
+            </div>
           </div>
-        </div>
 
-        <div class="chapter-content">
-          <h2 class="chapter-title">${chapter.title}</h2>
-          <p class="chapter-description">${chapter.summary}</p>
-          <div class="progress-track" aria-hidden="true">
-            <div
-              class="progress-fill"
-              style="width: ${this.getChapterProgress(index)}%;"
-            ></div>
+          <div class="chapter-content">
+            <h2 class="chapter-title">${chapter.title}</h2>
+            <p class="chapter-description">${chapter.summary}</p>
+            <div class="progress-track" aria-hidden="true">
+              <div
+                class="progress-fill"
+                style="width: ${this.getChapterProgress(index)}%;"
+              ></div>
+            </div>
           </div>
-        </div>
-      </article>
-    `;
+        </article>
+      `;
     });
   }
 
@@ -752,7 +766,11 @@ export default class AssetPreview extends LitElement {
                   @play="${() => { this.isVideoPlaying = true; }}"
                   @pause="${() => { this.isVideoPlaying = false; }}"
                   @timeupdate="${this.handleVideoTimeUpdate}"
+                  @loadedmetadata="${this.handleVideoLoadedMetadata}"
                   @loadstart="${() => { this.isVideoLoading = true; }}"
+                  @seeking="${() => { this.isVideoLoading = true; }}"
+                  @waiting="${() => { this.isVideoLoading = true; }}"
+                  @playing="${() => { this.isVideoLoading = false; }}"
                   @canplay="${() => { this.isVideoLoading = false; }}"
                   @error="${() => { this.isVideoLoading = false; }}"
                   playsinline

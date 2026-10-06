@@ -6,6 +6,7 @@ import AssetPreview from '../../../eds/blocks/asset-preview/AssetPreview.js';
 
 const miloLibs = setLibs('/libs');
 const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
+const { render } = await import(`${miloLibs}/deps/lit-all.min.js`);
 setConfig({ locales: { '': { ietf: 'en-US', tk: 'hah7vzn.css' } }, miloLibs });
 
 function makeInstance() {
@@ -560,6 +561,91 @@ describe('AssetPreview - getRealAssetUrl()', () => {
 });
 
 // ---------------------------------------------------------------------------
+describe('AssetPreview - shareChapter()', () => {
+  afterEach(() => {
+    sinon.restore();
+    document.body.innerHTML = '';
+  });
+
+  it('replaces the clicked share icon with a green check for two seconds', async () => {
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const writeText = sinon.stub(navigator.clipboard, 'writeText').resolves();
+    const el = makeInstance();
+    const container = document.createElement('div');
+    const iconStyles = document.createElement('style');
+    iconStyles.textContent = '.share-button svg { stroke: #707070; }';
+    document.body.append(iconStyles, container);
+    render(el.renderChapters(), container);
+    const button = container.querySelector('.share-button');
+    const sharePath = button.querySelector('path').getAttribute('d');
+    expect(button.querySelector('svg').getAttribute('slot')).to.equal('icon');
+    expect(button.querySelector('path').namespaceURI).to.equal('http://www.w3.org/2000/svg');
+
+    button.click();
+    await Promise.resolve();
+    render(el.renderChapters(), container);
+
+    expect(writeText.calledOnceWithExactly(el.createChapterUrl(0))).to.be.true;
+    expect(button.getAttribute('label')).to.equal('Chapter link copied');
+    expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#268e6c');
+    expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(38, 142, 108)');
+    expect(button.querySelector('path').getAttribute('d')).to.equal('M5 12l4 4L19 6');
+    expect(button.querySelector('svg').getAttribute('slot')).to.equal('icon');
+    expect(button.querySelector('path').namespaceURI).to.equal('http://www.w3.org/2000/svg');
+    expect(container.querySelectorAll('.share-button')[1].querySelector('svg').getAttribute('stroke')).to.equal('#707070');
+
+    clock.tick(1999);
+    expect(el.sharedChapterIndex).to.equal(0);
+    clock.tick(1);
+    render(el.renderChapters(), container);
+
+    expect(button.getAttribute('label')).to.equal('Share chapter');
+    expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#707070');
+    expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(112, 112, 112)');
+    expect(button.querySelector('path').getAttribute('d')).to.equal(sharePath);
+  });
+});
+
+describe('AssetPreview - selectChapter()', () => {
+  afterEach(() => {
+    sinon.restore();
+    document.body.innerHTML = '';
+  });
+
+  it('seeks and requests playback immediately when metadata is ready', () => {
+    const video = document.createElement('video');
+    sinon.stub(video, 'readyState').get(() => 1);
+    const playStub = sinon.stub(video, 'play').resolves();
+    document.body.appendChild(video);
+    const el = makeInstance();
+
+    el.selectChapter(1);
+
+    expect(el.selectedChapterIndex).to.equal(1);
+    expect(video.currentTime).to.equal(91.625);
+    expect(playStub.calledOnce).to.be.true;
+  });
+
+  it('requests playback immediately and seeks to the latest selection once metadata loads', () => {
+    const video = document.createElement('video');
+    sinon.stub(video, 'readyState').get(() => 0);
+    const playStub = sinon.stub(video, 'play').resolves();
+    document.body.appendChild(video);
+    const el = makeInstance();
+
+    el.selectChapter(1);
+    expect(playStub.calledOnce).to.be.true;
+    expect(video.currentTime).to.equal(0);
+
+    el.selectChapter(2);
+    el.handleVideoLoadedMetadata({ currentTarget: video });
+
+    expect(playStub.calledTwice).to.be.true;
+    expect(video.currentTime).to.equal(142.906);
+    expect(el.currentTime).to.equal(142.906);
+  });
+});
+
 describe('AssetPreview - playVideo()', () => {
   afterEach(() => {
     sinon.restore();
