@@ -427,6 +427,10 @@ span.asset-preview-block-details-left-label {
     min-height: 0;
   }
 
+  .asset-preview-block-video .video-container.video-holder:only-child {
+    grid-column: 1 / -1;
+  }
+
   .asset-preview-block-video sp-theme {
     display: flex;
     min-width: 0;
