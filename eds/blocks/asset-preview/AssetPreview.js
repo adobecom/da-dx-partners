@@ -160,7 +160,6 @@ await Promise.all([
 ]);
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
-
 export default class AssetPreview extends LitElement {
   static properties = {
     blockData: { type: Object },
@@ -202,6 +201,7 @@ export default class AssetPreview extends LitElement {
     this.currentTime = 0;
     this.sharedChapterIndex = -1;
     this.shareResetTimer = null;
+    this.restoreChapterFromUrl();
   }
 
   disconnectedCallback() {
@@ -407,11 +407,13 @@ export default class AssetPreview extends LitElement {
     img.src = transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH);
   };
 
+  // eslint-disable-next-line class-methods-use-this
   timecodeToSeconds(timecode) {
     const [hours, minutes, seconds] = timecode.split(':');
     return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getStartTime(timerange) {
     return timerange.split(' - ')[0];
   }
@@ -480,13 +482,27 @@ export default class AssetPreview extends LitElement {
     }
   }
 
-  handleVideoLoadedMetadata(event) {
-    if (this.selectedChapterIndex === 0) return;
+  restoreChapterFromUrl() {
+    const params = new URL(window.location.href).searchParams;
+    const chapterIndex = Number(params.get('chapter')) - 1;
+    const timestamp = params.has('t') && params.get('t').trim() !== ''
+      ? Number(params.get('t')) : NaN;
+    const timestampIndex = chapters.findIndex((chapter) => {
+      const [start, end] = chapter.timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
+      return Number.isFinite(timestamp) && timestamp >= start && timestamp < end;
+    });
+    const index = Number.isInteger(chapterIndex) && chapters[chapterIndex]
+      ? chapterIndex : timestampIndex;
+    if (index < 0) return;
 
-    const chapter = chapters[this.selectedChapterIndex];
-    const startTime = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
-    this.currentTime = startTime;
-    event.currentTarget.currentTime = startTime;
+    this.selectedChapterIndex = index;
+    const [start, end] = chapters[index].timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
+    this.currentTime = Number.isFinite(timestamp) && timestamp >= start && timestamp < end
+      ? timestamp : start;
+  }
+
+  handleVideoLoadedMetadata(event) {
+    event.currentTarget.currentTime = this.currentTime;
   }
 
   selectChapter(index) {
@@ -494,12 +510,12 @@ export default class AssetPreview extends LitElement {
     if (!chapter) return;
 
     this.selectedChapterIndex = index;
+    const startTime = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
+    this.currentTime = startTime;
 
     const video = this._video;
     if (!video) return;
 
-    const startTime = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
-    this.currentTime = startTime;
     if (video.readyState >= 1) video.currentTime = startTime;
 
     video.play().catch(() => {
@@ -511,6 +527,7 @@ export default class AssetPreview extends LitElement {
     return chapters.map((chapter, index) => {
       const [startTime, endTime] = chapter.timerange.split(' - ');
 
+      /* eslint-disable indent */
       return html`
         <article
           class="chapter ${this.selectedChapterIndex === index ? 'is-active' : ''}"

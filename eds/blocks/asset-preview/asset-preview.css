@@ -274,6 +274,7 @@ span.asset-preview-block-details-left-label {
   color: #6e6e6e;
   font-size: 12px;
   line-height: 1.35;
+  /* stylelint-disable-next-line value-no-vendor-prefix */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -295,7 +296,7 @@ span.asset-preview-block-details-left-label {
 }
 
 .share-button {
-  --spectrum-actionbutton-edge-to-visual-only: 0px;
+  --spectrum-actionbutton-edge-to-visual-only: 0;
 }
 
 .share-button svg {
@@ -359,9 +360,6 @@ span.asset-preview-block-details-left-label {
     font-size: 18px;
   }
 
-  /* .chapter-actions {
-    margin-left: -70px;
-  } */
   .chapter-actions {
     margin-left: 0;
   }

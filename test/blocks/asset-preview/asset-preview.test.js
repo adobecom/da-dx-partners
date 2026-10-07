@@ -606,10 +606,71 @@ describe('AssetPreview - shareChapter()', () => {
   });
 });
 
+describe('AssetPreview - chapter URLs', () => {
+  let originalUrl;
+
+  beforeEach(() => {
+    originalUrl = window.location.href;
+  });
+
+  afterEach(() => {
+    window.history.replaceState(null, '', originalUrl);
+    document.body.innerHTML = '';
+  });
+
+  it('restores the copied chapter and seeks after metadata loads', () => {
+    const url = makeInstance().createChapterUrl(2);
+    expect(new URL(url).searchParams.get('t')).to.equal('142.906');
+    window.history.replaceState(null, '', url);
+
+    const el = makeInstance();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    render(el.renderChapters(), container);
+    expect(el.selectedChapterIndex).to.equal(2);
+    expect(container.querySelector('.is-active').id).to.equal('chapter-3');
+
+    const video = document.createElement('video');
+    el.handleVideoLoadedMetadata({ currentTarget: video });
+    expect(video.currentTime).to.equal(142.906);
+  });
+
+  it('selects a chapter from a timestamp-only URL', () => {
+    window.history.replaceState(null, '', '?t=100');
+    const el = makeInstance();
+    expect(el.selectedChapterIndex).to.equal(1);
+    expect(el.currentTime).to.equal(100);
+  });
+
+  it('falls back to the chapter start for an invalid timestamp', () => {
+    window.history.replaceState(null, '', '?chapter=2&t=invalid');
+    const el = makeInstance();
+    expect(el.selectedChapterIndex).to.equal(1);
+    expect(el.currentTime).to.equal(91.625);
+  });
+
+  it('keeps the default chapter for invalid URL values', () => {
+    ['?chapter=999&t=-1', '?chapter=1.5&t=Infinity', '?chapter=invalid&t='].forEach((query) => {
+      window.history.replaceState(null, '', query);
+      const el = makeInstance();
+      expect(el.selectedChapterIndex).to.equal(0);
+      expect(el.currentTime).to.equal(0);
+    });
+  });
+});
+
 describe('AssetPreview - selectChapter()', () => {
   afterEach(() => {
     sinon.restore();
     document.body.innerHTML = '';
+  });
+
+  it('preserves the seek time when selecting before the video exists', () => {
+    const el = makeInstance();
+    el.selectChapter(1);
+    const video = document.createElement('video');
+    el.handleVideoLoadedMetadata({ currentTarget: video });
+    expect(video.currentTime).to.equal(91.625);
   });
 
   it('seeks and requests playback immediately when metadata is ready', () => {
