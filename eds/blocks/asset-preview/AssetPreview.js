@@ -808,6 +808,7 @@ export default class AssetPreview extends LitElement {
                 </video>
               </div>
 
+              ${chapters.length ? html`
               <div>
                 <sp-theme system="express" scale="medium" color="light">
                   <section
@@ -827,6 +828,7 @@ export default class AssetPreview extends LitElement {
                   </section>
                 </sp-theme>
               </div>
+              ` : ''}
             </div>
           ` : ''}
         ` : html`
