@@ -148,7 +148,7 @@ describe('App Assured progress', () => {
 
   beforeEach(() => {
     clearPartnerCookies();
-    setPartnerLevelCookie('Silver');
+    setPartnerLevelCookie('Gold');
   });
 
   afterEach(() => {
@@ -165,7 +165,7 @@ describe('App Assured progress', () => {
 
   it('renders the localized App Assured metric for technology programs', () => {
     const element = createElement({
-      level: 'gold',
+      level: 'platinum',
       appAssurances: {
         total: 2,
         required: 4,
@@ -184,7 +184,7 @@ describe('App Assured progress', () => {
 
   it('uses zero-valued App Assured data when the metric is missing', () => {
     const element = createElement({
-      level: 'gold',
+      level: 'platinum',
       credentials: { percentage: 25 },
     });
 
@@ -199,7 +199,7 @@ describe('App Assured progress', () => {
 
   it('does not render App Assured for solution programs', () => {
     const element = createElement({
-      level: 'gold',
+      level: 'platinum',
       appAssurances: {
         total: 2,
         required: 4,
@@ -209,6 +209,25 @@ describe('App Assured progress', () => {
 
     const node = renderToNode(element.renderProgramProgress('Solution', 'solution'));
 
+    expect(node.textContent).not.to.contain('App Assured (localized)');
+    expect(node.querySelector('[aria-label="App Assured (localized)"]')).to.equal(null);
+  });
+
+  it('does not render App Assured for silver partners', () => {
+    setPartnerLevelCookie('Silver');
+    const element = createElement({
+      level: 'gold',
+      credentials: { total: 1, required: 2, percentage: 50 },
+      appAssurances: {
+        total: 2,
+        required: 4,
+        percentage: 50,
+      },
+    });
+
+    const node = renderToNode(element.renderProgramProgress('Technology', 'technology'));
+
+    expect(node.textContent).to.contain('Credentials');
     expect(node.textContent).not.to.contain('App Assured (localized)');
     expect(node.querySelector('[aria-label="App Assured (localized)"]')).to.equal(null);
   });
