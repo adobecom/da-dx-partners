@@ -18,20 +18,21 @@ export function getTargetLevel(data) {
   const isSilverPartner = String(getPartnerCookieValue('level')).toLowerCase()
   === DX_PARTNER_LEVEL.SILVER.toLowerCase();
 
+  const solutionItem = (data.solution || []).find(
+    (item) => item.level?.toLowerCase() === targetLevel,
+  );
+  const solutionValid = isFullyCompleted(
+    solutionItem,
+    ['credentials', 'customerDeployments', 'specializations'],
+  );
+  if (solutionValid) return targetLevel;
+
   const technologyItem = (data.technology || []).find(
     (item) => item.level?.toLowerCase() === targetLevel,
   );
-  if (!isSilverPartner && technologyItem && !isFullyCompleted(technologyItem, ['appAssurances'])) return null;
-
-  // eslint-disable-next-line max-len
-  const solutionItem = (data.solution || []).find((item) => item.level?.toLowerCase() === targetLevel);
-  const solutionValid = isFullyCompleted(solutionItem, ['credentials', 'customerDeployments', 'specializations']);
-
-  if (!solutionValid) {
-    const technologyFields = ['credentials', 'customerDeployments', 'solutions'];
-    if (!isSilverPartner) technologyFields.push('appAssurances');
-    if (!isFullyCompleted(technologyItem, technologyFields)) return null;
-  }
+  const technologyFields = ['credentials', 'customerDeployments', 'solutions'];
+  if (!isSilverPartner) technologyFields.push('appAssurances');
+  if (!isFullyCompleted(technologyItem, technologyFields)) return null;
 
   return targetLevel;
 }
