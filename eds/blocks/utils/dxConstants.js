@@ -81,3 +81,9 @@ export const DX_PARTNER_LEVEL = {
   GOLD: 'Gold',
   PLATINUM: 'Platinum',
 };
+
+export const DX_ACCENTURE_ACCOUNT_NAMES = [
+  'Accenture PLC',
+  'Accenture ETLA',
+  'Accenture Llp',
+];

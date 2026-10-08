@@ -65,6 +65,7 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-newly-approved': isPartnerNewlyApproved(),
   'partner-account-state-calendly': hasPartnerAccountStateCalendly(),
   'partner-adobe-account': isAdobeAccount(),
+  'partner-accenture-account': isAccentureAccount(),
 };
 
 export const PROFILE_PERSONALIZATION_ACTIONS = {
