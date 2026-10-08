@@ -73,30 +73,34 @@ describe('uplevel-banner', () => {
     })).to.equal('platinum');
   });
 
-  it('returns null for gold partners when technology app assurances are not fully completed', () => {
+  it('returns null for the technology track when app assurances exist and are not fully completed', () => {
     setPartnerLevelCookie('Gold');
-    const incompleteSolution = [{ level: 'platinum', credentials: { percentage: 0 } }];
 
     expect(getTargetLevel({
       level: 'Gold',
-      solution: incompleteSolution,
+      solution: [{ level: 'platinum', credentials: { percentage: 0 } }],
       technology: [completedTechnology('platinum', { appAssurances: { percentage: 50 } })],
-    })).to.equal(null);
-    expect(getTargetLevel({
-      level: 'Gold',
-      solution: incompleteSolution,
-      technology: [completedTechnology('platinum')],
     })).to.equal(null);
   });
 
-  it('returns null for gold partners with a completed solution track when app assurances are incomplete', () => {
+  it('ignores app assurances on the technology track when they are missing', () => {
+    setPartnerLevelCookie('Gold');
+
+    expect(getTargetLevel({
+      level: 'Gold',
+      solution: [{ level: 'platinum', credentials: { percentage: 0 } }],
+      technology: [completedTechnology('platinum')],
+    })).to.equal('platinum');
+  });
+
+  it('does not check app assurances for gold partners when the solution track is completed', () => {
     setPartnerLevelCookie('Gold');
 
     expect(getTargetLevel({
       level: 'Gold',
       solution: [completedSolution('platinum')],
       technology: [completedTechnology('platinum', { appAssurances: { percentage: 80 } })],
-    })).to.equal(null);
+    })).to.equal('platinum');
   });
 
   it('does not require app assurances for silver partners on the technology track', () => {
