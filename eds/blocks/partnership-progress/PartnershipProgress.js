@@ -138,14 +138,11 @@ export default class PartnershipProgress extends LitElement {
 
     const requiredLevelLabel = (programData.level || '').toUpperCase();
     const isTechnology = programType.toLowerCase() === DX_PRIMARY_BUSINESS.TECHNOLOGY.toLowerCase();
-    const isSilverPartner = String(getPartnerCookieValue('level')).toLowerCase()
-      === DX_PARTNER_LEVEL.SILVER.toLowerCase();
-    const showAppAssured = isTechnology && !isSilverPartner;
 
     const specializationsMetric = programData.specializations || programData.solutions;
     const credentialsMetric = programData.credentials;
     const deploymentsMetric = programData.customerDeployments;
-    const appAssuredMetric = programData.appAssurances ?? { total: 0, required: 0, percentage: 0 };
+    const appAssuredMetric = programData.appAssurances;
     const appAssuredLabel = this.blockData.localizedText['{{App Assured}}'] || 'App Assured';
     const specializationsHelperText = getRequiredHelperText(specializationsMetric);
     const credentialsHelperText = getRequiredHelperText(credentialsMetric);
@@ -173,7 +170,7 @@ export default class PartnershipProgress extends LitElement {
   )}
           ${this.renderMetricRow(this.blockData.localizedText['{{Credentials}}'], credentialsMetric, credentialsHelperText)}
           ${this.renderMetricRow(this.blockData.localizedText['{{Active Customer Deployments}}'], deploymentsMetric, deploymentsHelperText)}
-          ${showAppAssured ? this.renderMetricRow(appAssuredLabel, appAssuredMetric, appAssuredHelperText) : html``}
+          ${isTechnology ? this.renderMetricRow(appAssuredLabel, appAssuredMetric, appAssuredHelperText) : html``}
         </div>
       </section>
     `;
