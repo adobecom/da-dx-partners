@@ -37,7 +37,8 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   if (!isSignedIn) {
     emailContainer = document.createElement('div');
     emailContainer.className = 'feedback-email-wrapper';
-    const emailLabel = document.createElement('span');
+    const emailLabel = document.createElement('sp-field-label');
+    emailLabel.setAttribute('for', 'feedback-email');
     emailLabel.className = 'feedback-label-text';
     emailLabel.textContent = config.dialogEmail;
     const emailTheme = document.createElement('sp-theme');
@@ -81,10 +82,12 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     const starButton = document.createElement('sp-action-button');
     starButton.setAttribute('quiet', '');
     starButton.setAttribute('data-rating', i);
+    starButton.setAttribute('label', config.ratingLabel.replace('{rating}', i));
     const iconWrapper = document.createElement('span');
     iconWrapper.setAttribute('slot', 'icon');
     const img = document.createElement('img');
     img.src = '/eds/img/icons/outline-star.svg';
+    img.setAttribute('alt', '');
     iconWrapper.appendChild(img);
     starButton.appendChild(iconWrapper);
     starButton.addEventListener('mouseenter', () => {
@@ -109,7 +112,8 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   textareaSection.className = 'feedback-comment-wrapper';
   const textareaHeader = document.createElement('div');
   textareaHeader.className = 'feedback-label-wrapper';
-  const textareaLabel = document.createElement('span');
+  const textareaLabel = document.createElement('sp-field-label');
+  textareaLabel.setAttribute('for', 'feedback-comment');
   textareaLabel.textContent = config.dialogComment;
   textareaLabel.className = 'feedback-label-text';
   const charCount = document.createElement('span');
@@ -144,6 +148,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   honeypotInput.className = 'feedback-context-field';
   honeypotInput.setAttribute('tabindex', '-1');
   honeypotInput.setAttribute('autocomplete', 'off');
+  honeypotInput.setAttribute('aria-hidden', 'true');
   const buttonsContainer = document.createElement('div');
   buttonsContainer.className = 'feedback-dialog-actions';
   const cancelButton = document.createElement('button');
@@ -270,6 +275,7 @@ export default async function init(el) {
     import(`${miloLibs}/features/spectrum-web-components/dist/button.js`),
     import(`${miloLibs}/features/spectrum-web-components/dist/action-button.js`),
     import(`${miloLibs}/features/spectrum-web-components/dist/textfield.js`),
+    import(`${miloLibs}/features/spectrum-web-components/dist/field-label.js`),
   ]);
 
   const isProd = prodHosts.includes(window.location.host);
@@ -280,6 +286,7 @@ export default async function init(el) {
     dialogText: 'How satisfied were you with this page? Be as candid as you want, all feedback is kept anonymous.',
     dialogEmail: 'Email (optional)',
     dialogComment: 'Want to share more? (optional)',
+    ratingLabel: 'Rate {rating} out of 5 stars',
     cancel: 'Cancel',
     send: 'Send',
     toastNegative: 'Unable to receive your rating.',
@@ -305,6 +312,8 @@ export default async function init(el) {
         config.dialogEmail = value;
       } else if (key === 'dialog-comment') {
         config.dialogComment = value;
+      } else if (key === 'rating-label') {
+        config.ratingLabel = value;
       } else if (key === 'cancel') {
         config.cancel = value;
       } else if (key === 'send') {

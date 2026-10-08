@@ -42,7 +42,7 @@ export default {
       tcid: '3',
       name: '@banners-global-banner-displayed-under-bctq-banner',
       path: '/digitalexperience/drafts/automation/regression/banner/global-banner-test-page',
-      tags: '@da-dx-banners @regression @da-dx-main',
+      tags: '@da-dx-banners @regression @anonymous @da-dx-main',
       data: {
         partnerData: {
           partnerPortal: 'DXP',

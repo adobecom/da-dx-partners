@@ -8,6 +8,31 @@ const newUserSegments = features.slice(7, 10);
 let gnavPersonalisationPage;
 let signInPage;
 
+const setupNewlyApprovedTest = async ({ page, baseURL, context, data, path }) => {
+  await test.step('Go to the page', async () => {
+    await page.goto(`${baseURL}${path}`);
+    await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
+  });
+
+  await test.step('Set partner_data cookie', async () => {
+    const newlyApprovedDate = gnavPersonalisationPage
+      .generateDateWithDaysOffset(data.partnerData.newlyApprovedDate)
+      .getTime()
+      .toString();
+
+    await signInPage.addCookie(
+      data.partnerData.partnerPortal,
+      data.partnerData.partnerLevel,
+      `${baseURL}${path}`,
+      context,
+      { ...data.partnerData, newlyApprovedDate },
+    );
+
+    await page.reload();
+    await page.waitForLoadState('domcontentloaded');
+  });
+};
+
 test.describe('Gnav Personalisation', () => {
   test.beforeEach(async ({ page, baseURL, context, browserName }) => {
     gnavPersonalisationPage = new GnavPersonalisationPage(page);
@@ -568,6 +593,37 @@ test.describe('Gnav Personalisation', () => {
 
     await test.step('Validate About tab on mobile restricted GNav', async () => {
       await gnavPersonalisationPage.verifyMobileRestrictedGnavAboutTab();
+    });
+  });
+  test(`${features[23].name},${features[23].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[23];
+
+    await setupNewlyApprovedTest({ page, baseURL, context, data, path });
+
+    await test.step('Verify segments on the page', async () => {
+      await gnavPersonalisationPage.newlyApprovedBanner.waitFor({ state: 'visible' });
+      await expect(gnavPersonalisationPage.newlyApprovedBanner).toBeVisible();
+    });
+  });
+
+  test(`${features[24].name},${features[24].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[24];
+
+    await setupNewlyApprovedTest({ page, baseURL, context, data, path });
+
+    await test.step('Verify segments on the page', async () => {
+      await gnavPersonalisationPage.newlyApprovedBanner.waitFor({ state: 'visible' });
+      await expect(gnavPersonalisationPage.newlyApprovedBanner).toBeVisible();
+    });
+  });
+
+  test(`${features[25].name},${features[25].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[25];
+
+    await setupNewlyApprovedTest({ page, baseURL, context, data, path });
+
+    await test.step('Verify segments not present on the page', async () => {
+      await expect(gnavPersonalisationPage.newlyApprovedBanner).not.toBeVisible();
     });
   });
 });

@@ -234,7 +234,7 @@ test.describe('Validate card collection block', () => {
       await cardCollectionPage.filterCheckbox(data.btnRoleWorkFromAnywhere, data.workFromAnywhereFilter).click();
       await cardCollectionPage.expectResultsNumber(data.topicWorkFromAnywhere);
       await cardCollectionPage.filterCheckbox(data.btnRoleWorkFromAnywhere, data.workFromAnywhereFilter).click();
-      await page.reload({ waitUntil: 'networkidle' });
+      await page.reload({ waitUntil: 'domcontentloaded' });
       await cardCollectionPage.expectResultsNumber(data.numberOfFilteredCards);
     });
   });

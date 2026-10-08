@@ -135,6 +135,8 @@ describe('feedback block', () => {
       expect(emailField.getAttribute('name')).to.equal('email');
       expect(emailField.getAttribute('autocomplete')).to.equal('email');
       expect(emailLabel).to.exist;
+      expect(emailLabel.tagName).to.equal('SP-FIELD-LABEL');
+      expect(emailLabel.getAttribute('for')).to.equal(emailField.id);
       expect(emailLabel.textContent).to.equal('Share your email address');
     });
 
