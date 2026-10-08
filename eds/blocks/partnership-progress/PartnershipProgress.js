@@ -98,7 +98,7 @@ export default class PartnershipProgress extends LitElement {
   }
 
   renderMetricRow(label, metric, helperText = '') {
-    if (metric === null || metric === undefined || metric.required === 0) return html``;
+    if (metric === null || metric === undefined) return html``;
 
     let percentage = 0;
 
@@ -142,7 +142,7 @@ export default class PartnershipProgress extends LitElement {
     const specializationsMetric = programData.specializations || programData.solutions;
     const credentialsMetric = programData.credentials;
     const deploymentsMetric = programData.customerDeployments;
-    const appAssuredMetric = programData.appAssurances ?? { total: 0, required: 0, percentage: 0 };
+    const appAssuredMetric = programData.appAssurances;
     const appAssuredLabel = this.blockData.localizedText['{{App Assured}}'] || 'App Assured';
     const specializationsHelperText = getRequiredHelperText(specializationsMetric);
     const credentialsHelperText = getRequiredHelperText(credentialsMetric);
