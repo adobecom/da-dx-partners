@@ -419,6 +419,7 @@ export default class AssetPreview extends LitElement {
   }
 
   getChapterProgress(index) {
+    if (index < this.selectedChapterIndex) return 100;
     if (index !== this.selectedChapterIndex) return 0;
 
     const [startTime, endTime] = chapters[index].timerange.split(' - ');
