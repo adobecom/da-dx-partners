@@ -707,6 +707,193 @@ describe('AssetPreview - selectChapter()', () => {
   });
 });
 
+describe('AssetPreview - custom video controls', () => {
+  let el;
+  let video;
+  let holder;
+
+  beforeEach(() => {
+    el = makeInstance();
+    holder = document.createElement('div');
+    holder.className = 'video-holder';
+    video = document.createElement('video');
+    holder.appendChild(video);
+    document.body.appendChild(holder);
+    sinon.stub(video, 'play').resolves();
+    sinon.stub(video, 'pause');
+    sinon.stub(video, 'readyState').get(() => 1);
+    sinon.stub(video, 'duration').get(() => 3491.273);
+    holder.addEventListener('keydown', (event) => el.handlePlayerKeydown(event));
+  });
+
+  afterEach(() => {
+    if (el.chaptersTrackUrl) URL.revokeObjectURL(el.chaptersTrackUrl);
+    sinon.restore();
+    document.body.innerHTML = '';
+  });
+
+  function renderControls() {
+    let controls = holder.querySelector('.test-controls');
+    if (!controls) {
+      controls = document.createElement('div');
+      controls.className = 'test-controls';
+      holder.appendChild(controls);
+    }
+    render(el.renderVideoControls(), controls);
+  }
+
+  it('toggles playback from both play buttons and reflects playing state', () => {
+    renderControls();
+    holder.querySelector('.player-center-play').click();
+    expect(video.play.calledOnce).to.equal(true);
+    sinon.stub(video, 'paused').get(() => false);
+    el.isVideoPlaying = true;
+    renderControls();
+    expect(holder.querySelector('.player-center-play').hidden).to.equal(true);
+    holder.querySelector('[aria-label="Pause"]').click();
+    expect(video.pause.calledOnce).to.equal(true);
+  });
+
+  it('clamps seeking and synchronizes the selected chapter even while paused', () => {
+    el.seekVideo(200);
+    expect(video.currentTime).to.equal(200);
+    expect(el.selectedChapterIndex).to.equal(2);
+    el.seekVideo(100);
+    expect(el.selectedChapterIndex).to.equal(1);
+    el.seekVideo(-10);
+    expect(video.currentTime).to.equal(0);
+    el.seekVideo(10000);
+    expect(video.currentTime).to.equal(3491.273);
+    expect(el.selectedChapterIndex).to.equal(26);
+    renderControls();
+    expect(holder.querySelector('.player-progress').getAttribute('aria-valuenow'))
+      .to.equal('3491.273');
+  });
+
+  it('does not seek or start playback when time enters a gap between chapters', () => {
+    video.currentTime = 322.5;
+    el.handleVideoTimeUpdate({ currentTarget: video });
+    expect(el.selectedChapterIndex).to.equal(2);
+    expect(video.currentTime).to.equal(322.5);
+    expect(video.play.called).to.equal(false);
+  });
+
+  it('rewinds and forwards ten seconds and skips to the next chapter', () => {
+    el.seekVideo(100);
+    renderControls();
+    holder.querySelector('[aria-label="Rewind 10 seconds"]').click();
+    expect(video.currentTime).to.equal(90);
+    holder.querySelector('[aria-label="Forward 10 seconds"]').click();
+    expect(video.currentTime).to.equal(100);
+    renderControls();
+    holder.querySelector('.player-next-chapter').click();
+    expect(video.currentTime).to.equal(142.906);
+    expect(video.play.calledOnce).to.equal(true);
+  });
+
+  it('hides and restores the side chapter list without changing playback', () => {
+    el.assetHasData = true;
+    el.isLoading = false;
+    el.isVideo = true;
+    el.currentTime = 100;
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    render(el.render(), container);
+    const player = container.querySelector('.video-holder');
+    const playerVideo = player.querySelector('video');
+    expect(container.querySelectorAll('.chapter').length).to.equal(27);
+    expect(player.querySelector('[aria-label="Chapters"]').getAttribute('aria-expanded'))
+      .to.equal('true');
+
+    player.querySelector('[aria-label="Chapters"]').click();
+    render(el.render(), container);
+    expect(container.querySelector('.video-chapters')).to.equal(null);
+    expect(player.matches(':only-child')).to.equal(true);
+    expect(player.querySelector('[aria-label="Chapters"]').getAttribute('aria-expanded'))
+      .to.equal('false');
+    expect(player.querySelector('.player-chapter-menu')).to.equal(null);
+
+    player.querySelector('[aria-label="Chapters"]').click();
+    render(el.render(), container);
+    expect(container.querySelectorAll('.chapter').length).to.equal(27);
+    expect(player.querySelector('[aria-label="Chapters"]').getAttribute('aria-expanded'))
+      .to.equal('true');
+    expect(player.querySelector('video')).to.equal(playerVideo);
+    expect(el.currentTime).to.equal(100);
+    expect(video.play.called).to.equal(false);
+    expect(player.querySelectorAll('.player-chapter-segment').length).to.equal(27);
+  });
+
+  it('mutes, changes volume, cycles speed, and applies settings', () => {
+    renderControls();
+    holder.querySelector('[aria-label="Mute"]').click();
+    expect(video.muted).to.equal(true);
+    expect(el.volumeExpanded).to.equal(true);
+    renderControls();
+    const volume = holder.querySelector('[aria-label="Volume"]');
+    volume.value = '0.4';
+    volume.dispatchEvent(new Event('input'));
+    expect(video.volume).to.equal(0.4);
+    expect(video.muted).to.equal(false);
+    holder.querySelector('.player-speed').click();
+    expect(video.playbackRate).to.equal(1.25);
+    holder.querySelector('[aria-label="Settings"]').click();
+    renderControls();
+    const speed = holder.querySelector('select');
+    speed.value = '2';
+    speed.dispatchEvent(new Event('change'));
+    expect(video.playbackRate).to.equal(2);
+    expect(el.settingsMenuOpen).to.equal(false);
+  });
+
+  it('seeks once per arrow key and leaves button and range keyboard actions alone', () => {
+    el.seekVideo(100);
+    renderControls();
+    const progress = holder.querySelector('.player-progress');
+    progress.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'ArrowRight', bubbles: true, cancelable: true,
+    }));
+    expect(video.currentTime).to.equal(105);
+    const volume = holder.querySelector('[aria-label="Volume"]');
+    volume.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    expect(video.currentTime).to.equal(105);
+    holder.querySelector('.player-speed').dispatchEvent(new KeyboardEvent('keydown', {
+      key: ' ', bubbles: true,
+    }));
+    expect(video.play.called).to.equal(false);
+  });
+
+  it('uses actual duration for chapter segments and progress after metadata loads', () => {
+    sinon.restore();
+    sinon.stub(video, 'duration').get(() => 300);
+    el.handleVideoLoadedMetadata({ currentTarget: video });
+    expect(el.playerDuration).to.equal(300);
+    renderControls();
+    const segments = holder.querySelectorAll('.player-chapter-segment');
+    expect(segments[0].style.left).to.equal(`${(1.001 / 300) * 100}%`);
+    expect(segments[26].style.width).to.equal('0%');
+    expect(holder.querySelector('.player-progress').getAttribute('aria-valuemax')).to.equal('300');
+  });
+
+  it('provides a cached WebVTT track that Chrome parses into all 27 chapter cues', async () => {
+    const url = el.createChaptersTrackUrl();
+    expect(el.createChaptersTrackUrl()).to.equal(url);
+    const track = document.createElement('track');
+    track.kind = 'chapters';
+    track.src = url;
+    const loaded = new Promise((resolve, reject) => {
+      track.onload = resolve;
+      track.onerror = reject;
+    });
+    video.appendChild(track);
+    track.track.mode = 'hidden';
+    await loaded;
+    expect(track.track.cues.length).to.equal(27);
+    expect(track.track.cues[0].startTime).to.equal(1.001);
+    expect(track.track.cues[26].endTime).to.equal(3491.273);
+  });
+});
+
 describe('AssetPreview - playVideo()', () => {
   afterEach(() => {
     sinon.restore();

@@ -183,6 +183,13 @@ export default class AssetPreview extends LitElement {
     selectedChapterIndex: { type: Number },
     currentTime: { type: Number },
     sharedChapterIndex: { type: Number },
+    videoDuration: { type: Number },
+    videoVolume: { type: Number },
+    videoMuted: { type: Boolean },
+    playbackSpeed: { type: Number },
+    chaptersVisible: { type: Boolean },
+    settingsMenuOpen: { type: Boolean },
+    volumeExpanded: { type: Boolean },
   };
 
   constructor() {
@@ -201,12 +208,21 @@ export default class AssetPreview extends LitElement {
     this.currentTime = 0;
     this.sharedChapterIndex = -1;
     this.shareResetTimer = null;
+    this.videoDuration = 0;
+    this.videoVolume = 1;
+    this.videoMuted = false;
+    this.playbackSpeed = 1;
+    this.chaptersVisible = true;
+    this.settingsMenuOpen = false;
+    this.volumeExpanded = false;
     this.restoreChapterFromUrl();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     clearTimeout(this.shareResetTimer);
+    if (this.chaptersTrackUrl) URL.revokeObjectURL(this.chaptersTrackUrl);
+    this.chaptersTrackUrl = null;
   }
 
   createRenderRoot() {
@@ -215,7 +231,7 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   get _video() {
-    return document.querySelector('video');
+    return this.querySelector('video') || (!this.isConnected && document.querySelector('video'));
   }
 
   playVideo() {
@@ -432,12 +448,75 @@ export default class AssetPreview extends LitElement {
   handleVideoTimeUpdate(event) {
     const video = event.currentTarget;
     this.currentTime = video.currentTime;
+    this.videoDuration = Number.isFinite(video.duration) ? video.duration : 0;
+    const index = chapters.findIndex((chapter, chapterIndex) => {
+      const next = chapters[chapterIndex + 1];
+      return video.currentTime >= this.timecodeToSeconds(this.getStartTime(chapter.timerange))
+        && (!next || video.currentTime < this.timecodeToSeconds(this.getStartTime(next.timerange)));
+    });
+    this.selectedChapterIndex = Math.max(0, index);
+  }
 
-    if (video.paused || this.selectedChapterIndex >= chapters.length - 1) return;
+  get playerDuration() {
+    return this.videoDuration || this.timecodeToSeconds(chapters[chapters.length - 1].timerange.split(' - ')[1]);
+  }
 
-    const [, endTime] = chapters[this.selectedChapterIndex].timerange.split(' - ');
-    if (video.currentTime >= this.timecodeToSeconds(endTime)) {
-      this.selectChapter(this.selectedChapterIndex + 1);
+  toggleVideoPlayback() {
+    const video = this._video;
+    if (!video) return;
+    if (video.paused) video.play()?.catch(() => {});
+    else video.pause();
+  }
+
+  seekVideo(time) {
+    if (!this._video) return;
+    this._video.currentTime = Math.max(0, Math.min(this.playerDuration, time));
+    this.handleVideoTimeUpdate({ currentTarget: this._video });
+  }
+
+  handleProgressPointer(event) {
+    const progress = event.currentTarget;
+    if (event.type === 'pointerdown') progress.setPointerCapture(event.pointerId);
+    if (event.type === 'pointermove' && !progress.hasPointerCapture(event.pointerId)) return;
+    const rect = progress.getBoundingClientRect();
+    if (rect.width) {
+      this.seekVideo(((event.clientX - rect.left) / rect.width) * this.playerDuration);
+    }
+    if (event.type === 'pointerup' && progress.hasPointerCapture(event.pointerId)) {
+      progress.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  handlePlayerKeydown(event) {
+    if (event.target.closest('button, input, select')) return;
+    const actions = {
+      ArrowLeft: () => this.seekVideo(this.currentTime - 5),
+      ArrowRight: () => this.seekVideo(this.currentTime + 5),
+      Home: () => this.seekVideo(0),
+      End: () => this.seekVideo(this.playerDuration),
+      ' ': () => this.toggleVideoPlayback(),
+      Escape: () => {
+        this.settingsMenuOpen = false;
+      },
+    };
+    if (actions[event.key]) {
+      event.preventDefault();
+      actions[event.key]();
+    }
+  }
+
+  handleVolumeChange() {
+    this.videoVolume = this._video.volume;
+    this.videoMuted = this._video.muted;
+  }
+
+  async toggleVideoFullscreen() {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await this.querySelector('.video-holder').requestFullscreen();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Unable to change video fullscreen:', error);
     }
   }
 
@@ -503,6 +582,175 @@ export default class AssetPreview extends LitElement {
 
   handleVideoLoadedMetadata(event) {
     event.currentTarget.currentTime = this.currentTime;
+    this.videoDuration = Number.isFinite(event.currentTarget.duration)
+      ? event.currentTarget.duration : 0;
+    const track = event.currentTarget.querySelector('track[kind="chapters"]');
+    if (track) track.track.mode = 'hidden';
+  }
+
+  createChaptersTrackUrl() {
+    if (!this.chaptersTrackUrl) {
+      const cues = chapters.map((chapter, index) => {
+        const [start, end] = chapter.timerange.split(' - ');
+        return `${index + 1}\n${start} --> ${end}\n${chapter.title}\n`;
+      });
+      this.chaptersTrackUrl = URL.createObjectURL(
+        new Blob([`WEBVTT\n\n${cues.join('\n')}`], { type: 'text/vtt' }),
+      );
+    }
+    return this.chaptersTrackUrl;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  formatVideoTime(time) {
+    const total = Number.isFinite(time) ? Math.max(0, Math.floor(time)) : 0;
+    return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+  }
+
+  setPlaybackSpeed(speed) {
+    if (!this._video) return;
+    this._video.playbackRate = speed;
+    this.playbackSpeed = speed;
+    this.settingsMenuOpen = false;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  renderPlayerIcon(name) {
+    const paths = {
+      play: 'M8 5l11 7-11 7z',
+      pause: 'M8 5v14M16 5v14',
+      back: 'M3 10a9 9 0 1 1 1 9M3 4v6h6',
+      forward: 'M21 10a9 9 0 1 0-1 9M21 4v6h-6',
+      volume: 'M3 9h4l5-4v14l-5-4H3zM16 8a6 6 0 0 1 0 8M19 5a10 10 0 0 1 0 14',
+      muted: 'M3 9h4l5-4v14l-5-4H3zM17 9l5 6M22 9l-5 6',
+      next: 'M5 5l11 7-11 7zM19 5v14',
+      chapters: 'M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1',
+      fullscreen: 'M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5',
+      settings: 'M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1',
+    };
+    return html`<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="${paths[name]}" />
+      ${name === 'settings' ? html`<circle cx="12" cy="12" r="3" />` : ''}
+      ${['back', 'forward'].includes(name)
+    ? html`<text x="8" y="15" stroke="none" fill="currentColor" font-size="8">10</text>` : ''}
+    </svg>`;
+  }
+
+  renderVideoControls() {
+    const chapter = chapters[this.selectedChapterIndex];
+    const nextIndex = (this.selectedChapterIndex + 1) % chapters.length;
+    const percent = Math.max(0, Math.min(100, (this.currentTime / this.playerDuration) * 100));
+    const speeds = [0.75, 1, 1.25, 1.5, 2];
+    /* eslint-disable indent */
+    return html`
+      <div class="video-tint"></div>
+      <div class="player-chapter-pill">
+        ${this.renderPlayerIcon('chapters')}
+        <span>Chapter ${this.selectedChapterIndex + 1}</span>
+        <strong>${chapter.title}</strong>
+      </div>
+      <button class="player-center-play" type="button" aria-label="Play" title="Play"
+        ?hidden="${this.isVideoPlaying}" @click="${this.toggleVideoPlayback}">
+        ${this.renderPlayerIcon('play')}
+      </button>
+      <div class="player-settings-menu" ?hidden="${!this.settingsMenuOpen}">
+        <label>Playback speed
+          <select aria-label="Playback speed" .value="${String(this.playbackSpeed)}"
+            @change="${(event) => this.setPlaybackSpeed(Number(event.target.value))}">
+            ${speeds.map((speed) => html`<option value="${speed}">${speed}x</option>`)}
+          </select>
+        </label>
+      </div>
+      <div class="player-controls">
+        <div class="player-progress" role="slider" tabindex="0" aria-label="Video progress"
+          aria-valuemin="0" aria-valuemax="${this.playerDuration}"
+          aria-valuenow="${Math.min(this.currentTime, this.playerDuration)}"
+          aria-valuetext="${this.formatVideoTime(this.currentTime)} of ${
+            this.formatVideoTime(this.playerDuration)}"
+          @pointerdown="${this.handleProgressPointer}" @pointermove="${this.handleProgressPointer}"
+          @pointerup="${this.handleProgressPointer}">
+          <div class="player-progress-track"></div>
+          ${chapters.map((item) => {
+            const [start, end] = item.timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
+            const left = Math.min(100, (start / this.playerDuration) * 100);
+            const right = (Math.min(end, this.playerDuration) / this.playerDuration) * 100;
+            const width = Math.max(0, right - left);
+            return html`<div class="player-chapter-segment" title="${item.title}"
+              style="left:${left}%;width:${width}%"></div>`;
+          })}
+          <div class="player-progress-played" style="width:${percent}%"></div>
+          <div class="player-progress-thumb" style="left:${percent}%"></div>
+        </div>
+        <div class="player-bottom-row">
+          <div class="player-controls-left">
+            <button class="player-control-button" type="button"
+              aria-label="${this.isVideoPlaying ? 'Pause' : 'Play'}"
+              title="${this.isVideoPlaying ? 'Pause' : 'Play'}" @click="${this.toggleVideoPlayback}">
+              ${this.renderPlayerIcon(this.isVideoPlaying ? 'pause' : 'play')}
+            </button>
+            <button class="player-control-button" type="button" aria-label="Rewind 10 seconds"
+              title="Rewind 10 seconds" @click="${() => this.seekVideo(this.currentTime - 10)}">
+              ${this.renderPlayerIcon('back')}
+            </button>
+            <button class="player-control-button" type="button" aria-label="Forward 10 seconds"
+              title="Forward 10 seconds" @click="${() => this.seekVideo(this.currentTime + 10)}">
+              ${this.renderPlayerIcon('forward')}
+            </button>
+            <div class="player-volume ${this.volumeExpanded ? 'expanded' : ''}"
+              @mouseleave="${() => { this.volumeExpanded = false; }}"
+              @focusout="${(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) this.volumeExpanded = false;
+              }}">
+              <button class="player-control-button" type="button"
+                aria-label="${this.videoMuted ? 'Unmute' : 'Mute'}"
+                title="${this.videoMuted ? 'Unmute' : 'Mute'}"
+                @click="${() => {
+                  this._video.muted = !this._video.muted;
+                  this.volumeExpanded = true;
+                  this.handleVolumeChange();
+                }}">
+                ${this.renderPlayerIcon(this.videoMuted || !this.videoVolume ? 'muted' : 'volume')}
+              </button>
+              <input type="range" min="0" max="1" step="0.01" aria-label="Volume"
+                ?hidden="${!this.volumeExpanded}"
+                .value="${String(this.videoMuted ? 0 : this.videoVolume)}"
+                @input="${(event) => {
+                  this._video.volume = Number(event.target.value);
+                  this._video.muted = this._video.volume === 0;
+                  this.handleVolumeChange();
+                }}" />
+            </div>
+            <span class="player-time">${this.formatVideoTime(this.currentTime)} / ${this.formatVideoTime(this.playerDuration)}</span>
+          </div>
+          <button class="player-next-chapter" type="button"
+            aria-label="Go to next chapter: ${chapters[nextIndex].title}"
+            title="Go to next chapter: ${chapters[nextIndex].title}"
+            @click="${() => this.selectChapter(nextIndex)}">
+            ${this.renderPlayerIcon('next')}<span>${chapter.summary}</span>
+          </button>
+          <div class="player-controls-right">
+            <button class="player-speed" type="button" aria-label="Playback speed"
+              title="Playback speed" @click="${() => {
+                const cycle = [1, 1.25, 1.5, 2, 0.75];
+                const nextSpeed = (cycle.indexOf(this.playbackSpeed) + 1) % cycle.length;
+                this.setPlaybackSpeed(cycle[nextSpeed]);
+              }}">${this.playbackSpeed}x</button>
+            <button class="player-control-button" type="button" aria-label="Settings" title="Settings"
+              aria-expanded="${this.settingsMenuOpen}" @click="${() => {
+                this.settingsMenuOpen = !this.settingsMenuOpen;
+              }}">${this.renderPlayerIcon('settings')}</button>
+            <button class="player-control-button" type="button" aria-label="Chapters" title="Chapters"
+              aria-expanded="${this.chaptersVisible}" @click="${() => {
+                this.chaptersVisible = !this.chaptersVisible;
+                this.settingsMenuOpen = false;
+              }}">${this.renderPlayerIcon('chapters')}</button>
+            <button class="player-control-button" type="button" aria-label="Fullscreen" title="Fullscreen"
+              @click="${this.toggleVideoFullscreen}">${this.renderPlayerIcon('fullscreen')}</button>
+          </div>
+        </div>
+      </div>
+    `;
+    /* eslint-enable indent */
   }
 
   selectChapter(index) {
@@ -771,7 +1019,8 @@ export default class AssetPreview extends LitElement {
 
           ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
             <div class="asset-preview-block-video">
-              <div class="video-container video-holder">
+              <div class="video-container video-holder" tabindex="0"
+                role="group" aria-label="Video player" @keydown="${this.handlePlayerKeydown}">
                 ${this.isVideoLoading ? html`
                   <div class="video-loading-overlay">
                     <loading-spinner theme="dark"></loading-spinner>
@@ -782,8 +1031,15 @@ export default class AssetPreview extends LitElement {
                   preload="auto"
                   @play="${() => { this.isVideoPlaying = true; }}"
                   @pause="${() => { this.isVideoPlaying = false; }}"
+                  @ended="${() => { this.isVideoPlaying = false; }}"
                   @timeupdate="${this.handleVideoTimeUpdate}"
                   @loadedmetadata="${this.handleVideoLoadedMetadata}"
+                  @durationchange="${() => {
+                    this.videoDuration = Number.isFinite(this._video.duration)
+                      ? this._video.duration : 0;
+                  }}"
+                  @volumechange="${this.handleVolumeChange}"
+                  @ratechange="${() => { this.playbackSpeed = this._video.playbackRate; }}"
                   @loadstart="${() => { this.isVideoLoading = true; }}"
                   @seeking="${() => { this.isVideoLoading = true; }}"
                   @waiting="${() => { this.isVideoLoading = true; }}"
@@ -791,10 +1047,8 @@ export default class AssetPreview extends LitElement {
                   @canplay="${() => { this.isVideoLoading = false; }}"
                   @error="${() => { this.isVideoLoading = false; }}"
                   playsinline
-                  loop
                   data-video-source="${this.getDownloadUrl()}"
                   oncontextmenu="return false;"
-                  controls
                   controlsList="nodownload"
                 >
                   <source
@@ -805,10 +1059,13 @@ export default class AssetPreview extends LitElement {
                     src="${this.getDownloadUrl()}"
                     type="video/mp4"
                   />
+                  <track kind="chapters" label="Chapters" srclang="en" default
+                    src="${this.createChaptersTrackUrl()}" />
                 </video>
+                ${this.renderVideoControls()}
               </div>
 
-              ${chapters.length ? html`
+              ${chapters.length && this.chaptersVisible ? html`
               <div>
                 <sp-theme system="express" scale="medium" color="light">
                   <section
