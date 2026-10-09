@@ -6,6 +6,7 @@ import AssetPreview from '../../../eds/blocks/asset-preview/AssetPreview.js';
 
 const miloLibs = setLibs('/libs');
 const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
+const { render } = await import(`${miloLibs}/deps/lit-all.min.js`);
 setConfig({ locales: { '': { ietf: 'en-US', tk: 'hah7vzn.css' } }, miloLibs });
 
 function makeInstance() {
@@ -560,6 +561,434 @@ describe('AssetPreview - getRealAssetUrl()', () => {
 });
 
 // ---------------------------------------------------------------------------
+describe('AssetPreview - shareChapter()', () => {
+  afterEach(() => {
+    sinon.restore();
+    document.body.innerHTML = '';
+  });
+
+  it('replaces the clicked share icon with a green check for two seconds', async () => {
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const writeText = sinon.stub(navigator.clipboard, 'writeText').resolves();
+    const el = makeInstance();
+    const container = document.createElement('div');
+    const iconStyles = document.createElement('style');
+    iconStyles.textContent = '.share-button svg { stroke: #707070; }';
+    document.body.append(iconStyles, container);
+    render(el.renderChapters(), container);
+    const button = container.querySelector('.share-button');
+    const sharePath = button.querySelector('path').getAttribute('d');
+    expect(button.querySelector('svg').getAttribute('slot')).to.equal('icon');
+    expect(button.querySelector('path').namespaceURI).to.equal('http://www.w3.org/2000/svg');
+
+    button.click();
+    await Promise.resolve();
+    render(el.renderChapters(), container);
+
+    expect(writeText.calledOnceWithExactly(el.createChapterUrl(0))).to.be.true;
+    expect(button.getAttribute('label')).to.equal('Chapter link copied');
+    expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#268e6c');
+    expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(38, 142, 108)');
+    expect(button.querySelector('path').getAttribute('d')).to.equal('M5 12l4 4L19 6');
+    expect(button.querySelector('svg').getAttribute('slot')).to.equal('icon');
+    expect(button.querySelector('path').namespaceURI).to.equal('http://www.w3.org/2000/svg');
+    expect(container.querySelectorAll('.share-button')[1].querySelector('svg').getAttribute('stroke')).to.equal('#707070');
+
+    clock.tick(1999);
+    expect(el.sharedChapterIndex).to.equal(0);
+    clock.tick(1);
+    render(el.renderChapters(), container);
+
+    expect(button.getAttribute('label')).to.equal('Share chapter');
+    expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#707070');
+    expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(112, 112, 112)');
+    expect(button.querySelector('path').getAttribute('d')).to.equal(sharePath);
+  });
+
+  it('stops propagation and leaves the selected chapter unchanged when sharing', async () => {
+    const el = makeInstance();
+    const writeText = sinon.stub(navigator.clipboard, 'writeText').resolves();
+    const markShared = sinon.stub(el, 'markChapterShared');
+    const stopPropagation = sinon.spy();
+
+    await el.shareChapter(2, { stopPropagation });
+
+    expect(stopPropagation.calledOnce).to.be.true;
+    expect(writeText.calledOnceWithExactly(el.createChapterUrl(2))).to.be.true;
+    expect(markShared.calledOnceWithExactly(2)).to.be.true;
+    expect(el.selectedChapterIndex).to.equal(0);
+  });
+
+  it('logs clipboard failures without showing a copied state', async () => {
+    const el = makeInstance();
+    const error = new Error('Clipboard permission denied');
+    sinon.stub(navigator.clipboard, 'writeText').rejects(error);
+    const logError = sinon.stub(console, 'error');
+    const markShared = sinon.stub(el, 'markChapterShared');
+
+    await el.shareChapter(2, { stopPropagation: sinon.spy() });
+
+    expect(logError.calledOnceWithExactly('Failed to copy chapter URL:', error)).to.be.true;
+    expect(markShared.called).to.be.false;
+    expect(el.sharedChapterIndex).to.equal(-1);
+    expect(el.shareResetTimer).to.equal(null);
+  });
+});
+
+describe('AssetPreview - chapter time helpers', () => {
+  it('converts hours, minutes and fractional seconds to seconds', () => {
+    expect(makeInstance().timecodeToSeconds('01:02:03.456')).to.be.closeTo(3723.456, 0.001);
+  });
+
+  it('extracts the unchanged start time from a chapter range', () => {
+    expect(makeInstance().getStartTime('00:01:31.625 - 00:02:22.906')).to.equal('00:01:31.625');
+  });
+
+  it('formats timecodes with zero padding and discards fractional seconds', () => {
+    const el = makeInstance();
+    expect(el.formatTimecode('00:00:01.999')).to.equal('00:01');
+    expect(el.formatTimecode('00:05:09.123')).to.equal('05:09');
+    expect(el.formatTimecode('01:02:03.456')).to.equal('62:03');
+  });
+});
+
+describe('AssetPreview - markChapterShared() and disconnectedCallback()', () => {
+  afterEach(() => sinon.restore());
+
+  it('restarts the copied-state timer when another chapter is shared', () => {
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const el = makeInstance();
+    el.markChapterShared(0);
+    clock.tick(1000);
+    el.markChapterShared(2);
+
+    clock.tick(1000);
+    expect(el.sharedChapterIndex).to.equal(2);
+    clock.tick(999);
+    expect(el.sharedChapterIndex).to.equal(2);
+    clock.tick(1);
+    expect(el.sharedChapterIndex).to.equal(-1);
+    expect(el.shareResetTimer).to.equal(null);
+  });
+
+  it('cancels the pending copied-state timer when disconnected', () => {
+    const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const el = makeInstance();
+    el.markChapterShared(2);
+
+    el.disconnectedCallback();
+    clock.tick(2000);
+
+    expect(el.sharedChapterIndex).to.equal(2);
+    expect(clock.countTimers()).to.equal(0);
+  });
+});
+
+describe('AssetPreview - handleVideoTimeUpdate()', () => {
+  afterEach(() => sinon.restore());
+
+  it('updates playback time without advancing before the chapter ends', () => {
+    const el = makeInstance();
+    const selectChapter = sinon.stub(el, 'selectChapter');
+
+    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 91.624, paused: false } });
+
+    expect(el.currentTime).to.equal(91.624);
+    expect(selectChapter.called).to.be.false;
+  });
+
+  it('advances to the next chapter at or after the end time', () => {
+    const el = makeInstance();
+    const selectChapter = sinon.stub(el, 'selectChapter');
+
+    [91.625, 92].forEach((currentTime) => {
+      el.handleVideoTimeUpdate({ currentTarget: { currentTime, paused: false } });
+    });
+
+    expect(selectChapter.calledTwice).to.be.true;
+    expect(selectChapter.alwaysCalledWithExactly(1)).to.be.true;
+    expect(el.currentTime).to.equal(92);
+  });
+
+  it('updates time but does not advance while paused', () => {
+    const el = makeInstance();
+    const selectChapter = sinon.stub(el, 'selectChapter');
+
+    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 100, paused: true } });
+
+    expect(el.currentTime).to.equal(100);
+    expect(selectChapter.called).to.be.false;
+  });
+
+  it('does not advance beyond the final chapter', () => {
+    const el = makeInstance();
+    const container = document.createElement('div');
+    render(el.renderChapters(), container);
+    el.selectedChapterIndex = container.querySelectorAll('.chapter').length - 1;
+    const selectChapter = sinon.stub(el, 'selectChapter');
+
+    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 4000, paused: false } });
+
+    expect(el.currentTime).to.equal(4000);
+    expect(selectChapter.called).to.be.false;
+  });
+});
+
+describe('AssetPreview - chapter progress', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('fills earlier tracks blue when clicking the third chapter', async () => {
+    const el = makeInstance();
+    const container = document.createElement('div');
+    const styles = document.createElement('style');
+    styles.textContent = await readFile({ path: '../../../eds/blocks/asset-preview/asset-preview.css' });
+    document.body.append(styles, container);
+    render(el.renderChapters(), container);
+
+    container.querySelector('#chapter-3').click();
+    render(el.renderChapters(), container);
+
+    const fills = container.querySelectorAll('.progress-fill');
+    [fills[0], fills[1]].forEach((fill) => {
+      expect(fill.style.width).to.equal('100%');
+      expect(getComputedStyle(fill).backgroundColor).to.equal('rgb(20, 115, 230)');
+    });
+    Array.from(fills).slice(2).forEach((fill) => {
+      expect(fill.style.width).to.equal('0%');
+    });
+  });
+
+  it('updates earlier tracks for keyboard selection and resets later tracks when going back', () => {
+    const el = makeInstance();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    render(el.renderChapters(), container);
+
+    container.querySelector('#chapter-3').dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    render(el.renderChapters(), container);
+    expect(el.getChapterProgress(0)).to.equal(100);
+    expect(el.getChapterProgress(1)).to.equal(100);
+
+    container.querySelector('#chapter-2').click();
+    render(el.renderChapters(), container);
+    expect(el.getChapterProgress(0)).to.equal(100);
+    expect(el.getChapterProgress(1)).to.equal(0);
+    expect(el.getChapterProgress(2)).to.equal(0);
+  });
+
+  it('preserves partial progress for the active chapter and empty future tracks', () => {
+    const el = makeInstance();
+    el.selectChapter(2);
+    el.currentTime = (142.906 + 322.223) / 2;
+
+    expect(el.getChapterProgress(0)).to.equal(100);
+    expect(el.getChapterProgress(1)).to.equal(100);
+    expect(el.getChapterProgress(2)).to.be.closeTo(50, 0.001);
+    expect(el.getChapterProgress(3)).to.equal(0);
+  });
+
+  it('clamps active chapter progress between zero and one hundred percent', () => {
+    const el = makeInstance();
+    el.selectChapter(2);
+    el.currentTime = 0;
+    expect(el.getChapterProgress(2)).to.equal(0);
+    el.currentTime = 4000;
+    expect(el.getChapterProgress(2)).to.equal(100);
+  });
+
+  it('selects a chapter with Space and ignores unrelated keys', () => {
+    const el = makeInstance();
+    const container = document.createElement('div');
+    render(el.renderChapters(), container);
+    const chapter = container.querySelector('#chapter-3');
+    const space = new KeyboardEvent('keydown', { key: ' ', cancelable: true });
+
+    chapter.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+    expect(el.selectedChapterIndex).to.equal(0);
+    chapter.dispatchEvent(space);
+    render(el.renderChapters(), container);
+
+    expect(space.defaultPrevented).to.be.true;
+    expect(el.selectedChapterIndex).to.equal(2);
+    expect(chapter.getAttribute('aria-current')).to.equal('true');
+    expect(container.querySelector('#chapter-1').getAttribute('aria-current')).to.equal('false');
+  });
+});
+
+describe('AssetPreview - chapter URLs', () => {
+  let originalUrl;
+
+  beforeEach(() => {
+    originalUrl = window.location.href;
+  });
+
+  afterEach(() => {
+    window.history.replaceState(null, '', originalUrl);
+    document.body.innerHTML = '';
+  });
+
+  it('restores the copied chapter and seeks after metadata loads', () => {
+    const url = makeInstance().createChapterUrl(2);
+    expect(new URL(url).searchParams.get('t')).to.equal('142.906');
+    window.history.replaceState(null, '', url);
+
+    const el = makeInstance();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    render(el.renderChapters(), container);
+    expect(el.selectedChapterIndex).to.equal(2);
+    expect(container.querySelector('.is-active').id).to.equal('chapter-3');
+    expect(container.querySelector('#chapter-1 .progress-fill').style.width).to.equal('100%');
+    expect(container.querySelector('#chapter-2 .progress-fill').style.width).to.equal('100%');
+
+    const video = document.createElement('video');
+    el.handleVideoLoadedMetadata({ currentTarget: video });
+    expect(video.currentTime).to.equal(142.906);
+  });
+
+  it('selects a chapter from a timestamp-only URL', () => {
+    window.history.replaceState(null, '', '?t=100');
+    const el = makeInstance();
+    expect(el.selectedChapterIndex).to.equal(1);
+    expect(el.currentTime).to.equal(100);
+  });
+
+  it('preserves unrelated URL parameters and the hash when creating a chapter link', () => {
+    window.history.replaceState(null, '', '?asset=example&chapter=1&t=0#details');
+    const url = new URL(makeInstance().createChapterUrl(2));
+
+    expect(url.searchParams.get('asset')).to.equal('example');
+    expect(url.searchParams.get('chapter')).to.equal('3');
+    expect(url.searchParams.get('t')).to.equal('142.906');
+    expect(url.hash).to.equal('#details');
+  });
+
+  it('restores an in-range timestamp for an explicitly selected chapter', () => {
+    window.history.replaceState(null, '', '?chapter=3&t=200');
+    const el = makeInstance();
+    expect(el.selectedChapterIndex).to.equal(2);
+    expect(el.currentTime).to.equal(200);
+  });
+
+  it('uses the next chapter at a shared timestamp boundary', () => {
+    window.history.replaceState(null, '', '?t=91.625');
+    const el = makeInstance();
+    expect(el.selectedChapterIndex).to.equal(1);
+    expect(el.currentTime).to.equal(91.625);
+  });
+
+  it('falls back to a valid timestamp when the chapter parameter is invalid', () => {
+    window.history.replaceState(null, '', '?chapter=999&t=100');
+    const el = makeInstance();
+    expect(el.selectedChapterIndex).to.equal(1);
+    expect(el.currentTime).to.equal(100);
+  });
+
+  it('uses the selected chapter start for an out-of-range timestamp', () => {
+    window.history.replaceState(null, '', '?chapter=3&t=100');
+    const el = makeInstance();
+    expect(el.selectedChapterIndex).to.equal(2);
+    expect(el.currentTime).to.equal(142.906);
+  });
+
+  it('falls back to the chapter start for an invalid timestamp', () => {
+    window.history.replaceState(null, '', '?chapter=2&t=invalid');
+    const el = makeInstance();
+    expect(el.selectedChapterIndex).to.equal(1);
+    expect(el.currentTime).to.equal(91.625);
+  });
+
+  it('keeps the default chapter for invalid URL values', () => {
+    ['?chapter=999&t=-1', '?chapter=1.5&t=Infinity', '?chapter=invalid&t='].forEach((query) => {
+      window.history.replaceState(null, '', query);
+      const el = makeInstance();
+      expect(el.selectedChapterIndex).to.equal(0);
+      expect(el.currentTime).to.equal(0);
+    });
+  });
+});
+
+describe('AssetPreview - selectChapter()', () => {
+  afterEach(() => {
+    sinon.restore();
+    document.body.innerHTML = '';
+  });
+
+  it('preserves the seek time when selecting before the video exists', () => {
+    const el = makeInstance();
+    el.selectChapter(1);
+    const video = document.createElement('video');
+    el.handleVideoLoadedMetadata({ currentTarget: video });
+    expect(video.currentTime).to.equal(91.625);
+  });
+
+  it('seeks and requests playback immediately when metadata is ready', () => {
+    const video = document.createElement('video');
+    sinon.stub(video, 'readyState').get(() => 1);
+    const playStub = sinon.stub(video, 'play').resolves();
+    document.body.appendChild(video);
+    const el = makeInstance();
+
+    el.selectChapter(1);
+
+    expect(el.selectedChapterIndex).to.equal(1);
+    expect(video.currentTime).to.equal(91.625);
+    expect(playStub.calledOnce).to.be.true;
+  });
+
+  it('requests playback immediately and seeks to the latest selection once metadata loads', () => {
+    const video = document.createElement('video');
+    sinon.stub(video, 'readyState').get(() => 0);
+    const playStub = sinon.stub(video, 'play').resolves();
+    document.body.appendChild(video);
+    const el = makeInstance();
+
+    el.selectChapter(1);
+    expect(playStub.calledOnce).to.be.true;
+    expect(video.currentTime).to.equal(0);
+
+    el.selectChapter(2);
+    el.handleVideoLoadedMetadata({ currentTarget: video });
+
+    expect(playStub.calledTwice).to.be.true;
+    expect(video.currentTime).to.equal(142.906);
+    expect(el.currentTime).to.equal(142.906);
+  });
+
+  it('ignores invalid chapter indices without changing playback', () => {
+    const video = document.createElement('video');
+    const playStub = sinon.stub(video, 'play').resolves();
+    document.body.appendChild(video);
+    const el = makeInstance();
+    el.currentTime = 20;
+
+    [-1, 999].forEach((index) => el.selectChapter(index));
+
+    expect(el.selectedChapterIndex).to.equal(0);
+    expect(el.currentTime).to.equal(20);
+    expect(video.currentTime).to.equal(0);
+    expect(playStub.called).to.be.false;
+  });
+
+  it('keeps the selection and seek time when playback is rejected', async () => {
+    const video = document.createElement('video');
+    sinon.stub(video, 'readyState').get(() => 1);
+    const playStub = sinon.stub(video, 'play').rejects(new Error('Playback requires interaction'));
+    document.body.appendChild(video);
+    const el = makeInstance();
+
+    el.selectChapter(2);
+    await Promise.resolve();
+
+    expect(playStub.calledOnce).to.be.true;
+    expect(el.selectedChapterIndex).to.equal(2);
+    expect(el.currentTime).to.equal(142.906);
+    expect(video.currentTime).to.equal(142.906);
+  });
+});
+
 describe('AssetPreview - playVideo()', () => {
   afterEach(() => {
     sinon.restore();
@@ -571,12 +1000,15 @@ describe('AssetPreview - playVideo()', () => {
     container.className = 'asset-preview-block-video';
     const video = document.createElement('video');
     const playStub = sinon.stub(video, 'play');
+    const scrollStub = sinon.stub(window, 'scrollTo');
+    sinon.stub(container, 'offsetTop').get(() => 240);
     container.appendChild(video);
     document.body.appendChild(container);
 
     const el = makeInstance();
     el.playVideo();
     expect(playStub.calledOnce).to.be.true;
+    expect(scrollStub.calledOnceWithExactly({ top: 240, behavior: 'smooth' })).to.be.true;
   });
 
   it('does nothing when no video element exists in the DOM', () => {
