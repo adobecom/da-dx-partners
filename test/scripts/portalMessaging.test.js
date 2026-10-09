@@ -4,9 +4,9 @@ import { setLibs } from '../../eds/scripts/utils.js';
 import {
   getBctqBanner,
   getGlobalBanner,
+  insertBannerContent,
   loadPopupFragment,
   portalMessaging,
-  prependContent,
 } from '../../eds/scripts/portalMessaging.js';
 import { PERSONALIZATION_CONDITIONS } from '../../eds/scripts/personalizationConfigDX.js';
 
@@ -22,7 +22,7 @@ describe('portalMessaging browser coverage', () => {
     sessionStorage.clear();
   });
 
-  it('returns the first element from a popup fragment main', async () => {
+  it('returns the first element from a popup fragment body', async () => {
     sinon.stub(window, 'fetch').resolves({
       ok: true,
       text: async () => '<html><body><main><div id="popup">Content</div></main></body></html>',
@@ -30,7 +30,7 @@ describe('portalMessaging browser coverage', () => {
 
     const result = await loadPopupFragment('/fragment.html', 'portal messaging');
 
-    expect(result.id).to.equal('popup');
+    expect(result.tagName).to.equal('MAIN');
   });
 
   it('returns null when a fragment request fails', async () => {
@@ -78,7 +78,7 @@ describe('portalMessaging browser coverage', () => {
   it('adds a notification ribbon when a main element exists', async () => {
     document.body.innerHTML = '<main><p>Content</p></main>';
 
-    await prependContent();
+    insertBannerContent({});
 
     expect(document.querySelector('#notificationRibbon')).to.exist;
     expect(document.querySelector('main').firstElementChild.id).to.equal('notificationRibbon');
@@ -87,7 +87,7 @@ describe('portalMessaging browser coverage', () => {
   it('does nothing when no main element exists', async () => {
     document.body.innerHTML = '<section>Content</section>';
 
-    await prependContent();
+    insertBannerContent({});
 
     expect(document.querySelector('#notificationRibbon')).to.equal(null);
   });
