@@ -7,7 +7,7 @@ import {
   getPartnerCookieValue,
   partnerCookieContainsValue,
   isReturningUser, isAccountLocked, isBctqExpiring, isPartnerNewlyApproved,
-  hasPartnerAccountStateCalendly, isAdobeAccount,
+  hasPartnerAccountStateCalendly, isAdobeAccount, isAccentureAccount,
 } from './utils.js';
 import {
   DX_ACCESS_TYPE,
