@@ -29,7 +29,7 @@ function defaultData(overrides = {}) {
     },
     arbitrary: [
       { product: 'analytics' },
-      { partnerlevel: 'platinum' },
+      { 'partner-level': 'platinum' },
       { solution: 'commerce' },
     ],
     contentArea: {
@@ -83,8 +83,18 @@ describe('SearchCard component', () => {
 
   it('omits partner level and unknown tags', async () => {
     const searchCard = makeSearchCard({
+      data: defaultData({
+        arbitrary: [
+          { product: 'analytics' },
+          { 'partner-level': 'platinum' },
+          { 'audience-partner-level': 'gold' },
+          { unknown: 'mystery' },
+        ],
+      }),
       allTagsFlatMap: new Map([
         ['product/analytics', { title: 'Analytics' }],
+        ['partner-level/platinum', { title: 'Platinum' }],
+        ['audience-partner-level/gold', { title: 'Gold' }],
       ]),
     });
     await searchCard.updateComplete;
