@@ -213,6 +213,42 @@ describe('AssetPreview - getAssetMetadata()', () => {
 
     expect(fetchStub.called).to.be.false;
   });
+
+  it('fetches metadata without chapter parameters and restores the chapter on the client', async () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '/digitalexperience/preview/video.html?chapter=2&t=35');
+      const el = new AssetPreview();
+      el.blockData = {};
+      const chapters = [
+        { title: 'First', summary: 'First summary', timerange: '00:00:00.000 - 00:00:30.000' },
+        { title: 'Second', summary: 'Second summary', timerange: '00:00:30.000 - 00:01:00.000' },
+      ];
+      const fetchStub = sinon.stub(window, 'fetch').resolves({
+        status: 200,
+        json: async () => ({ title: 'Video', url: 'https://example.com/video.mp4', chapters }),
+      });
+
+      expect(el.chapters).to.deep.equal([]);
+      expect(el.selectedChapterIndex).to.equal(0);
+      await el.getAssetMetadata();
+
+      const metadataUrl = fetchStub.firstCall.args[0];
+      expect(metadataUrl.pathname).to.equal('/digitalexperience-assets/preview/video/_jcr_content/metadata.assetmetadata.json');
+      expect(metadataUrl.search).to.equal('');
+      expect(window.location.search).to.equal('?chapter=2&t=35');
+      expect(el.chapters).to.deep.equal(chapters);
+      expect(el.selectedChapterIndex).to.equal(1);
+      expect(el.currentTime).to.equal(35);
+      expect(el.isLoading).to.be.false;
+
+      const video = document.createElement('video');
+      el.handleVideoLoadedMetadata({ currentTarget: video });
+      expect(video.currentTime).to.equal(35);
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
 });
 
 describe('AssetPreview - setData() pdfPreviewUrl', () => {
@@ -691,6 +727,23 @@ describe('AssetPreview - getRealAssetUrl()', () => {
     const result = el.getRealAssetUrl();
     expect(result === null || result instanceof URL).to.be.true;
   });
+
+  it('removes client-only chapter parameters while preserving other query parameters', () => {
+    const originalUrl = window.location.href;
+    try {
+      ['chapter=1&t=1.001', 'chapter=1', 't=1.001'].forEach((query) => {
+        window.history.replaceState(null, '', `/digitalexperience/preview/video.html?${query}&asset=example`);
+        const metadataUrl = new AssetPreview().getRealAssetUrl();
+
+        expect(metadataUrl.searchParams.has('chapter')).to.be.false;
+        expect(metadataUrl.searchParams.has('t')).to.be.false;
+        expect(metadataUrl.searchParams.get('asset')).to.equal('example');
+        expect(window.location.search).to.equal(`?${query}&asset=example`);
+      });
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -865,6 +918,17 @@ describe('AssetPreview - handleVideoTimeUpdate()', () => {
     expect(el.currentTime).to.equal(4000);
     expect(selectChapter.called).to.be.false;
   });
+
+  it('updates playback time without selecting a chapter when chapters are absent', () => {
+    const el = makeInstance();
+    el.chapters = [];
+    const selectChapter = sinon.stub(el, 'selectChapter');
+
+    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 100, paused: false } });
+
+    expect(el.currentTime).to.equal(100);
+    expect(selectChapter.called).to.be.false;
+  });
 });
 
 describe('AssetPreview - chapter progress', () => {
@@ -1031,6 +1095,67 @@ describe('AssetPreview - chapter URLs', () => {
     const el = makeInstance();
     expect(el.selectedChapterIndex).to.equal(1);
     expect(el.currentTime).to.equal(91.625);
+  });
+
+  it('restores a chapter at its start when the timestamp is missing or blank', () => {
+    ['?chapter=3', '?chapter=3&t=', '?chapter=3&t=%20%20'].forEach((query) => {
+      window.history.replaceState(null, '', query);
+      const el = makeInstance();
+
+      expect(el.selectedChapterIndex).to.equal(2);
+      expect(el.currentTime).to.equal(142.906);
+    });
+  });
+
+  it('keeps the explicit chapter when the timestamp is exactly its end', () => {
+    window.history.replaceState(null, '', '?chapter=2&t=142.906');
+    const el = makeInstance();
+
+    expect(el.selectedChapterIndex).to.equal(1);
+    expect(el.currentTime).to.equal(91.625);
+  });
+
+  it('restores the chapter start when the timestamp is exactly its start', () => {
+    window.history.replaceState(null, '', '?chapter=3&t=142.906');
+    const el = makeInstance();
+
+    expect(el.selectedChapterIndex).to.equal(2);
+    expect(el.currentTime).to.equal(142.906);
+  });
+
+  it('falls back to a timestamp for non-integer and non-positive chapter values', () => {
+    ['1.5', '0', '-1', 'invalid'].forEach((chapter) => {
+      window.history.replaceState(null, '', `?chapter=${chapter}&t=200`);
+      const el = makeInstance();
+
+      expect(el.selectedChapterIndex).to.equal(2);
+      expect(el.currentTime).to.equal(200);
+    });
+  });
+
+  it('leaves the selection unchanged for timestamps outside all chapter ranges', () => {
+    ['0', '322.5', '432.258', '500'].forEach((timestamp) => {
+      window.history.replaceState(null, '', `?t=${timestamp}`);
+      const el = makeInstance();
+      el.selectedChapterIndex = 1;
+      el.currentTime = 100;
+
+      el.restoreChapterFromUrl();
+
+      expect(el.selectedChapterIndex).to.equal(1);
+      expect(el.currentTime).to.equal(100);
+    });
+  });
+
+  it('ignores chapter links when no chapter metadata is available', () => {
+    window.history.replaceState(null, '', '?chapter=2&t=100');
+    const el = new AssetPreview();
+
+    el.restoreChapterFromUrl();
+
+    expect(el.chapters).to.deep.equal([]);
+    expect(el.selectedChapterIndex).to.equal(0);
+    expect(el.currentTime).to.equal(0);
   });
 
   it('keeps the default chapter for invalid URL values', () => {

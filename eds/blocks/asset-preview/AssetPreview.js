@@ -259,6 +259,8 @@ export default class AssetPreview extends LitElement {
       const isProd = prodHosts.includes(window.location.host);
       url.hostname = isProd ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
       url.port = '';
+      url.searchParams.delete('chapter');
+      url.searchParams.delete('t');
       return url;
     } catch (error) {
       return null;
