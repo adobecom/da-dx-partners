@@ -65,5 +65,55 @@ export default {
         globalBannerText: 'Live chat is unavailable on September 14, 2026. Please submit your support request here.',
       },
     },
+    {
+      tcid: '4',
+      name: '@uplevel-banner-silver-user-100-solution',
+      path: '/digitalexperience/drafts/automation/regression/uplevel-banner-test-page#',
+      tags: '@da-dx-banners @regression @anonymous @da-dx-main',
+      data: {
+        partnerLevel: 'dxp-silver-100-solution:',
+        uplevelBannerText: 'Silver Uplevel Banner Account Name is eligible to move up to the gold partner',
+        ctaLink: '/gold-membership.html',
+      },
+    },
+    {
+      tcid: '5',
+      name: '@uplevel-banner-gold-user-100-tehnology',
+      path: 'digitalexperience/drafts/automation/regression/uplevel-banner-test-page#',
+      tags: '@da-dx-banners @regression @anonymous @da-dx-main',
+      data: {
+        partnerLevel: 'dxp-gold-100-tehnology:',
+        uplevelBannerText: 'DONOT USE DXP Stage Technology 100 Company Name is eligible to move up to the platinum partner level at no cost for the rest of the program year.',
+        ctaLink: '/platinum-membership.html',
+      },
+    },
+    {
+      tcid: '6',
+      name: '@uplevel-banner-not-displayed-metadata-sitewide-none',
+      path: '/digitalexperience/drafts/automation/regression/uplevel-banner-none-test-page',
+      tags: '@da-dx-banners @regression @anonymous @da-dx-main',
+      data: { partnerLevel: 'dxp-silver-100-solution:' },
+    },
+    {
+      tcid: '7',
+      name: '@uplevel-banner-not-displayed-under-100-progress',
+      path: '/digitalexperience/drafts/automation/regression/uplevel-banner-test-page#',
+      tags: '@da-dx-banners @regression @anonymous @da-dx-main',
+      data: { partnerLevel: 'dxp-gold-progress:' },
+    },
+    {
+      tcid: '8',
+      name: '@uplevel-banner-displayed-no-personalization',
+      path: '/digitalexperience/drafts/automation/regression/uplevel-banner-no-personalization-test-page#',
+      tags: '@da-dx-banners @regression @anonymous @da-dx-main',
+      data: {
+        partnerLevel: 'dxp-silver-100-solution:',
+        ctaLink: '/digitalexperience/s/registration',
+      },
+    },
+    {
+      tcid: '9',
+      name: '@uplevel-banner-not-displayed-app-under-100-progress',
+    },
   ],
 };
