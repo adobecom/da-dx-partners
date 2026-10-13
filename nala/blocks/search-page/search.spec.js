@@ -155,7 +155,7 @@ export default {
         assetTitle1: 'Asset preview Public PDF Regular Automation',
         assetTitle2: 'Asset preview Community JPG Regular Automation',
         assetTitle3: 'Asset preview Silver PPTX Regular Automation',
-        assetTitle4: 'Asset preview Silver PPTX Regular Automation',
+        assetTitle4: 'Asset preview Public ZIP Netstorage Automation',
         silverAsset: 'Silver only page for testing search Automation',
       },
     },
@@ -308,6 +308,12 @@ export default {
           },
         ],
       },
+    },
+    {
+      tcid: '25',
+      name: '@video-player-asset-preview-page',
+      path: '/digitalexperience/preview/netstorage-assets/public/au/Automation_Regression_Public_Search_Page_Test.mp4.html',
+      tags: '@da-dx-search-page @regression @circleCi',
     },
   ],
 };
