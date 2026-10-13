@@ -13,144 +13,6 @@ import {
 
 import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
-const chapters = [
-  {
-    title: 'Welcome And Speaker Introductions',
-    summary: 'Natalie Niehoff welcomes attendees to the AJO Loyalty Go-To-Market Launch webinar and introduces Tyler Hogan, Kira Fawcett, and Daniel Vivas from the product marketing and management teams.',
-    timerange: '00:00:01.001 - 00:01:31.625',
-  },
-  {
-    title: 'Agenda And Session Goals',
-    summary: 'Tyler outlines the agenda covering product overview, demo, use cases, and FAQs, aiming for partners to confidently discuss Adobe\'s loyalty strategy and value with customers.',
-    timerange: '00:01:31.625 - 00:02:22.906',
-  },
-  {
-    title: 'Why Partners Should Be Excited',
-    summary: 'Tyler explains the market shift driven by rising acquisition costs and AI disruption, introduces the loyalty leader persona, and highlights AJO Loyalty as a standalone offering with strong market demand.',
-    timerange: '00:02:22.906 - 00:05:22.223',
-  },
-  {
-    title: 'Market Headwinds And Loyalty Importance',
-    summary: 'Discussion of Gartner and Bain data showing declining organic search, rising acquisition costs, and 78% of retail executives believing generative AI will weaken brand loyalty, positioning loyalty as a strategic asset.',
-    timerange: '00:05:22.959 - 00:07:12.258',
-  },
-  {
-    title: 'Evolution Of Loyalty Programs',
-    summary: 'Tyler traces loyalty\'s evolution from transactional point systems through experiential gamification to the future vision of loyalty as an AI-powered growth engine capturing zero-party data.',
-    timerange: '00:07:14.346 - 00:08:53.278',
-  },
-  {
-    title: 'Blockers To Modern Loyalty',
-    summary: 'Four key blockers are outlined: fragmented data, static programs, operational silos and lag, and underutilization of AI, with 60% of loyalty spend going to manual services.',
-    timerange: '00:08:53.778 - 00:11:32.270',
-  },
-  {
-    title: 'Current Loyalty Solution Approaches',
-    summary: 'Tyler reviews three approaches brands take today: in-house solutions, pure-play loyalty management platforms, and enterprise ecosystems, identifying gaps in personalization, orchestration, and agentic AI.',
-    timerange: '00:11:33.132 - 00:13:27.365',
-  },
-  {
-    title: 'Introducing AJO Loyalty',
-    summary: 'Tyler introduces Adobe Journey Optimizer Loyalty as an AI-first orchestration app built on AEP with three core capabilities: agentic AI, personalized gamification, and unified loyalty data.',
-    timerange: '00:13:32.412 - 00:14:29.143',
-  },
-  {
-    title: 'Agentic AI Capabilities',
-    summary: 'Deep dive into always-on agentic AI that identifies high-value members, flags churn risks, recommends tactics, and measures incremental ROI tied to customer lifetime value and AOV.',
-    timerange: '00:14:30.453 - 00:15:47.013',
-  },
-  {
-    title: 'Personalized Gamification',
-    summary: 'Overview of the no-code personalized gamification capability enabling one-to-one challenges that adapt to member behavior, lifecycle stage, and preferences with cross-channel messaging orchestration.',
-    timerange: '00:15:50.194 - 00:16:53.814',
-  },
-  {
-    title: 'Integration With Existing Loyalty Stack',
-    summary: 'Tyler emphasizes AJO Loyalty complements existing loyalty infrastructure via custom integrations and connectors, with the loyalty management platform remaining the system of record while AJO orchestrates experiences.',
-    timerange: '00:16:53.814 - 00:18:45.641',
-  },
-  {
-    title: 'Roadmap Preview By Kira',
-    summary: 'Kira previews upcoming enhancements including integration with decisioning and experimentation, positioning this launch as the beginning of a broader roadmap.',
-    timerange: '00:18:49.554 - 00:19:22.525',
-  },
-  {
-    title: 'Demo Introduction And AI Agent',
-    summary: 'Kira begins the demo in AJO Loyalty, showing the insights section with anomaly detection and demonstrates coworker agent skills to create a “Mad About Matcha” challenge via prompts.',
-    timerange: '00:19:24.051 - 00:24:51.846',
-  },
-  {
-    title: 'Form-Based Challenge Creation',
-    summary: 'Daniel walks through form-based challenge creation, showing three challenge types and reviews the general setup including AEP audiences and manual opt-in or event triggers.',
-    timerange: '00:24:52.688 - 00:29:59.923',
-  },
-  {
-    title: 'Challenge Structure And Tasks',
-    summary: 'Daniel demonstrates the structure section, creating tasks with activity types including purchase, spend, and custom events tied to AEP experience events, with SKU-level or product group eligibility.',
-    timerange: '00:30:15.493 - 00:33:31.707',
-  },
-  {
-    title: 'Rewards Configuration',
-    summary: 'Daniel explains reward setup, connecting to partner endpoints like Capillary via API to issue points upon challenge completion, with plans for multiple reward types like points and miles later in the year.',
-    timerange: '00:33:34.117 - 00:34:57.325',
-  },
-  {
-    title: 'Content And Messaging Orchestration',
-    summary: 'Daniel demonstrates content creation via AJO content cards and code-based experiences, plus messaging orchestration across six AJO channels at launch, in-progress, and end phases of the challenge.',
-    timerange: '00:34:57.325 - 00:38:15.274',
-  },
-  {
-    title: 'Auto-Generated Journey',
-    summary: 'Daniel shows how AJO Loyalty auto-generates a journey from the configured challenge, including read audience, content card, and messaging nodes, with full journey features like dry run and experimentation available.',
-    timerange: '00:38:17.711 - 00:39:40.222',
-  },
-  {
-    title: 'Loyalty Admin Section',
-    summary: 'Daniel walks through the admin section for configuring reward providers, event definitions for custom events, and product inventory uploads to simplify marketer workflows.',
-    timerange: '00:39:40.883 - 00:41:12.249',
-  },
-  {
-    title: 'Reporting Powered By CJA',
-    summary: 'Daniel explains the CJA-backed reporting section providing out-of-the-box per-challenge reports, with data available for deeper CJA analysis if customers have CJA licensed.',
-    timerange: '00:41:14.035 - 00:42:34.348',
-  },
-  {
-    title: 'Customer Zero Case Study',
-    summary: 'Daniel shares how AJO Loyalty was born from a customer needing sub-two-second challenge task delivery at fuel pumps, launching 12-14 million challenges with less than two-second latency where journeys couldn’t scale.',
-    timerange: '00:42:35.543 - 00:46:36.350',
-  },
-  {
-    title: 'Use Cases Across Verticals',
-    summary: 'Tyler covers use cases including identifying high-propensity members, gamifying onboarding, driving purchase behaviors, incentivizing zero-party data capture, and personalizing reward amounts based on CLV.',
-    timerange: '00:46:36.370 - 00:49:33.298',
-  },
-  {
-    title: 'Ideal Customers And Personas',
-    summary: 'Tyler identifies top verticals and target personas including loyalty program owners, CRM and lifecycle marketing leaders.',
-    timerange: '00:49:33.358 - 00:50:35.556',
-  },
-  {
-    title: 'Pricing And Packaging',
-    summary: 'AJO Loyalty is a new base SKU chargeable on engagement profiles, sold standalone or as add-on, with included agentic features, though not yet compatible with healthcare and privacy security shields.',
-    timerange: '00:50:35.556 - 00:52:00.840',
-  },
-  {
-    title: 'Product Roadmap',
-    summary: 'Tyler previews roadmap investments including expansion to all 14 AJO channels, decisioning and experimentation integration, coupon codes, brand concierge integration, and additional agentic skills.',
-    timerange: '00:52:01.275 - 00:54:27.977',
-  },
-  {
-    title: 'Resources And Enablement',
-    summary: 'Tyler shares available resources on Partner Experience Hub including FAQ, pitch deck, verticalized decks, demo hub assets, virtual tour, and Experience League documentation.',
-    timerange: '00:54:29.907 - 00:55:59.122',
-  },
-  {
-    title: 'Q&A And Closing',
-    summary: 'Team addresses questions on journey exclusion criteria and reward endpoint standards before Natalie closes the session.',
-    timerange: '00:56:08.820 - 00:58:11.273',
-  },
-];
-
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
@@ -180,6 +42,7 @@ export default class AssetPreview extends LitElement {
     isVideoLoading: { type: Boolean, reflect: true },
     assetPartnerLevel: { type: Array },
     pdfPreviewUrl: { type: String },
+    chapters: { type: Array },
     selectedChapterIndex: { type: Number },
     currentTime: { type: Number },
     sharedChapterIndex: { type: Number },
@@ -197,11 +60,11 @@ export default class AssetPreview extends LitElement {
     this.isVideoLoading = false;
     this.assetPartnerLevel = [];
     this.pdfPreviewUrl = '';
+    this.chapters = [];
     this.selectedChapterIndex = 0;
     this.currentTime = 0;
     this.sharedChapterIndex = -1;
     this.shareResetTimer = null;
-    this.restoreChapterFromUrl();
   }
 
   disconnectedCallback() {
@@ -343,6 +206,9 @@ export default class AssetPreview extends LitElement {
   }
 
   async setData(assetMetadata) {
+    const metadataChapters = assetMetadata.chapters || [];
+    this.chapters = Array.isArray(metadataChapters) ? metadataChapters : [metadataChapters];
+    if (this.chapters.length) this.restoreChapterFromUrl();
     this.title = DOMPurify.sanitize(assetMetadata.title);
     document.title = DOMPurify.sanitize(assetMetadata.title);
     this.summary = DOMPurify.sanitize(assetMetadata.summary)
@@ -422,7 +288,7 @@ export default class AssetPreview extends LitElement {
     if (index < this.selectedChapterIndex) return 100;
     if (index !== this.selectedChapterIndex) return 0;
 
-    const [startTime, endTime] = chapters[index].timerange.split(' - ');
+    const [startTime, endTime] = this.chapters[index].timerange.split(' - ');
     const start = this.timecodeToSeconds(startTime);
     const end = this.timecodeToSeconds(endTime);
     const progress = ((this.currentTime - start) / (end - start)) * 100;
@@ -434,9 +300,9 @@ export default class AssetPreview extends LitElement {
     const video = event.currentTarget;
     this.currentTime = video.currentTime;
 
-    if (video.paused || this.selectedChapterIndex >= chapters.length - 1) return;
+    if (video.paused || this.selectedChapterIndex >= this.chapters.length - 1) return;
 
-    const [, endTime] = chapters[this.selectedChapterIndex].timerange.split(' - ');
+    const [, endTime] = this.chapters[this.selectedChapterIndex].timerange.split(' - ');
     if (video.currentTime >= this.timecodeToSeconds(endTime)) {
       this.selectChapter(this.selectedChapterIndex + 1);
     }
@@ -456,7 +322,7 @@ export default class AssetPreview extends LitElement {
     url.searchParams.set('chapter', String(index + 1));
     url.searchParams.set(
       't',
-      String(this.timecodeToSeconds(this.getStartTime(chapters[index].timerange))),
+      String(this.timecodeToSeconds(this.getStartTime(this.chapters[index].timerange))),
     );
 
     return url.toString();
@@ -488,16 +354,16 @@ export default class AssetPreview extends LitElement {
     const chapterIndex = Number(params.get('chapter')) - 1;
     const timestamp = params.has('t') && params.get('t').trim() !== ''
       ? Number(params.get('t')) : NaN;
-    const timestampIndex = chapters.findIndex((chapter) => {
+    const timestampIndex = this.chapters.findIndex((chapter) => {
       const [start, end] = chapter.timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
       return Number.isFinite(timestamp) && timestamp >= start && timestamp < end;
     });
-    const index = Number.isInteger(chapterIndex) && chapters[chapterIndex]
+    const index = Number.isInteger(chapterIndex) && this.chapters[chapterIndex]
       ? chapterIndex : timestampIndex;
     if (index < 0) return;
 
     this.selectedChapterIndex = index;
-    const [start, end] = chapters[index].timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
+    const [start, end] = this.chapters[index].timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
     this.currentTime = Number.isFinite(timestamp) && timestamp >= start && timestamp < end
       ? timestamp : start;
   }
@@ -507,7 +373,7 @@ export default class AssetPreview extends LitElement {
   }
 
   selectChapter(index) {
-    const chapter = chapters[index];
+    const chapter = this.chapters[index];
     if (!chapter) return;
 
     this.selectedChapterIndex = index;
@@ -525,7 +391,7 @@ export default class AssetPreview extends LitElement {
   }
 
   renderChapters() {
-    return chapters.map((chapter, index) => {
+    return this.chapters.map((chapter, index) => {
       const [startTime, endTime] = chapter.timerange.split(' - ');
 
       /* eslint-disable indent */
@@ -809,7 +675,7 @@ export default class AssetPreview extends LitElement {
                 </video>
               </div>
 
-              ${chapters.length ? html`
+              ${this.chapters.length ? html`
               <div>
                 <sp-theme system="express" scale="medium" color="light">
                   <section
@@ -819,7 +685,7 @@ export default class AssetPreview extends LitElement {
                     <header class="header">
                       <h1 class="header-title">In this video</h1>
                       <div class="chapter-count">
-                        Chapters: ${chapters.length}
+                        Chapters: ${this.chapters.length}
                       </div>
                     </header>
 

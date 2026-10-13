@@ -20,6 +20,29 @@ function makeInstance() {
   el.pdfPreviewUrl = '';
   el.url = '';
   el.webinarPresentation = '';
+  el.chapters = [
+    {
+      title: 'Welcome And Speaker Introductions',
+      summary: 'Welcome and introductions.',
+      timerange: '00:00:01.001 - 00:01:31.625',
+    },
+    {
+      title: 'Agenda And Session Goals',
+      summary: 'Session agenda and goals.',
+      timerange: '00:01:31.625 - 00:02:22.906',
+    },
+    {
+      title: 'Why Partners Should Be Excited',
+      summary: 'Partner opportunities.',
+      timerange: '00:02:22.906 - 00:05:22.223',
+    },
+    {
+      title: 'Market Headwinds And Loyalty Importance',
+      summary: 'Market trends.',
+      timerange: '00:05:22.959 - 00:07:12.258',
+    },
+  ];
+  el.restoreChapterFromUrl();
   return el;
 }
 
@@ -246,6 +269,116 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
     await el.setData({ title: '', url: '', tags: [] });
 
     expect(el.assetHasData).to.be.false;
+  });
+});
+
+describe('AssetPreview - setData() chapters', () => {
+  it('starts without chapters before metadata arrives', () => {
+    expect(new AssetPreview().chapters).to.deep.equal([]);
+  });
+
+  it('renders chapter titles, summaries and ranges from metadata', async () => {
+    const el = makeInstance();
+    const chapters = [{
+      title: 'API chapter',
+      summary: 'API summary',
+      timerange: '00:00:10.000 - 00:00:20.000',
+    }];
+    await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters });
+    expect(el.chapters).to.deep.equal(chapters);
+
+    const container = document.createElement('div');
+    render(el.renderChapters(), container);
+    expect(container.querySelectorAll('.chapter')).to.have.lengthOf(1);
+    expect(container.textContent).to.include('API chapter');
+    expect(container.textContent).to.include('API summary');
+    expect(container.textContent).to.include('00:10');
+    expect(container.textContent).to.include('00:20');
+  });
+
+  it('accepts a single chapter object from metadata', async () => {
+    const el = makeInstance();
+    const chapter = {
+      title: 'Introduction',
+      summary: 'Welcome.',
+      timerange: '00:00:01.001 - 00:01:31.625',
+    };
+    await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters: chapter });
+    expect(el.chapters).to.deep.equal([chapter]);
+  });
+
+  it('clears chapters when metadata has no chapters', async () => {
+    const el = makeInstance();
+    for (const chapters of [undefined, null, []]) {
+      await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters });
+      expect(el.chapters).to.deep.equal([]);
+      const container = document.createElement('div');
+      render(el.renderChapters(), container);
+      expect(container.querySelectorAll('.chapter')).to.have.lengthOf(0);
+      el.handleVideoTimeUpdate({ currentTarget: { currentTime: 10, paused: false } });
+      expect(el.currentTime).to.equal(10);
+    }
+  });
+
+  it('renders a playable video and clears its spinner without optional chapters', async () => {
+    const el = makeInstance();
+    el.allCaaSTags = {
+      namespaces: {
+        // eslint-disable-next-line object-curly-newline
+        caas: { tags: { 'file-format': { tags: { video: { title: 'Video' } } } } },
+      },
+    };
+    for (const chapters of [undefined, null, []]) {
+      await el.setData({
+        title: 'Video without chapters',
+        url: 'https://example.com/video.mp4',
+        fileType: 'video/mp4',
+        tags: ['caas:file-format/video'],
+        partnerLevel: ['public'],
+        chapters,
+      });
+      el.isLoading = false;
+      const container = document.createElement('div');
+      render(el.render(), container);
+      const video = container.querySelector('video');
+      expect(video).to.exist;
+      expect(video.controls).to.be.true;
+      expect(video.querySelector('source').getAttribute('src')).to.equal('https://example.com/video.mp4');
+      expect(container.querySelector('.video-chapters')).to.equal(null);
+
+      video.dispatchEvent(new Event('loadstart'));
+      render(el.render(), container);
+      expect(container.querySelector('.video-loading-overlay')).to.exist;
+      video.dispatchEvent(new Event('canplay'));
+      render(el.render(), container);
+      expect(container.querySelector('.video-loading-overlay')).to.equal(null);
+      video.dispatchEvent(new Event('waiting'));
+      video.dispatchEvent(new Event('playing'));
+      expect(el.isVideoLoading).to.be.false;
+      video.dispatchEvent(new Event('loadstart'));
+      video.dispatchEvent(new Event('error'));
+      expect(el.isVideoLoading).to.be.false;
+    }
+  });
+
+  it('restores chapter links only after metadata arrives', async () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '?chapter=2&t=35');
+      const el = new AssetPreview();
+      el.blockData = {};
+      const chapters = [
+        { title: 'First', summary: 'First summary', timerange: '00:00:00.000 - 00:00:30.000' },
+        { title: 'Second', summary: 'Second summary', timerange: '00:00:30.000 - 00:01:00.000' },
+      ];
+      expect(el.selectedChapterIndex).to.equal(0);
+      expect(el.currentTime).to.equal(0);
+      await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters });
+      expect(el.selectedChapterIndex).to.equal(1);
+      expect(el.currentTime).to.equal(35);
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
   });
 });
 
