@@ -491,7 +491,7 @@ export default {
       tcid: '22',
       name: '@gnav-mobile-public-gnav-validation',
       path: '/digitalexperience/',
-      tags: '@da-dx-gnav @regression @circleCi @mobile @anonymous @da-dx-main',
+      tags: '@da-dx-gnav @regression @circleCi @mobile @da-dx-main',
       data: {
         gnavFragmentPath: '/digitalexperience/fragments/gnav/dx-public-gnav.plain.html',
         visibleCtas: ['Find a partner', 'Become a partner'],
