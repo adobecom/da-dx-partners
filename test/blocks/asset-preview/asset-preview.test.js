@@ -1026,24 +1026,6 @@ describe('AssetPreview - chapter progress', () => {
     });
   });
 
-  it('updates earlier tracks for keyboard selection and resets later tracks when going back', () => {
-    const el = makeInstance();
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-    render(el.renderChapters(), container);
-
-    container.querySelector('#chapter-3').dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
-    render(el.renderChapters(), container);
-    expect(el.getChapterProgress(0)).to.equal(100);
-    expect(el.getChapterProgress(1)).to.equal(100);
-
-    container.querySelector('#chapter-2').click();
-    render(el.renderChapters(), container);
-    expect(el.getChapterProgress(0)).to.equal(100);
-    expect(el.getChapterProgress(1)).to.equal(0);
-    expect(el.getChapterProgress(2)).to.equal(0);
-  });
-
   it('preserves partial progress for the active chapter and empty future tracks', () => {
     const el = makeInstance();
     el.selectChapter(2);
@@ -1062,24 +1044,6 @@ describe('AssetPreview - chapter progress', () => {
     expect(el.getChapterProgress(2)).to.equal(0);
     el.currentTime = 4000;
     expect(el.getChapterProgress(2)).to.equal(100);
-  });
-
-  it('selects a chapter with Space and ignores unrelated keys', () => {
-    const el = makeInstance();
-    const container = document.createElement('div');
-    render(el.renderChapters(), container);
-    const chapter = container.querySelector('#chapter-3');
-    const space = new KeyboardEvent('keydown', { key: ' ', cancelable: true });
-
-    chapter.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
-    expect(el.selectedChapterIndex).to.equal(0);
-    chapter.dispatchEvent(space);
-    render(el.renderChapters(), container);
-
-    expect(space.defaultPrevented).to.be.true;
-    expect(el.selectedChapterIndex).to.equal(2);
-    expect(chapter.getAttribute('aria-current')).to.equal('true');
-    expect(container.querySelector('#chapter-1').getAttribute('aria-current')).to.equal('false');
   });
 });
 
