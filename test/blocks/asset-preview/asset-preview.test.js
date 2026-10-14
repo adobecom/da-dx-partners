@@ -308,6 +308,75 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
   });
 });
 
+describe('AssetPreview - render() metadata details', () => {
+  [
+    {
+      property: 'createdDate',
+      localizationKey: '{{Date}}',
+      label: 'Published on',
+      value: '1/15/2025',
+      text: '1/15/2025',
+      emptyValues: [undefined, null, ''],
+    },
+    {
+      property: 'audienceTags',
+      localizationKey: '{{Audience}}',
+      label: 'For',
+      value: [{ title: '<strong>Partners</strong>' }, { title: 'Developers' }],
+      text: 'Partners, Developers',
+      markupSelector: 'strong',
+      emptyValues: [undefined, [], [{ title: '' }]],
+    },
+    {
+      property: 'summary',
+      localizationKey: '{{Summary}}',
+      label: 'Overview',
+      value: '<em>Asset summary</em>',
+      text: 'Asset summary',
+      markupSelector: 'em',
+      emptyValues: [undefined, null, ''],
+    },
+  ].forEach((detail) => {
+    let el;
+    let container;
+
+    beforeEach(() => {
+      el = makeInstance();
+      el.assetHasData = true;
+      el.isLoading = false;
+      el.blockData.localizedText[detail.localizationKey] = detail.label;
+      container = document.createElement('div');
+    });
+
+    it(`renders ${detail.property} with its localized label when present`, () => {
+      el[detail.property] = detail.value;
+      render(el.render(), container);
+
+      const rows = container.querySelectorAll('.asset-preview-block-details-left > p');
+      expect(rows).to.have.lengthOf(1);
+      expect(rows[0].querySelector('.asset-preview-block-details-left-label').textContent.trim())
+        .to.equal(`${detail.label}:`);
+      expect(rows[0].textContent.replace(/\s+/g, ' ').trim())
+        .to.equal(`${detail.label}: ${detail.text}`);
+      if (detail.markupSelector) {
+        expect(rows[0].querySelector(detail.markupSelector)).to.exist;
+      }
+    });
+
+    it(`omits ${detail.property} and its label when empty`, () => {
+      detail.emptyValues.forEach((value) => {
+        el[detail.property] = value;
+        render(el.render(), container);
+
+        expect(container.querySelector('.asset-preview-block-details-left')).to.exist;
+        expect(container.querySelectorAll('.asset-preview-block-details-left > p'))
+          .to.have.lengthOf(0);
+        expect(container.textContent).not.to.include(`${detail.label}:`);
+      });
+    });
+  });
+});
+
 describe('AssetPreview - setData() chapters', () => {
   it('starts without chapters before metadata arrives', () => {
     expect(new AssetPreview().chapters).to.deep.equal([]);
