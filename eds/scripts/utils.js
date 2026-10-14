@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { DX_PROGRAM_TYPE, DX_SPECIAL_STATE, DX_ACCENTURE_ACCOUNT_NAMES } from '../blocks/utils/dxConstants.js';
+import { DX_PROGRAM_TYPE, DX_SPECIAL_STATE, DX_ACCOUNT_NAME_MAPPING } from '../blocks/utils/dxConstants.js';
 
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
@@ -337,11 +337,11 @@ export function isAdobeAccount() {
   return getPartnerCookieObject(getCurrentProgramType())?.email?.endsWith('@adobe.com');
 }
 
-export function isAccentureAccount() {
+export function matchesAccountNameMapping(key) {
   if (!isMember()) return false;
   const accountName = getPartnerCookieValue('accountname').trim();
   if (!accountName) return false;
-  return DX_ACCENTURE_ACCOUNT_NAMES
+  return (DX_ACCOUNT_NAME_MAPPING[key] ?? [])
     .some((name) => name.trim().toLowerCase() === accountName);
 }
 
