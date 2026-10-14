@@ -402,19 +402,10 @@ export default class AssetPreview extends LitElement {
           class="chapter ${this.selectedChapterIndex === index ? 'is-active' : ''}"
           id="chapter-${index + 1}"
           role="button"
-          tabindex="0"
-          aria-current="${this.selectedChapterIndex === index ? 'true' : 'false'}"
           @click="${() => this.selectChapter(index)}"
-          @keydown="${(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              this.selectChapter(index);
-            }
-          }}"
         >
           <div
             class="chapter-time"
-            aria-label="Chapter time range ${this.formatTimecode(startTime)} - ${this.formatTimecode(endTime)}"
           >
             <span class="start-time">${this.formatTimecode(startTime)}</span>
             <span class="duration-time">${this.formatTimecode(endTime)}</span>
@@ -483,158 +474,42 @@ export default class AssetPreview extends LitElement {
   }
 
   render() {
-    return html`
-      <div
-        class="asset-preview-block-container"
-        daa-lh="Asset preview container | ${this.title}"
-      >
-        ${this.assetHasData && !this.isLoading ? html`
-          <div class="asset-preview-block-header">
-            <p>
-              ${this.blockData.localizedText['{{Asset detail}}']}:
-              ${unsafeHTML(this.title)}
-              ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}
-            </p>
-          </div>
-
-          <div class="asset-preview-block-details">
+    return html`<div class="asset-preview-block-container" daa-lh="Asset preview container | ${this.title}">
+      ${this.assetHasData && !this.isLoading ? html`
+          <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${unsafeHTML(this.title)}  ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}</p></div>
+          <div class="asset-preview-block-details ">
             <div class="asset-preview-block-details-left">
-              ${this.createdDate ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Date}}']}:
-                  </span>
-                  ${this.createdDate}
-                </p>
-              ` : ''}
-
-              ${this.getTagsTitlesString(this.audienceTags) ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Audience}}']}:
-                  </span>
-                  ${unsafeHTML(this.getTagsTitlesString(this.audienceTags))}
-                </p>
-              ` : ''}
-
-              ${this.summary ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Summary}}']}:
-                  </span>
-                  ${unsafeHTML(this.summary)}
-                </p>
-              ` : ''}
-
-              ${this.getTagsTitlesString(this.fileFormatTags) ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Type}}']}:
-                  </span>
-                  ${unsafeHTML(this.getTagsTitlesString(this.fileFormatTags))}
-                </p>
-              ` : ''}
-
-              ${this.getTagsTitlesString(this.tags) ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Tags}}']}:
-                  </span>
-                  ${unsafeHTML(this.getTagsTitlesString(this.tags))}
-                </p>
-              ` : ''}
-
-              ${this.size ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Size}}']}:
-                  </span>
-                  ${unsafeHTML(this.size)}
-                </p>
-              ` : ''}
+              ${this.createdDate ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Date}}']}: </span>${this.createdDate}</p>` : ''}
+              ${this.getTagsTitlesString(this.audienceTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Audience}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.audienceTags))}</p>` : ''}
+              ${this.summary ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Summary}}']}: </span>${unsafeHTML(this.summary)}</p>` : ''}
+              ${this.getTagsTitlesString(this.fileFormatTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Type}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.fileFormatTags))}</p>` : ''}
+              ${this.getTagsTitlesString(this.tags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Tags}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.tags))}</p>` : ''}
+              ${this.size ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span class="bold">${unsafeHTML(this.size)}</p>` : ''}
 
               ${!this.isRestrictedAssetForUser() ? html`
-                <div
-                  class="asset-preview-block-actions"
-                  daa-lh="Asset preview block actions"
-                >
-                  ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`
-                    <button class="outline">
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="${this.getDownloadUrl()}"
-                        daa-ll="View"
-                      >
-                        View
-                      </a>
-                    </button>
-                  ` : ''}
-
-                  ${!this.isVideo ? html`
-                    <button class="filled">
-                      <a
-                        download="${this.title}"
-                        href="${this.getDownloadUrl()}"
-                        daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}"
-                      >
-                        ${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}
-                      </a>
-                    </button>
-                  ` : ''}
-
+              <div class="asset-preview-block-actions" daa-lh="Asset preview block actions">
+                ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button
+                  class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}" daa-ll="View"> View </a></button>` : ''}
+                  ${!this.isVideo ? html`<button class="filled"><a download="${this.title}" href="${this.getDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>` : ''}
                   ${this.webinarPresentation ? html`
-                    <button class="filled">
-                      <a
-                        download="${`${this.title}_presentation`}"
-                        href="${this.getWebinarPresentationDownloadUrl()}"
-                        daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}"
-                      >
-                        ${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}
-                      </a>
-                    </button>
+                    <button class="filled"><a  download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
                   ` : ''}
 
                   ${this.isVideo ? html`
-                    <button
-                      @click="${() => this.playVideo()}"
-                      class="filled"
-                      ?disabled="${this.isVideoLoading}"
-                    >
-                      <span>
-                        ${this.blockData.localizedText['{{Watch Video}}']}
-                      </span>
+                    <button @click="${() => this.playVideo()}" class="filled" ?disabled="${this.isVideoLoading}">
+                      <span>${this.blockData.localizedText['{{Watch Video}}']}</span>
                     </button>
                   ` : ''}
 
-                  ${this.backButtonUrl ? html`
-                    <a
-                      class="link"
-                      href="${this.backButtonUrl}"
-                      daa-ll="${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}"
-                    >
-                      ${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}
-                    </a>
-                  ` : ''}
-                </div>
-              ` : ''}
+                  ${this.backButtonUrl ? html`<a
+                  class="link" href="${this.backButtonUrl}" daa-ll="${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
+                </div>` : ''}
             </div>
 
             <div class="asset-preview-block-details-right">
-              ${this.pdfPreviewUrl && !this.isRestrictedAssetForUser()
-                ? html`
-                  <div
-                    id="${PDF_RENDER_DIV_ID}"
-                    class="asset-preview-pdf-viewer"
-                  ></div>
-                `
-                : html`
-                  <img
-                    src="${transformCardUrl(this.previewImage)}"
-                    @error="${this._handleImgError}"
-                    alt="${this.title || ''}"
-                  />
-                `}
+            ${this.pdfPreviewUrl && !this.isRestrictedAssetForUser()
+                ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
+                : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`}
             </div>
           </div>
 
