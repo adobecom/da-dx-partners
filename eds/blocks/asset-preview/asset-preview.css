@@ -506,10 +506,10 @@ span.asset-preview-block-details-left-label {
   min-height: 700px;
   border: 1px solid #d5d5d5;
   overflow: hidden;
-  background: #fff;
+  background: #f8f8f8;
 }
 
-.header {
+.video-chapters .header {
   padding: 3px 16px;
   display: flex;
   align-items: center;
@@ -517,19 +517,19 @@ span.asset-preview-block-details-left-label {
   border-bottom: 1px solid #d5d5d5;
 }
 
-.header-title {
+.video-chapters .header-title {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
 }
 
-.chapter-count {
+.video-chapters .chapter-count {
   font-size: 12px;
   color: #6e6e6e;
   white-space: nowrap;
 }
 
-.chapter-list {
+.video-chapters .chapter-list {
   flex: 1;
   min-height: 0;
   height: auto;
@@ -553,7 +553,7 @@ span.asset-preview-block-details-left-label {
 }
 
 .chapter:hover {
-  background: #fafafa;
+  background: #f4f4f4;
 }
 
 .chapter.is-active {
@@ -570,7 +570,7 @@ span.asset-preview-block-details-left-label {
   background: #1473e6;
 }
 
-.chapter-time {
+.chapter .chapter-time {
   padding-top: 3px;
   display: flex;
   flex-direction: column;
@@ -581,13 +581,13 @@ span.asset-preview-block-details-left-label {
   margin-right: 12px;
 }
 
-.chapter-time .start-time {
+.chapter .chapter-time .start-time {
   padding-top: 1px;
   color: #1473e6;
   font-weight: 700;
 }
 
-.chapter-time .duration-time {
+.chapter .chapter-time .duration-time {
   margin-top: 8px;
 }
 
@@ -596,19 +596,19 @@ span.asset-preview-block-details-left-label {
   font-weight: 700;
 }
 
-.chapter-content {
+.chapter .chapter-content {
   min-width: 0;
   width: calc(100% - 18px);
 }
 
-.chapter-title {
+.chapter .chapter-title {
   margin: 0;
   font-size: 14px;
   line-height: 1.3;
   font-weight: 600;
 }
 
-.chapter-description {
+.chapter .chapter-description {
   margin: 4px 0 0;
   max-width: 100%;
   color: #6e6e6e;
@@ -621,12 +621,12 @@ span.asset-preview-block-details-left-label {
   overflow: hidden;
 }
 
-.ellipsis {
+.chapter .ellipsis {
   color: #1473e6;
   font-weight: 700;
 }
 
-.chapter-actions {
+.chapter .chapter-actions {
   width: 20px;
   height: 20px;
   margin-top: 16px;
@@ -635,21 +635,21 @@ span.asset-preview-block-details-left-label {
   justify-content: center;
 }
 
-.share-button {
+.chapter .share-button {
   --spectrum-actionbutton-edge-to-visual-only: 0;
 }
 
-.share-button svg {
+.chapter .share-button svg {
   fill: none;
 }
 
-.share-icon {
+.chapter .share-icon {
   width: 20px;
   height: 20px;
   display: block;
 }
 
-.progress-track {
+.chapter .progress-track {
   height: 4px;
   width: 100%;
   margin-top: 8px;
@@ -658,7 +658,7 @@ span.asset-preview-block-details-left-label {
   overflow: hidden;
 }
 
-.progress-fill {
+.chapter .progress-fill {
   height: 100%;
   width: 0;
   border-radius: inherit;
@@ -673,15 +673,15 @@ span.asset-preview-block-details-left-label {
     border-right: 0;
   }
 
-  .header {
+  .video-chapters .header {
     padding: 0 20px;
   }
 
-  .header-title {
+  .video-chapters .header-title {
     font-size: 24px;
   }
 
-  .chapter-count {
+  .video-chapters .chapter-count {
     font-size: 18px;
   }
 
@@ -691,16 +691,16 @@ span.asset-preview-block-details-left-label {
     padding-right: 20px;
   }
 
-  .chapter-title {
+  .chapter .chapter-title {
     font-size: 21px;
   }
 
-  .chapter-description,
-  .chapter-time {
+  .chapter .chapter-description,
+  .chapter .chapter-time {
     font-size: 18px;
   }
 
-  .chapter-actions {
+  .chapter .chapter-actions {
     margin-left: 0;
   }
 }

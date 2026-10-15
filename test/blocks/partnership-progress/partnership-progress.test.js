@@ -182,19 +182,16 @@ describe('App Assured progress', () => {
     expect(progressBar.getAttribute('aria-valuenow')).to.equal('50');
   });
 
-  it('uses zero-valued App Assured data when the metric is missing', () => {
+  it('does not render App Assured when the metric is missing', () => {
     const element = createElement({
       level: 'platinum',
       credentials: { percentage: 25 },
     });
 
     const node = renderToNode(element.renderProgramProgress('Technology', 'technology'));
-    const progressBar = node.querySelector('[aria-label="App Assured (localized)"]');
 
-    expect(node.textContent).to.contain('App Assured (localized)');
-    expect(node.textContent).to.contain('0 of 0 required');
-    expect(progressBar).to.exist;
-    expect(progressBar.getAttribute('aria-valuenow')).to.equal('0');
+    expect(node.textContent).not.to.contain('App Assured (localized)');
+    expect(node.querySelector('[aria-label="App Assured (localized)"]')).to.equal(null);
   });
 
   it('does not render App Assured for solution programs', () => {
@@ -218,11 +215,6 @@ describe('App Assured progress', () => {
     const element = createElement({
       level: 'gold',
       credentials: { total: 1, required: 2, percentage: 50 },
-      appAssurances: {
-        total: 2,
-        required: 4,
-        percentage: 50,
-      },
     });
 
     const node = renderToNode(element.renderProgramProgress('Technology', 'technology'));

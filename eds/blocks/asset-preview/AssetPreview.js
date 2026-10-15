@@ -13,144 +13,6 @@ import {
 
 import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
-const chapters = [
-  {
-    title: 'Welcome And Speaker Introductions',
-    summary: 'Natalie Niehoff welcomes attendees to the AJO Loyalty Go-To-Market Launch webinar and introduces Tyler Hogan, Kira Fawcett, and Daniel Vivas from the product marketing and management teams.',
-    timerange: '00:00:01.001 - 00:01:31.625',
-  },
-  {
-    title: 'Agenda And Session Goals',
-    summary: 'Tyler outlines the agenda covering product overview, demo, use cases, and FAQs, aiming for partners to confidently discuss Adobe\'s loyalty strategy and value with customers.',
-    timerange: '00:01:31.625 - 00:02:22.906',
-  },
-  {
-    title: 'Why Partners Should Be Excited',
-    summary: 'Tyler explains the market shift driven by rising acquisition costs and AI disruption, introduces the loyalty leader persona, and highlights AJO Loyalty as a standalone offering with strong market demand.',
-    timerange: '00:02:22.906 - 00:05:22.223',
-  },
-  {
-    title: 'Market Headwinds And Loyalty Importance',
-    summary: 'Discussion of Gartner and Bain data showing declining organic search, rising acquisition costs, and 78% of retail executives believing generative AI will weaken brand loyalty, positioning loyalty as a strategic asset.',
-    timerange: '00:05:22.959 - 00:07:12.258',
-  },
-  {
-    title: 'Evolution Of Loyalty Programs',
-    summary: 'Tyler traces loyalty\'s evolution from transactional point systems through experiential gamification to the future vision of loyalty as an AI-powered growth engine capturing zero-party data.',
-    timerange: '00:07:14.346 - 00:08:53.278',
-  },
-  {
-    title: 'Blockers To Modern Loyalty',
-    summary: 'Four key blockers are outlined: fragmented data, static programs, operational silos and lag, and underutilization of AI, with 60% of loyalty spend going to manual services.',
-    timerange: '00:08:53.778 - 00:11:32.270',
-  },
-  {
-    title: 'Current Loyalty Solution Approaches',
-    summary: 'Tyler reviews three approaches brands take today: in-house solutions, pure-play loyalty management platforms, and enterprise ecosystems, identifying gaps in personalization, orchestration, and agentic AI.',
-    timerange: '00:11:33.132 - 00:13:27.365',
-  },
-  {
-    title: 'Introducing AJO Loyalty',
-    summary: 'Tyler introduces Adobe Journey Optimizer Loyalty as an AI-first orchestration app built on AEP with three core capabilities: agentic AI, personalized gamification, and unified loyalty data.',
-    timerange: '00:13:32.412 - 00:14:29.143',
-  },
-  {
-    title: 'Agentic AI Capabilities',
-    summary: 'Deep dive into always-on agentic AI that identifies high-value members, flags churn risks, recommends tactics, and measures incremental ROI tied to customer lifetime value and AOV.',
-    timerange: '00:14:30.453 - 00:15:47.013',
-  },
-  {
-    title: 'Personalized Gamification',
-    summary: 'Overview of the no-code personalized gamification capability enabling one-to-one challenges that adapt to member behavior, lifecycle stage, and preferences with cross-channel messaging orchestration.',
-    timerange: '00:15:50.194 - 00:16:53.814',
-  },
-  {
-    title: 'Integration With Existing Loyalty Stack',
-    summary: 'Tyler emphasizes AJO Loyalty complements existing loyalty infrastructure via custom integrations and connectors, with the loyalty management platform remaining the system of record while AJO orchestrates experiences.',
-    timerange: '00:16:53.814 - 00:18:45.641',
-  },
-  {
-    title: 'Roadmap Preview By Kira',
-    summary: 'Kira previews upcoming enhancements including integration with decisioning and experimentation, positioning this launch as the beginning of a broader roadmap.',
-    timerange: '00:18:49.554 - 00:19:22.525',
-  },
-  {
-    title: 'Demo Introduction And AI Agent',
-    summary: 'Kira begins the demo in AJO Loyalty, showing the insights section with anomaly detection and demonstrates coworker agent skills to create a “Mad About Matcha” challenge via prompts.',
-    timerange: '00:19:24.051 - 00:24:51.846',
-  },
-  {
-    title: 'Form-Based Challenge Creation',
-    summary: 'Daniel walks through form-based challenge creation, showing three challenge types and reviews the general setup including AEP audiences and manual opt-in or event triggers.',
-    timerange: '00:24:52.688 - 00:29:59.923',
-  },
-  {
-    title: 'Challenge Structure And Tasks',
-    summary: 'Daniel demonstrates the structure section, creating tasks with activity types including purchase, spend, and custom events tied to AEP experience events, with SKU-level or product group eligibility.',
-    timerange: '00:30:15.493 - 00:33:31.707',
-  },
-  {
-    title: 'Rewards Configuration',
-    summary: 'Daniel explains reward setup, connecting to partner endpoints like Capillary via API to issue points upon challenge completion, with plans for multiple reward types like points and miles later in the year.',
-    timerange: '00:33:34.117 - 00:34:57.325',
-  },
-  {
-    title: 'Content And Messaging Orchestration',
-    summary: 'Daniel demonstrates content creation via AJO content cards and code-based experiences, plus messaging orchestration across six AJO channels at launch, in-progress, and end phases of the challenge.',
-    timerange: '00:34:57.325 - 00:38:15.274',
-  },
-  {
-    title: 'Auto-Generated Journey',
-    summary: 'Daniel shows how AJO Loyalty auto-generates a journey from the configured challenge, including read audience, content card, and messaging nodes, with full journey features like dry run and experimentation available.',
-    timerange: '00:38:17.711 - 00:39:40.222',
-  },
-  {
-    title: 'Loyalty Admin Section',
-    summary: 'Daniel walks through the admin section for configuring reward providers, event definitions for custom events, and product inventory uploads to simplify marketer workflows.',
-    timerange: '00:39:40.883 - 00:41:12.249',
-  },
-  {
-    title: 'Reporting Powered By CJA',
-    summary: 'Daniel explains the CJA-backed reporting section providing out-of-the-box per-challenge reports, with data available for deeper CJA analysis if customers have CJA licensed.',
-    timerange: '00:41:14.035 - 00:42:34.348',
-  },
-  {
-    title: 'Customer Zero Case Study',
-    summary: 'Daniel shares how AJO Loyalty was born from a customer needing sub-two-second challenge task delivery at fuel pumps, launching 12-14 million challenges with less than two-second latency where journeys couldn’t scale.',
-    timerange: '00:42:35.543 - 00:46:36.350',
-  },
-  {
-    title: 'Use Cases Across Verticals',
-    summary: 'Tyler covers use cases including identifying high-propensity members, gamifying onboarding, driving purchase behaviors, incentivizing zero-party data capture, and personalizing reward amounts based on CLV.',
-    timerange: '00:46:36.370 - 00:49:33.298',
-  },
-  {
-    title: 'Ideal Customers And Personas',
-    summary: 'Tyler identifies top verticals and target personas including loyalty program owners, CRM and lifecycle marketing leaders.',
-    timerange: '00:49:33.358 - 00:50:35.556',
-  },
-  {
-    title: 'Pricing And Packaging',
-    summary: 'AJO Loyalty is a new base SKU chargeable on engagement profiles, sold standalone or as add-on, with included agentic features, though not yet compatible with healthcare and privacy security shields.',
-    timerange: '00:50:35.556 - 00:52:00.840',
-  },
-  {
-    title: 'Product Roadmap',
-    summary: 'Tyler previews roadmap investments including expansion to all 14 AJO channels, decisioning and experimentation integration, coupon codes, brand concierge integration, and additional agentic skills.',
-    timerange: '00:52:01.275 - 00:54:27.977',
-  },
-  {
-    title: 'Resources And Enablement',
-    summary: 'Tyler shares available resources on Partner Experience Hub including FAQ, pitch deck, verticalized decks, demo hub assets, virtual tour, and Experience League documentation.',
-    timerange: '00:54:29.907 - 00:55:59.122',
-  },
-  {
-    title: 'Q&A And Closing',
-    summary: 'Team addresses questions on journey exclusion criteria and reward endpoint standards before Natalie closes the session.',
-    timerange: '00:56:08.820 - 00:58:11.273',
-  },
-];
-
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
@@ -158,8 +20,10 @@ await Promise.all([
   import('../../components/LoadingSpinner.js'),
   loadStyle('/eds/components/LoadingSpinner.css'),
 ]);
+
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
+
 export default class AssetPreview extends LitElement {
   static properties = {
     blockData: { type: Object },
@@ -180,6 +44,7 @@ export default class AssetPreview extends LitElement {
     isVideoLoading: { type: Boolean, reflect: true },
     assetPartnerLevel: { type: Array },
     pdfPreviewUrl: { type: String },
+    chapters: { type: Array },
     selectedChapterIndex: { type: Number },
     currentTime: { type: Number },
     sharedChapterIndex: { type: Number },
@@ -204,6 +69,7 @@ export default class AssetPreview extends LitElement {
     this.isVideoLoading = false;
     this.assetPartnerLevel = [];
     this.pdfPreviewUrl = '';
+    this.chapters = [];
     this.selectedChapterIndex = 0;
     this.currentTime = 0;
     this.sharedChapterIndex = -1;
@@ -215,6 +81,7 @@ export default class AssetPreview extends LitElement {
     this.chaptersVisible = true;
     this.settingsMenuOpen = false;
     this.volumeExpanded = false;
+    this.chaptersTrackUrl = null;
     this.restoreChapterFromUrl();
   }
 
@@ -234,12 +101,31 @@ export default class AssetPreview extends LitElement {
     return this.querySelector('video') || (!this.isConnected && document.querySelector('video'));
   }
 
-  playVideo() {
-    if (this._video) {
-      const videoContainer = this._video.closest('.asset-preview-block-video');
-      window.scrollTo({ top: videoContainer.offsetTop, behavior: 'smooth' });
-      this._video.play();
+  get playerDuration() {
+    if (Number.isFinite(this.videoDuration) && this.videoDuration > 0) {
+      return this.videoDuration;
     }
+
+    const lastChapter = this.chapters[this.chapters.length - 1];
+    if (!lastChapter) return 0;
+
+    const [, endTime] = lastChapter.timerange.split(' - ');
+    const duration = this.timecodeToSeconds(endTime);
+    return Number.isFinite(duration) && duration > 0 ? duration : 0;
+  }
+
+  playVideo() {
+    const video = this._video;
+    if (!video) return;
+
+    const videoContainer = video.closest('.asset-preview-block-video');
+    if (videoContainer) {
+      window.scrollTo({ top: videoContainer.offsetTop, behavior: 'smooth' });
+    }
+
+    video.play().catch(() => {
+      // Playback may require user interaction in some browsers.
+    });
   }
 
   async connectedCallback() {
@@ -335,15 +221,16 @@ export default class AssetPreview extends LitElement {
   }
 
   async getAssetMetadata() {
-    // for domain we use what is in  window.location.href
-    // (this assumes that on cards we have partners.stage.adobe.com or partners.adobe.com
-    // on prod caas index we would have only have prod assets, so asset metadata
-    // would always be found on prod
-    // for stage, we will display also some assets from qa01 or dev02,
-    // but will always fetch asset metadata from stage
-    // so we should delete assets from lower env if they make us problem on stage
+    // For domain we use what is in window.location.href.
+    // This assumes cards use partners.stage.adobe.com or partners.adobe.com.
+    // Production assets are fetched from production.
+    // Stage may display QA or development assets, but metadata is fetched from stage.
     const mappedAssetUrl = this.getRealAssetUrl();
-    if (!mappedAssetUrl) return;
+    if (!mappedAssetUrl) {
+      this.isLoading = false;
+      return;
+    }
+
     try {
       await fetch(mappedAssetUrl).then(async (res) => {
         if (res && res.status === 200) {
@@ -359,6 +246,17 @@ export default class AssetPreview extends LitElement {
   }
 
   async setData(assetMetadata) {
+    const metadataChapters = assetMetadata.chapters || [];
+    this.chapters = Array.isArray(metadataChapters) ? metadataChapters : [metadataChapters];
+
+    if (this.chaptersTrackUrl) URL.revokeObjectURL(this.chaptersTrackUrl);
+    this.chaptersTrackUrl = null;
+    this.selectedChapterIndex = 0;
+    this.currentTime = 0;
+    this.videoDuration = 0;
+
+    if (this.chapters.length) this.restoreChapterFromUrl();
+
     this.title = DOMPurify.sanitize(assetMetadata.title);
     document.title = DOMPurify.sanitize(assetMetadata.title);
     this.summary = DOMPurify.sanitize(assetMetadata.summary)
@@ -378,7 +276,7 @@ export default class AssetPreview extends LitElement {
     this.ctaText = DOMPurify.sanitize(assetMetadata.ctaText);
     this.size = DOMPurify.sanitize(this.getSizeInMb(assetMetadata.size));
     this.assetPartnerLevel = assetMetadata.partnerLevel
-      ?.map((level) => DOMPurify.sanitize(level.toLowerCase()));
+      ?.map((level) => DOMPurify.sanitize(level.toLowerCase())) || [];
     this.createdDate = (() => {
       if (!assetMetadata.createdDate) return '';
 
@@ -409,6 +307,8 @@ export default class AssetPreview extends LitElement {
       const isProd = prodHosts.includes(window.location.host);
       url.hostname = isProd ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
       url.port = '';
+      url.searchParams.delete('chapter');
+      url.searchParams.delete('t');
       return url;
     } catch (error) {
       return null;
@@ -435,13 +335,18 @@ export default class AssetPreview extends LitElement {
   }
 
   getChapterProgress(index) {
+    if (index < this.selectedChapterIndex) return 100;
     if (index !== this.selectedChapterIndex) return 0;
 
-    const [startTime, endTime] = chapters[index].timerange.split(' - ');
+    const chapter = this.chapters[index];
+    if (!chapter) return 0;
+
+    const [startTime, endTime] = chapter.timerange.split(' - ');
     const start = this.timecodeToSeconds(startTime);
     const end = this.timecodeToSeconds(endTime);
-    const progress = ((this.currentTime - start) / (end - start)) * 100;
+    if (end <= start) return 0;
 
+    const progress = ((this.currentTime - start) / (end - start)) * 100;
     return Math.max(0, Math.min(100, progress));
   }
 
@@ -449,74 +354,24 @@ export default class AssetPreview extends LitElement {
     const video = event.currentTarget;
     this.currentTime = video.currentTime;
     this.videoDuration = Number.isFinite(video.duration) ? video.duration : 0;
-    const index = chapters.findIndex((chapter, chapterIndex) => {
-      const next = chapters[chapterIndex + 1];
-      return video.currentTime >= this.timecodeToSeconds(this.getStartTime(chapter.timerange))
-        && (!next || video.currentTime < this.timecodeToSeconds(this.getStartTime(next.timerange)));
+
+    if (!this.chapters.length) return;
+
+    const index = this.chapters.findIndex((chapter, chapterIndex) => {
+      const next = this.chapters[chapterIndex + 1];
+      const start = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
+      const nextStart = next
+        ? this.timecodeToSeconds(this.getStartTime(next.timerange)) : Infinity;
+
+      return video.currentTime >= start && video.currentTime < nextStart;
     });
     this.selectedChapterIndex = Math.max(0, index);
-  }
 
-  get playerDuration() {
-    return this.videoDuration || this.timecodeToSeconds(chapters[chapters.length - 1].timerange.split(' - ')[1]);
-  }
+    if (video.paused || this.selectedChapterIndex >= this.chapters.length - 1) return;
 
-  toggleVideoPlayback() {
-    const video = this._video;
-    if (!video) return;
-    if (video.paused) video.play()?.catch(() => {});
-    else video.pause();
-  }
-
-  seekVideo(time) {
-    if (!this._video) return;
-    this._video.currentTime = Math.max(0, Math.min(this.playerDuration, time));
-    this.handleVideoTimeUpdate({ currentTarget: this._video });
-  }
-
-  handleProgressPointer(event) {
-    const progress = event.currentTarget;
-    if (event.type === 'pointerdown') progress.setPointerCapture(event.pointerId);
-    if (event.type === 'pointermove' && !progress.hasPointerCapture(event.pointerId)) return;
-    const rect = progress.getBoundingClientRect();
-    if (rect.width) {
-      this.seekVideo(((event.clientX - rect.left) / rect.width) * this.playerDuration);
-    }
-    if (event.type === 'pointerup' && progress.hasPointerCapture(event.pointerId)) {
-      progress.releasePointerCapture(event.pointerId);
-    }
-  }
-
-  handlePlayerKeydown(event) {
-    if (event.target.closest('button, input, select')) return;
-    const actions = {
-      ArrowLeft: () => this.seekVideo(this.currentTime - 5),
-      ArrowRight: () => this.seekVideo(this.currentTime + 5),
-      Home: () => this.seekVideo(0),
-      End: () => this.seekVideo(this.playerDuration),
-      ' ': () => this.toggleVideoPlayback(),
-      Escape: () => {
-        this.settingsMenuOpen = false;
-      },
-    };
-    if (actions[event.key]) {
-      event.preventDefault();
-      actions[event.key]();
-    }
-  }
-
-  handleVolumeChange() {
-    this.videoVolume = this._video.volume;
-    this.videoMuted = this._video.muted;
-  }
-
-  async toggleVideoFullscreen() {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await this.querySelector('.video-holder').requestFullscreen();
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Unable to change video fullscreen:', error);
+    const [, endTime] = this.chapters[this.selectedChapterIndex].timerange.split(' - ');
+    if (video.currentTime >= this.timecodeToSeconds(endTime)) {
+      this.selectChapter(this.selectedChapterIndex + 1);
     }
   }
 
@@ -534,7 +389,7 @@ export default class AssetPreview extends LitElement {
     url.searchParams.set('chapter', String(index + 1));
     url.searchParams.set(
       't',
-      String(this.timecodeToSeconds(this.getStartTime(chapters[index].timerange))),
+      String(this.timecodeToSeconds(this.getStartTime(this.chapters[index].timerange))),
     );
 
     return url.toString();
@@ -566,32 +421,39 @@ export default class AssetPreview extends LitElement {
     const chapterIndex = Number(params.get('chapter')) - 1;
     const timestamp = params.has('t') && params.get('t').trim() !== ''
       ? Number(params.get('t')) : NaN;
-    const timestampIndex = chapters.findIndex((chapter) => {
+    const timestampIndex = this.chapters.findIndex((chapter) => {
       const [start, end] = chapter.timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
       return Number.isFinite(timestamp) && timestamp >= start && timestamp < end;
     });
-    const index = Number.isInteger(chapterIndex) && chapters[chapterIndex]
+    const index = Number.isInteger(chapterIndex) && this.chapters[chapterIndex]
       ? chapterIndex : timestampIndex;
     if (index < 0) return;
 
     this.selectedChapterIndex = index;
-    const [start, end] = chapters[index].timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
+    const [start, end] = this.chapters[index].timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
     this.currentTime = Number.isFinite(timestamp) && timestamp >= start && timestamp < end
       ? timestamp : start;
   }
 
   handleVideoLoadedMetadata(event) {
-    event.currentTarget.currentTime = this.currentTime;
-    this.videoDuration = Number.isFinite(event.currentTarget.duration)
-      ? event.currentTarget.duration : 0;
-    const track = event.currentTarget.querySelector('track[kind="chapters"]');
+    const video = event.currentTarget;
+    this.videoDuration = Number.isFinite(video.duration) ? video.duration : 0;
+    video.currentTime = this.videoDuration > 0
+      ? Math.min(this.currentTime, this.videoDuration) : this.currentTime;
+    this.videoVolume = video.volume;
+    this.videoMuted = video.muted;
+    this.playbackSpeed = video.playbackRate;
+
+    const track = video.querySelector('track[kind="chapters"]');
     if (track) track.track.mode = 'hidden';
   }
 
   createChaptersTrackUrl() {
     if (!this.chaptersTrackUrl) {
-      const cues = chapters.map((chapter, index) => {
-        const [start, end] = chapter.timerange.split(' - ');
+      const cues = this.chapters.map((chapter, index) => {
+        const [start, end] = chapter.timerange.split(' - ').map((time) => (
+          time.includes('.') ? time : `${time}.000`
+        ));
         return `${index + 1}\n${start} --> ${end}\n${chapter.title}\n`;
       });
       this.chaptersTrackUrl = URL.createObjectURL(
@@ -607,11 +469,150 @@ export default class AssetPreview extends LitElement {
     return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
   }
 
+  toggleVideoPlayback() {
+    const video = this._video;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play().catch(() => {
+        // Playback may require user interaction in some browsers.
+      });
+    } else {
+      video.pause();
+    }
+  }
+
+  seekVideo(time) {
+    const video = this._video;
+    if (!video || video.readyState < 1 || !Number.isFinite(time)) return;
+
+    const duration = this.playerDuration;
+    if (duration <= 0) return;
+
+    const target = Math.max(0, Math.min(duration, time));
+    video.currentTime = target;
+    this.currentTime = target;
+  }
+
+  handleProgressPointer(event) {
+    const progress = event.currentTarget;
+
+    if (event.type === 'pointerdown') {
+      if (event.button !== 0) return;
+      event.preventDefault();
+      progress.focus();
+      progress.setPointerCapture(event.pointerId);
+    } else if (!progress.hasPointerCapture(event.pointerId)) {
+      return;
+    }
+
+    const bounds = progress.getBoundingClientRect();
+    if (bounds.width > 0) {
+      const fraction = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+      this.seekVideo(fraction * this.playerDuration);
+    }
+
+    if (event.type === 'pointerup') {
+      progress.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  handleVolumeChange() {
+    const video = this._video;
+    if (!video) return;
+
+    this.videoVolume = video.volume;
+    this.videoMuted = video.muted;
+  }
+
   setPlaybackSpeed(speed) {
-    if (!this._video) return;
-    this._video.playbackRate = speed;
+    const video = this._video;
+    if (!video || !Number.isFinite(speed) || speed <= 0) return;
+
+    video.playbackRate = speed;
     this.playbackSpeed = speed;
     this.settingsMenuOpen = false;
+  }
+
+  async toggleVideoFullscreen() {
+    const container = this._video?.closest('.video-container');
+    if (!container) return;
+
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else if (container.requestFullscreen) {
+        await container.requestFullscreen();
+      } else if (this._video.webkitEnterFullscreen) {
+        this._video.webkitEnterFullscreen();
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to toggle fullscreen:', error);
+    }
+  }
+
+  handlePlayerKeydown(event) {
+    const target = event.target;
+    if (target.closest('input, select, textarea, button, a, sp-action-button')
+      || target.isContentEditable
+      || event.altKey || event.ctrlKey || event.metaKey) return;
+
+    const video = this._video;
+    if (!video) return;
+
+    switch (event.key) {
+      case ' ':
+      case 'k':
+      case 'K':
+        event.preventDefault();
+        this.toggleVideoPlayback();
+        break;
+      case 'ArrowLeft':
+        event.preventDefault();
+        this.seekVideo(this.currentTime - 10);
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        this.seekVideo(this.currentTime + 10);
+        break;
+      case 'Home':
+        event.preventDefault();
+        this.seekVideo(0);
+        break;
+      case 'End':
+        event.preventDefault();
+        this.seekVideo(this.playerDuration);
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        video.volume = Math.min(1, video.volume + 0.05);
+        video.muted = false;
+        this.handleVolumeChange();
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        video.volume = Math.max(0, video.volume - 0.05);
+        this.handleVolumeChange();
+        break;
+      case 'm':
+      case 'M':
+        event.preventDefault();
+        video.muted = !video.muted;
+        this.handleVolumeChange();
+        break;
+      case 'f':
+      case 'F':
+        event.preventDefault();
+        this.toggleVideoFullscreen();
+        break;
+      case 'Escape':
+        this.settingsMenuOpen = false;
+        this.volumeExpanded = false;
+        break;
+      default:
+        break;
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -637,18 +638,25 @@ export default class AssetPreview extends LitElement {
   }
 
   renderVideoControls() {
-    const chapter = chapters[this.selectedChapterIndex];
-    const nextIndex = (this.selectedChapterIndex + 1) % chapters.length;
-    const percent = Math.max(0, Math.min(100, (this.currentTime / this.playerDuration) * 100));
+    const chapter = this.chapters[this.selectedChapterIndex];
+    const nextIndex = this.chapters.length
+      ? (this.selectedChapterIndex + 1) % this.chapters.length : -1;
+    const nextChapter = this.chapters[nextIndex];
+    const duration = this.playerDuration;
+    const percent = duration > 0
+      ? Math.max(0, Math.min(100, (this.currentTime / duration) * 100)) : 0;
     const speeds = [0.75, 1, 1.25, 1.5, 2];
+
     /* eslint-disable indent */
     return html`
       <div class="video-tint"></div>
-      <div class="player-chapter-pill">
-        ${this.renderPlayerIcon('chapters')}
-        <span>Chapter ${this.selectedChapterIndex + 1}</span>
-        <strong>${chapter.title}</strong>
-      </div>
+      ${chapter ? html`
+        <div class="player-chapter-pill">
+          ${this.renderPlayerIcon('chapters')}
+          <span>Chapter ${this.selectedChapterIndex + 1}</span>
+          <strong>${chapter.title}</strong>
+        </div>
+      ` : ''}
       <button class="player-center-play" type="button" aria-label="Play" title="Play"
         ?hidden="${this.isVideoPlaying}" @click="${this.toggleVideoPlayback}">
         ${this.renderPlayerIcon('play')}
@@ -663,21 +671,21 @@ export default class AssetPreview extends LitElement {
       </div>
       <div class="player-controls">
         <div class="player-progress" role="slider" tabindex="0" aria-label="Video progress"
-          aria-valuemin="0" aria-valuemax="${this.playerDuration}"
-          aria-valuenow="${Math.min(this.currentTime, this.playerDuration)}"
+          aria-valuemin="0" aria-valuemax="${duration}"
+          aria-valuenow="${Math.min(this.currentTime, duration)}"
           aria-valuetext="${this.formatVideoTime(this.currentTime)} of ${
-            this.formatVideoTime(this.playerDuration)}"
+            this.formatVideoTime(duration)}"
           @pointerdown="${this.handleProgressPointer}" @pointermove="${this.handleProgressPointer}"
           @pointerup="${this.handleProgressPointer}">
           <div class="player-progress-track"></div>
-          ${chapters.map((item) => {
+          ${duration > 0 ? this.chapters.map((item) => {
             const [start, end] = item.timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
-            const left = Math.min(100, (start / this.playerDuration) * 100);
-            const right = (Math.min(end, this.playerDuration) / this.playerDuration) * 100;
+            const left = Math.max(0, Math.min(100, (start / duration) * 100));
+            const right = (Math.min(end, duration) / duration) * 100;
             const width = Math.max(0, right - left);
             return html`<div class="player-chapter-segment" title="${item.title}"
               style="left:${left}%;width:${width}%"></div>`;
-          })}
+          }) : ''}
           <div class="player-progress-played" style="width:${percent}%"></div>
           <div class="player-progress-thumb" style="left:${percent}%"></div>
         </div>
@@ -705,7 +713,9 @@ export default class AssetPreview extends LitElement {
                 aria-label="${this.videoMuted ? 'Unmute' : 'Mute'}"
                 title="${this.videoMuted ? 'Unmute' : 'Mute'}"
                 @click="${() => {
-                  this._video.muted = !this._video.muted;
+                  const video = this._video;
+                  if (!video) return;
+                  video.muted = !video.muted;
                   this.volumeExpanded = true;
                   this.handleVolumeChange();
                 }}">
@@ -715,19 +725,23 @@ export default class AssetPreview extends LitElement {
                 ?hidden="${!this.volumeExpanded}"
                 .value="${String(this.videoMuted ? 0 : this.videoVolume)}"
                 @input="${(event) => {
-                  this._video.volume = Number(event.target.value);
-                  this._video.muted = this._video.volume === 0;
+                  const video = this._video;
+                  if (!video) return;
+                  video.volume = Number(event.target.value);
+                  video.muted = video.volume === 0;
                   this.handleVolumeChange();
                 }}" />
             </div>
-            <span class="player-time">${this.formatVideoTime(this.currentTime)} / ${this.formatVideoTime(this.playerDuration)}</span>
+            <span class="player-time">${this.formatVideoTime(this.currentTime)} / ${this.formatVideoTime(duration)}</span>
           </div>
-          <button class="player-next-chapter" type="button"
-            aria-label="Go to next chapter: ${chapters[nextIndex].title}"
-            title="Go to next chapter: ${chapters[nextIndex].title}"
-            @click="${() => this.selectChapter(nextIndex)}">
-            ${this.renderPlayerIcon('next')}<span>${chapter.summary}</span>
-          </button>
+          ${nextChapter ? html`
+            <button class="player-next-chapter" type="button"
+              aria-label="Go to next chapter: ${nextChapter.title}"
+              title="Go to next chapter: ${nextChapter.title}"
+              @click="${() => this.selectChapter(nextIndex)}">
+              ${this.renderPlayerIcon('next')}<span>${nextChapter.summary || nextChapter.title}</span>
+            </button>
+          ` : ''}
           <div class="player-controls-right">
             <button class="player-speed" type="button" aria-label="Playback speed"
               title="Playback speed" @click="${() => {
@@ -739,11 +753,13 @@ export default class AssetPreview extends LitElement {
               aria-expanded="${this.settingsMenuOpen}" @click="${() => {
                 this.settingsMenuOpen = !this.settingsMenuOpen;
               }}">${this.renderPlayerIcon('settings')}</button>
-            <button class="player-control-button" type="button" aria-label="Chapters" title="Chapters"
-              aria-expanded="${this.chaptersVisible}" @click="${() => {
-                this.chaptersVisible = !this.chaptersVisible;
-                this.settingsMenuOpen = false;
-              }}">${this.renderPlayerIcon('chapters')}</button>
+            ${this.chapters.length ? html`
+              <button class="player-control-button" type="button" aria-label="Chapters" title="Chapters"
+                aria-expanded="${this.chaptersVisible}" @click="${() => {
+                  this.chaptersVisible = !this.chaptersVisible;
+                  this.settingsMenuOpen = false;
+                }}">${this.renderPlayerIcon('chapters')}</button>
+            ` : ''}
             <button class="player-control-button" type="button" aria-label="Fullscreen" title="Fullscreen"
               @click="${this.toggleVideoFullscreen}">${this.renderPlayerIcon('fullscreen')}</button>
           </div>
@@ -754,7 +770,7 @@ export default class AssetPreview extends LitElement {
   }
 
   selectChapter(index) {
-    const chapter = chapters[index];
+    const chapter = this.chapters[index];
     if (!chapter) return;
 
     this.selectedChapterIndex = index;
@@ -772,7 +788,7 @@ export default class AssetPreview extends LitElement {
   }
 
   renderChapters() {
-    return chapters.map((chapter, index) => {
+    return this.chapters.map((chapter, index) => {
       const [startTime, endTime] = chapter.timerange.split(' - ');
 
       /* eslint-disable indent */
@@ -782,19 +798,16 @@ export default class AssetPreview extends LitElement {
           id="chapter-${index + 1}"
           role="button"
           tabindex="0"
-          aria-current="${this.selectedChapterIndex === index ? 'true' : 'false'}"
           @click="${() => this.selectChapter(index)}"
           @keydown="${(event) => {
+            if (event.target !== event.currentTarget) return;
             if (event.key === 'Enter' || event.key === ' ') {
               event.preventDefault();
               this.selectChapter(index);
             }
           }}"
         >
-          <div
-            class="chapter-time"
-            aria-label="Chapter time range ${this.formatTimecode(startTime)} - ${this.formatTimecode(endTime)}"
-          >
+          <div class="chapter-time">
             <span class="start-time">${this.formatTimecode(startTime)}</span>
             <span class="duration-time">${this.formatTimecode(endTime)}</span>
 
@@ -858,162 +871,47 @@ export default class AssetPreview extends LitElement {
           </div>
         </article>
       `;
+      /* eslint-enable indent */
     });
   }
 
   render() {
-    return html`
-      <div
-        class="asset-preview-block-container"
-        daa-lh="Asset preview container | ${this.title}"
-      >
-        ${this.assetHasData && !this.isLoading ? html`
-          <div class="asset-preview-block-header">
-            <p>
-              ${this.blockData.localizedText['{{Asset detail}}']}:
-              ${unsafeHTML(this.title)}
-              ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}
-            </p>
-          </div>
-
-          <div class="asset-preview-block-details">
+    return html`<div class="asset-preview-block-container" daa-lh="Asset preview container | ${this.title}">
+      ${this.assetHasData && !this.isLoading ? html`
+          <div class="asset-preview-block-header"><p>${this.blockData.localizedText['{{Asset detail}}']}: ${unsafeHTML(this.title)}  ${this.getFileTypeFromTag() ? `(${this.getFileTypeFromTag()})` : ''}</p></div>
+          <div class="asset-preview-block-details ">
             <div class="asset-preview-block-details-left">
-              ${this.createdDate ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Date}}']}:
-                  </span>
-                  ${this.createdDate}
-                </p>
-              ` : ''}
-
-              ${this.getTagsTitlesString(this.audienceTags) ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Audience}}']}:
-                  </span>
-                  ${unsafeHTML(this.getTagsTitlesString(this.audienceTags))}
-                </p>
-              ` : ''}
-
-              ${this.summary ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Summary}}']}:
-                  </span>
-                  ${unsafeHTML(this.summary)}
-                </p>
-              ` : ''}
-
-              ${this.getTagsTitlesString(this.fileFormatTags) ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Type}}']}:
-                  </span>
-                  ${unsafeHTML(this.getTagsTitlesString(this.fileFormatTags))}
-                </p>
-              ` : ''}
-
-              ${this.getTagsTitlesString(this.tags) ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Tags}}']}:
-                  </span>
-                  ${unsafeHTML(this.getTagsTitlesString(this.tags))}
-                </p>
-              ` : ''}
-
-              ${this.size ? html`
-                <p>
-                  <span class="asset-preview-block-details-left-label">
-                    ${this.blockData.localizedText['{{Size}}']}:
-                  </span>
-                  ${unsafeHTML(this.size)}
-                </p>
-              ` : ''}
+              ${this.createdDate ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Date}}']}: </span>${this.createdDate}</p>` : ''}
+              ${this.getTagsTitlesString(this.audienceTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Audience}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.audienceTags))}</p>` : ''}
+              ${this.summary ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Summary}}']}: </span>${unsafeHTML(this.summary)}</p>` : ''}
+              ${this.getTagsTitlesString(this.fileFormatTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Type}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.fileFormatTags))}</p>` : ''}
+              ${this.getTagsTitlesString(this.tags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Tags}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.tags))}</p>` : ''}
+              ${this.size ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span>${unsafeHTML(this.size)}</p>` : ''}
 
               ${!this.isRestrictedAssetForUser() ? html`
-                <div
-                  class="asset-preview-block-actions"
-                  daa-lh="Asset preview block actions"
-                >
-                  ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`
-                    <button class="outline">
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="${this.getDownloadUrl()}"
-                        daa-ll="View"
-                      >
-                        View
-                      </a>
-                    </button>
-                  ` : ''}
-
-                  ${!this.isVideo ? html`
-                    <button class="filled">
-                      <a
-                        download="${this.title}"
-                        href="${this.getDownloadUrl()}"
-                        daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}"
-                      >
-                        ${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}
-                      </a>
-                    </button>
-                  ` : ''}
-
+              <div class="asset-preview-block-actions" daa-lh="Asset preview block actions">
+                ${this.isPreviewEnabled(this.getFileTypeFromTag()) ? html`<button
+                  class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}" daa-ll="View"> View </a></button>` : ''}
+                  ${!this.isVideo ? html`<button class="filled"><a download="${this.title}" href="${this.getDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>` : ''}
                   ${this.webinarPresentation ? html`
-                    <button class="filled">
-                      <a
-                        download="${`${this.title}_presentation`}"
-                        href="${this.getWebinarPresentationDownloadUrl()}"
-                        daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}"
-                      >
-                        ${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}
-                      </a>
-                    </button>
+                    <button class="filled"><a download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
                   ` : ''}
 
                   ${this.isVideo ? html`
-                    <button
-                      @click="${() => this.playVideo()}"
-                      class="filled"
-                      ?disabled="${this.isVideoLoading}"
-                    >
-                      <span>
-                        ${this.blockData.localizedText['{{Watch Video}}']}
-                      </span>
+                    <button @click="${() => this.playVideo()}" class="filled" ?disabled="${this.isVideoLoading}">
+                      <span>${this.blockData.localizedText['{{Watch Video}}']}</span>
                     </button>
                   ` : ''}
 
-                  ${this.backButtonUrl ? html`
-                    <a
-                      class="link"
-                      href="${this.backButtonUrl}"
-                      daa-ll="${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}"
-                    >
-                      ${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}
-                    </a>
-                  ` : ''}
-                </div>
-              ` : ''}
+                  ${this.backButtonUrl ? html`<a
+                  class="link" href="${this.backButtonUrl}" daa-ll="${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}">${this.blockData.localizedText[`{{${this.backButtonLabel}}}`]}</a>` : ''}
+                </div>` : ''}
             </div>
 
             <div class="asset-preview-block-details-right">
-              ${this.pdfPreviewUrl && !this.isRestrictedAssetForUser()
-                ? html`
-                  <div
-                    id="${PDF_RENDER_DIV_ID}"
-                    class="asset-preview-pdf-viewer"
-                  ></div>
-                `
-                : html`
-                  <img
-                    src="${transformCardUrl(this.previewImage)}"
-                    @error="${this._handleImgError}"
-                    alt="${this.title || ''}"
-                  />
-                `}
+            ${this.pdfPreviewUrl && !this.isRestrictedAssetForUser()
+                ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
+                : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`}
             </div>
           </div>
 
@@ -1034,12 +932,14 @@ export default class AssetPreview extends LitElement {
                   @ended="${() => { this.isVideoPlaying = false; }}"
                   @timeupdate="${this.handleVideoTimeUpdate}"
                   @loadedmetadata="${this.handleVideoLoadedMetadata}"
-                  @durationchange="${() => {
-                    this.videoDuration = Number.isFinite(this._video.duration)
-                      ? this._video.duration : 0;
+                  @durationchange="${(event) => {
+                    this.videoDuration = Number.isFinite(event.currentTarget.duration)
+                      ? event.currentTarget.duration : 0;
                   }}"
                   @volumechange="${this.handleVolumeChange}"
-                  @ratechange="${() => { this.playbackSpeed = this._video.playbackRate; }}"
+                  @ratechange="${(event) => {
+                    this.playbackSpeed = event.currentTarget.playbackRate;
+                  }}"
                   @loadstart="${() => { this.isVideoLoading = true; }}"
                   @seeking="${() => { this.isVideoLoading = true; }}"
                   @waiting="${() => { this.isVideoLoading = true; }}"
@@ -1059,14 +959,16 @@ export default class AssetPreview extends LitElement {
                     src="${this.getDownloadUrl()}"
                     type="video/mp4"
                   />
-                  <track kind="chapters" label="Chapters" srclang="en" default
-                    src="${this.createChaptersTrackUrl()}" />
+                  ${this.chapters.length ? html`
+                    <track kind="chapters" label="Chapters" srclang="en" default
+                      src="${this.createChaptersTrackUrl()}" />
+                  ` : ''}
                 </video>
                 ${this.renderVideoControls()}
               </div>
 
-              ${chapters.length && this.chaptersVisible ? html`
-              <div>
+              ${this.chapters.length ? html`
+              <div ?hidden="${!this.chaptersVisible}">
                 <sp-theme system="express" scale="medium" color="light">
                   <section
                     class="video-chapters"
@@ -1075,7 +977,7 @@ export default class AssetPreview extends LitElement {
                     <header class="header">
                       <h1 class="header-title">In this video</h1>
                       <div class="chapter-count">
-                        Chapters: ${chapters.length}
+                        Chapters: ${this.chapters.length}
                       </div>
                     </header>
 
@@ -1154,10 +1056,12 @@ export default class AssetPreview extends LitElement {
   }
 
   getFileTypeFromTag() {
-    // we should always have only one file format tag since it is added based on file type
-    // or we should use this.fileType but this has some ugly values (see
+    // We should always have only one file format tag, added based on file type.
+    // this.fileType can contain values unsuitable for display.
     // https://git.corp.adobe.com/wcms/gravity/blob/develop/app-configuration/core/src/main/java/com/adobe/wcm/configuration/utils/CaaSContentDXUtils.java#L52
-    if (this.fileFormatTags && this.fileFormatTags.length) { return this.fileFormatTags[0].title; }
+    if (this.fileFormatTags && this.fileFormatTags.length) {
+      return this.fileFormatTags[0].title;
+    }
     return '';
   }
 
