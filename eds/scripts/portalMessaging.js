@@ -12,7 +12,7 @@ import { personalizePage, personalizePlaceholders } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
 
 export async function loadPopupFragment(popupFragment, modal = 'partner agreement') {
-  const response = await fetch(popupFragment);
+  const response = await fetch(`${popupFragment}.plain.html`);
   if (!response.ok) {
     console.error(`Fetching ${modal} metadata failed, status ${response.status}`);
     return null;
@@ -21,8 +21,7 @@ export async function loadPopupFragment(popupFragment, modal = 'partner agreemen
   const { body } = new DOMParser().parseFromString(text, 'text/html');
   if (!body) return null;
 
-  const main = body.querySelector('main');
-  return main.firstElementChild;
+  return body.firstElementChild;
 }
 
 export async function portalMessaging(miloLibs, partnerAgreementDisplayed) {
@@ -146,14 +145,19 @@ export async function getGlobalBanner() {
   return loadBannerContent('global-banner');
 }
 
-export async function prependContent() {
-  const documentMain = document.querySelector('main');
-  if (!documentMain) return;
-
+export async function fetchBannerContent() {
   const [bctqBannerContent, globalBannerContent] = await Promise.all([
     getBctqBanner(),
     getGlobalBanner(),
   ]);
+
+  return { bctqBannerContent, globalBannerContent };
+}
+
+// eslint-disable-next-line max-len
+export function insertBannerContent({ bctqBannerContent, globalBannerContent }) {
+  const documentMain = document.querySelector('main');
+  if (!documentMain) return;
 
   if (globalBannerContent) documentMain.prepend(globalBannerContent);
   if (bctqBannerContent) documentMain.prepend(bctqBannerContent);
