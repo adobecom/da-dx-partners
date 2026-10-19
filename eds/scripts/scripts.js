@@ -40,6 +40,7 @@ const isProd = prodHosts.includes(window.location.host);
 // required for react-include component: react-app may need different ims client ids.
 let imsClientId = document.querySelector(`meta[name=${isProd ? 'ims_client_id' : 'ims_client_id_stage'}]`)?.content;
 imsClientId = imsClientId || (isProd ? 'MILO_PARTNERS_PROD' : 'MILO_PARTNERS_STAGE');
+const isC2 = document.querySelector('meta[name="foundation"]')?.content?.trim().toLowerCase() === 'c2';
 
 const localesDefault = { '': { ietf: 'en-US', tk: 'hah7vzn.css' } };
 // typekits with swap
@@ -112,7 +113,8 @@ const CONFIG = {
 const miloLibs = setLibs(LIBS);
 
 (function loadStyles() {
-  const paths = [`${miloLibs}/styles/styles.css`];
+  const stylesPrefix = isC2 ? '/c2' : '';
+  const paths = [`${miloLibs}${stylesPrefix}/styles/styles.css`];
   if (STYLES) { paths.push(STYLES); }
   paths.forEach((path) => {
     const link = document.createElement('link');
