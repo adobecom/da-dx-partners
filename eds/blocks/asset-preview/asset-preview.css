@@ -287,6 +287,7 @@ span.asset-preview-block-details-left-label {
 }
 
 .chapter .chapter-actions {
+  position: relative;
   width: 20px;
   height: 20px;
   margin-top: 16px;
@@ -301,6 +302,33 @@ span.asset-preview-block-details-left-label {
 
 .chapter .share-button svg {
   fill: none;
+}
+
+.chapter .share-button:hover .copy-icon,
+.chapter .share-button:focus-visible .copy-icon {
+  stroke: #1473e6;
+}
+
+.chapter .chapter-share-tooltip {
+  position: absolute;
+  left: calc(100% - 10px);
+  top: calc(100% + 8px);
+  padding: 0 5px;
+  border: 1px solid #54585D;
+  border-radius: 0;
+  background-color: #4F5358;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.chapter .share-button:hover + .chapter-share-tooltip,
+.chapter .share-button:focus-visible + .chapter-share-tooltip {
+  visibility: visible;
 }
 
 .chapter .share-icon {
