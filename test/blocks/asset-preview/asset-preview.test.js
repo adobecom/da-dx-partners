@@ -1,4 +1,4 @@
-import { readFile, sendMouse } from '@web/test-runner-commands';
+import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { setLibs } from '../../../eds/scripts/utils.js';
@@ -822,12 +822,16 @@ describe('AssetPreview - shareChapter()', () => {
     document.body.innerHTML = '';
   });
 
-  it('shows a blue copy icon and chapter tooltip on hover', async () => {
+  it('styles the chapter tooltip for hover, copy and keyboard focus', async () => {
+    sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     sinon.stub(navigator.clipboard, 'writeText').resolves();
     const el = makeInstance();
     const container = document.createElement('div');
     const styles = document.createElement('style');
-    styles.textContent = await readFile({ path: '../../../eds/blocks/asset-preview/asset-preview.css' });
+    const css = await readFile({ path: '../../../eds/blocks/asset-preview/asset-preview.css' });
+    // Model pointer and keyboard states without native mouse commands across concurrent test tabs.
+    styles.textContent = css.replaceAll(':hover', '[data-test-hover]')
+      .replaceAll(':focus-visible', '[data-test-focus-visible]');
     document.body.append(styles, container);
     render(el.renderChapters(), container);
     const button = container.querySelector('.share-button');
@@ -842,7 +846,7 @@ describe('AssetPreview - shareChapter()', () => {
     expect(getComputedStyle(icon).stroke).to.equal('rgb(112, 112, 112)');
 
     const { x, y, width, height } = icon.getBoundingClientRect();
-    await sendMouse({ type: 'move', position: [x + width / 2, y + height / 2] });
+    button.setAttribute('data-test-hover', '');
 
     expect(getComputedStyle(icon).stroke).to.equal('rgb(20, 115, 230)');
     expect(getComputedStyle(tooltip).visibility).to.equal('visible');
@@ -850,16 +854,22 @@ describe('AssetPreview - shareChapter()', () => {
     expect(tooltipBounds.top).to.be.greaterThan(y + height);
     expect(tooltipBounds.left).to.be.at.least(x + width / 2);
 
-    await sendMouse({ type: 'click', position: [x + width / 2, y + height / 2] });
+    button.focus();
+    button.click();
+    await Promise.resolve();
     render(el.renderChapters(), container);
     expect(document.activeElement).to.equal(button);
     expect(tooltip.textContent.trim()).to.equal('Link copied');
     expect(getComputedStyle(tooltip).visibility).to.equal('visible');
 
-    await sendMouse({ type: 'move', position: [0, 0] });
+    button.removeAttribute('data-test-hover');
     expect(document.activeElement).to.equal(button);
     expect(getComputedStyle(tooltip).visibility).to.equal('hidden');
-    clearTimeout(el.shareResetTimer);
+
+    button.setAttribute('data-test-focus-visible', '');
+    expect(getComputedStyle(tooltip).visibility).to.equal('visible');
+    button.removeAttribute('data-test-focus-visible');
+    expect(getComputedStyle(tooltip).visibility).to.equal('hidden');
   });
 
   it('replaces the clicked share icon with a green check for two seconds', async () => {
