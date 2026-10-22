@@ -96,10 +96,6 @@
   max-height: unset;
 }
 
-.journey-card .media-area .modal-img-link {
-  display: block;
-}
-
 .journey-card .foreground,
 .journey-card .card-footer {
   padding: var(--spacing-xs);
@@ -180,24 +176,6 @@
 .journey-card .background .milo-iframe {
   height: 100%;
   padding-bottom: 0;
-}
-
-.journey-card .lockup-area,
-.journey-card .device {
-  margin: 0;
-}
-
-.journey-card .device {
-  font-size: var(--type-body-xxs-size);
-  line-height: var(--type-body-xxs-lh);
-}
-
-.journey-card .lockup-area {
-  row-gap: var(--spacing-xxs);
-}
-
-.journey-card .lockup-label {
-  line-height: initial;
 }
 
 .journey-card .action-area,
