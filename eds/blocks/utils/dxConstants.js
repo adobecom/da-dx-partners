@@ -81,3 +81,14 @@ export const DX_PARTNER_LEVEL = {
   GOLD: 'Gold',
   PLATINUM: 'Platinum',
 };
+
+export const DX_ACCOUNT_NAME_CONDITION_PREFIX = 'partner-account-name-';
+
+// Keys are used by authors as block class names, so they must be lowercase kebab-case.
+export const DX_ACCOUNT_NAME_MAPPING = {
+  accenture: ['Accenture PLC', 'Accenture ETLA', 'Accenture Llp', 'Accenture Test'],
+  'accenture-plc': ['Accenture PLC'],
+  'accenture-etla': ['Accenture ETLA'],
+  'accenture-llp': ['Accenture Llp'],
+  'accenture-test': ['Accenture Test'],
+};
