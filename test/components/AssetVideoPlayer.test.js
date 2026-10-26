@@ -829,20 +829,20 @@ describe('AssetVideoPlayer - custom video controls', () => {
     const player = container.querySelector('.video-holder');
     const playerVideo = player.querySelector('video');
     expect(container.querySelectorAll('.chapter').length).to.equal(4);
-    expect(player.querySelector('[aria-label="Chapters"]').getAttribute('aria-expanded'))
+    expect(player.querySelector('.player-controls-right [aria-expanded]').getAttribute('aria-expanded'))
       .to.equal('true');
 
-    player.querySelector('[aria-label="Chapters"]').click();
+    player.querySelector('.player-controls-right [aria-expanded]').click();
     render(el.render(), container);
     expect(container.querySelector('.video-chapters').parentElement.parentElement.hidden).to.equal(true);
-    expect(player.querySelector('[aria-label="Chapters"]').getAttribute('aria-expanded'))
+    expect(player.querySelector('.player-controls-right [aria-expanded]').getAttribute('aria-expanded'))
       .to.equal('false');
     expect(player.querySelector('.player-chapter-menu')).to.equal(null);
 
-    player.querySelector('[aria-label="Chapters"]').click();
+    player.querySelector('.player-controls-right [aria-expanded]').click();
     render(el.render(), container);
     expect(container.querySelectorAll('.chapter').length).to.equal(4);
-    expect(player.querySelector('[aria-label="Chapters"]').getAttribute('aria-expanded'))
+    expect(player.querySelector('.player-controls-right [aria-expanded]').getAttribute('aria-expanded'))
       .to.equal('true');
     expect(player.querySelector('video')).to.equal(playerVideo);
     expect(el.currentTime).to.equal(100);
@@ -924,7 +924,11 @@ describe('AssetVideoPlayer - custom video controls', () => {
     renderControls();
     const segments = holder.querySelectorAll('.player-chapter-segment');
     expect(segments[0].style.left).to.equal('0%');
-    expect(segments[3].style.width).to.equal('max(0px, 0% + 0px)');
+    holder.style.width = '300px';
+    holder.style.position = 'relative';
+    document.body.appendChild(holder);
+    expect(segments[3].style.left).to.equal('100%');
+    expect(getComputedStyle(segments[3]).width).to.equal('0px');
     expect(holder.querySelector('.player-progress').getAttribute('aria-valuemax')).to.equal('300');
   });
 
@@ -1133,7 +1137,8 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
     progress.dispatchEvent(new PointerEvent('pointermove', { clientX: 214, pointerType: 'mouse' }));
     await player.updateComplete;
 
-    const tooltip = player.querySelector('[role="tooltip"]');
+    const tooltip = player.querySelector('.player-progress-tooltip');
+    expect(tooltip).to.exist;
     expect(tooltip.children[0].textContent.trim()).to.equal('3:34');
     expect(tooltip.children[1].textContent.trim()).to.equal('Why Partners Should Be Excited');
     expect(video.currentTime).to.equal(0);
@@ -1141,7 +1146,8 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
 
     progress.dispatchEvent(new PointerEvent('pointerleave'));
     await player.updateComplete;
-    expect(player.querySelector('[role="tooltip"]')).to.equal(null);
+    expect(player.querySelector('.player-progress-tooltip')).to.equal(null);
+    expect(player.querySelectorAll('.chapter-share-tooltip')).to.have.lengthOf(4);
   });
 
   it('keeps completed segments blue, rounded and separated without a leading gap', async () => {
