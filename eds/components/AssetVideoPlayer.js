@@ -954,6 +954,6 @@ export default class AssetVideoPlayer extends LitElement {
   }
 }
 
-if (!customElements.get('video-player')) {
-  customElements.define('video-player', AssetVideoPlayer);
+if (!customElements.get('asset-video-player')) {
+  customElements.define('asset-video-player', AssetVideoPlayer);
 }

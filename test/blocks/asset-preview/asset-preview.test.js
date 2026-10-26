@@ -452,7 +452,7 @@ describe('AssetPreview - setData() chapters', () => {
       const container = document.createElement('div');
       document.body.appendChild(container);
       render(el.render(), container);
-      const player = container.querySelector('video-player');
+      const player = container.querySelector('asset-video-player');
       await player.updateComplete;
       const video = container.querySelector('video');
       expect(video).to.exist;
@@ -844,7 +844,7 @@ describe('AssetPreview - video component integration', () => {
     sinon.stub(window, 'fetch').resolves({ ok: true, json: async () => ({}) });
     document.body.appendChild(el);
     await el.updateComplete;
-    const player = el.querySelector('video-player');
+    const player = el.querySelector('asset-video-player');
     await player.updateComplete;
 
     expect(player.src).to.equal(el.url);
@@ -867,7 +867,7 @@ describe('AssetPreview - video component integration', () => {
     sinon.stub(window, 'scrollTo');
     button.click();
     expect(play.calledOnce).to.be.true;
-    expect(el.querySelector('video-player')).to.equal(player);
+    expect(el.querySelector('asset-video-player')).to.equal(player);
     expect(player.querySelector('video')).to.equal(video);
   });
 
@@ -879,12 +879,12 @@ describe('AssetPreview - video component integration', () => {
     el.assetPartnerLevel = ['gold'];
     const container = document.createElement('div');
     render(el.render(), container);
-    expect(container.querySelector('video-player')).to.equal(null);
+    expect(container.querySelector('asset-video-player')).to.equal(null);
 
     el.assetPartnerLevel = [];
     el.isVideo = false;
     render(el.render(), container);
-    expect(container.querySelector('video-player')).to.equal(null);
+    expect(container.querySelector('asset-video-player')).to.equal(null);
   });
 });
 

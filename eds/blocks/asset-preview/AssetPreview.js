@@ -61,7 +61,7 @@ export default class AssetPreview extends LitElement {
   }
 
   async playVideo() {
-    const player = this.querySelector('video-player');
+    const player = this.querySelector('asset-video-player');
     if (!player) return;
 
     window.scrollTo({ top: player.offsetTop, behavior: 'smooth' });
@@ -170,10 +170,13 @@ export default class AssetPreview extends LitElement {
   }
 
   async getAssetMetadata() {
-    // For domain we use what is in window.location.href.
-    // This assumes cards use partners.stage.adobe.com or partners.adobe.com.
-    // Production assets are fetched from production.
-    // Stage may display QA or development assets, but metadata is fetched from stage.
+    // for domain we use what is in  window.location.href
+    // (this assumes that on cards we have partners.stage.adobe.com or partners.adobe.com
+    // on prod caas index we would have only have prod assets, so asset metadata
+    // would always be found on prod
+    // for stage, we will display also some assets from qa01 or dev02,
+    // but will always fetch asset metadata from stage
+    // so we should delete assets from lower env if they make us problem on stage
     const mappedAssetUrl = this.getRealAssetUrl();
     if (!mappedAssetUrl) {
       this.isLoading = false;
@@ -307,12 +310,12 @@ export default class AssetPreview extends LitElement {
           </div>
 
           ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
-            <video-player
+            <asset-video-player
               .src="${this.getDownloadUrl()}"
               .fileType="${this.fileType}"
               .chapters="${this.chapters}"
               @loading-change="${this.handleVideoLoadingChange}"
-            ></video-player>
+            ></asset-video-player>
           ` : ''}
         ` : html`
           <div class="asset-preview-block-header">
@@ -380,12 +383,10 @@ export default class AssetPreview extends LitElement {
   }
 
   getFileTypeFromTag() {
-    // We should always have only one file format tag, added based on file type.
-    // this.fileType can contain values unsuitable for display.
+    // we should always have only one file format tag since it is added based on file type
+    // or we should use this.fileType but this has some ugly values (see
     // https://git.corp.adobe.com/wcms/gravity/blob/develop/app-configuration/core/src/main/java/com/adobe/wcm/configuration/utils/CaaSContentDXUtils.java#L52
-    if (this.fileFormatTags && this.fileFormatTags.length) {
-      return this.fileFormatTags[0].title;
-    }
+    if (this.fileFormatTags && this.fileFormatTags.length) { return this.fileFormatTags[0].title; }
     return '';
   }
 

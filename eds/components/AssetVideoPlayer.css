@@ -1,5 +1,5 @@
 /* stylelint-disable declaration-block-no-redundant-longhand-properties, no-descending-specificity, color-function-notation, alpha-value-notation */
-video-player {
+asset-video-player {
   --video-player-black: #2c2c2c;
   --video-player-white: #fff;
 
@@ -9,7 +9,7 @@ video-player {
 }
 
 /* Video layout: one column unless chapters are open on desktop. */
-video-player .video-player-layout {
+asset-video-player .video-player-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
@@ -18,16 +18,16 @@ video-player .video-player-layout {
   margin: 24px auto;
 }
 
-video-player .video-player-layout > * {
+asset-video-player .video-player-layout > * {
   min-width: 0;
 }
 
-video-player .video-player-layout > [hidden],
-video-player .video-holder [hidden] {
+asset-video-player .video-player-layout > [hidden],
+asset-asvideo-player .video-holder [hidden] {
   display: none !important;
 }
 
-video-player .video-player-layout .video-container.video-holder {
+asset-video-player .video-player-layout .video-container.video-holder {
   display: flex;
   position: relative;
   width: 100%;
@@ -41,7 +41,7 @@ video-player .video-player-layout .video-container.video-holder {
   overflow: hidden;
 }
 
-video-player .video-player-layout .video-container.video-holder video {
+asset-video-player .video-player-layout .video-container.video-holder video {
   display: block;
   width: 100%;
   height: 100%;
@@ -49,7 +49,7 @@ video-player .video-player-layout .video-container.video-holder video {
   background-color: var(--video-player-black);
 }
 
-video-player .video-holder .video-tint {
+asset-video-player .video-holder .video-tint {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -57,14 +57,14 @@ video-player .video-holder .video-tint {
   mix-blend-mode: multiply;
 }
 
-video-player .video-holder button {
+asset-video-player .video-holder button {
   font: inherit;
   color: inherit;
   border: 0;
   cursor: pointer;
 }
 
-video-player .video-holder svg {
+asset-video-player .video-holder svg {
   width: 20px;
   height: 20px;
   flex: 0 0 auto;
@@ -72,7 +72,7 @@ video-player .video-holder svg {
   stroke: none;
 }
 
-video-player .video-holder .player-center-play {
+asset-video-player .video-holder .player-center-play {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -85,61 +85,61 @@ video-player .video-holder .player-center-play {
   background: rgba(20, 20, 20, 0.55);
 }
 
-video-player .video-holder .player-center-play:hover {
+asset-video-player .video-holder .player-center-play:hover {
   background: #1473e6;
 }
 
-video-player .video-holder .player-center-play svg {
+asset-video-player .video-holder .player-center-play svg {
   width: 24px;
   height: 24px;
 }
 
-video-player .video-holder .player-controls {
+asset-video-player .video-holder .player-controls {
   position: absolute;
   inset: auto 0 0;
   padding: 24px 20px 16px;
   background: linear-gradient(to top, rgb(26 5 39 / 92%) 65%, transparent);
 }
 
-video-player .player-progress {
+asset-video-player .player-progress {
   position: relative;
   height: 22px;
   cursor: pointer;
   touch-action: none;
 }
 
-video-player .player-progress:hover .player-chapter-segment {
+asset-video-player .player-progress:hover .player-chapter-segment {
   height: 8px;
   top: 7px;
 }
 
-video-player .player-progress-track,
-video-player .player-chapter-segment,
-video-player .player-progress-played {
+asset-video-player .player-progress-track,
+asset-video-player .player-chapter-segment,
+asset-video-player .player-progress-played {
   position: absolute;
   top: 8px;
   height: 5px;
   pointer-events: none;
 }
 
-video-player .player-progress-track {
+asset-video-player .player-progress-track {
   inset-inline: 0;
   border-radius: 8px;
   background: rgb(255 255 255 / 42%);
 }
 
-video-player .player-chapter-segment {
+asset-video-player .player-chapter-segment {
   box-sizing: border-box;
   background: rgb(255 255 255 / 30%);
 }
 
-video-player .player-progress-played {
+asset-video-player .player-progress-played {
   left: 0;
   border-radius: 8px;
   background: #147af3;
 }
 
-video-player .player-progress-thumb {
+asset-video-player .player-progress-thumb {
   position: absolute;
   top: 50%;
   width: 13px;
@@ -150,32 +150,32 @@ video-player .player-progress-thumb {
   pointer-events: none;
 }
 
-video-player .video-holder :focus-visible {
+asset-video-player .video-holder :focus-visible {
   outline: 2px solid var(--video-player-white);
   outline-offset: 3px;
 }
 
-video-player .player-bottom-row {
+asset-video-player .player-bottom-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
 }
 
-video-player .player-controls-left,
-video-player .player-controls-right,
-video-player .player-volume {
+asset-video-player .player-controls-left,
+asset-video-player .player-controls-right,
+asset-video-player .player-volume {
   display: flex;
   align-items: center;
   gap: 4px;
   min-width: 0;
 }
 
-video-player .player-controls-right {
+asset-video-player .player-controls-right {
   grid-column: -2 / -1;
 }
 
-video-player .video-holder .player-control-button {
+asset-video-player .video-holder .player-control-button {
   width: 32px;
   height: 32px;
   padding: 0;
@@ -186,23 +186,23 @@ video-player .video-holder .player-control-button {
   border-radius: 6px;
 }
 
-video-player .video-holder .player-control-button:hover,
-video-player .video-holder .player-next-chapter:hover {
+asset-video-player .video-holder .player-control-button:hover,
+asset-video-player .video-holder .player-next-chapter:hover {
   background: rgb(255 255 255 / 12%);
 }
 
-video-player .player-volume input {
+asset-video-player .player-volume input {
   width: 70px;
   margin: 0 4px;
   accent-color: var(--video-player-white);
 }
 
-video-player .player-time {
+asset-video-player .player-time {
   font-size: 14px;
   white-space: nowrap;
 }
 
-video-player .video-holder .player-next-chapter {
+asset-video-player .video-holder .player-next-chapter {
   display: flex;
   align-items: center;
   gap: 0;
@@ -214,7 +214,7 @@ video-player .video-holder .player-next-chapter {
   border-radius: 6px;
 }
 
-video-player .player-next-chapter span {
+asset-video-player .player-next-chapter span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -222,7 +222,7 @@ video-player .player-next-chapter span {
   font-weight: 600;
 }
 
-video-player .player-settings-menu {
+asset-video-player .player-settings-menu {
   position: absolute;
   right: 20px;
   bottom: 100px;
@@ -236,14 +236,14 @@ video-player .player-settings-menu {
   background: rgb(24 8 34 / 96%);
 }
 
-video-player .player-settings-menu label {
+asset-video-player .player-settings-menu label {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-video-player .video-player-layout .video-holder:fullscreen {
+asset-video-player .video-player-layout .video-holder:fullscreen {
   max-width: none;
   width: 100%;
   height: 100%;
@@ -252,12 +252,12 @@ video-player .video-player-layout .video-holder:fullscreen {
 }
 
 /* Chapters */
-video-player .video-player-layout sp-theme {
+asset-video-player .video-player-layout sp-theme {
   display: block;
   min-width: 0;
 }
 
-video-player .video-chapters {
+asset-video-player .video-chapters {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -269,7 +269,7 @@ video-player .video-chapters {
   background: #f8f8f8;
 }
 
-video-player .video-chapters .header {
+asset-video-player .video-chapters .header {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -278,26 +278,26 @@ video-player .video-chapters .header {
   border-bottom: 1px solid #d5d5d5;
 }
 
-video-player .video-chapters .header-title {
+asset-video-player .video-chapters .header-title {
   margin: 0;
   font-size: 16px;
   font-weight: 700;
 }
 
-video-player .video-chapters .chapter-count {
+asset-video-player .video-chapters .chapter-count {
   font-size: 12px;
   color: #6e6e6e;
   white-space: nowrap;
 }
 
-video-player .video-chapters .chapter-list {
+asset-video-player .video-chapters .chapter-list {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-video-player .chapter {
+asset-video-player .chapter {
   position: relative;
   display: grid;
   box-sizing: border-box;
@@ -312,15 +312,15 @@ video-player .chapter {
   transition: background 120ms ease;
 }
 
-video-player .chapter:hover {
+asset-video-player .chapter:hover {
   background: #f4f4f4;
 }
 
-video-player .chapter.is-active {
+asset-video-player .chapter.is-active {
   background: #e8f1fc;
 }
 
-video-player .chapter.is-active::before {
+asset-video-player .chapter.is-active::before {
   content: "";
   position: absolute;
   left: 0;
@@ -330,7 +330,7 @@ video-player .chapter.is-active::before {
   background: #1473e6;
 }
 
-video-player .chapter .chapter-time {
+asset-video-player .chapter .chapter-time {
   display: flex;
   flex-direction: column;
   padding-top: 3px;
@@ -341,29 +341,29 @@ video-player .chapter .chapter-time {
   font-variant-numeric: tabular-nums;
 }
 
-video-player .chapter .chapter-time .start-time {
+asset-video-player .chapter .chapter-time .start-time {
   padding-top: 1px;
   color: #1473e6;
   font-weight: 700;
 }
 
-video-player .chapter .chapter-time .duration-time {
+asset-video-player .chapter .chapter-time .duration-time {
   margin-top: 8px;
 }
 
-video-player .chapter .chapter-content {
+asset-video-player .chapter .chapter-content {
   min-width: 0;
   width: calc(100% - 18px);
 }
 
-video-player .chapter .chapter-title {
+asset-video-player .chapter .chapter-title {
   margin: 0;
   font-size: 14px;
   line-height: 1.3;
   font-weight: 600;
 }
 
-video-player .chapter .chapter-description {
+asset-video-player .chapter .chapter-description {
   margin: 4px 0 0;
   max-width: 100%;
   color: #6e6e6e;
@@ -376,7 +376,7 @@ video-player .chapter .chapter-description {
   overflow: hidden;
 }
 
-video-player .chapter .chapter-actions {
+asset-video-player .chapter .chapter-actions {
   position: relative;
   display: flex;
   align-items: center;
@@ -386,20 +386,20 @@ video-player .chapter .chapter-actions {
   margin-top: 16px;
 }
 
-video-player .chapter .share-button {
+asset-video-player .chapter .share-button {
   --spectrum-actionbutton-edge-to-visual-only: 0;
 }
 
-video-player .chapter .share-button svg {
+asset-video-player .chapter .share-button svg {
   fill: none;
 }
 
-video-player .chapter .share-button:hover .copy-icon,
-video-player .chapter .share-button:focus-visible .copy-icon {
+asset-video-player .chapter .share-button:hover .copy-icon,
+asset-video-player .chapter .share-button:focus-visible .copy-icon {
   stroke: #1473e6;
 }
 
-video-player .chapter .chapter-share-tooltip {
+asset-video-player .chapter .chapter-share-tooltip {
   position: absolute;
   left: calc(100% - 10px);
   top: calc(100% + 8px);
@@ -416,12 +416,12 @@ video-player .chapter .chapter-share-tooltip {
   z-index: 1;
 }
 
-video-player .chapter .share-button:hover + .chapter-share-tooltip,
-video-player .chapter .share-button:focus-visible + .chapter-share-tooltip {
+asset-video-player .chapter .share-button:hover + .chapter-share-tooltip,
+asset-video-player .chapter .share-button:focus-visible + .chapter-share-tooltip {
   visibility: visible;
 }
 
-video-player .chapter .progress-track {
+asset-video-player .chapter .progress-track {
   height: 4px;
   width: 100%;
   margin-top: 8px;
@@ -430,7 +430,7 @@ video-player .chapter .progress-track {
   overflow: hidden;
 }
 
-video-player .chapter .progress-fill {
+asset-video-player .chapter .progress-fill {
   height: 100%;
   width: 0;
   border-radius: inherit;
@@ -439,7 +439,7 @@ video-player .chapter .progress-fill {
 }
 
 /* Loading overlay */
-video-player .video-player-layout .video-loading-overlay {
+asset-video-player .video-player-layout .video-loading-overlay {
   position: absolute;
   inset: 0;
   background-color: rgb(0 0 0 / 70%);
@@ -455,27 +455,27 @@ video-player .video-player-layout .video-loading-overlay {
 
 /* Desktop layout */
 @media screen and (min-width: 900px) {
-  video-player .video-player-layout.chapters-open {
+  asset-video-player .video-player-layout.chapters-open {
     grid-template-columns: minmax(0, 1fr) 340px;
   }
 
-  video-player .video-player-layout.chapters-collapsed {
+  asset-video-player .video-player-layout.chapters-collapsed {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  video-player .video-player-layout > :not(.video-container) {
+  asset-video-player .video-player-layout > :not(.video-container) {
     align-self: stretch;
     min-height: 0;
   }
 
-  video-player .video-player-layout sp-theme {
+  asset-video-player .video-player-layout sp-theme {
     display: flex;
     min-height: 0;
     contain: size;
     height: 100%;
   }
 
-  video-player .video-player-layout .video-chapters {
+  asset-video-player .video-player-layout .video-chapters {
     flex: 1;
     height: 100%;
     min-height: 0;
@@ -484,40 +484,40 @@ video-player .video-player-layout .video-loading-overlay {
 
 /* Compact player controls */
 @media (max-width: 800px) {
-  video-player .video-holder .player-controls {
+  asset-video-player .video-holder .player-controls {
     padding: 12px 10px 8px;
   }
 
-  video-player .player-progress {
+  asset-video-player .player-progress {
     margin-bottom: 2px;
   }
 
-  video-player .player-next-chapter span {
+  asset-video-player .player-next-chapter span {
     font-size: 12px;
   }
 
-  video-player .player-controls-left,
-  video-player .player-controls-right {
+  asset-video-player .player-controls-left,
+  asset-video-player .player-controls-right {
     gap: 0;
   }
 
-  video-player .video-holder .player-control-button {
+  asset-video-player .video-holder .player-control-button {
     width: 28px;
     height: 30px;
   }
 
-  video-player .player-time {
+  asset-video-player .player-time {
     font-size: 11px;
   }
 
-  video-player .player-volume.expanded input {
+  asset-video-player .player-volume.expanded input {
     position: absolute;
     left: 100px;
     bottom: 72px;
     width: 85px;
   }
 
-  video-player .player-settings-menu {
+  asset-video-player .player-settings-menu {
     right: 10px;
     bottom: 95px;
     width: calc(100% - 20px);
@@ -527,36 +527,36 @@ video-player .video-player-layout .video-loading-overlay {
 
 /* Mobile chapters */
 @media (max-width: 560px) {
-  video-player .video-chapters {
+  asset-video-player .video-chapters {
     min-height: 100vh;
     border-left: 0;
     border-right: 0;
   }
 
-  video-player .video-chapters .header {
+  asset-video-player .video-chapters .header {
     padding: 0 20px;
   }
 
-  video-player .video-chapters .header-title {
+  asset-video-player .video-chapters .header-title {
     font-size: 24px;
   }
 
-  video-player .video-chapters .chapter-count {
+  asset-video-player .video-chapters .chapter-count {
     font-size: 18px;
   }
 
-  video-player .chapter {
+  asset-video-player .chapter {
     grid-template-columns: 70px minmax(0, 1fr);
     padding-left: 20px;
     padding-right: 20px;
   }
 
-  video-player .chapter .chapter-title {
+  asset-video-player .chapter .chapter-title {
     font-size: 21px;
   }
 
-  video-player .chapter .chapter-description,
-  video-player .chapter .chapter-time {
+  asset-video-player .chapter .chapter-description,
+  asset-video-player .chapter .chapter-time {
     font-size: 18px;
   }
 }

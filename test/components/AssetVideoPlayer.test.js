@@ -47,7 +47,6 @@ describe('AssetVideoPlayer - shareChapter()', () => {
   });
 
   it('styles the chapter tooltip for hover, copy and keyboard focus', async () => {
-    sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     sinon.stub(navigator.clipboard, 'writeText').resolves();
     const el = makeInstance();
     const styles = document.createElement('style');
@@ -85,12 +84,14 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     expect(tooltip.textContent.trim()).to.equal('Link copied');
     expect(getComputedStyle(tooltip).visibility).to.equal('visible');
 
+    button.blur();
     button.removeAttribute('data-test-hover');
     expect(getComputedStyle(tooltip).visibility).to.equal('hidden');
     button.setAttribute('data-test-focus-visible', '');
     expect(getComputedStyle(tooltip).visibility).to.equal('visible');
     button.removeAttribute('data-test-focus-visible');
     expect(getComputedStyle(tooltip).visibility).to.equal('hidden');
+    clearTimeout(el.shareResetTimer);
   });
 
   it('replaces the clicked share icon with a green check for two seconds', async () => {
@@ -485,8 +486,8 @@ describe('AssetVideoPlayer - chapter scrolling', () => {
     scrollIntoView = sinon.stub(Element.prototype, 'scrollIntoView');
     const styles = document.createElement('style');
     styles.textContent = `
-      video-player .chapter-list { max-height: 120px; }
-      video-player .chapter { min-height: 100px; }
+      asset-video-player .chapter-list { max-height: 120px; }
+      asset-video-player .chapter { min-height: 100px; }
     `;
     document.body.appendChild(styles);
   });
@@ -955,8 +956,12 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
   }
 
   it('registers the component and renders in light DOM', async () => {
-    const player = await mountPlayer();
-    expect(customElements.get('video-player')).to.equal(AssetVideoPlayer);
+    expect(customElements.get('asset-video-player')).to.equal(AssetVideoPlayer);
+    const player = document.createElement('asset-video-player');
+    player.chapters = makeInstance().chapters;
+    document.body.appendChild(player);
+    await player.updateComplete;
+    expect(player).to.be.instanceOf(AssetVideoPlayer);
     expect(player.shadowRoot).to.equal(null);
     expect(player.querySelectorAll('.chapter')).to.have.lengthOf(4);
   });
