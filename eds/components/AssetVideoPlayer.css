@@ -377,6 +377,7 @@ video-player .chapter .chapter-description {
 }
 
 video-player .chapter .chapter-actions {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -391,6 +392,33 @@ video-player .chapter .share-button {
 
 video-player .chapter .share-button svg {
   fill: none;
+}
+
+video-player .chapter .share-button:hover .copy-icon,
+video-player .chapter .share-button:focus-visible .copy-icon {
+  stroke: #1473e6;
+}
+
+video-player .chapter .chapter-share-tooltip {
+  position: absolute;
+  left: calc(100% - 10px);
+  top: calc(100% + 8px);
+  padding: 0 5px;
+  border: 1px solid #54585d;
+  border-radius: 0;
+  background-color: #4f5358;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+video-player .chapter .share-button:hover + .chapter-share-tooltip,
+video-player .chapter .share-button:focus-visible + .chapter-share-tooltip {
+  visibility: visible;
 }
 
 video-player .chapter .progress-track {

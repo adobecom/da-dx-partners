@@ -777,6 +777,7 @@ export default class AssetVideoPlayer extends LitElement {
   renderChapters() {
     return this.chapters.map((chapter, index) => {
       const [startTime, endTime] = chapter.timerange.split(' - ');
+      const shareLabel = this.sharedChapterIndex === index ? 'Link copied' : 'Copy link to this chapter';
 
       /* eslint-disable indent */
       return html`
@@ -803,7 +804,8 @@ export default class AssetVideoPlayer extends LitElement {
                 class="share-button"
                 quiet
                 icon-only
-                label="${this.sharedChapterIndex === index ? 'Chapter link copied' : 'Share chapter'}"
+                label="${shareLabel}"
+                aria-describedby="chapter-share-tooltip-${index + 1}"
                 @click="${(event) => this.shareChapter(index, event)}"
               >
                 ${this.sharedChapterIndex === index ? html`
@@ -825,6 +827,7 @@ export default class AssetVideoPlayer extends LitElement {
                   </svg>
                 ` : html`
                   <svg
+                    class="copy-icon"
                     slot="icon"
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -843,6 +846,9 @@ export default class AssetVideoPlayer extends LitElement {
                   </svg>
                 `}
               </sp-action-button>
+              <span class="chapter-share-tooltip" id="chapter-share-tooltip-${index + 1}" role="tooltip">
+                ${shareLabel}
+              </span>
             </div>
           </div>
 

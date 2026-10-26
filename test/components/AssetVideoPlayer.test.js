@@ -46,6 +46,53 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     document.body.innerHTML = '';
   });
 
+  it('styles the chapter tooltip for hover, copy and keyboard focus', async () => {
+    sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    sinon.stub(navigator.clipboard, 'writeText').resolves();
+    const el = makeInstance();
+    const styles = document.createElement('style');
+    const css = await readFile({ path: '../../eds/components/AssetVideoPlayer.css' });
+    // Model pointer and keyboard states without native mouse commands across concurrent test tabs.
+    styles.textContent = css.replaceAll(':hover', '[data-test-hover]')
+      .replaceAll(':focus-visible', '[data-test-focus-visible]');
+    document.body.append(styles, el);
+    await el.updateComplete;
+    const button = el.querySelector('.share-button');
+    const tooltip = el.querySelector('.chapter-share-tooltip');
+    const icon = button.querySelector('svg');
+    button.setAttribute('tabindex', '0');
+
+    expect(button.getAttribute('label')).to.equal('Copy link to this chapter');
+    expect(button.getAttribute('aria-describedby')).to.equal(tooltip.id);
+    expect(tooltip.textContent.trim()).to.equal('Copy link to this chapter');
+    expect(getComputedStyle(tooltip).visibility).to.equal('hidden');
+    expect(getComputedStyle(icon).stroke).to.equal('rgb(112, 112, 112)');
+
+    const { x, y, width, height } = icon.getBoundingClientRect();
+    button.setAttribute('data-test-hover', '');
+
+    expect(getComputedStyle(icon).stroke).to.equal('rgb(20, 115, 230)');
+    expect(getComputedStyle(tooltip).visibility).to.equal('visible');
+    const tooltipBounds = tooltip.getBoundingClientRect();
+    expect(tooltipBounds.top).to.be.greaterThan(y + height);
+    expect(tooltipBounds.left).to.be.at.least(x + width / 2);
+
+    button.focus();
+    button.click();
+    await Promise.resolve();
+    await el.updateComplete;
+    expect(document.activeElement).to.equal(button);
+    expect(tooltip.textContent.trim()).to.equal('Link copied');
+    expect(getComputedStyle(tooltip).visibility).to.equal('visible');
+
+    button.removeAttribute('data-test-hover');
+    expect(getComputedStyle(tooltip).visibility).to.equal('hidden');
+    button.setAttribute('data-test-focus-visible', '');
+    expect(getComputedStyle(tooltip).visibility).to.equal('visible');
+    button.removeAttribute('data-test-focus-visible');
+    expect(getComputedStyle(tooltip).visibility).to.equal('hidden');
+  });
+
   it('replaces the clicked share icon with a green check for two seconds', async () => {
     const clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     const writeText = sinon.stub(navigator.clipboard, 'writeText').resolves();
@@ -65,7 +112,9 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     render(el.renderChapters(), container);
 
     expect(writeText.calledOnceWithExactly(el.createChapterUrl(0))).to.be.true;
-    expect(button.getAttribute('label')).to.equal('Chapter link copied');
+    expect(button.getAttribute('label')).to.equal('Link copied');
+    expect(container.querySelector('[role="tooltip"]').textContent.trim()).to.equal('Link copied');
+    expect(container.querySelectorAll('[role="tooltip"]')[1].textContent.trim()).to.equal('Copy link to this chapter');
     expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#268e6c');
     expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(38, 142, 108)');
     expect(button.querySelector('path').getAttribute('d')).to.equal('M5 12l4 4L19 6');
@@ -78,7 +127,8 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     clock.tick(1);
     render(el.renderChapters(), container);
 
-    expect(button.getAttribute('label')).to.equal('Share chapter');
+    expect(button.getAttribute('label')).to.equal('Copy link to this chapter');
+    expect(container.querySelector('[role="tooltip"]').textContent.trim()).to.equal('Copy link to this chapter');
     expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#707070');
     expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(112, 112, 112)');
     expect(button.querySelector('path').getAttribute('d')).to.equal(sharePath);
