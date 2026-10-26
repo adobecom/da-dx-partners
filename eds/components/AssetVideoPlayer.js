@@ -7,14 +7,10 @@ const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 await Promise.all([
   import('./LoadingSpinner.js'),
   loadStyle('/eds/components/LoadingSpinner.css'),
-  loadStyle('/eds/components/VideoPlayer.css'),
+  loadStyle('/eds/components/AssetVideoPlayer.css'),
 ]);
 
-/**
- * Light-DOM video player. Set src, fileType and chapters as properties.
- * Call play() for external playback; loading-change carries { loading } in detail.
- */
-export default class VideoPlayer extends LitElement {
+export default class AssetVideoPlayer extends LitElement {
   static properties = {
     src: { type: String },
     fileType: { type: String },
@@ -54,6 +50,7 @@ export default class VideoPlayer extends LitElement {
     this.volumeExpanded = false;
     this.chaptersTrackUrl = null;
     this.progressHover = null;
+    this.scrollToRestoredChapter = false;
   }
 
   createRenderRoot() {
@@ -73,6 +70,7 @@ export default class VideoPlayer extends LitElement {
       this.selectedChapterIndex = 0;
       this.currentTime = 0;
       this.progressHover = null;
+      this.scrollToRestoredChapter = false;
       this.restoreChapterFromUrl();
       if (changedProperties.has('src')) {
         this.videoDuration = 0;
@@ -90,6 +88,14 @@ export default class VideoPlayer extends LitElement {
       && this._video.readyState >= 1) {
       this._video.currentTime = Math.min(this.currentTime, this.playerDuration);
     }
+    if (this.scrollToRestoredChapter) {
+      this.scrollToRestoredChapter = false;
+      this.scrollSelectedChapterIntoView('start');
+      this.querySelector('.video-container').scrollIntoView({ block: 'start' });
+    } else if (changedProperties.has('selectedChapterIndex')
+      || changedProperties.has('chaptersVisible')) {
+      this.scrollSelectedChapterIntoView();
+    }
     if (changedProperties.has('isVideoLoading')) {
       this.dispatchEvent(new CustomEvent('loading-change', {
         detail: { loading: this.isVideoLoading },
@@ -102,6 +108,23 @@ export default class VideoPlayer extends LitElement {
   releaseChaptersTrack() {
     if (this.chaptersTrackUrl) URL.revokeObjectURL(this.chaptersTrackUrl);
     this.chaptersTrackUrl = null;
+  }
+
+  scrollSelectedChapterIntoView(block = 'nearest') {
+    const chapterList = this.querySelector('.chapter-list');
+    const selectedChapter = chapterList?.querySelector('.chapter.is-active');
+    if (!selectedChapter || !this.chaptersVisible) return;
+
+    const chapterBounds = selectedChapter.getBoundingClientRect();
+    const listTop = chapterList.getBoundingClientRect().top + chapterList.clientTop;
+    const offset = chapterBounds.top - listTop;
+    const overflow = chapterBounds.bottom - (listTop + chapterList.clientHeight);
+
+    if (block === 'start' || offset < 0) {
+      chapterList.scrollTop += offset;
+    } else if (overflow > 0) {
+      chapterList.scrollTop += Math.min(offset, overflow);
+    }
   }
 
   disconnectedCallback() {
@@ -242,6 +265,7 @@ export default class VideoPlayer extends LitElement {
     const [start, end] = this.chapters[index].timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
     this.currentTime = Number.isFinite(timestamp) && timestamp >= start && timestamp < end
       ? timestamp : start;
+    this.scrollToRestoredChapter = true;
   }
 
   handleVideoLoadedMetadata(event) {
@@ -407,6 +431,8 @@ export default class VideoPlayer extends LitElement {
   }
 
   handlePlayerKeydown(event) {
+    if (!this.chapters.length) return;
+
     const { target } = event;
     if (target.closest('input, select, textarea, button, a, sp-action-button')
       || target.isContentEditable
@@ -541,8 +567,9 @@ export default class VideoPlayer extends LitElement {
   }
 
   renderVideoControls() {
-    const nextIndex = this.chapters.length
-      ? (this.selectedChapterIndex + 1) % this.chapters.length : -1;
+    if (!this.chapters.length) return '';
+
+    const nextIndex = this.selectedChapterIndex + 1;
     const nextChapter = this.chapters[nextIndex];
     const duration = this.playerDuration;
     const percent = duration > 0
@@ -552,7 +579,7 @@ export default class VideoPlayer extends LitElement {
     /* eslint-disable indent */
     return html`
       <div class="video-tint"></div>
-      <button class="player-center-play" type="button" aria-label="Play" title="Play"
+      <button class="player-center-play" type="button"
         ?hidden="${this.isVideoPlaying}" @click="${this.toggleVideoPlayback}">
         ${this.renderPlayerIcon('play')}
       </button>
@@ -713,13 +740,13 @@ export default class VideoPlayer extends LitElement {
           ` : ''}
           <div class="player-controls-right">
             ${this.chapters.length ? html`
-              <button class="player-control-button" type="button" aria-label="Chapters" title="Chapters"
+              <button class="player-control-button" type="button"
                 aria-expanded="${this.chaptersVisible}" @click="${() => {
                   this.chaptersVisible = !this.chaptersVisible;
                   this.settingsMenuOpen = false;
                 }}">${this.renderPlayerIcon('chapters')}</button>
             ` : ''}
-            <button class="player-control-button" type="button" aria-label="Fullscreen" title="Fullscreen"
+            <button class="player-control-button" type="button"
               @click="${this.toggleVideoFullscreen}">${this.renderPlayerIcon('fullscreen')}</button>
           </div>
         </div>
@@ -849,6 +876,11 @@ export default class VideoPlayer extends LitElement {
 
           <video
             preload="auto"
+            ?controls="${!this.chapters.length}"
+            @click="${(event) => {
+              const video = event.currentTarget;
+              if (this.chapters.length && !video.paused) video.pause();
+            }}"
             @play="${() => { this.isVideoPlaying = true; }}"
             @pause="${() => { this.isVideoPlaying = false; }}"
             @ended="${() => { this.isVideoPlaying = false; }}"
@@ -917,5 +949,5 @@ export default class VideoPlayer extends LitElement {
 }
 
 if (!customElements.get('video-player')) {
-  customElements.define('video-player', VideoPlayer);
+  customElements.define('video-player', AssetVideoPlayer);
 }

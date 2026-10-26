@@ -3,7 +3,7 @@ import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { setLibs } from '../../../eds/scripts/utils.js';
 import AssetPreview from '../../../eds/blocks/asset-preview/AssetPreview.js';
-import VideoPlayer from '../../../eds/components/VideoPlayer.js';
+import AssetVideoPlayer from '../../../eds/components/AssetVideoPlayer.js';
 
 const miloLibs = setLibs('/libs');
 const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
@@ -239,7 +239,7 @@ describe('AssetPreview - getAssetMetadata()', () => {
       expect(el.chapters).to.deep.equal(chapters);
       expect(el.isLoading).to.be.false;
 
-      const player = new VideoPlayer();
+      const player = new AssetVideoPlayer();
       player.chapters = el.chapters;
       player.willUpdate(new Map([['chapters', []]]));
       expect(player.selectedChapterIndex).to.equal(1);
@@ -394,7 +394,7 @@ describe('AssetPreview - setData() chapters', () => {
     await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters });
     expect(el.chapters).to.deep.equal(chapters);
 
-    const player = new VideoPlayer();
+    const player = new AssetVideoPlayer();
     player.chapters = el.chapters;
     const container = document.createElement('div');
     render(player.renderChapters(), container);
@@ -421,7 +421,7 @@ describe('AssetPreview - setData() chapters', () => {
     for (const chapters of [undefined, null, []]) {
       await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters });
       expect(el.chapters).to.deep.equal([]);
-      const player = new VideoPlayer();
+      const player = new AssetVideoPlayer();
       player.chapters = el.chapters;
       const container = document.createElement('div');
       render(player.renderChapters(), container);
@@ -456,8 +456,9 @@ describe('AssetPreview - setData() chapters', () => {
       await player.updateComplete;
       const video = container.querySelector('video');
       expect(video).to.exist;
-      expect(video.controls).to.be.false;
-      expect(container.querySelector('.player-progress')).to.exist;
+      expect(video.controls).to.be.true;
+      expect(container.querySelector('.player-progress')).to.equal(null);
+      expect(container.querySelector('.player-center-play')).to.equal(null);
       expect(video.querySelector('source').getAttribute('src')).to.equal('https://example.com/video.mp4');
       expect(container.querySelector('.video-chapters')).to.equal(null);
 
@@ -489,7 +490,7 @@ describe('AssetPreview - setData() chapters', () => {
         { title: 'First', summary: 'First summary', timerange: '00:00:00.000 - 00:00:30.000' },
         { title: 'Second', summary: 'Second summary', timerange: '00:00:30.000 - 00:01:00.000' },
       ];
-      const player = new VideoPlayer();
+      const player = new AssetVideoPlayer();
       expect(player.selectedChapterIndex).to.equal(0);
       expect(player.currentTime).to.equal(0);
       await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters });
@@ -895,7 +896,7 @@ describe('AssetPreview - playVideo()', () => {
 
   it('plays and scrolls to its own video component', async () => {
     const el = makeInstance();
-    const player = new VideoPlayer();
+    const player = new AssetVideoPlayer();
     const playStub = sinon.stub(player, 'play').resolves();
     const scrollStub = sinon.stub(window, 'scrollTo');
     sinon.stub(player, 'offsetTop').get(() => 240);
@@ -917,7 +918,7 @@ describe('AssetPreview - playVideo()', () => {
 
   it('reports a rejected play request', async () => {
     const el = makeInstance();
-    const player = new VideoPlayer();
+    const player = new AssetVideoPlayer();
     const error = new Error('Playback rejected');
     sinon.stub(player, 'play').rejects(error);
     const logError = sinon.stub(console, 'error');

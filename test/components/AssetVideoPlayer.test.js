@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import { setLibs } from '../../eds/scripts/utils.js';
 
 const miloLibs = setLibs('/libs');
-const { default: VideoPlayer } = await import('../../eds/components/VideoPlayer.js');
+const { default: AssetVideoPlayer } = await import('../../eds/components/AssetVideoPlayer.js');
 const { render } = await import(`${miloLibs}/deps/lit-all.min.js`);
 
 afterEach(() => {
@@ -13,7 +13,7 @@ afterEach(() => {
 });
 
 function makeInstance() {
-  const el = new VideoPlayer();
+  const el = new AssetVideoPlayer();
   el.chapters = [
     {
       title: 'Welcome And Speaker Introductions',
@@ -40,7 +40,7 @@ function makeInstance() {
   return el;
 }
 
-describe('VideoPlayer - shareChapter()', () => {
+describe('AssetVideoPlayer - shareChapter()', () => {
   afterEach(() => {
     sinon.restore();
     document.body.innerHTML = '';
@@ -114,7 +114,7 @@ describe('VideoPlayer - shareChapter()', () => {
   });
 });
 
-describe('VideoPlayer - chapter time helpers', () => {
+describe('AssetVideoPlayer - chapter time helpers', () => {
   it('converts hours, minutes and fractional seconds to seconds', () => {
     expect(makeInstance().timecodeToSeconds('01:02:03.456')).to.be.closeTo(3723.456, 0.001);
   });
@@ -131,7 +131,7 @@ describe('VideoPlayer - chapter time helpers', () => {
   });
 });
 
-describe('VideoPlayer - markChapterShared() and disconnectedCallback()', () => {
+describe('AssetVideoPlayer - markChapterShared() and disconnectedCallback()', () => {
   afterEach(() => sinon.restore());
 
   it('restarts the copied-state timer when another chapter is shared', () => {
@@ -163,7 +163,7 @@ describe('VideoPlayer - markChapterShared() and disconnectedCallback()', () => {
   });
 });
 
-describe('VideoPlayer - handleVideoTimeUpdate()', () => {
+describe('AssetVideoPlayer - handleVideoTimeUpdate()', () => {
   afterEach(() => sinon.restore());
 
   it('updates playback time without advancing before the chapter ends', () => {
@@ -224,7 +224,7 @@ describe('VideoPlayer - handleVideoTimeUpdate()', () => {
   });
 });
 
-describe('VideoPlayer - chapter progress', () => {
+describe('AssetVideoPlayer - chapter progress', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -233,7 +233,7 @@ describe('VideoPlayer - chapter progress', () => {
     const el = makeInstance();
     const container = document.createElement('div');
     const styles = document.createElement('style');
-    styles.textContent = await readFile({ path: '../../eds/components/VideoPlayer.css' });
+    styles.textContent = await readFile({ path: '../../eds/components/AssetVideoPlayer.css' });
     el.appendChild(container);
     document.body.append(styles, el);
     render(el.renderChapters(), container);
@@ -272,7 +272,7 @@ describe('VideoPlayer - chapter progress', () => {
   });
 });
 
-describe('VideoPlayer - chapter URLs', () => {
+describe('AssetVideoPlayer - chapter URLs', () => {
   let originalUrl;
 
   beforeEach(() => {
@@ -407,7 +407,7 @@ describe('VideoPlayer - chapter URLs', () => {
 
   it('ignores chapter links when no chapter metadata is available', () => {
     window.history.replaceState(null, '', '?chapter=2&t=100');
-    const el = new VideoPlayer();
+    const el = new AssetVideoPlayer();
 
     el.restoreChapterFromUrl();
 
@@ -426,7 +426,179 @@ describe('VideoPlayer - chapter URLs', () => {
   });
 });
 
-describe('VideoPlayer - selectChapter()', () => {
+describe('AssetVideoPlayer - chapter scrolling', () => {
+  let originalUrl;
+  let scrollIntoView;
+
+  beforeEach(() => {
+    originalUrl = window.location.href;
+    scrollIntoView = sinon.stub(Element.prototype, 'scrollIntoView');
+    const styles = document.createElement('style');
+    styles.textContent = `
+      video-player .chapter-list { max-height: 120px; }
+      video-player .chapter { min-height: 100px; }
+    `;
+    document.body.appendChild(styles);
+  });
+
+  afterEach(() => {
+    window.history.replaceState(null, '', originalUrl);
+  });
+
+  it('scrolls to the rendered player for chapter and timestamp links without autoplay', async () => {
+    const play = sinon.stub(HTMLMediaElement.prototype, 'play').resolves();
+    for (const query of ['?chapter=3&t=200', '?chapter=3', '?t=200']) {
+      window.history.replaceState(null, '', query);
+      const player = makeInstance();
+      expect(scrollIntoView.called).to.be.false;
+
+      document.body.appendChild(player);
+      await player.updateComplete;
+
+      expect(scrollIntoView.calledOnceWithExactly({ block: 'start' })).to.be.true;
+      expect(scrollIntoView.firstCall.thisValue).to.equal(player.querySelector('.video-container'));
+      expect(player.selectedChapterIndex).to.equal(2);
+      expect(player.currentTime).to.equal(query === '?chapter=3' ? 142.906 : 200);
+      expect(play.called).to.be.false;
+      const chapterList = player.querySelector('.chapter-list');
+      const selectedChapter = player.querySelector('.chapter.is-active');
+      expect(chapterList.scrollTop).to.be.greaterThan(0);
+      expect(selectedChapter.getBoundingClientRect().top)
+        .to.be.closeTo(chapterList.getBoundingClientRect().top, 1);
+      const { scrollTop } = chapterList;
+
+      player.currentTime += 1;
+      await player.updateComplete;
+      expect(scrollIntoView.calledOnce).to.be.true;
+      expect(chapterList.scrollTop).to.equal(scrollTop);
+      player.remove();
+      scrollIntoView.resetHistory();
+    }
+  });
+
+  it('waits for asynchronously supplied chapters before scrolling', async () => {
+    window.history.replaceState(null, '', '?chapter=2&t=100');
+    const player = new AssetVideoPlayer();
+    document.body.appendChild(player);
+    await player.updateComplete;
+    expect(scrollIntoView.called).to.be.false;
+
+    player.chapters = makeInstance().chapters;
+    await player.updateComplete;
+
+    expect(scrollIntoView.calledOnce).to.be.true;
+    expect(scrollIntoView.firstCall.thisValue).to.equal(player.querySelector('.video-container'));
+    expect(player.selectedChapterIndex).to.equal(1);
+    expect(player.currentTime).to.equal(100);
+    const chapterList = player.querySelector('.chapter-list');
+    expect(chapterList.scrollTop).to.be.greaterThan(0);
+    expect(player.querySelector('.chapter.is-active').getBoundingClientRect().top)
+      .to.be.closeTo(chapterList.getBoundingClientRect().top, 1);
+  });
+
+  it('keeps the final linked chapter visible when the list reaches its scroll limit', async () => {
+    window.history.replaceState(null, '', '?chapter=4');
+    const player = makeInstance();
+    document.body.appendChild(player);
+    await player.updateComplete;
+
+    const chapterList = player.querySelector('.chapter-list');
+    const selectedChapter = player.querySelector('.chapter.is-active');
+    expect(chapterList.scrollTop).to.be.greaterThan(0);
+    expect(selectedChapter.getBoundingClientRect().top)
+      .to.be.at.least(chapterList.getBoundingClientRect().top - 1);
+    expect(selectedChapter.getBoundingClientRect().bottom)
+      .to.be.at.most(chapterList.getBoundingClientRect().bottom + 1);
+    expect(scrollIntoView.calledOnce).to.be.true;
+    expect(scrollIntoView.firstCall.thisValue).to.equal(player.querySelector('.video-container'));
+  });
+
+  it('reveals chapters selected on the video timeline without scrolling the page', async () => {
+    window.history.replaceState(null, '', '?asset=example');
+    const player = makeInstance();
+    document.body.appendChild(player);
+    await player.updateComplete;
+    const video = player.querySelector('video');
+    sinon.stub(video, 'readyState').get(() => 1);
+    sinon.stub(video, 'duration').get(() => 400);
+    player.videoDuration = 400;
+    await player.updateComplete;
+    const progress = player.querySelector('.player-progress');
+    sinon.stub(progress, 'getBoundingClientRect').returns({ left: 0, right: 400, top: 0, bottom: 22, width: 400 });
+    sinon.stub(progress, 'setPointerCapture');
+    const chapterList = player.querySelector('.chapter-list');
+
+    for (const time of [380, 10]) {
+      progress.dispatchEvent(new PointerEvent('pointerdown', { clientX: time, button: 0, pointerId: 1 }));
+      video.dispatchEvent(new Event('timeupdate'));
+      await player.updateComplete;
+
+      expect(video.currentTime).to.equal(time);
+      expect(player.selectedChapterIndex).to.equal(time === 380 ? 3 : 0);
+      const selectedChapter = player.querySelector('.chapter.is-active');
+      expect(selectedChapter.getBoundingClientRect().top)
+        .to.be.at.least(chapterList.getBoundingClientRect().top - 1);
+      expect(selectedChapter.getBoundingClientRect().bottom)
+        .to.be.at.most(chapterList.getBoundingClientRect().bottom + 1);
+      expect(scrollIntoView.called).to.be.false;
+    }
+  });
+
+  it('keeps the list position when the newly selected chapter is already visible', async () => {
+    window.history.replaceState(null, '', '?asset=example');
+    const player = makeInstance();
+    document.body.appendChild(player);
+    await player.updateComplete;
+    const chapterList = player.querySelector('.chapter-list');
+    chapterList.style.maxHeight = '250px';
+    const video = player.querySelector('video');
+    video.currentTime = 100;
+    video.dispatchEvent(new Event('timeupdate'));
+    await player.updateComplete;
+
+    expect(player.selectedChapterIndex).to.equal(1);
+    expect(chapterList.scrollTop).to.equal(0);
+    expect(scrollIntoView.called).to.be.false;
+  });
+
+  it('reveals the current chapter when reopening a collapsed chapter list', async () => {
+    window.history.replaceState(null, '', '?asset=example');
+    const player = makeInstance();
+    document.body.appendChild(player);
+    await player.updateComplete;
+    player.chaptersVisible = false;
+    await player.updateComplete;
+    const video = player.querySelector('video');
+    video.currentTime = 380;
+    video.dispatchEvent(new Event('timeupdate'));
+    await player.updateComplete;
+    const chapterList = player.querySelector('.chapter-list');
+    expect(chapterList.scrollTop).to.equal(0);
+
+    player.chaptersVisible = true;
+    await player.updateComplete;
+
+    expect(chapterList.scrollTop).to.be.greaterThan(0);
+    expect(player.querySelector('.chapter.is-active').getBoundingClientRect().bottom)
+      .to.be.at.most(chapterList.getBoundingClientRect().bottom + 1);
+    expect(scrollIntoView.called).to.be.false;
+  });
+
+  it('does not scroll for ordinary page visits or invalid chapter links', async () => {
+    for (const query of ['?asset=example', '?chapter=999&t=-1', '?t=invalid']) {
+      window.history.replaceState(null, '', query);
+      const player = makeInstance();
+      document.body.appendChild(player);
+      await player.updateComplete;
+
+      expect(scrollIntoView.called).to.be.false;
+      expect(player.querySelector('.chapter-list').scrollTop).to.equal(0);
+      player.remove();
+    }
+  });
+});
+
+describe('AssetVideoPlayer - selectChapter()', () => {
   afterEach(() => {
     sinon.restore();
     document.body.innerHTML = '';
@@ -505,7 +677,7 @@ describe('VideoPlayer - selectChapter()', () => {
   });
 });
 
-describe('VideoPlayer - custom video controls', () => {
+describe('AssetVideoPlayer - custom video controls', () => {
   let el;
   let video;
   let holder;
@@ -627,6 +799,36 @@ describe('VideoPlayer - custom video controls', () => {
     expect(player.querySelectorAll('.player-chapter-segment').length).to.equal(4);
   });
 
+  it('removes the next-chapter control on the final chapter and restores it when navigating back', () => {
+    el.selectedChapterIndex = el.chapters.length - 2;
+    renderControls();
+    const nextChapter = holder.querySelector('.player-next-chapter');
+    expect(nextChapter.getAttribute('aria-label')).to.equal(`Up next: ${el.chapters[3].title}`);
+
+    nextChapter.click();
+    renderControls();
+
+    expect(el.selectedChapterIndex).to.equal(3);
+    expect(video.currentTime).to.equal(322.959);
+    expect(video.play.calledOnce).to.be.true;
+    expect(holder.querySelector('.player-next-chapter')).to.equal(null);
+
+    el.selectChapter(2);
+    renderControls();
+    expect(holder.querySelector('.player-next-chapter')).to.exist;
+  });
+
+  it('omits the next-chapter control for a single chapter or no chapters', () => {
+    el.chapters = el.chapters.slice(0, 1);
+    renderControls();
+    expect(holder.querySelector('.player-next-chapter')).to.equal(null);
+
+    el.chapters = [];
+    renderControls();
+    expect(holder.querySelector('.player-next-chapter')).to.equal(null);
+    expect(video.play.called).to.be.false;
+  });
+
   it('mutes, changes volume, cycles speed, and applies settings', () => {
     renderControls();
     holder.querySelector('[aria-label="Mute"]').click();
@@ -694,7 +896,7 @@ describe('VideoPlayer - custom video controls', () => {
   });
 });
 
-describe('VideoPlayer - component lifecycle and progress', () => {
+describe('AssetVideoPlayer - component lifecycle and progress', () => {
   async function mountPlayer() {
     const player = makeInstance();
     document.body.appendChild(player);
@@ -704,7 +906,7 @@ describe('VideoPlayer - component lifecycle and progress', () => {
 
   it('registers the component and renders in light DOM', async () => {
     const player = await mountPlayer();
-    expect(customElements.get('video-player')).to.equal(VideoPlayer);
+    expect(customElements.get('video-player')).to.equal(AssetVideoPlayer);
     expect(player.shadowRoot).to.equal(null);
     expect(player.querySelectorAll('.chapter')).to.have.lengthOf(4);
   });
@@ -719,6 +921,55 @@ describe('VideoPlayer - component lifecycle and progress', () => {
 
     expect(firstPlay.called).to.be.false;
     expect(secondPlay.calledOnce).to.be.true;
+  });
+
+  it('pauses a playing chaptered video when clicked and restores the center play button', async () => {
+    const player = await mountPlayer();
+    const video = player.querySelector('video');
+    sinon.stub(video, 'paused').get(() => false);
+    const pause = sinon.stub(video, 'pause').callsFake(() => {
+      video.dispatchEvent(new Event('pause'));
+    });
+    video.dispatchEvent(new Event('play'));
+    await player.updateComplete;
+    expect(player.querySelector('.player-center-play').hidden).to.be.true;
+
+    player.querySelector('[aria-label="Rewind 10 seconds"]').click();
+    expect(pause.called).to.be.false;
+
+    video.click();
+    await player.updateComplete;
+
+    expect(pause.calledOnce).to.be.true;
+    expect(player.isVideoPlaying).to.be.false;
+    expect(player.querySelector('.player-center-play').hidden).to.be.false;
+  });
+
+  it('does not start playback when clicking a paused chaptered video', async () => {
+    const player = await mountPlayer();
+    const video = player.querySelector('video');
+    sinon.stub(video, 'paused').get(() => true);
+    const pause = sinon.stub(video, 'pause');
+    const play = sinon.stub(video, 'play').resolves();
+
+    video.click();
+
+    expect(pause.called).to.be.false;
+    expect(play.called).to.be.false;
+  });
+
+  it('leaves video clicks to native controls when there are no chapters', async () => {
+    const player = new AssetVideoPlayer();
+    document.body.appendChild(player);
+    await player.updateComplete;
+    const video = player.querySelector('video');
+    sinon.stub(video, 'paused').get(() => false);
+    const pause = sinon.stub(video, 'pause');
+
+    video.click();
+
+    expect(video.controls).to.be.true;
+    expect(pause.called).to.be.false;
   });
 
   it('notifies consumers when loading starts and stops', async () => {
@@ -856,14 +1107,63 @@ describe('VideoPlayer - component lifecycle and progress', () => {
     expect(player.querySelector('.player-progress-played')).to.equal(null);
   });
 
-  it('supports videos without chapters with a continuous seek bar', async () => {
+  it('uses native controls without custom controls or a custom play button when chapters are absent', async () => {
+    const player = new AssetVideoPlayer();
+    document.body.appendChild(player);
+    await player.updateComplete;
+
+    expect(player.querySelector('video').controls).to.be.true;
+    expect(player.querySelector('.video-chapters')).to.equal(null);
+    expect(player.querySelector('.player-controls')).to.equal(null);
+    expect(player.querySelector('.player-center-play')).to.equal(null);
+    expect(player.querySelector('.player-settings-menu')).to.equal(null);
+    expect(player.querySelector('.video-tint')).to.equal(null);
+  });
+
+  it('switches between native and custom controls when chapters change without replacing the video', async () => {
     const player = await mountPlayer();
+    const video = player.querySelector('video');
+    const { chapters } = player;
+    expect(video.controls).to.be.false;
+    expect(player.querySelector('.player-controls')).to.exist;
+    expect(player.querySelector('.player-center-play')).to.exist;
+
     player.chapters = [];
     await player.updateComplete;
 
+    expect(player.querySelector('video')).to.equal(video);
+    expect(video.controls).to.be.true;
     expect(player.querySelector('.video-chapters')).to.equal(null);
     expect(player.querySelector('track')).to.equal(null);
-    expect(player.querySelector('.player-progress-track')).to.exist;
-    expect(player.querySelector('.player-progress-played')).to.exist;
+    expect(player.querySelector('.player-controls')).to.equal(null);
+    expect(player.querySelector('.player-center-play')).to.equal(null);
+    expect(player.querySelector('.video-tint')).to.equal(null);
+
+    player.chapters = chapters;
+    await player.updateComplete;
+
+    expect(player.querySelector('video')).to.equal(video);
+    expect(video.controls).to.be.false;
+    expect(player.querySelector('.player-controls')).to.exist;
+    expect(player.querySelector('.player-center-play')).to.exist;
+    expect(player.querySelector('.video-chapters')).to.exist;
+  });
+
+  it('leaves native video keyboard handling alone when there are no chapters', async () => {
+    const player = new AssetVideoPlayer();
+    document.body.appendChild(player);
+    await player.updateComplete;
+    const video = player.querySelector('video');
+    const play = sinon.stub(video, 'play').resolves();
+    const seek = sinon.spy(player, 'seekVideo');
+
+    for (const key of [' ', 'ArrowRight', 'ArrowUp']) {
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+      video.dispatchEvent(event);
+      expect(event.defaultPrevented).to.be.false;
+    }
+
+    expect(play.called).to.be.false;
+    expect(seek.called).to.be.false;
   });
 });
