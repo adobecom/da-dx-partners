@@ -430,72 +430,6 @@ export default class AssetVideoPlayer extends LitElement {
     }
   }
 
-  handlePlayerKeydown(event) {
-    if (!this.chapters.length) return;
-
-    const { target } = event;
-    if (target.closest('input, select, textarea, button, a, sp-action-button')
-      || target.isContentEditable
-      || event.altKey || event.ctrlKey || event.metaKey) return;
-
-    const video = this._video;
-    if (!video) return;
-
-    switch (event.key) {
-      case ' ':
-      case 'k':
-      case 'K':
-        event.preventDefault();
-        this.toggleVideoPlayback();
-        break;
-      case 'ArrowLeft':
-        event.preventDefault();
-        this.seekVideo(this.currentTime - 10);
-        break;
-      case 'ArrowRight':
-        event.preventDefault();
-        this.seekVideo(this.currentTime + 10);
-        break;
-      case 'Home':
-        event.preventDefault();
-        this.seekVideo(0);
-        break;
-      case 'End':
-        event.preventDefault();
-        this.seekVideo(this.playerDuration);
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        video.volume = Math.min(1, video.volume + 0.05);
-        video.muted = false;
-        this.handleVolumeChange();
-        break;
-      case 'ArrowDown':
-        event.preventDefault();
-        video.volume = Math.max(0, video.volume - 0.05);
-        this.handleVolumeChange();
-        break;
-      case 'm':
-      case 'M':
-        event.preventDefault();
-        video.muted = !video.muted;
-        this.handleVolumeChange();
-        break;
-      case 'f':
-      case 'F':
-        event.preventDefault();
-        this.toggleVideoFullscreen();
-        break;
-      case 'Escape':
-        this.settingsMenuOpen = false;
-        this.volumeExpanded = false;
-        this.progressHover = null;
-        break;
-      default:
-        break;
-    }
-  }
-
   // eslint-disable-next-line class-methods-use-this
   renderPlayerIcon(name) {
     const icons = ['play', 'pause', 'volume', 'muted', 'next', 'chapters', 'fullscreen', 'back', 'forward'];
@@ -816,7 +750,7 @@ export default class AssetVideoPlayer extends LitElement {
     return html`
       <div class="video-player-layout ${this.chapters.length && this.chaptersVisible ? 'chapters-open' : 'chapters-collapsed'}">
         <div class="video-container video-holder" tabindex="0"
-          role="group" aria-label="Video player" @keydown="${this.handlePlayerKeydown}">
+          role="group" aria-label="Video player">
           ${this.isVideoLoading ? html`
             <div class="video-loading-overlay">
               <loading-spinner theme="dark"></loading-spinner>

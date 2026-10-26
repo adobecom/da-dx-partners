@@ -784,7 +784,6 @@ describe('AssetVideoPlayer - custom video controls', () => {
     sinon.stub(video, 'readyState').get(() => 1);
     sinon.stub(video, 'duration').get(() => 3491.273);
     el.videoDuration = video.duration;
-    holder.addEventListener('keydown', (event) => el.handlePlayerKeydown(event));
   });
 
   afterEach(() => {
@@ -939,20 +938,6 @@ describe('AssetVideoPlayer - custom video controls', () => {
     speed.dispatchEvent(new Event('change'));
     expect(video.playbackRate).to.equal(2);
     expect(el.settingsMenuOpen).to.equal(false);
-  });
-
-  it('seeks once per arrow key and leaves button and range keyboard actions alone', () => {
-    el.seekVideo(100);
-    el.handleVideoTimeUpdate({ currentTarget: video });
-    renderControls();
-    const progress = holder.querySelector('.player-progress');
-    progress.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
-    expect(video.currentTime).to.equal(110);
-    const volume = holder.querySelector('[aria-label="Volume"]');
-    volume.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
-    expect(video.currentTime).to.equal(110);
-    holder.querySelector('[aria-label="Play"]').dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-    expect(video.play.called).to.equal(false);
   });
 
   it('uses actual duration for chapter segments and progress after metadata loads', () => {
@@ -1247,23 +1232,5 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
     expect(player.querySelector('.player-controls')).to.exist;
     expect(player.querySelector('.player-center-play')).to.exist;
     expect(player.querySelector('.video-chapters')).to.exist;
-  });
-
-  it('leaves native video keyboard handling alone when there are no chapters', async () => {
-    const player = new AssetVideoPlayer();
-    document.body.appendChild(player);
-    await player.updateComplete;
-    const video = player.querySelector('video');
-    const play = sinon.stub(video, 'play').resolves();
-    const seek = sinon.spy(player, 'seekVideo');
-
-    for (const key of [' ', 'ArrowRight', 'ArrowUp']) {
-      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
-      video.dispatchEvent(event);
-      expect(event.defaultPrevented).to.be.false;
-    }
-
-    expect(play.called).to.be.false;
-    expect(seek.called).to.be.false;
   });
 });
