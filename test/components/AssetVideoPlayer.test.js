@@ -104,9 +104,10 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     document.body.append(iconStyles, container);
     render(el.renderChapters(), container);
     const button = container.querySelector('.share-button');
-    const sharePath = button.querySelector('path').getAttribute('d');
+    const shareHref = '/eds/img/icons/player-share.svg#icon';
+    expect(button.querySelector('use').getAttribute('href')).to.equal(shareHref);
     expect(button.querySelector('svg').getAttribute('slot')).to.equal('icon');
-    expect(button.querySelector('path').namespaceURI).to.equal('http://www.w3.org/2000/svg');
+    expect(button.querySelector('use').namespaceURI).to.equal('http://www.w3.org/2000/svg');
 
     button.click();
     await Promise.resolve();
@@ -118,10 +119,11 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     expect(container.querySelectorAll('[role="tooltip"]')[1].textContent.trim()).to.equal('Copy link to this chapter');
     expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#268e6c');
     expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(38, 142, 108)');
-    expect(button.querySelector('path').getAttribute('d')).to.equal('M5 12l4 4L19 6');
+    expect(button.querySelector('use').getAttribute('href')).to.equal('/eds/img/icons/player-check.svg#icon');
     expect(button.querySelector('svg').getAttribute('slot')).to.equal('icon');
-    expect(button.querySelector('path').namespaceURI).to.equal('http://www.w3.org/2000/svg');
+    expect(button.querySelector('use').namespaceURI).to.equal('http://www.w3.org/2000/svg');
     expect(container.querySelectorAll('.share-button')[1].querySelector('svg').getAttribute('stroke')).to.equal('#707070');
+    expect(container.querySelectorAll('.share-button')[1].querySelector('use').getAttribute('href')).to.equal(shareHref);
 
     clock.tick(1999);
     expect(el.sharedChapterIndex).to.equal(0);
@@ -132,7 +134,7 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     expect(container.querySelector('[role="tooltip"]').textContent.trim()).to.equal('Copy link to this chapter');
     expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#707070');
     expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(112, 112, 112)');
-    expect(button.querySelector('path').getAttribute('d')).to.equal(sharePath);
+    expect(button.querySelector('use').getAttribute('href')).to.equal(shareHref);
   });
 
   it('stops propagation and leaves the selected chapter unchanged when sharing', async () => {
@@ -162,6 +164,43 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     expect(markShared.called).to.be.false;
     expect(el.sharedChapterIndex).to.equal(-1);
     expect(el.shareResetTimer).to.equal(null);
+  });
+});
+
+describe('AssetVideoPlayer - external icons', () => {
+  const names = ['play', 'pause', 'volume', 'muted', 'next', 'chapters', 'fullscreen', 'back', 'forward'];
+
+  names.forEach((name) => {
+    it(`renders the external ${name} icon with the original viewport`, () => {
+      const container = document.createElement('div');
+      render(makeInstance().renderPlayerIcon(name), container);
+      const icon = container.querySelector('svg');
+      const isSkip = name === 'back' || name === 'forward';
+
+      expect(icon.getAttribute('viewBox')).to.equal(isSkip ? '0 0 24 24' : '0 0 20 20');
+      expect(icon.getAttribute('aria-hidden')).to.equal('true');
+      expect(icon.getAttribute('focusable')).to.equal('false');
+      expect(icon.style.fill).to.equal('currentcolor');
+      expect(icon.querySelector('use').getAttribute('href')).to.equal(`/eds/img/icons/player-${name}.svg#icon`);
+      expect(icon.querySelector('use').namespaceURI).to.equal('http://www.w3.org/2000/svg');
+      expect(icon.querySelector('path')).to.equal(null);
+    });
+  });
+
+  [...names, 'share', 'check'].forEach((name) => {
+    it(`loads the ${name} SVG asset and its referenced artwork`, async () => {
+      const response = await fetch(`/eds/img/icons/player-${name}.svg`);
+      expect(response.ok).to.be.true;
+      const document = new DOMParser().parseFromString(await response.text(), 'image/svg+xml');
+
+      expect(document.querySelector('parsererror')).to.equal(null);
+      expect(document.documentElement.namespaceURI).to.equal('http://www.w3.org/2000/svg');
+      expect(document.querySelector('#icon path')).not.to.equal(null);
+    });
+  });
+
+  it('does not render unsupported icons', () => {
+    expect(makeInstance().renderPlayerIcon('unknown')).to.equal('');
   });
 });
 
