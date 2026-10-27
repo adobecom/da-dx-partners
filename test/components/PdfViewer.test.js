@@ -13,13 +13,7 @@ setConfig({
   env: { consumer: { pdfViewerClientId: '3b6559c26f1e478a99e97ffe3da634bb' } },
 });
 
-// ---------------------------------------------------------------------------
-// Import PdfViewer and use its own loadSdk to load the real SDK once.
-// ---------------------------------------------------------------------------
-
 const { default: initPdfViewer, getPdfConfig, loadSdk } = await import('../../eds/components/PdfViewer.js');
-
-await loadSdk();
 
 // ---------------------------------------------------------------------------
 describe('PdfViewer', () => {
@@ -29,16 +23,35 @@ describe('PdfViewer', () => {
 
   let previewFileStub;
   let viewConstructorStub;
+  let originalAdobeDC;
+  let injectedScript;
 
   beforeEach(() => {
     document.body.innerHTML = `<div id="${TEST_DIV_ID}"></div>`;
 
+    originalAdobeDC = window.AdobeDC;
     previewFileStub = sinon.stub();
-    viewConstructorStub = sinon.stub(window.AdobeDC, 'View').returns({ previewFile: previewFileStub });
+    viewConstructorStub = sinon.stub().returns({ previewFile: previewFileStub });
+    window.AdobeDC = { View: viewConstructorStub };
+    injectedScript = undefined;
+
+    const { appendChild } = document.head;
+    sinon.stub(document.head, 'appendChild').callsFake(function (node) {
+      if (node.tagName === 'SCRIPT' && node.src === 'https://documentservices.adobe.com/view-sdk/viewer.js') {
+        injectedScript = node;
+        return node;
+      }
+      return appendChild.call(this, node);
+    });
   });
 
   afterEach(() => {
     sinon.restore();
+    if (originalAdobeDC === undefined) {
+      delete window.AdobeDC;
+    } else {
+      window.AdobeDC = originalAdobeDC;
+    }
     document.body.innerHTML = '';
     document.head.querySelectorAll('link[rel="stylesheet"]').forEach((el) => el.remove());
   });
@@ -226,7 +239,6 @@ describe('PdfViewer', () => {
   // -------------------------------------------------------------------------
   describe('loadSdk – SDK event path', () => {
     it('should wait for adobe_dc_view_sdk.ready when View is not yet available', async () => {
-      sinon.restore();
       const savedView = window.AdobeDC.View;
       window.AdobeDC.View = null;
 
@@ -240,6 +252,7 @@ describe('PdfViewer', () => {
       await initPdfViewer({ url: TEST_URL, fileName: TEST_FILE_NAME, divId: TEST_DIV_ID });
 
       expect(previewFileStub.calledOnce).to.be.true;
+      expect(injectedScript.src).to.equal('https://documentservices.adobe.com/view-sdk/viewer.js');
       window.AdobeDC.View = savedView;
     });
   });
@@ -248,12 +261,11 @@ describe('PdfViewer', () => {
     let savedAdobeDC;
 
     beforeEach(() => {
-      // The outer beforeEach already stubs window.AdobeDC.View; save the
-      // whole object so we can put it back after tests that replace it.
       savedAdobeDC = window.AdobeDC;
     });
 
     afterEach(() => {
+      document.dispatchEvent(new Event('adobe_dc_view_sdk.ready'));
       window.AdobeDC = savedAdobeDC;
     });
 
@@ -283,16 +295,6 @@ describe('PdfViewer', () => {
 
     it('should reject when the SDK script fails to load', async () => {
       window.AdobeDC = {};
-
-      // Remove the real SDK script so loadSdk() enters the injection branch,
-      // then stub appendChild to capture the element WITHOUT making a real
-      // network request (avoids cross-origin window.onerror from the browser).
-      document.querySelector('script[src*="view-sdk/viewer.js"]')?.remove();
-
-      let injectedScript;
-      sinon.stub(document.head, 'appendChild').callsFake((node) => {
-        if (node.tagName === 'SCRIPT') injectedScript = node;
-      });
 
       const promise = loadSdk();
       injectedScript.onerror();

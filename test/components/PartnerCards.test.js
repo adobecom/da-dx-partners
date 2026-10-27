@@ -168,6 +168,7 @@ describe('PartnerCards unit behavior', () => {
   });
 
   it('sets a completed state when card fetching fails', async () => {
+    const consoleErrorStub = sinon.stub(console, 'error');
     const component = makeCardsInstance();
     component.blockData.caasUrl = '/cards';
     sinon.stub(window, 'fetch').resolves({ ok: false, status: 500 });
@@ -175,6 +176,10 @@ describe('PartnerCards unit behavior', () => {
     await component.fetchData();
 
     expect(component.hasResponseData).to.equal(true);
+    expect(consoleErrorStub.calledOnce).to.be.true;
+    expect(consoleErrorStub.firstCall.args[0]).to.equal('Error fetching data:');
+    expect(consoleErrorStub.firstCall.args[1]).to.be.instanceOf(Error);
+    expect(consoleErrorStub.firstCall.args[1].message).to.equal('HTTP error! Status: 500');
   });
 
   it('initializes search terms and selected filters from the URL', () => {
