@@ -567,31 +567,36 @@ export default class AssetVideoPlayer extends LitElement {
         <div class="player-bottom-row">
           <div class="player-controls-left">
             <button class="player-control-button" type="button"
-              aria-label="${this.isVideoPlaying ? 'Pause' : 'Play'}"
-              title="${this.isVideoPlaying ? 'Pause' : 'Play'}" @click="${this.toggleVideoPlayback}">
+              @click="${this.toggleVideoPlayback}">
               ${this.renderPlayerIcon(this.isVideoPlaying ? 'pause' : 'play')}
             </button>
-            <button class="player-control-button" type="button" aria-label="Rewind 10 seconds"
-              title="Rewind 10 seconds" @click="${() => this.seekVideo(this.currentTime - 10)}">
+            <button class="player-control-button" type="button"
+              @click="${() => this.seekVideo(this.currentTime - 10)}">
               ${this.renderPlayerIcon('back')}
             </button>
-            <button class="player-control-button" type="button" aria-label="Forward 10 seconds"
-              title="Forward 10 seconds" @click="${() => this.seekVideo(this.currentTime + 10)}">
+            <button class="player-control-button" type="button"
+              @click="${() => this.seekVideo(this.currentTime + 10)}">
               ${this.renderPlayerIcon('forward')}
             </button>
             <div class="player-volume ${this.volumeExpanded ? 'expanded' : ''}"
-              @mouseleave="${() => { this.volumeExpanded = false; }}"
+              @focusin="${() => { this.volumeExpanded = true; }}"
+              @mouseleave="${(event) => {
+                if (!event.currentTarget.contains(document.activeElement)) {
+                  this.volumeExpanded = false;
+                }
+              }}"
               @focusout="${(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget)) this.volumeExpanded = false;
-              }}">
+                if (!event.currentTarget.contains(event.relatedTarget)
+                  && !event.currentTarget.matches(':hover')) this.volumeExpanded = false;
+              }}"
+              >
               <button class="player-control-button" type="button"
                 aria-label="${this.videoMuted ? 'Unmute' : 'Mute'}"
-                title="${this.videoMuted ? 'Unmute' : 'Mute'}"
+                @mouseenter="${() => { this.volumeExpanded = true; }}"
                 @click="${() => {
                   const video = this._video;
                   if (!video) return;
                   video.muted = !video.muted;
-                  this.volumeExpanded = true;
                   this.handleVolumeChange();
                 }}">
                 ${this.renderPlayerIcon(this.videoMuted || !this.videoVolume ? 'muted' : 'volume')}
@@ -599,6 +604,7 @@ export default class AssetVideoPlayer extends LitElement {
               <input type="range" min="0" max="1" step="0.01" aria-label="Volume"
                 ?hidden="${!this.volumeExpanded}"
                 .value="${String(this.videoMuted ? 0 : this.videoVolume)}"
+                style="--volume: ${(this.videoMuted ? 0 : this.videoVolume) * 100}%"
                 @input="${(event) => {
                   const video = this._video;
                   if (!video) return;
@@ -760,9 +766,8 @@ export default class AssetVideoPlayer extends LitElement {
           <video
             preload="auto"
             ?controls="${!this.chapters.length}"
-            @click="${(event) => {
-              const video = event.currentTarget;
-              if (this.chapters.length && !video.paused) video.pause();
+            @click="${() => {
+              if (this.chapters.length) this.toggleVideoPlayback();
             }}"
             @play="${() => { this.isVideoPlaying = true; }}"
             @pause="${() => { this.isVideoPlaying = false; }}"

@@ -810,7 +810,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     el.isVideoPlaying = true;
     renderControls();
     expect(holder.querySelector('.player-center-play').hidden).to.equal(true);
-    holder.querySelector('[aria-label="Pause"]').click();
+    holder.querySelector('use[href="/eds/img/icons/player-pause.svg#icon"]').closest('button').click();
     expect(video.pause.calledOnce).to.equal(true);
   });
 
@@ -846,9 +846,9 @@ describe('AssetVideoPlayer - custom video controls', () => {
     el.seekVideo(100);
     el.handleVideoTimeUpdate({ currentTarget: video });
     renderControls();
-    holder.querySelector('[aria-label="Rewind 10 seconds"]').click();
+    holder.querySelector('use[href="/eds/img/icons/player-back.svg#icon"]').closest('button').click();
     expect(video.currentTime).to.equal(90);
-    holder.querySelector('[aria-label="Forward 10 seconds"]').click();
+    holder.querySelector('use[href="/eds/img/icons/player-forward.svg#icon"]').closest('button').click();
     expect(video.currentTime).to.equal(100);
     renderControls();
     holder.querySelector('.player-next-chapter').click();
@@ -918,11 +918,154 @@ describe('AssetVideoPlayer - custom video controls', () => {
     expect(video.play.called).to.be.false;
   });
 
+  it('expands volume on hover or keyboard focus while clicks only toggle mute', async () => {
+    const player = makeInstance();
+    document.body.append(player);
+    await player.updateComplete;
+    const control = player.querySelector('.player-volume');
+    const button = control.querySelector('button');
+    const slider = control.querySelector('input');
+    const media = player.querySelector('video');
+
+    button.click();
+    await player.updateComplete;
+    expect(media.muted).to.be.true;
+    expect(slider.hidden).to.be.true;
+    button.dispatchEvent(new MouseEvent('mouseenter'));
+    await player.updateComplete;
+    expect(slider.hidden).to.be.false;
+    expect(media.muted).to.be.true;
+    button.click();
+    await player.updateComplete;
+    expect(media.muted).to.be.false;
+    expect(slider.hidden).to.be.false;
+    button.dispatchEvent(new MouseEvent('mouseleave'));
+    await player.updateComplete;
+    expect(slider.hidden).to.be.false;
+    control.dispatchEvent(new MouseEvent('mouseleave'));
+    await player.updateComplete;
+    expect(slider.hidden).to.be.true;
+
+    // Model focus explicitly because concurrent test tabs may not receive native focus.
+    button.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    await player.updateComplete;
+    expect(slider.hidden).to.be.false;
+    button.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: slider }));
+    slider.dispatchEvent(new FocusEvent('focusin', { bubbles: true, relatedTarget: button }));
+    sinon.stub(document, 'activeElement').get(() => slider);
+    control.dispatchEvent(new MouseEvent('mouseleave'));
+    await player.updateComplete;
+    expect(slider.hidden).to.be.false;
+    sinon.stub(control, 'matches').withArgs(':hover').returns(false);
+    slider.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    await player.updateComplete;
+    expect(slider.hidden).to.be.true;
+  });
+
+  it('synchronizes the volume track with input, mute, and external volume changes', async () => {
+    const player = makeInstance();
+    document.body.append(player);
+    await player.updateComplete;
+    const media = player.querySelector('video');
+    const slider = player.querySelector('.player-volume input');
+    const button = player.querySelector('.player-volume button');
+
+    expect(slider.hidden).to.be.true;
+    expect(slider.style.getPropertyValue('--volume').trim()).to.equal('100%');
+    button.dispatchEvent(new MouseEvent('mouseenter'));
+    button.click();
+    await player.updateComplete;
+    expect(slider.hidden).to.be.false;
+    expect(slider.value).to.equal('0');
+    expect(slider.style.getPropertyValue('--volume').trim()).to.equal('0%');
+    expect(button.getAttribute('aria-label')).to.equal('Unmute');
+
+    slider.value = '0.4';
+    slider.dispatchEvent(new Event('input'));
+    await player.updateComplete;
+    expect(media.volume).to.equal(0.4);
+    expect(media.muted).to.be.false;
+    expect(slider.style.getPropertyValue('--volume').trim()).to.equal('40%');
+    expect(button.getAttribute('aria-label')).to.equal('Mute');
+
+    button.click();
+    await player.updateComplete;
+    expect(slider.style.getPropertyValue('--volume').trim()).to.equal('0%');
+    button.click();
+    await player.updateComplete;
+    expect(slider.value).to.equal('0.4');
+    expect(slider.style.getPropertyValue('--volume').trim()).to.equal('40%');
+
+    media.volume = 0.8;
+    media.dispatchEvent(new Event('volumechange'));
+    await player.updateComplete;
+    expect(slider.value).to.equal('0.8');
+    expect(slider.style.getPropertyValue('--volume').trim()).to.equal('80%');
+
+    slider.value = '0';
+    slider.dispatchEvent(new Event('input'));
+    await player.updateComplete;
+    expect(media.muted).to.be.true;
+    expect(slider.style.getPropertyValue('--volume').trim()).to.equal('0%');
+  });
+
+  it('styles the volume control and preserves slider keyboard focus feedback', async () => {
+    const styles = document.createElement('style');
+    const css = await readFile({ path: '../../eds/components/AssetVideoPlayer.css' });
+    styles.textContent = css.replaceAll('::-webkit-slider-thumb', '[data-test-webkit-thumb]')
+      .replaceAll('::-moz-range-thumb', '[data-test-moz-thumb]')
+      .replaceAll(':hover', '[data-test-hover]')
+      .replaceAll(':focus-visible', '[data-test-focus-visible]');
+    const player = makeInstance();
+    player.volumeExpanded = true;
+    document.body.append(styles, player);
+    await player.updateComplete;
+    const control = player.querySelector('.player-volume');
+    const button = control.querySelector('button');
+    const slider = control.querySelector('input');
+
+    expect(getComputedStyle(slider).appearance).to.equal('none');
+    expect(getComputedStyle(slider).height).to.equal('2px');
+    const sliderStyle = getComputedStyle(slider);
+    expect(Number.parseFloat(sliderStyle.width)
+      - Number.parseFloat(sliderStyle.getPropertyValue('--volume-thumb-size'))).to.equal(54);
+    expect(getComputedStyle(control).getPropertyValue('--video-player-controls-background').trim())
+      .to.equal('26 5 39');
+    const rules = [...styles.sheet.cssRules];
+    ['webkit', 'moz'].forEach((engine) => {
+      const hoverColor = engine === 'webkit' ? 'rgb(41, 41, 41)' : 'rgb(80, 80, 80)';
+      const selector = `asset-video-player .player-volume input[data-test-${engine}-thumb]`;
+      const thumb = rules.find((rule) => rule.selectorText === selector);
+      const hoveredThumb = rules.find((rule) => rule.selectorText === `${selector}[data-test-hover]`);
+      expect(thumb.style.background).to.equal('rgb(var(--video-player-controls-background))');
+      expect(hoveredThumb.style.borderColor).to.equal(hoverColor);
+      slider.setAttribute(`data-test-${engine}-thumb`, '');
+      expect(getComputedStyle(slider).backgroundColor).to.equal('rgb(26, 5, 39)');
+      expect(getComputedStyle(slider).borderTopColor).to.equal('rgb(255, 255, 255)');
+      expect(getComputedStyle(slider).boxShadow).to.equal('rgb(26, 5, 39) 0px 0px 0px 4px');
+      slider.setAttribute('data-test-hover', '');
+      expect(getComputedStyle(slider).backgroundColor).to.equal('rgb(26, 5, 39)');
+      expect(getComputedStyle(slider).borderTopColor).to.equal(hoverColor);
+      expect(getComputedStyle(slider).boxShadow).to.equal('rgb(26, 5, 39) 0px 0px 0px 4px');
+      slider.removeAttribute('data-test-hover');
+      slider.removeAttribute(`data-test-${engine}-thumb`);
+    });
+
+    button.setAttribute('data-test-hover', '');
+    expect(getComputedStyle(button).backgroundColor).to.equal('rgba(255, 255, 255, 0.16)');
+    button.removeAttribute('data-test-hover');
+    button.setAttribute('data-test-focus-visible', '');
+    expect(getComputedStyle(button).backgroundColor).to.equal('rgba(255, 255, 255, 0.16)');
+    slider.setAttribute('data-test-focus-visible', '');
+    expect(getComputedStyle(slider).outlineWidth).to.equal('2px');
+    expect(getComputedStyle(slider).outlineOffset).to.equal('4px');
+  });
+
   it('mutes, changes volume, cycles speed, and applies settings', () => {
     renderControls();
     holder.querySelector('[aria-label="Mute"]').click();
     expect(video.muted).to.equal(true);
-    expect(el.volumeExpanded).to.equal(true);
+    expect(el.volumeExpanded).to.equal(false);
     renderControls();
     const volume = holder.querySelector('[aria-label="Volume"]');
     volume.value = '0.4';
@@ -1017,7 +1160,7 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
     await player.updateComplete;
     expect(player.querySelector('.player-center-play').hidden).to.be.true;
 
-    player.querySelector('[aria-label="Rewind 10 seconds"]').click();
+    player.querySelector('use[href="/eds/img/icons/player-back.svg#icon"]').closest('button').click();
     expect(pause.called).to.be.false;
 
     video.click();
@@ -1028,17 +1171,40 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
     expect(player.querySelector('.player-center-play').hidden).to.be.false;
   });
 
-  it('does not start playback when clicking a paused chaptered video', async () => {
+  it('starts a paused chaptered video on click and hides the center play button during playback', async () => {
+    const styles = document.createElement('style');
+    styles.textContent = await readFile({ path: '../../eds/components/AssetVideoPlayer.css' });
+    document.body.append(styles);
     const player = await mountPlayer();
     const video = player.querySelector('video');
     sinon.stub(video, 'paused').get(() => true);
     const pause = sinon.stub(video, 'pause');
-    const play = sinon.stub(video, 'play').resolves();
+    const play = sinon.stub(video, 'play').callsFake(async () => {
+      video.dispatchEvent(new Event('play'));
+    });
+    const playButton = player.querySelector('.player-center-play');
+    expect(getComputedStyle(playButton).display).not.to.equal('none');
 
     video.click();
+    await player.updateComplete;
 
     expect(pause.called).to.be.false;
-    expect(play.called).to.be.false;
+    expect(play.calledOnce).to.be.true;
+    expect(player.isVideoPlaying).to.be.true;
+    expect(playButton.hidden).to.be.true;
+    expect(getComputedStyle(playButton).display).to.equal('none');
+
+    video.dispatchEvent(new Event('pause'));
+    await player.updateComplete;
+    expect(playButton.hidden).to.be.false;
+    expect(getComputedStyle(playButton).display).not.to.equal('none');
+
+    video.dispatchEvent(new Event('play'));
+    await player.updateComplete;
+    expect(getComputedStyle(playButton).display).to.equal('none');
+    video.dispatchEvent(new Event('ended'));
+    await player.updateComplete;
+    expect(getComputedStyle(playButton).display).not.to.equal('none');
   });
 
   it('leaves video clicks to native controls when there are no chapters', async () => {
