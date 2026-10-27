@@ -464,14 +464,14 @@ export default class AssetVideoPlayer extends LitElement {
       </button>
       <div class="player-settings-menu" ?hidden="${!this.settingsMenuOpen}">
         <label>Playback speed
-          <select aria-label="Playback speed" .value="${String(this.playbackSpeed)}"
+          <select .value="${String(this.playbackSpeed)}"
             @change="${(event) => this.setPlaybackSpeed(Number(event.target.value))}">
             ${speeds.map((speed) => html`<option value="${speed}">${speed}x</option>`)}
           </select>
         </label>
       </div>
       <div class="player-controls">
-        <div class="player-progress" role="slider" tabindex="0" aria-label="Video progress"
+        <div class="player-progress" role="slider" tabindex="0"
           style="position: relative; overflow: visible;"
           aria-valuemin="0" aria-valuemax="${duration}"
           aria-valuenow="${Math.min(this.currentTime, duration)}"
@@ -591,7 +591,6 @@ export default class AssetVideoPlayer extends LitElement {
               }}"
               >
               <button class="player-control-button" type="button"
-                aria-label="${this.videoMuted ? 'Unmute' : 'Mute'}"
                 @mouseenter="${() => { this.volumeExpanded = true; }}"
                 @click="${() => {
                   const video = this._video;
@@ -601,7 +600,7 @@ export default class AssetVideoPlayer extends LitElement {
                 }}">
                 ${this.renderPlayerIcon(this.videoMuted || !this.videoVolume ? 'muted' : 'volume')}
               </button>
-              <input type="range" min="0" max="1" step="0.01" aria-label="Volume"
+              <input type="range" min="0" max="1" step="0.01"
                 ?hidden="${!this.volumeExpanded}"
                 .value="${String(this.videoMuted ? 0 : this.videoVolume)}"
                 style="--volume: ${(this.videoMuted ? 0 : this.videoVolume) * 100}%"
@@ -755,8 +754,7 @@ export default class AssetVideoPlayer extends LitElement {
     /* eslint-disable indent */
     return html`
       <div class="video-player-layout ${this.chapters.length && this.chaptersVisible ? 'chapters-open' : 'chapters-collapsed'}">
-        <div class="video-container video-holder" tabindex="0"
-          role="group" aria-label="Video player">
+        <div class="video-container video-holder" tabindex="0" role="group">
           ${this.isVideoLoading ? html`
             <div class="video-loading-overlay">
               <loading-spinner theme="dark"></loading-spinner>
@@ -812,10 +810,7 @@ export default class AssetVideoPlayer extends LitElement {
         ${this.chapters.length ? html`
         <div ?hidden="${!this.chaptersVisible}">
           <sp-theme system="express" scale="medium" color="light">
-            <section
-              class="video-chapters"
-              aria-label="Video chapters"
-            >
+            <section class="video-chapters">
               <header class="header">
                 <h1 class="header-title">In this video</h1>
                 <div class="chapter-count">

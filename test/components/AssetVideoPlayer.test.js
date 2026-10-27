@@ -978,7 +978,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     expect(slider.hidden).to.be.false;
     expect(slider.value).to.equal('0');
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('0%');
-    expect(button.getAttribute('aria-label')).to.equal('Unmute');
+    expect(button.querySelector('use').getAttribute('href')).to.equal('/eds/img/icons/player-muted.svg#icon');
 
     slider.value = '0.4';
     slider.dispatchEvent(new Event('input'));
@@ -986,7 +986,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     expect(media.volume).to.equal(0.4);
     expect(media.muted).to.be.false;
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('40%');
-    expect(button.getAttribute('aria-label')).to.equal('Mute');
+    expect(button.querySelector('use').getAttribute('href')).to.equal('/eds/img/icons/player-volume.svg#icon');
 
     button.click();
     await player.updateComplete;
@@ -1063,11 +1063,11 @@ describe('AssetVideoPlayer - custom video controls', () => {
 
   it('mutes, changes volume, cycles speed, and applies settings', () => {
     renderControls();
-    holder.querySelector('[aria-label="Mute"]').click();
+    holder.querySelector('.player-volume button').click();
     expect(video.muted).to.equal(true);
     expect(el.volumeExpanded).to.equal(false);
     renderControls();
-    const volume = holder.querySelector('[aria-label="Volume"]');
+    const volume = holder.querySelector('.player-volume input[type="range"]');
     volume.value = '0.4';
     volume.dispatchEvent(new Event('input'));
     expect(video.volume).to.equal(0.4);
