@@ -5,7 +5,7 @@ import { setLibs } from '../../../eds/scripts/utils.js';
 import createMockYukonMultiSourceResponse from './mocks/multi-source-stream.js';
 
 const miloLibs = setLibs('/libs');
-const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
+const { setConfig, getConfig } = await import(`${miloLibs}/utils/utils.js`);
 
 describe('yukon-chat block', () => {
   let fetchStub;
@@ -65,6 +65,27 @@ describe('yukon-chat block', () => {
   });
 
   describe('Block initialization and rendering', () => {
+    it('logs localization failures and keeps default labels when locale configuration is missing', async () => {
+      const debugStub = sinon.stub(console, 'debug');
+      delete getConfig().locale;
+      const block = document.querySelector('.yukon-chat');
+
+      await init(block);
+
+      expect(document.querySelector('.yc-input-field-button').getAttribute('aria-label')).to.equal('Send Message');
+      const keys = [
+        '{{send-message}}', '{{open-chat}}', '{{scroll-to-bottom}}', '{{timeout-error}}',
+        '{{server-error}}', '{{network-error}}', '{{sources}}', '{{modal-disclaimer}}',
+      ];
+      expect(debugStub.callCount).to.equal(keys.length);
+      keys.forEach((key, index) => {
+        const { args } = debugStub.getCall(index);
+        expect(args[0]).to.equal('Failed to replace text for key: ');
+        expect(args[1]).to.equal(key);
+        expect(args[2]).to.be.instanceOf(TypeError);
+      });
+    });
+
     it('should resolve localized labels without logging localization errors', async () => {
       const debugSpy = sinon.spy(console, 'debug');
       const block = document.querySelector('.yukon-chat');

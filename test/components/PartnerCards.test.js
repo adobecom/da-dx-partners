@@ -56,6 +56,86 @@ describe('PartnerCards unit behavior', () => {
     document.body.innerHTML = '';
   });
 
+  it('retries first-update setup after filters become available', async () => {
+    const component = makeCardsInstance();
+    delete component.blockData.filters;
+    const frameStub = sinon.stub(window, 'requestAnimationFrame');
+    const fetchStub = sinon.stub(component, 'fetchData').resolves();
+    sinon.stub(component, 'handleActions');
+
+    await component.firstUpdated();
+
+    expect(frameStub.calledOnce).to.be.true;
+    expect(fetchStub.called).to.be.false;
+
+    component.blockData.filters = [];
+    await frameStub.firstCall.args[0]();
+
+    expect(fetchStub.calledOnce).to.be.true;
+    expect(component.urlSearchParams).to.be.instanceOf(URLSearchParams);
+  });
+
+  it('initializes sorting, page size, URL state, and actions on first update', async () => {
+    const component = makeCardsInstance();
+    const defaultSort = { key: 'most-recent', value: 'Most Recent' };
+    component.blockData.sort = { items: [defaultSort], default: defaultSort };
+    component.blockData.cardsPerPage = 6;
+    const fetchStub = sinon.stub(component, 'fetchData').resolves();
+    const additionalSetupStub = sinon.stub(component, 'additionalFirstUpdated');
+    const urlSetupSpy = sinon.spy(component, 'initUrlSearchParams');
+    const actionsStub = sinon.stub(component, 'handleActions');
+
+    await component.firstUpdated();
+
+    expect(component.selectedSortOrder).to.equal(defaultSort);
+    expect(component.cardsPerPage).to.equal(6);
+    expect(fetchStub.calledOnce).to.be.true;
+    expect(additionalSetupStub.calledOnce).to.be.true;
+    expect(urlSetupSpy.calledOnce).to.be.true;
+    expect(actionsStub.calledOnce).to.be.true;
+    expect(fetchStub.calledBefore(additionalSetupStub)).to.be.true;
+    expect(additionalSetupStub.calledBefore(urlSetupSpy)).to.be.true;
+    expect(urlSetupSpy.calledBefore(actionsStub)).to.be.true;
+  });
+
+  ['complete', 'loading'].forEach((readyState) => {
+    it(`waits for cards and scrolls to the URL anchor when the document is ${readyState}`, async () => {
+      const originalUrl = window.location.href;
+      try {
+        window.history.replaceState({}, '', '#partner-cards-anchor');
+        document.body.innerHTML = '<div id="partner-cards-anchor"></div>';
+        const anchorTop = document.querySelector('#partner-cards-anchor').offsetTop;
+        const component = makeCardsInstance();
+        sinon.stub(component, 'updateComplete').get(() => Promise.resolve(true));
+        const child = document.createElement('div');
+        const childUpdateSpy = sinon.spy();
+        child.updateComplete = Promise.resolve().then(childUpdateSpy);
+        sinon.stub(component, 'querySelectorAll').returns([child]);
+        sinon.stub(component, 'fetchData').resolves();
+        sinon.stub(component, 'handleActions');
+        const frameStub = sinon.stub(window, 'requestAnimationFrame').callsFake((callback) => {
+          queueMicrotask(callback);
+          return 1;
+        });
+        sinon.stub(document, 'readyState').get(() => readyState);
+        const addListenerStub = sinon.stub(window, 'addEventListener').callThrough();
+        addListenerStub.withArgs('load').callsFake((_event, callback) => {
+          queueMicrotask(callback);
+        });
+        const scrollStub = sinon.stub(window, 'scrollTo');
+
+        await component.firstUpdated();
+
+        expect(childUpdateSpy.calledOnce).to.be.true;
+        expect(frameStub.calledTwice).to.be.true;
+        expect(addListenerStub.calledWith('load')).to.equal(readyState === 'loading');
+        expect(scrollStub.calledOnceWithExactly({ top: anchorTop, behavior: 'smooth' })).to.be.true;
+      } finally {
+        window.history.replaceState({}, '', originalUrl);
+      }
+    });
+  });
+
   it('extracts text while preserving strong markup', () => {
     const component = makeCardsInstance();
     const node = document.createElement('div');

@@ -103,6 +103,42 @@ describe('asset-preview block', () => {
   });
 });
 
+describe('AssetPreview - connectedCallback() errors', () => {
+  afterEach(() => sinon.restore());
+
+  it('logs a failed tags response and continues loading asset metadata', async () => {
+    const el = makeInstance();
+    const fetchStub = sinon.stub(window, 'fetch').resolves({ ok: false, status: 503 });
+    const consoleStub = sinon.stub(console, 'log');
+    const metadataStub = sinon.stub(el, 'getAssetMetadata').resolves();
+
+    await el.connectedCallback();
+
+    expect(fetchStub.calledOnceWithExactly(CAAS_TAGS_URL)).to.be.true;
+    expect(consoleStub.calledOnce).to.be.true;
+    expect(consoleStub.firstCall.args[0]).to.equal('error');
+    expect(consoleStub.firstCall.args[1]).to.be.instanceOf(Error);
+    expect(consoleStub.firstCall.args[1].message).to.equal('Get caas tags HTTP error! Status: 503');
+    expect(metadataStub.calledOnce).to.be.true;
+    expect(el.allCaaSTags).to.deep.equal([]);
+    el.disconnectedCallback();
+  });
+
+  it('logs a rejected tags request and continues loading asset metadata', async () => {
+    const el = makeInstance();
+    const error = new Error('Tags unavailable');
+    sinon.stub(window, 'fetch').rejects(error);
+    const consoleStub = sinon.stub(console, 'log');
+    const metadataStub = sinon.stub(el, 'getAssetMetadata').resolves();
+
+    await el.connectedCallback();
+
+    expect(consoleStub.calledOnceWithExactly('error', error)).to.be.true;
+    expect(metadataStub.calledOnce).to.be.true;
+    el.disconnectedCallback();
+  });
+});
+
 describe('AssetPreview - updated()', () => {
   afterEach(() => sinon.restore());
 
