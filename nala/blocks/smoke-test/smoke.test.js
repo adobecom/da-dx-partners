@@ -715,4 +715,20 @@ test.describe('Validate Partner Directory pages', () => {
       await smokeTest.agreementPopup.waitFor({ state: 'visible', timeout: 30000 });
     });
   });
+  test(`${features[28].name},${features[28].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[28];
+
+    await test.step('Go to public home page and log in', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await smokeTest.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await smokeTest.signInButton.click();
+      await smokeTest.smokeSignIn(page, baseURL, data.partnerLevel);
+      await smokeTest.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Verify partner agreement popup', async () => {
+      await expect(smokeTest.pxTeamButton).not.toBeVisible();
+    });
+  });
 });
