@@ -192,7 +192,12 @@ export default class AssetPreview extends LitElement {
     const mappedAssetUrl = this.getRealAssetUrl();
     if (!mappedAssetUrl) return;
     try {
-      await fetch(mappedAssetUrl).then(async (res) => {
+      // AssetMetadataServlet (used when isAEM) requires this header to identify
+      // the request as coming from a trusted internal caller.
+      const fetchOptions = this.blockData.isAEM
+        ? { headers: { 'X-Requested-With': 'EdgeWorkerGravity' } }
+        : undefined;
+      await fetch(mappedAssetUrl, fetchOptions).then(async (res) => {
         if (res && res.status === 200) {
           const assetMetadata = await res.json();
           await this.setData(assetMetadata);
@@ -251,8 +256,17 @@ export default class AssetPreview extends LitElement {
     this.aemPath = DOMPurify.sanitize(assetMetadata.aemPath);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   getRealAssetUrl() {
+    if (this.blockData.isAEM) {
+      const assetPath = new URLSearchParams(window.location.search).get('assetPath') || '';
+      if (!assetPath.startsWith('/content/dam/')) return null;
+      try {
+        return new URL(`${window.location.origin}${assetPath}.assetmetadata.json`);
+      } catch (error) {
+        return null;
+      }
+    }
+
     const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH).replace('.html', '/_jcr_content/metadata.assetmetadata.json');
     try {
       const url = new URL(assetMetadataPath);
@@ -269,9 +283,11 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   _handleImgError = (e) => {
-    // eslint-disable-next-line no-console
-    console.log('error', e);
     const img = e.currentTarget;
+    // Guard against an infinite error loop if the fallback image itself fails
+    // to load (e.g. blocked/offline) - only swap to the default once.
+    if (img.dataset.fallbackApplied === 'true') return;
+    img.dataset.fallbackApplied = 'true';
     img.src = transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH);
   };
 
@@ -670,6 +686,8 @@ export default class AssetPreview extends LitElement {
   }
 
   isRestrictedAssetForUser() {
+    if (this.blockData.isAEM) return false;
+
     return !(!this.assetPartnerLevel.length
       || this.assetPartnerLevel.includes('public')
       || this.assetPartnerLevel.includes(PARTNER_LEVEL));
