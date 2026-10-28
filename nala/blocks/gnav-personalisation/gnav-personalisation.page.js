@@ -17,6 +17,9 @@ export default class GnavPersonalisationPage {
     this.navigationMenuButton = page.getByRole('button', { name: 'Navigation menu' });
     this.mainMenuButton = page.getByLabel('About').locator('div').filter({ hasText: 'Main menu' });
     this.newlyApprovedBanner = page.locator('.partner-newly-approved');
+    this.nonSignedPartnerBanner = page.locator('.notification.ribbon.center.partner-not-signed-in');
+    this.signedPartnerBanner = page.locator('.notification.ribbon.center.partner-member');
+    this.pxTeamButton = page.getByRole('link', { name: 'Px Team' });
   }
 
   getPartnerLevelSegment(partnerLevelSegmentText) {
