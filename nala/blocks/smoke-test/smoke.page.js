@@ -59,6 +59,7 @@ export default class SmokeTest {
     this.registerButton = page.getByRole('link', { name: 'register now' });
     this.assetRedirectCta = page.locator('a[href*="/digitalexperience/preview/restricted/1/program-guide.pdf.html"]').first();
     this.agreementPopup = page.locator('#partner-agreement-modal');
+    this.pxTeamButton = page.getByRole('link', { name: 'Px Team' });
   }
 
   async smokeSignIn(page, baseURL, partnerLevel) {

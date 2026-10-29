@@ -293,5 +293,12 @@ export default {
       tags: '@da-dx-smoke-test',
       data: { partnerLevel: 'dxp-agreement:' },
     },
+    {
+      tcid: '29',
+      name: '@smoke-test-px-icon-not-adobe-account',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: { partnerLevel: 'dxp-platinum:' },
+    },
   ],
 };
