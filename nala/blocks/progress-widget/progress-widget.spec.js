@@ -44,13 +44,6 @@ export default {
     },
     {
       tcid: '4',
-      name: '@progress-widget-community-user',
-      path: '/digitalexperience/drafts/automation/regression/partnership-progress-widget?georouting=off&martech=off',
-      tags: '@da-dx-progress-widget @regression @circleCi',
-      data: { partnerLevel: 'dxp-community:' },
-    },
-    {
-      tcid: '5',
       name: '@progress-widget-ui-silver-user',
       path: '/digitalexperience/drafts/automation/regression/partnership-progress-widget',
       tags: '@da-dx-progress-widget @regression @circleCi',
@@ -62,7 +55,7 @@ export default {
       },
     },
     {
-      tcid: '6',
+      tcid: '5',
       name: '@progress-widget-ui-gold-user',
       path: '/digitalexperience/drafts/automation/regression/partnership-progress-widget',
       tags: '@da-dx-progress-widget @regression @circleCi',

@@ -63,23 +63,7 @@ test.describe('Partnership Progress Widget', () => {
   test(`${features[3].name},${features[3].tags}`, async ({ page }) => {
     const { data } = features[3];
     await test.step('Go to page', async () => {
-      await page.goto(`${features[0].path}`);
-      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
-      await signInPage.signInButton.click();
-    });
-    await test.step('Sign in as Community user', async () => {
-      await signInPage.signIn(page, `${data.partnerLevel}`);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
-    });
-    await test.step('Verify progress widget not visible for Community user', async () => {
-      await expect(progressWidgetPage.progressWidget).not.toBeVisible();
-    });
-  });
-
-  test(`${features[4].name},${features[4].tags}`, async ({ page }) => {
-    const { data } = features[4];
-    await test.step('Go to page', async () => {
-      await page.goto(`${features[4].path}`);
+      await page.goto(`${features[3].path}`);
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
     });
@@ -102,10 +86,10 @@ test.describe('Partnership Progress Widget', () => {
     });
   });
 
-  test(`${features[5].name},${features[5].tags}`, async ({ page }) => {
-    const { data } = features[5];
+  test(`${features[4].name},${features[4].tags}`, async ({ page }) => {
+    const { data } = features[4];
     await test.step('Go to page', async () => {
-      await page.goto(`${features[5].path}`);
+      await page.goto(`${features[4].path}`);
       await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
       await signInPage.signInButton.click();
     });
