@@ -1,4 +1,5 @@
 import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
 import {
   deleteCookieValue,
   formatDate,
@@ -14,6 +15,7 @@ import {
   getUserRegionParams,
   isMember,
   matchesAccountNameMapping,
+  partnerCookieContainsValue,
   setLibs,
 } from '../../eds/scripts/utils.js';
 
@@ -82,6 +84,7 @@ describe('Libs', () => {
 
 describe('utils browser coverage', () => {
   afterEach(() => {
+    sinon.restore();
     document.head.innerHTML = '';
     document.body.innerHTML = '';
     document.cookie = 'partner_data=; Path=/; Max-Age=0;';
@@ -112,6 +115,16 @@ describe('utils browser coverage', () => {
     expect(getPartnerCookieValue('status')).to.equal('member');
     expect(getUserRegionParams('dxp')).to.contain('region/europe');
     expect(isMember()).to.equal(true);
+  });
+
+  it('checks partner cookie values case-insensitively and rejects missing values', () => {
+    const partnerData = { DXP: { specialState: 'Locked-Compliance-Past' } };
+    sinon.stub(document, 'cookie').get(() => `partner_data=${encodeURIComponent(JSON.stringify(partnerData))}`);
+
+    expect(partnerCookieContainsValue('specialstate', 'LOCKED')).to.be.true;
+    expect(partnerCookieContainsValue('specialstate', 'compliance-past')).to.be.true;
+    expect(partnerCookieContainsValue('specialstate', 'submitted-in-review')).to.be.false;
+    expect(partnerCookieContainsValue('missing', 'locked')).to.be.false;
   });
 
   it('matches account names against the account name mapping', () => {

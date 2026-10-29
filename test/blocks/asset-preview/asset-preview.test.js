@@ -1,13 +1,15 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { setLibs } from '../../../eds/scripts/utils.js';
+import { CAAS_TAGS_URL, setLibs } from '../../../eds/scripts/utils.js';
 import AssetPreview from '../../../eds/blocks/asset-preview/AssetPreview.js';
 
 const miloLibs = setLibs('/libs');
 const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
 const { render } = await import(`${miloLibs}/deps/lit-all.min.js`);
 setConfig({ locales: { '': { ietf: 'en-US', tk: 'hah7vzn.css' } }, miloLibs });
+
+const mockPreviewImage = new URL('/eds/img/icons/star.svg', window.location.origin).href;
 
 function makeInstance() {
   const el = new AssetPreview();
@@ -18,6 +20,7 @@ function makeInstance() {
   };
   el.fileFormatTags = [];
   el.pdfPreviewUrl = '';
+  el.previewImage = mockPreviewImage;
   el.url = '';
   el.webinarPresentation = '';
   el.chapters = [
@@ -48,7 +51,12 @@ function makeInstance() {
 
 describe('asset-preview block', () => {
   beforeEach(async () => {
-    sinon.stub(window, 'fetch').resolves({ ok: false, json: async () => ({ data: [] }) });
+    const fetchStub = sinon.stub(window, 'fetch').resolves({ ok: false, json: async () => ({ data: [] }) });
+    fetchStub.withArgs(CAAS_TAGS_URL).resolves({
+      ok: true,
+      status: 200,
+      json: async () => ({ namespaces: { caas: { tags: {} } } }),
+    });
     document.body.innerHTML = await readFile({ path: './mocks/body.html' });
   });
 
@@ -95,6 +103,42 @@ describe('asset-preview block', () => {
   });
 });
 
+describe('AssetPreview - connectedCallback() errors', () => {
+  afterEach(() => sinon.restore());
+
+  it('logs a failed tags response and continues loading asset metadata', async () => {
+    const el = makeInstance();
+    const fetchStub = sinon.stub(window, 'fetch').resolves({ ok: false, status: 503 });
+    const consoleStub = sinon.stub(console, 'log');
+    const metadataStub = sinon.stub(el, 'getAssetMetadata').resolves();
+
+    await el.connectedCallback();
+
+    expect(fetchStub.calledOnceWithExactly(CAAS_TAGS_URL)).to.be.true;
+    expect(consoleStub.calledOnce).to.be.true;
+    expect(consoleStub.firstCall.args[0]).to.equal('error');
+    expect(consoleStub.firstCall.args[1]).to.be.instanceOf(Error);
+    expect(consoleStub.firstCall.args[1].message).to.equal('Get caas tags HTTP error! Status: 503');
+    expect(metadataStub.calledOnce).to.be.true;
+    expect(el.allCaaSTags).to.deep.equal([]);
+    el.disconnectedCallback();
+  });
+
+  it('logs a rejected tags request and continues loading asset metadata', async () => {
+    const el = makeInstance();
+    const error = new Error('Tags unavailable');
+    sinon.stub(window, 'fetch').rejects(error);
+    const consoleStub = sinon.stub(console, 'log');
+    const metadataStub = sinon.stub(el, 'getAssetMetadata').resolves();
+
+    await el.connectedCallback();
+
+    expect(consoleStub.calledOnceWithExactly('error', error)).to.be.true;
+    expect(metadataStub.calledOnce).to.be.true;
+    el.disconnectedCallback();
+  });
+});
+
 describe('AssetPreview - updated()', () => {
   afterEach(() => sinon.restore());
 
@@ -131,10 +175,12 @@ describe('AssetPreview - loadPdfViewer()', () => {
     el.pdfPreviewUrl = 'https://example.com/file.pdf';
     el.title = 'Test Asset';
     sinon.stub(window, 'fetch').rejects(new Error('mock sdk error'));
+    const consoleStub = sinon.stub(console, 'log');
 
     await el.loadPdfViewer();
 
     expect(el.pdfPreviewUrl).to.equal('');
+    expect(consoleStub.calledOnceWithExactly('PDF viewer failed to load, falling back to preview image: mock sdk error')).to.be.true;
   });
 
   it('logs error message on failure', async () => {
@@ -197,11 +243,14 @@ describe('AssetPreview - getAssetMetadata()', () => {
   it('clears loading when metadata fetching fails', async () => {
     const el = makeInstance();
     el.getRealAssetUrl = () => new URL('https://partners.stage.adobe.com/asset.json');
-    sinon.stub(window, 'fetch').rejects(new Error('metadata unavailable'));
+    const error = new Error('metadata unavailable');
+    sinon.stub(window, 'fetch').rejects(error);
+    const consoleStub = sinon.stub(console, 'log');
 
     await el.getAssetMetadata();
 
     expect(el.isLoading).to.be.false;
+    expect(consoleStub.calledOnceWithExactly('Error on fetch of asset https://partners.stage.adobe.com/asset.json :', error)).to.be.true;
   });
 
   it('does not fetch metadata when no real asset URL can be built', async () => {
@@ -437,6 +486,7 @@ describe('AssetPreview - setData() chapters', () => {
       await el.setData({
         title: 'Video without chapters',
         url: 'https://example.com/video.mp4',
+        previewImage: mockPreviewImage,
         fileType: 'video/mp4',
         tags: ['caas:file-format/video'],
         partnerLevel: ['public'],
@@ -569,10 +619,13 @@ describe('AssetPreview - utility methods', () => {
 
   it('_handleImgError sets fallback image src', () => {
     const el = makeInstance();
+    const consoleStub = sinon.stub(console, 'log');
     const img = document.createElement('img');
     document.body.appendChild(img);
-    el._handleImgError({ currentTarget: img });
+    const event = { currentTarget: img };
+    el._handleImgError(event);
     expect(img.src).to.include('sample-default.png');
+    expect(consoleStub.calledOnceWithExactly('error', event)).to.be.true;
     document.body.removeChild(img);
   });
 });

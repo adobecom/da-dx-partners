@@ -65,6 +65,7 @@ describe('search-full block', () => {
     });
 
     sinon.stub(Search.prototype, 'firstUpdated').callsFake(async function () {
+      this.urlSearchParams = new URLSearchParams();
       this.allCards = cards;
       this.cards = cards;
       this.paginatedCards = this.cards.slice(0, 12);
@@ -78,14 +79,11 @@ describe('search-full block', () => {
     document.body.innerHTML = await readFile({ path: './mocks/body.html' });
   });
 
-  afterEach(() => {
-    fetchStub.restore();
-    Search.prototype.fetchData.restore();
-    Search.prototype.fetchTags.restore();
-    Search.prototype.handleActionsCore.restore();
-    Search.prototype.getSuggestions.restore();
-    Search.prototype.setBlockData.restore();
-    Search.prototype.firstUpdated.restore();
+  afterEach(async () => {
+    await Promise.all([...document.querySelectorAll('search-cards')]
+      .map((component) => component.updateComplete));
+    document.body.innerHTML = '';
+    sinon.restore();
   });
 
   const setupAndCommonTest = async (windowWidth) => {
@@ -156,6 +154,34 @@ describe('search-full block', () => {
 
     const searchBoxWrapper = searchCardsWrapper.querySelector('.search-box-wrapper');
     expect(searchBoxWrapper).to.exist;
+  });
+
+  it('should contain search cards analytics attributes', async () => {
+    const { searchCardsWrapper } = await setupAndCommonTest(1500);
+    searchCardsWrapper.selectedFilters = {
+      product: [
+        { key: 'analytics', parentKey: 'product', value: 'Analytics', checked: true },
+        { key: 'target', parentKey: 'product', value: 'Target', checked: true },
+      ],
+      industry: [
+        { key: 'retail', parentKey: 'industry', value: 'Retail', checked: true },
+      ],
+    };
+    await searchCardsWrapper.updateComplete;
+
+    expect(searchCardsWrapper.getAttribute('daa-lh')).to.equal('Search Cards Section');
+
+    const searchBoxWrapper = searchCardsWrapper.querySelector('.search-box-wrapper');
+    expect(searchBoxWrapper.getAttribute('daa-lh')).to.equal('Search Box');
+
+    const searchCardsContent = searchCardsWrapper.querySelectorAll('.content')[1];
+    expect(searchCardsContent.getAttribute('daa-lh')).to.equal('Search Cards Content | Filters: Analytics Target Retail | Search Query: None');
+
+    const firstCard = searchCardsWrapper.querySelector('search-card');
+    expect(firstCard.getAttribute('daa-lh')).to.equal(`Search Card 1 | ${cards[0].contentArea.title}`);
+
+    const singlePartnerCardBtn = firstCard.querySelector('.card-btn');
+    expect(singlePartnerCardBtn.getAttribute('daa-ll')).to.equal(cards[0].contentArea.title);
   });
 
   it('should render search cards with proper content type filtering', async () => {
@@ -451,10 +477,7 @@ describe('SearchCards Unit Tests', () => {
   });
 
   afterEach(() => {
-    fetchStub.restore();
-    if (consoleErrorStub.restore) {
-      consoleErrorStub.restore();
-    }
+    sinon.restore();
   });
 
   describe('fetchData', () => {
@@ -1365,6 +1388,7 @@ describe('SearchCards Unit Tests', () => {
     });
 
     it('should handle fetch error gracefully', async () => {
+      const consoleLogStub = sinon.stub(console, 'log');
       fetchStub.resolves({
         ok: false,
         status: 404,
@@ -1376,10 +1400,16 @@ describe('SearchCards Unit Tests', () => {
       // allTags should remain as initialized (empty array)
       expect(searchComponent.allTags).to.be.an('array');
       expect(searchComponent.allTagsFlatMap).to.be.instanceOf(Map);
+      expect(consoleLogStub.calledOnce).to.be.true;
+      expect(consoleLogStub.firstCall.args[0]).to.equal('error');
+      expect(consoleLogStub.firstCall.args[1]).to.be.instanceOf(Error);
+      expect(consoleLogStub.firstCall.args[1].message).to.equal('Get caas tags HTTP error! Status: 404');
     });
 
     it('should handle network error gracefully', async () => {
-      fetchStub.rejects(new Error('Network error'));
+      const consoleLogStub = sinon.stub(console, 'log');
+      const error = new Error('Network error');
+      fetchStub.rejects(error);
 
       // Should not throw
       await searchComponent.fetchTags();
@@ -1387,6 +1417,7 @@ describe('SearchCards Unit Tests', () => {
       // allTags should remain as initialized
       expect(searchComponent.allTags).to.be.an('array');
       expect(searchComponent.allTagsFlatMap).to.be.instanceOf(Map);
+      expect(consoleLogStub.calledOnceWithExactly('error', error)).to.be.true;
     });
 
     it('should handle complex nested structure with multiple levels', async () => {
@@ -1684,29 +1715,6 @@ describe('SearchCard Unit Tests', () => {
 
       // Clean up
       document.body.removeChild(searchCard);
-    });
-
-    it('should contain search cards analytics attributes', async () => {
-      const searchCardsWrapper = document.querySelector('.search-cards-wrapper');
-      expect(searchCardsWrapper).to.exist;
-
-      const component = await init(searchCardsWrapper);
-      await component.updateComplete;
-      expect(component).to.exist;
-
-      expect(searchCardsWrapper.getAttribute('daa-lh')).to.equal('Search Cards Section');
-
-      const searchBoxWrapper = searchCardsWrapper.querySelector('.search-box-wrapper');
-      expect(searchBoxWrapper.getAttribute('daa-lh')).to.equal('Search Box');
-
-      const searchCardsContent = searchCardsWrapper.querySelectorAll('.content')[1];
-      expect(searchCardsContent.getAttribute('daa-lh')).to.equal('Search Cards Content | Filters: Analytics Target Retail | Search Query: None');
-
-      const firstCard = searchCardsWrapper.querySelector('search-card');
-      expect(firstCard.getAttribute('daa-lh')).to.equal(`Search Card 1 | ${cards[0].contentArea.title}`);
-
-      const singlePartnerCardBtn = firstCard.querySelector('.card-btn');
-      expect(singlePartnerCardBtn.getAttribute('daa-ll')).to.equal(cards[0].contentArea.title);
     });
   });
 });
