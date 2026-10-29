@@ -44,10 +44,27 @@ export default {
     },
     {
       tcid: '4',
-      name: '@progress-widget-community-user',
-      path: '/digitalexperience/drafts/automation/regression/partnership-progress-widget?georouting=off&martech=off',
+      name: '@progress-widget-ui-silver-user',
+      path: '/digitalexperience/drafts/automation/regression/partnership-progress-widget',
       tags: '@da-dx-progress-widget @regression @circleCi',
-      data: { partnerLevel: 'dxp-community:' },
+      data: {
+        partnerLevel: 'dxp-silver:',
+        progressionLevel: 'GOLD',
+        dashboardURL: '/digitalexperience/m/manageprofile/companyinfo/partnership',
+        widgetVisible: true,
+      },
+    },
+    {
+      tcid: '5',
+      name: '@progress-widget-ui-gold-user',
+      path: '/digitalexperience/drafts/automation/regression/partnership-progress-widget',
+      tags: '@da-dx-progress-widget @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-gold:',
+        progressionLevel: 'PLATINUM',
+        dashboardURL: '/digitalexperience/m/manageprofile/companyinfo/partnership',
+        widgetVisible: true,
+      },
     },
   ],
 };
