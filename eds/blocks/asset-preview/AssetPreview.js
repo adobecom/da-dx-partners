@@ -284,6 +284,8 @@ export default class AssetPreview extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this
   _handleImgError = (e) => {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
     const img = e.currentTarget;
     // Guard against an infinite error loop if the fallback image also fails to load.
     if (img.dataset.fallbackApplied === 'true') return;
