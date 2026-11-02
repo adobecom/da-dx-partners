@@ -31,6 +31,7 @@ export default async function init(el) {
     '{{Credentials}}': 'Credentials',
     '{{Active Customer Deployments}}': 'Active Customer Deployments',
     '{{Exchange Marketplace listings}}': 'Exchange Marketplace listings',
+    '{{App Assured}}': 'App Assured',
   };
   populateLocalizedTextFromListItems(el, localizedText);
 

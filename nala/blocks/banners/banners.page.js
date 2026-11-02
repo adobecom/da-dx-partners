@@ -9,6 +9,12 @@ export default class BannersPage {
     this.globalBannerCta = this.globalBanner.getByRole('link', { name: 'here.' });
     this.bctqBannerSection = page.locator('[daa-lh^="s"]').filter({ hasText: 'Your BCTQ compliance will' });
     this.globalBannerSection = page.locator('[daa-lh^="s"]').filter({ hasText: 'Live chat is unavailable on' });
+    this.uplevelBanner = (level) => page.locator(`.uplevel-banner.partner-level-${level}`);
+    this.upgradeButton = (level) => this.uplevelBanner(level).getByRole('link', { name: 'Upgrade now' });
+    this.closeBannerButton = (level) => this.uplevelBanner(level).locator('button[daa-ll="Close Promotional Ba-2--Silver Uplevel Banne"]');
+    this.partnershipProgressBar = page.locator('partnership-progress');
+    this.solutionHeading = this.partnershipProgressBar.getByText('Solution', { exact: true });
+    this.technologyHeading = this.partnershipProgressBar.getByText('Technology', { exact: true });
   }
 
   parseDaaLhSectionNumber(daaLh = '') {

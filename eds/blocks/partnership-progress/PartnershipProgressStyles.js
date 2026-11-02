@@ -22,7 +22,7 @@ export const partnershipProgressStyles = css`
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
-    max-width: 800px;
+    max-width: 960px;
     margin: 0 auto;
   }
 
@@ -90,6 +90,20 @@ export const partnershipProgressStyles = css`
 
   .partnership-progress-metric-bar {
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .partnership-progress-metric-bar-inner {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .partnership-progress-metric-helper-text {
+    white-space: nowrap;
+    flex: 0 0 auto;
   }
 
   @media (max-width: 600px) {

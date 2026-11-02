@@ -7,10 +7,12 @@ import {
   getPartnerCookieValue,
   partnerCookieContainsValue,
   isReturningUser, isAccountLocked, isBctqExpiring, isPartnerNewlyApproved,
-  hasPartnerAccountStateCalendly, isAdobeAccount,
+  hasPartnerAccountStateCalendly, isAdobeAccount, matchesAccountNameMapping,
 } from './utils.js';
 import {
   DX_ACCESS_TYPE,
+  DX_ACCOUNT_NAME_CONDITION_PREFIX,
+  DX_ACCOUNT_NAME_MAPPING,
   DX_COMPLIANCE_STATUS, DX_DESIGNATION_TYPE,
   DX_PRIMARY_BUSINESS,
   DX_SPECIAL_STATE,
@@ -36,6 +38,13 @@ export const LEVEL_CONDITION = 'partner-level';
 export const PERSONALIZATION_MARKER = 'partner-personalization';
 export const PROCESSED_MARKER = '-processed';
 export const NEGATION_PREFIX = 'partner-not-';
+
+const ACCOUNT_NAME_CONDITIONS = Object.fromEntries(
+  Object.keys(DX_ACCOUNT_NAME_MAPPING).map((key) => [
+    `${DX_ACCOUNT_NAME_CONDITION_PREFIX}${key}`,
+    matchesAccountNameMapping(key),
+  ]),
+);
 
 export const PERSONALIZATION_CONDITIONS = {
   'partner-signed-in': partnerIsSignedIn(),
@@ -65,6 +74,7 @@ export const PERSONALIZATION_CONDITIONS = {
   'partner-newly-approved': isPartnerNewlyApproved(),
   'partner-account-state-calendly': hasPartnerAccountStateCalendly(),
   'partner-adobe-account': isAdobeAccount(),
+  ...ACCOUNT_NAME_CONDITIONS,
 };
 
 export const PROFILE_PERSONALIZATION_ACTIONS = {

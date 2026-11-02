@@ -697,5 +697,22 @@ test.describe('Search Page', () => {
         await expect(registrationPage).toHaveURL(data.link[0].url);
       });
     });
+
+    test(`${features[24].name},${features[24].tags}`, async ({ page }) => {
+      await test.step('Go to asset preview page', async () => {
+        await goTo(page, features[24].path);
+        await page.waitForLoadState('domcontentloaded');
+        await expect(searchPage.watchVideoButton).toBeVisible();
+        await expect(searchPage.searchAllAssetsButton).toBeVisible();
+      });
+
+      await test.step('Verify video player', async () => {
+        searchPage.watchVideoButton.click();
+        await expect(searchPage.videoPlayer).toHaveAttribute('isvideoplaying', '');
+
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect(searchPage.videoPlayer).not.toHaveAttribute('isvideoplaying');
+      });
+    });
   });
 });

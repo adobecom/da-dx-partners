@@ -278,13 +278,27 @@ export default {
     },
     {
       tcid: '27',
-      name: '@redirects-asset-redirect-stage-prod',
+      name: '@smoke-test-redirects-asset-redirect-stage-prod',
       path: '/digitalexperience/about',
       tags: '@da-dx-smoke-test',
       data: {
         assetRedirectCtaHref: '/digitalexperience/preview/restricted/1/program-guide.pdf.html',
         expectedLandingPath: ASSET_REDIRECT_TARGET,
       },
+    },
+    {
+      tcid: '28',
+      name: '@smoke-test-partner-agreement-popup',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: { partnerLevel: 'dxp-agreement:' },
+    },
+    {
+      tcid: '29',
+      name: '@smoke-test-px-icon-not-adobe-account',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: { partnerLevel: 'dxp-platinum:' },
     },
   ],
 };
