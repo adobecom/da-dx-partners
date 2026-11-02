@@ -9,10 +9,11 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { DX_PROGRAM_TYPE, DX_SPECIAL_STATE } from '../blocks/utils/dxConstants.js';
+import { DX_PROGRAM_TYPE, DX_SPECIAL_STATE, DX_ACCOUNT_NAME_MAPPING } from '../blocks/utils/dxConstants.js';
 
 const PARTNER_ERROR_REDIRECTS_COUNT_COOKIE = 'partner_redirects_count';
 const MAX_PARTNER_ERROR_REDIRECTS_COUNT = 3;
+const dxpRegions = ['australia-and-new-zealand', 'europe', 'latin-america', 'north-america', 'china', 'hong-kong', 'india', 'japan', 'korea', 'south-east-asia', 'uk'];
 export const PARTNER_LOGIN_QUERY = 'partnerLogin';
 export const CAAS_TAGS_URL = 'https://www.adobe.com/chimera-api/tags';
 export const SHOW_NEXT_POPUP = 'dxp:showNextPopup';
@@ -221,6 +222,21 @@ function getPartnerLevelParams(portal) {
   return `(${notConditions})`;
 }
 
+export function getUserRegionParams(portal) {
+  const userRegion = getPartnerCookieValue('region', portal);
+  if (!userRegion) {
+    return null;
+  }
+  const regionTagBase = 'caas:adobe-partners/px/region/';
+
+  // Build the NOT conditions for all regions (excluding the target one)
+  const notConditions = dxpRegions
+    .map((region) => `NOT+"${regionTagBase}${region}"`)
+    .join('+AND+');
+
+  return `("${regionTagBase}${userRegion}"+OR+(${notConditions}))`;
+}
+
 function checkForQaContent(el) {
   if (!el.children) return false;
 
@@ -256,6 +272,9 @@ function getComplexQueryParams(el) {
 
   const partnerLevelParams = getPartnerLevelParams(DX_PROGRAM_TYPE);
   if (partnerLevelParams) fullQuery += `${fullQuery.length > 0 ? '+AND+' : ''}${partnerLevelParams}`;
+
+  const regionParm = getUserRegionParams(DX_PROGRAM_TYPE);
+  if (regionParm) fullQuery += `${fullQuery.length > 0 ? '+AND+' : ''}${regionParm}`;
 
   return fullQuery;
 }
@@ -311,6 +330,19 @@ export function isMember() {
 export function hasPartnerAccountStateCalendly() {
   if (!isMember()) return false;
   return hasPartnerAccountStateProperty('calendly');
+}
+
+export function isAdobeAccount() {
+  if (!isMember()) return false;
+  return getPartnerCookieObject(getCurrentProgramType())?.email?.endsWith('@adobe.com');
+}
+
+export function matchesAccountNameMapping(key) {
+  if (!isMember()) return false;
+  const accountName = getPartnerCookieValue('accountname').trim();
+  if (!accountName) return false;
+  return (DX_ACCOUNT_NAME_MAPPING[key] ?? [])
+    .some((name) => name.trim().toLowerCase() === accountName);
 }
 
 export function isPartnerNewlyRegistered() {

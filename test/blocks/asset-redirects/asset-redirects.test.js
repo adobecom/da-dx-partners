@@ -27,4 +27,28 @@ describe('Asset redirects', () => {
     // Verify the block was removed (happens before redirect)
     expect(document.querySelector('.asset-redirects')).to.not.exist;
   });
+
+  it('should remove the block without redirecting when no rule matches', async () => {
+    const block = document.querySelector('.asset-redirects');
+    window.history.replaceState({}, '', '/digitalexperience/preview/no-match.html');
+
+    await init(block);
+
+    expect(document.querySelector('.asset-redirects')).to.not.exist;
+  });
+
+  it('should normalize spaces in authored redirect paths', async () => {
+    document.body.innerHTML = `
+      <div class="asset-redirects">
+        <div><div>/digitalexperience/preview/source file.html</div><div>/digitalexperience/preview/target file.html</div></div>
+        <div><div>only one column</div></div>
+      </div>
+    `;
+    const block = document.querySelector('.asset-redirects');
+    window.history.replaceState({}, '', '/digitalexperience/preview/source-file.html');
+
+    await init(block);
+
+    expect(document.querySelector('.asset-redirects')).to.not.exist;
+  });
 });

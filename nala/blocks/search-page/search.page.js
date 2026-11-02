@@ -50,6 +50,8 @@ export default class SearchPage {
     this.journeyPhaseHeader = page.locator('.filter', { has: page.getByRole('button', { name: 'Journey Phase' }) });
     this.errorHeading = page.locator('.heading-xxl');
     this.hubLogo = page.locator('a.feds-brand').filter({ has: page.locator('img[src*="px-hub-logo"]') });
+    this.watchVideoButton = page.getByRole('button', { name: 'Watch Video' });
+    this.videoPlayer = page.locator('asset-preview.asset-preview-block');
   }
 
   async getCardTitle() {

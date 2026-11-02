@@ -137,6 +137,17 @@ describe('search-full block', () => {
     expect(searchCardsWrapper.contentTypeCounter).to.deep.equal(mockSearchResponse.count);
   });
 
+  it('should apply authored block metadata to the search component', async () => {
+    document.querySelector('.search-full').parentNode.setAttribute('data-idx', '0');
+    const { searchCardsWrapper } = await setupAndCommonTest(1200);
+
+    expect(searchCardsWrapper.getAttribute('data-idx')).to.equal('0');
+    expect(searchCardsWrapper.getAttribute('daa-lh')).to.equal('Search Cards Section');
+    expect(searchCardsWrapper.blockData.cardsPerPage).to.equal(12);
+    expect(searchCardsWrapper.blockData.pagination).to.equal('default');
+    expect(searchCardsWrapper.blockData.localizedText['{{all}}']).to.equal('All');
+  });
+
   it('should render search cards for desktop', async () => {
     const { searchCardsWrapper } = await setupAndCommonTest(1500);
 

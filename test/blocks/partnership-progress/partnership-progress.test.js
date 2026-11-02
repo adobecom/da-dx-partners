@@ -1,0 +1,226 @@
+import { readFile } from '@web/test-runner-commands';
+import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
+import { setLibs } from '../../../eds/scripts/utils.js';
+import { waitFor } from '../../helpers/waitfor.js';
+
+const miloLibs = setLibs('/libs');
+const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
+const { render } = await import(`${miloLibs}/deps/lit-all.min.js`);
+setConfig({ locales: { '': { ietf: 'en-US' } }, miloLibs });
+const { default: PartnershipProgress } = await import('../../../eds/blocks/partnership-progress/PartnershipProgress.js');
+const { default: init } = await import('../../../eds/blocks/partnership-progress/partnership-progress.js');
+
+function setPartnerLevelCookie(level) {
+  document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { level } }))}; Path=/`;
+}
+
+function clearPartnerCookies() {
+  document.cookie = 'partner_data=; Max-Age=0; Path=/';
+  document.cookie = 'partner_info=; Max-Age=0; Path=/';
+}
+
+function renderToNode(template) {
+  const container = document.createElement('div');
+  render(template, container);
+  return container.firstElementChild;
+}
+
+describe('partnership-progress', () => {
+  beforeEach(async () => {
+    document.body.innerHTML = await readFile({ path: './mocks/body.html' });
+    clearPartnerCookies();
+    delete window.dxpImsReady;
+    window.adobeIMS = { getAccessToken: () => ({ token: 'test-token' }) };
+  });
+
+  afterEach(() => {
+    sinon.restore();
+    document.body.innerHTML = '';
+    delete window.adobeIMS;
+    delete window.dxpImsReady;
+    clearPartnerCookies();
+  });
+
+  it('replaces the authored block with a partnership-progress element', async () => {
+    const section = document.createElement('div');
+    section.setAttribute('data-idx', '0');
+
+    const block = document.createElement('div');
+    block.className = 'partnership-progress';
+    section.appendChild(block);
+    document.body.appendChild(section);
+
+    const app = await init(block);
+
+    expect(app.tagName.toLowerCase()).to.equal('partnership-progress');
+    expect(app.getAttribute('data-idx')).to.equal('0');
+    expect(app.className).to.equal('partnership-progress-block');
+  });
+
+  it('initializes the block and sets blockData', async () => {
+    const el = document.querySelector('.partnership-progress');
+    expect(el).to.exist;
+
+    el.parentNode.setAttribute('data-idx', '0');
+    const app = await init(el);
+
+    expect(app).to.exist;
+    expect(app.blockData).to.exist;
+    expect(app.className).to.equal('partnership-progress-block');
+  });
+
+  it('fetches data on imsReady and populates component state', async () => {
+    const apiResponse = {
+      solution: [{
+        level: 'gold',
+        customerDeployments: { percentage: 50 },
+        credentials: { percentage: 20 },
+        specializations: { percentage: 75 },
+      }],
+      technology: [{
+        level: 'gold',
+        customerDeployments: { percentage: 30 },
+        credentials: { percentage: 10 },
+        solutions: { percentage: 50 },
+      }],
+    };
+
+    const fetchStub = sinon.stub(window, 'fetch').resolves({
+      ok: true,
+      json: async () => apiResponse,
+    });
+
+    const el = document.querySelector('.partnership-progress');
+    el.parentNode.setAttribute('data-idx', '0');
+    const app = await init(el);
+
+    window.dispatchEvent(new Event('dxpImsReady'));
+    await waitFor(() => app.data && app.loading === false, 1000, 10);
+    await app.updateComplete;
+
+    expect(fetchStub.calledOnce).to.equal(true);
+    expect(app.data).to.deep.equal(apiResponse);
+    expect(app.loading).to.equal(false);
+  });
+
+  it('getProgramData returns target level data based on partner level', () => {
+    const instance = new PartnershipProgress();
+    instance.blockData = { localizedText: {} };
+    instance.data = {
+      solution: [
+        { level: 'gold', credentials: { percentage: 10 } },
+        { level: 'platinum', credentials: { percentage: 20 } },
+      ],
+    };
+
+    setPartnerLevelCookie('Silver');
+    const res = instance.getProgramData('solution');
+
+    expect(res).to.exist;
+    expect(res.level.toLowerCase()).to.equal('gold');
+  });
+
+  it('renderProgressBar clamps values between 0 and 100', () => {
+    const instance = new PartnershipProgress();
+
+    const low = renderToNode(instance.renderProgressBar(-10, 'low'));
+    expect(low.getAttribute('aria-valuenow')).to.equal('0');
+
+    const high = renderToNode(instance.renderProgressBar(150, 'high'));
+    expect(high.getAttribute('aria-valuenow')).to.equal('100');
+
+    const mid = renderToNode(instance.renderProgressBar(42, 'mid'));
+    expect(mid.getAttribute('aria-valuenow')).to.equal('42');
+  });
+});
+
+describe('App Assured progress', () => {
+  const localizedText = {
+    '{{Requirements}}': 'Requirements',
+    '{{Technology}}': 'Technology',
+    '{{Solution}}': 'Solution',
+    '{{Specializations}}': 'Specializations',
+    '{{Credentials}}': 'Credentials',
+    '{{Active Customer Deployments}}': 'Active Customer Deployments',
+    '{{App Assured}}': 'App Assured (localized)',
+  };
+
+  beforeEach(() => {
+    clearPartnerCookies();
+    setPartnerLevelCookie('Gold');
+  });
+
+  afterEach(() => {
+    clearPartnerCookies();
+    document.body.innerHTML = '';
+  });
+
+  const createElement = (programData, programType = 'technology') => {
+    const element = new PartnershipProgress();
+    element.blockData = { localizedText };
+    element.data = { [programType]: [programData] };
+    return element;
+  };
+
+  it('renders the localized App Assured metric for technology programs', () => {
+    const element = createElement({
+      level: 'platinum',
+      appAssurances: {
+        total: 2,
+        required: 4,
+        percentage: 50,
+      },
+    });
+
+    const node = renderToNode(element.renderProgramProgress('Technology', 'technology'));
+    const progressBar = node.querySelector('[aria-label="App Assured (localized)"]');
+
+    expect(node.textContent).to.contain('App Assured (localized)');
+    expect(node.textContent).to.contain('2 of 4 required');
+    expect(progressBar).to.exist;
+    expect(progressBar.getAttribute('aria-valuenow')).to.equal('50');
+  });
+
+  it('does not render App Assured when the metric is missing', () => {
+    const element = createElement({
+      level: 'platinum',
+      credentials: { percentage: 25 },
+    });
+
+    const node = renderToNode(element.renderProgramProgress('Technology', 'technology'));
+
+    expect(node.textContent).not.to.contain('App Assured (localized)');
+    expect(node.querySelector('[aria-label="App Assured (localized)"]')).to.equal(null);
+  });
+
+  it('does not render App Assured for solution programs', () => {
+    const element = createElement({
+      level: 'platinum',
+      appAssurances: {
+        total: 2,
+        required: 4,
+        percentage: 50,
+      },
+    }, 'solution');
+
+    const node = renderToNode(element.renderProgramProgress('Solution', 'solution'));
+
+    expect(node.textContent).not.to.contain('App Assured (localized)');
+    expect(node.querySelector('[aria-label="App Assured (localized)"]')).to.equal(null);
+  });
+
+  it('does not render App Assured for silver partners', () => {
+    setPartnerLevelCookie('Silver');
+    const element = createElement({
+      level: 'gold',
+      credentials: { total: 1, required: 2, percentage: 50 },
+    });
+
+    const node = renderToNode(element.renderProgramProgress('Technology', 'technology'));
+
+    expect(node.textContent).to.contain('Credentials');
+    expect(node.textContent).not.to.contain('App Assured (localized)');
+    expect(node.querySelector('[aria-label="App Assured (localized)"]')).to.equal(null);
+  });
+});

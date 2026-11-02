@@ -4622,6 +4622,26 @@
       "product-implementation": {
         "jcr:primaryType": "cq:Tag",
         "jcr:title": "Product Implementation"
+      },
+      "bacom-webinars": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "BACOM webinars"
+      },
+      "bacom-webinars-light-hero": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "BACOM Webinars - Light Hero"
+      },
+      "bacom-webinars-dark-hero": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "BACOM Webinars - Dark Hero"
+      },
+      "adobe-ai-forum": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "Adobe AI Forum"
+      },
+      "solution-ready-enablement": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "Solution Ready Enablement"
       }
     },
     "conference": {
@@ -5662,7 +5682,7 @@
     },
     "brand-intelligence": {
       "jcr:primaryType": "cq:Tag",
-      "jcr:title": "Brand Intelligence"
+      "jcr:title": "Adobe Brand Intelligence"
     },
     "photoshop-elements": {
       "jcr:primaryType": "cq:Tag",
@@ -5686,7 +5706,31 @@
     },
     "brand-visibility": {
       "jcr:primaryType": "cq:Tag",
-      "jcr:title": "Brand Visibility"
+      "jcr:title": "Adobe Brand Visibility"
+    },
+    "adobe-journey-optimizer-loyalty": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adobe Journey Optimizer Loyalty"
+    },
+    "cold-fusion": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Cold Fusion"
+    },
+    "creative-cloud-desktop": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Creative Cloud Desktop"
+    },
+    "creative-cloud-installer": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Creative Cloud Installer"
+    },
+    "presenter": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Presenter"
+    },
+    "creative-cloud-video-player": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Creative Cloud Video Player"
     }
   },
   "product-categories": {
@@ -6103,6 +6147,42 @@
     "photoshop-express": {
       "jcr:primaryType": "cq:Tag",
       "jcr:title": "Photoshop Express"
+    },
+    "incopy": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "InCopy"
+    },
+    "dreamweaver": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Dreamweaver"
+    },
+    "coldfusion": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "ColdFusion"
+    },
+    "connect": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Connect"
+    },
+    "framemaker": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "FrameMaker"
+    },
+    "adobe-media-encoder": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adobe Media Encoder"
+    },
+    "adobe-dng-sdk": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adobe DNG SDK"
+    },
+    "adobe-format-plugin": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adobe Format Plugin"
+    },
+    "content-credentials-sdk": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Content Credentials SDK"
     }
   },
   "audience": {
@@ -7102,6 +7182,10 @@
     "job-search": {
       "jcr:primaryType": "cq:Tag",
       "jcr:title": "Job Search"
+    },
+    "customer-zero": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Customer Zero"
     }
   },
   "technical-level": {
@@ -7298,6 +7382,10 @@
     "americas": {
       "jcr:primaryType": "cq:Tag",
       "jcr:title": "Americas"
+    },
+    "europe": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Europe"
     }
   },
   "related-product": {
@@ -7871,6 +7959,10 @@
           "b2b-agentic-content-supply-chain": {
             "jcr:primaryType": "cq:Tag",
             "jcr:title": "B2B Agentic Content Supply Chain"
+          },
+          "b2c-brand-visibility": {
+            "jcr:primaryType": "cq:Tag",
+            "jcr:title": "B2C Brand Visibility"
           }
         },
         "strategic": {
@@ -8048,6 +8140,54 @@
         "program-newsletter": {
           "jcr:primaryType": "cq:Tag",
           "jcr:title": "Program Newsletter"
+        }
+      },
+      "region": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "Region",
+        "japan": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "Japan"
+        },
+        "australia-and-new-zealand": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "Australia and New Zealand"
+        },
+        "europe": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "Europe"
+        },
+        "latin-america": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "Latin America"
+        },
+        "north-america": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "North America"
+        },
+        "china": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "China"
+        },
+        "hong-kong": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "Hong Kong"
+        },
+        "india": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "India"
+        },
+        "korea": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "Korea"
+        },
+        "uk": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "UK"
+        },
+        "south-east-asia": {
+          "jcr:primaryType": "cq:Tag",
+          "jcr:title": "South East Asia"
         }
       }
     }
@@ -10237,6 +10377,14 @@
       "brand-concierge": {
         "jcr:primaryType": "cq:Tag",
         "jcr:title": "Brand Concierge"
+      },
+      "acrobat-studio": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "Acrobat Studio"
+      },
+      "adobe-brand-intelligence": {
+        "jcr:primaryType": "cq:Tag",
+        "jcr:title": "Adobe Brand Intelligence"
       }
     },
     "milo-card": {
@@ -10246,6 +10394,14 @@
     "security-bulletin": {
       "jcr:primaryType": "cq:Tag",
       "jcr:title": "Security Bulletin"
+    },
+    "compliance-certification": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Compliance Certification"
+    },
+    "accessibility": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Accessibility"
     }
   },
   "file-format": {
@@ -10586,6 +10742,382 @@
     "higher-ed": {
       "jcr:primaryType": "cq:Tag",
       "jcr:title": "Higher Ed"
+    }
+  },
+  "blog-author": {
+    "jcr:primaryType": "cq:Tag",
+    "jcr:title": "Blog Author",
+    "adobe-for-business-team": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adobe for Business Team"
+    },
+    "brian-chidester": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Brian Chidester"
+    },
+    "vivek-pandya": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Vivek Pandya"
+    },
+    "saibal-bhattacharjee": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Saibal Bhattacharjee"
+    },
+    "hannah-elsakr": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Hannah Elsakr"
+    },
+    "kyle-gesuelli": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Kyle Gesuelli"
+    },
+    "ankur-jain": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Ankur Jain"
+    },
+    "adobe-events-team": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adobe Events Team"
+    },
+    "aaron-mitchell-finegold": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Aaron Mitchell Finegold"
+    },
+    "alyssa-espiritu": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Alyssa Espiritu"
+    },
+    "ed-kennedy": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Ed Kennedy"
+    },
+    "marie-knight": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Marie Knight"
+    },
+    "elliot-sedegah": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Elliot Sedegah"
+    },
+    "varun-parmar": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Varun Parmar"
+    },
+    "anoop-sahgal": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Anoop Sahgal"
+    },
+    "shelly-chiang": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Shelly Chiang"
+    },
+    "ryan-fleisch": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Ryan Fleisch"
+    },
+    "akintunde-ajayi": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Akintunde Ajayi"
+    },
+    "huong-vu": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Huong Vu"
+    },
+    "karishma-phansalkar": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Karishma Phansalkar"
+    },
+    "sunil-menon": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Sunil Menon"
+    },
+    "emily-mcreynolds": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Emily Mcreynolds"
+    },
+    "tina-ngo": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Tina Ngo"
+    },
+    "rohit-bansal": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Rohit Bansal"
+    },
+    "peter-parker": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Peter Parker"
+    },
+    "pierre-tapia": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Pierre Tapia"
+    },
+    "adobe-support-and-success-team": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adobe Support And Success Team"
+    },
+    "lory-mishra": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Lory Mishra"
+    },
+    "jason-hickey": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Jason Hickey"
+    },
+    "ariel-sultan": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Ariel Sultan"
+    },
+    "julie-hoffmann": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Julie Hoffmann"
+    },
+    "loni-stark": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Loni Stark"
+    },
+    "karthik-muralidharan": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Karthik Muralidharan"
+    },
+    "christopher-young": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Christopher Young"
+    },
+    "marissa-dacay": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Marissa Dacay"
+    },
+    "nicole-gibson": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Nicole Gibson"
+    },
+    "brent-kostak": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Brent Kostak"
+    },
+    "anjul-bhambhri": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Anjul Bhambhri"
+    },
+    "surbhit-jain": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Surbhit Jain"
+    },
+    "stephen-frieder": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Stephen Frieder"
+    },
+    "clayton-smith": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Clayton Smith"
+    },
+    "kay-sin": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Kay Sin"
+    },
+    "danial-kafeel": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Danial Kafeel"
+    },
+    "nathan-etter": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Nathan Etter"
+    },
+    "kathie-yang": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Kathie Yang"
+    },
+    "amit-ahuja": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Amit Ahuja"
+    },
+    "lily-chiu-watson": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Lily Chiu Watson"
+    },
+    "adrienne-tsai": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adrienne Tsai"
+    },
+    "nishthaa-bhardwaj": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Nishthaa Bhardwaj"
+    },
+    "nina-caruso": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Nina Caruso"
+    },
+    "alex-erickson": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Alex Erickson"
+    },
+    "rachel-thornton": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Rachel Thornton"
+    },
+    "jodi-simmons": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Jodi Simmons"
+    },
+    "megan-lazalier": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Megan Lazalier"
+    },
+    "anshuman-nangia": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Anshuman Nangia"
+    },
+    "alok-ojha": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Alok Ojha"
+    },
+    "aditi-dash-": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Aditi Dash "
+    },
+    "horia-galatanu": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Horia Galatanu"
+    },
+    "david-kao": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "David Kao"
+    },
+    "joy-bhattacharya": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Joy Bhattacharya"
+    },
+    "hannah-browne": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Hannah Browne"
+    },
+    "brad-bedford": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Brad Bedford"
+    },
+    "sanjay-vachani": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Sanjay Vachani"
+    },
+    "sneha-chowdhary": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Sneha Chowdhary"
+    },
+    "reid-carlberg": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Reid Carlberg"
+    },
+    "ravi-duddukuru": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Ravi Duddukuru"
+    },
+    "paul-vaughn": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Paul Vaughn"
+    },
+    "abhigyan-modi": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Abhigyan Modi"
+    },
+    "andy-lauta": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Andy Lauta"
+    },
+    "pranav-parekh": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Pranav Parekh"
+    },
+    "lisa-croft": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Lisa Croft"
+    },
+    "john-mackenney": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "John Mackenney"
+    },
+    "katsue-koiwa": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Katsue Koiwa"
+    },
+    "nabila-coovadi": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Nabila Coovadi"
+    },
+    "adam-justis": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adam Justis"
+    },
+    "tyler-hogue": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Tyler Hogue"
+    },
+    "brian-glover": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Brian Glover"
+    },
+    "toni-van-winkle": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Toni Van Winkle"
+    },
+    "claudia-de-lavelle": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Claudia de Lavelle"
+    },
+    "mitch-folks": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Mitch Folks"
+    },
+    "camille-fabre": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Camille Fabre"
+    },
+    "shweta-ahooja": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Shweta Ahooja"
+    },
+    "michi-alexander": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Michi Alexander"
+    },
+    "amanda-cabrera": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Amanda Cabrera"
+    },
+    "pat-toothaker": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Pat Toothaker"
+    },
+    "patrick-brown": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Patrick Brown"
+    },
+    "stacy-martinet": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Stacy Martinet"
+    }
+  },
+  "services": {
+    "jcr:primaryType": "cq:Tag",
+    "jcr:title": "Services",
+    "admin-console": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Admin Console"
+    },
+    "adobe-exchange": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adobe Exchange"
+    },
+    "adobe-status": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Adobe Status"
+    },
+    "developer-console": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Developer Console"
+    },
+    "developer-distribution": {
+      "jcr:primaryType": "cq:Tag",
+      "jcr:title": "Developer Distribution"
     }
   }
 }
