@@ -596,7 +596,7 @@ test.describe('Validate Partner Directory pages', () => {
         await downloadButton.waitFor({ state: 'visible', timeout: 30000 });
         const downloadLink = downloadButton.locator('a');
         const href = await downloadLink.getAttribute('href');
-        expect(href).toContain(data.expectedURL);
+        expect(new URL(href).pathname).toContain(data.expectedURL);
       });
 
       await test.step('Click View button and verify asset opens successfully', async () => {
@@ -620,15 +620,14 @@ test.describe('Validate Partner Directory pages', () => {
       await page.goto(`${baseURL}${path}`);
       await page.waitForLoadState('domcontentloaded');
 
-      const isStage = baseURL.includes('stage');
-      const expectedURL = isStage
-        ? `${baseURL}${path}`
-        : `${baseURL}${data.expectedURL}`;
+      const expectedURL = `${baseURL}${data.expectedURL}`;
 
       await expect(page).toHaveURL(
         new RegExp(`${expectedURL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}#?$`),
         { timeout: 30000 },
       );
+
+      const isStage = baseURL.includes('stage');
 
       if (isStage) {
         return;
