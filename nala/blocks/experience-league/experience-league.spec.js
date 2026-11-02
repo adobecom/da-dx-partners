@@ -1,4 +1,4 @@
-const PREVIEW_URL = 'https://experienceleague.stage.adobe.com/en/docs/advertising/dsp/home';
+const PREVIEW_URL = 'https://experienceleague.adobe.com/en/docs/advertising/dsp/home';
 
 export default {
   FeatureName: 'Experience League Page',
@@ -26,7 +26,7 @@ export default {
       tcid: '2',
       name: '@experience-league-search-page-metadata-validation',
       path: '/digitalexperience/drafts/automation/regression/search-page?georouting=off&martech=off',
-      tags: '@da-dx-search-page @da-dx-card-collection @regression @circleCi',
+      tags: '@da-dx-search-page @regression @circleCi',
       data: {
         partnerLevel: 'dxp-community:',
         searchKeyword: 'Automation Regression Experience League Page',

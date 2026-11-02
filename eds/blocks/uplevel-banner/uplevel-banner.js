@@ -6,7 +6,9 @@ const miloLibs = getLibs();
 
 const LEVEL_MAP = { silver: 'gold', gold: 'platinum' };
 
-const isFullyCompleted = (obj, fields) => fields.every((field) => obj?.[field]?.percentage === 100);
+const isFullyCompleted = (obj, fields) => fields.every(
+  (field) => obj?.[field]?.percentage === 100,
+);
 
 export function getTargetLevel(data) {
   const currentLevel = data.level?.toLowerCase();
@@ -14,15 +16,16 @@ export function getTargetLevel(data) {
   if (currentLevel !== 'silver' && currentLevel !== 'gold') return null;
 
   const targetLevel = LEVEL_MAP[currentLevel];
-
   // eslint-disable-next-line max-len
   const solutionItem = (data.solution || []).find((item) => item.level?.toLowerCase() === targetLevel);
   const solutionValid = isFullyCompleted(solutionItem, ['credentials', 'customerDeployments', 'specializations']);
 
   if (!solutionValid) {
-    // eslint-disable-next-line max-len
-    const technologyItem = (data.technology || []).find((item) => item.level?.toLowerCase() === targetLevel);
-    const technologyValid = isFullyCompleted(technologyItem, ['credentials', 'customerDeployments', 'solutions']);
+    const technologyItem = (data.technology || []).find(
+      (item) => item.level?.toLowerCase() === targetLevel,
+    );
+    const technologyValid = isFullyCompleted(technologyItem, ['credentials', 'customerDeployments', 'solutions'])
+      && (!technologyItem?.appAssurances || isFullyCompleted(technologyItem, ['appAssurances']));
     if (!technologyValid) return null;
   }
 
