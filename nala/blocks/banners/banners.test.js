@@ -7,6 +7,65 @@ let bannersPage;
 let signInPage;
 const { features } = banners;
 
+const mockProgress = async (page, type, appAssurancesPercentage = 100) => {
+  await page.route('**/level-requirements**', async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+
+    const mockedBody = {
+      ...body,
+
+      [type]: body[type].map((level) => ({
+        ...level,
+
+        customerDeployments: {
+          ...level.customerDeployments,
+          total: level.customerDeployments.required,
+          percentage: 100,
+        },
+
+        credentials: {
+          ...level.credentials,
+          total: level.credentials.required,
+          percentage: 100,
+        },
+
+        ...(type === 'solution' && {
+          specializations: {
+            ...level.specializations,
+            total: level.specializations.required,
+            percentage: 100,
+          },
+        }),
+
+        ...(type === 'technology' && {
+          solutions: {
+            ...level.solutions,
+            total: level.solutions.required,
+            percentage: 100,
+          },
+
+          ...(level.appAssurances && {
+            appAssurances: {
+              ...level.appAssurances,
+              total:
+                appAssurancesPercentage === 100
+                  ? level.appAssurances.required
+                  : level.appAssurances.required / 2,
+              percentage: appAssurancesPercentage,
+            },
+          }),
+        }),
+      })),
+    };
+
+    await route.fulfill({
+      response,
+      json: mockedBody,
+    });
+  });
+};
+
 test.describe('Validate banners block', () => {
   test.beforeEach(async ({ page, baseURL, context, browserName }) => {
     bannersPage = new BannersPage(page);
@@ -107,6 +166,153 @@ test.describe('Validate banners block', () => {
           && globalSectionNumber !== null
           && globalSectionNumber > bctqSectionNumber;
       }, { timeout: 30000 }).toBe(true);
+    });
+  });
+
+  test(`${features[3].name},${features[3].tags}`, async ({ page, baseURL }) => {
+    const { data } = features[3];
+    await mockProgress(page, 'solution');
+
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${features[3].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+    });
+
+    await test.step('Sign in as Silver user', async () => {
+      await signInPage.signIn(page, `${features[3].data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Verify uplevel banner', async () => {
+      await expect(bannersPage.uplevelBanner('silver')).toBeVisible();
+      await expect(bannersPage.uplevelBanner('silver')).toContainText(data.uplevelBannerText);
+      await expect(bannersPage.upgradeButton('silver')).toBeVisible();
+      const href = await bannersPage.upgradeButton('silver').getAttribute('href');
+      expect(new URL(href, baseURL).pathname).toBe(data.ctaLink);
+    });
+
+    await test.step('Verify banner after close and reload', async () => {
+      await expect(bannersPage.closeBannerButton('silver')).toBeVisible();
+      await bannersPage.closeBannerButton('silver').click();
+      await page.reload();
+      await expect(bannersPage.uplevelBanner('silver')).toBeVisible({ timeout: 30000 });
+    });
+  });
+
+  test(`${features[4].name},${features[4].tags}`, async ({ page, baseURL }) => {
+    const { data } = features[4];
+    await mockProgress(page, 'technology');
+
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${features[4].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+    });
+
+    await test.step('Sign in as Gold user', async () => {
+      await signInPage.signIn(page, `${features[4].data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+    });
+
+    await test.step('Verify uplevel banner', async () => {
+      await expect(bannersPage.uplevelBanner('gold')).toBeVisible({ timeout: 30000 });
+      await expect(bannersPage.uplevelBanner('gold')).toContainText(data.uplevelBannerText);
+      await expect(bannersPage.upgradeButton('gold')).toBeVisible();
+      const href = await (bannersPage.upgradeButton('gold')).getAttribute('href');
+      expect(new URL(href, baseURL).pathname).toBe(data.ctaLink);
+    });
+  });
+
+  test(`${features[5].name},${features[5].tags}`, async ({ page }) => {
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${features[5].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+    });
+
+    await test.step('Sign in as Silver user', async () => {
+      await signInPage.signIn(page, `${features[5].data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(bannersPage.partnershipProgressBar).toBeVisible({ timeout: 30000 });
+    });
+
+    await test.step('Verify uplevel banner not visible on the page', async () => {
+      await expect(bannersPage.uplevelBanner('silver')).not.toBeVisible();
+      await page.reload();
+      await expect(bannersPage.uplevelBanner('silver')).not.toBeVisible();
+    });
+
+    await test.step('Verify uplevel banner not visible when App Assured is under 100%', async () => {
+      await expect(bannersPage.uplevelBanner('silver')).not.toBeVisible();
+    });
+  });
+
+  test(`${features[6].name},${features[6].tags}`, async ({ page }) => {
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${features[6].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+    });
+
+    await test.step('Sign in as Gold user', async () => {
+      await signInPage.signIn(page, `${features[6].data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(bannersPage.partnershipProgressBar).toBeVisible({ timeout: 30000 });
+      await expect(bannersPage.solutionHeading).toBeVisible();
+      await expect(bannersPage.technologyHeading).toBeVisible();
+    });
+
+    await test.step('Verify uplevel banner not visible on the page', async () => {
+      await expect(bannersPage.uplevelBanner('gold')).not.toBeVisible();
+    });
+  });
+
+  test(`${features[7].name},${features[7].tags}`, async ({ page, baseURL }) => {
+    const { data } = features[7];
+    await mockProgress(page, 'solution');
+
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${features[7].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+    });
+
+    await test.step('Sign in as Silver user', async () => {
+      await signInPage.signIn(page, `${features[7].data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(bannersPage.partnershipProgressBar).toBeVisible({ timeout: 30000 });
+      await expect(bannersPage.solutionHeading).toBeVisible();
+      await expect(bannersPage.technologyHeading).toBeVisible();
+    });
+
+    await test.step('Verify uplevel banner on the page', async () => {
+      await expect(bannersPage.uplevelBanner('silver')).toBeVisible({ timeout: 30000 });
+      await expect(bannersPage.upgradeButton('silver')).toBeVisible();
+      const href = await bannersPage.upgradeButton('silver').getAttribute('href');
+      expect(new URL(href, baseURL).pathname).toBe(data.ctaLink);
+    });
+  });
+
+  test(`${features[8].name},${features[6].tags}`, async ({ page }) => {
+    await mockProgress(page, 'technology', 50);
+
+    await test.step('Go to public home page', async () => {
+      await page.goto(`${features[6].path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+    });
+
+    await test.step('Sign in as Gold user', async () => {
+      await signInPage.signIn(page, `${features[6].data.partnerLevel}`);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(bannersPage.partnershipProgressBar).toBeVisible({ timeout: 30000 });
+      await expect(bannersPage.solutionHeading).toBeVisible();
+      await expect(bannersPage.technologyHeading).toBeVisible();
+    });
+
+    await test.step('Verify uplevel banner not visible on the page', async () => {
+      await expect(bannersPage.uplevelBanner('gold')).not.toBeVisible();
     });
   });
 });

@@ -8,6 +8,31 @@ const newUserSegments = features.slice(7, 10);
 let gnavPersonalisationPage;
 let signInPage;
 
+const setupNewlyApprovedTest = async ({ page, baseURL, context, data, path }) => {
+  await test.step('Go to the page', async () => {
+    await page.goto(`${baseURL}${path}`);
+    await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
+  });
+
+  await test.step('Set partner_data cookie', async () => {
+    const newlyApprovedDate = gnavPersonalisationPage
+      .generateDateWithDaysOffset(data.partnerData.newlyApprovedDate)
+      .getTime()
+      .toString();
+
+    await signInPage.addCookie(
+      data.partnerData.partnerPortal,
+      data.partnerData.partnerLevel,
+      `${baseURL}${path}`,
+      context,
+      { ...data.partnerData, newlyApprovedDate },
+    );
+
+    await page.reload();
+    await page.waitForLoadState('domcontentloaded');
+  });
+};
+
 test.describe('Gnav Personalisation', () => {
   test.beforeEach(async ({ page, baseURL, context, browserName }) => {
     gnavPersonalisationPage = new GnavPersonalisationPage(page);
@@ -568,6 +593,66 @@ test.describe('Gnav Personalisation', () => {
 
     await test.step('Validate About tab on mobile restricted GNav', async () => {
       await gnavPersonalisationPage.verifyMobileRestrictedGnavAboutTab();
+    });
+  });
+  test(`${features[23].name},${features[23].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[23];
+
+    await setupNewlyApprovedTest({ page, baseURL, context, data, path });
+
+    await test.step('Verify segments on the page', async () => {
+      await gnavPersonalisationPage.newlyApprovedBanner.waitFor({ state: 'visible' });
+      await expect(gnavPersonalisationPage.newlyApprovedBanner).toBeVisible();
+    });
+  });
+
+  test(`${features[24].name},${features[24].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[24];
+
+    await setupNewlyApprovedTest({ page, baseURL, context, data, path });
+
+    await test.step('Verify segments on the page', async () => {
+      await gnavPersonalisationPage.newlyApprovedBanner.waitFor({ state: 'visible' });
+      await expect(gnavPersonalisationPage.newlyApprovedBanner).toBeVisible();
+    });
+  });
+
+  test(`${features[25].name},${features[25].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[25];
+
+    await setupNewlyApprovedTest({ page, baseURL, context, data, path });
+
+    await test.step('Verify segments not present on the page', async () => {
+      await expect(gnavPersonalisationPage.newlyApprovedBanner).not.toBeVisible();
+    });
+  });
+
+  test(`${features[26].name},${features[26].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[26];
+
+    await test.step('Go to home page on mobile viewport', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(gnavPersonalisationPage.nonSignedPartnerBanner).toBeVisible({ timeout: 30000 });
+    });
+
+    await test.step('Sign in as Gold user', async () => {
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(gnavPersonalisationPage.signedPartnerBanner).toBeVisible({ timeout: 30000 });
+    });
+  });
+
+  test(`${features[27].name},${features[27].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[27];
+
+    await setupNewlyApprovedTest({ page, baseURL, context, data, path });
+
+    await test.step('Verify segments on the page', async () => {
+      await expect(gnavPersonalisationPage.pxTeamButton).toBeVisible({ timeout: 30000 });
     });
   });
 });

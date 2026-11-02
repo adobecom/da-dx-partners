@@ -1,5 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 import { setLibs } from '../../eds/scripts/utils.js';
+import { PERSONALIZATION_CONDITIONS } from '../../eds/scripts/personalizationConfigDX.js';
 import {
   applyGnavPersonalization,
   personalizeMainNav,
@@ -108,6 +109,26 @@ describe('personalization browser coverage', () => {
 
     expect(shouldHideLinkGroup(marked)).to.equal(true);
     expect(shouldHideLinkGroup(unmarked)).to.equal(false);
+  });
+
+  it('hides and reveals content for Adobe account personalization segments', () => {
+    const originalAdobeAccount = PERSONALIZATION_CONDITIONS['partner-adobe-account'];
+    const adobeBlock = document.createElement('div');
+    adobeBlock.className = 'partner-personalization partner-adobe-account';
+    const negatedAdobeBlock = document.createElement('div');
+    negatedAdobeBlock.className = 'partner-personalization partner-not-adobe-account';
+
+    try {
+      PERSONALIZATION_CONDITIONS['partner-adobe-account'] = true;
+      expect(shouldHideLinkGroup(adobeBlock)).to.equal(false);
+      expect(shouldHideLinkGroup(negatedAdobeBlock)).to.equal(true);
+
+      PERSONALIZATION_CONDITIONS['partner-adobe-account'] = false;
+      expect(shouldHideLinkGroup(adobeBlock)).to.equal(true);
+      expect(shouldHideLinkGroup(negatedAdobeBlock)).to.equal(false);
+    } finally {
+      PERSONALIZATION_CONDITIONS['partner-adobe-account'] = originalAdobeAccount;
+    }
   });
 
   it('replaces a profile image after the profile image is available', async () => {

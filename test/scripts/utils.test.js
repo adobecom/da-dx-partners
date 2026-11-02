@@ -13,6 +13,7 @@ import {
   getProgramType,
   getUserRegionParams,
   isMember,
+  matchesAccountNameMapping,
   setLibs,
 } from '../../eds/scripts/utils.js';
 
@@ -111,6 +112,26 @@ describe('utils browser coverage', () => {
     expect(getPartnerCookieValue('status')).to.equal('member');
     expect(getUserRegionParams('dxp')).to.contain('region/europe');
     expect(isMember()).to.equal(true);
+  });
+
+  it('matches account names against the account name mapping', () => {
+    document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { status: 'MEMBER' } }))}; Path=/`;
+    document.cookie = `partner_info=${encodeURIComponent(JSON.stringify({ accountName: 'ACCENTURE etla' }))}; Path=/`;
+
+    expect(matchesAccountNameMapping('accenture')).to.equal(true);
+    expect(matchesAccountNameMapping('accenture-etla')).to.equal(true);
+    expect(matchesAccountNameMapping('accenture-plc')).to.equal(false);
+    expect(matchesAccountNameMapping('unknown-key')).to.equal(false);
+  });
+
+  it('does not match account names for non-members or missing account names', () => {
+    document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { status: 'NOT_PARTNER' } }))}; Path=/`;
+    document.cookie = `partner_info=${encodeURIComponent(JSON.stringify({ accountName: 'Accenture PLC' }))}; Path=/`;
+    expect(matchesAccountNameMapping('accenture-plc')).to.equal(false);
+
+    document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { status: 'MEMBER' } }))}; Path=/`;
+    document.cookie = `partner_info=${encodeURIComponent(JSON.stringify({ company: 'Accenture PLC' }))}; Path=/`;
+    expect(matchesAccountNameMapping('accenture-plc')).to.equal(false);
   });
 
   it('handles state cookies, metadata, XPath, and deletion', () => {
