@@ -620,15 +620,14 @@ test.describe('Validate Partner Directory pages', () => {
       await page.goto(`${baseURL}${path}`);
       await page.waitForLoadState('domcontentloaded');
 
-      const isStage = baseURL.includes('stage');
-      const expectedURL = isStage
-        ? `${baseURL}${path}`
-        : `${baseURL}${data.expectedURL}`;
+      const expectedURL = `${baseURL}${data.expectedURL}`;
 
       await expect(page).toHaveURL(
         new RegExp(`${expectedURL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}#?$`),
         { timeout: 30000 },
       );
+
+      const isStage = baseURL.includes('stage');
 
       if (isStage) {
         return;
