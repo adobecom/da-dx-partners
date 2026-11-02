@@ -596,7 +596,7 @@ test.describe('Validate Partner Directory pages', () => {
         await downloadButton.waitFor({ state: 'visible', timeout: 30000 });
         const downloadLink = downloadButton.locator('a');
         const href = await downloadLink.getAttribute('href');
-        expect(href).toContain(data.expectedURL);
+        expect(new URL(href).pathname).toContain(data.expectedURL);
       });
 
       await test.step('Click View button and verify asset opens successfully', async () => {
