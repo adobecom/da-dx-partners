@@ -15,6 +15,7 @@ function customReporter() {
   };
 }
 export default {
+  concurrency: 1,
   coverageConfig: {
     exclude: [
       '**/mocks/**',
