@@ -1,19 +1,6 @@
 import AssetPreview from './AssetPreview.js';
 import { getConfig, populateLocalizedTextFromListItems, replaceText, keepInlineFragmentInDOM } from '../utils/utils.js';
-
-const AEM_AUTHOR_HOSTS = [
-  'dx-partner-author.prod.corp.adobe.com',
-  'dx-partner-author.stage2.corp.adobe.com',
-  'dx-partner-author.qa01.corp.adobe.com',
-  'dx-partner-author.dev02.corp.adobe.com',
-];
-
-const EDS_DEV_SERVER_PORT = '3000';
-
-function isAemHost(hostname, port) {
-  if (AEM_AUTHOR_HOSTS.includes(hostname)) return true;
-  return hostname === 'localhost' && port !== EDS_DEV_SERVER_PORT;
-}
+import { isAemAuthorHost } from '../../scripts/utils.js';
 
 function declareAssetPreview() {
   if (customElements.get('asset-preview')) return;
@@ -30,7 +17,7 @@ async function localizationPromises(localizedText, config) {
 export default async function init(el) {
   performance.mark('asset-preview:start');
 
-  const isAEM = isAemHost(window.location.hostname, window.location.port);
+  const isAEM = isAemAuthorHost(window.location.origin);
   const config = isAEM ? null : getConfig();
 
   const sectionIndex = el.parentNode?.getAttribute('data-idx');

@@ -802,7 +802,7 @@ describe('AssetPreview - getRealAssetUrl()', () => {
     try {
       ['chapter=1&t=1.001', 'chapter=1', 't=1.001'].forEach((query) => {
         window.history.replaceState(null, '', `/digitalexperience/preview/video.html?${query}&asset=example`);
-        const metadataUrl = new AssetPreview().getRealAssetUrl();
+        const metadataUrl = makeInstance().getRealAssetUrl();
 
         expect(metadataUrl.searchParams.has('chapter')).to.be.false;
         expect(metadataUrl.searchParams.has('t')).to.be.false;

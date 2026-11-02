@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
+import { CAAS_TAGS_URL, getEdsOrigin, getLibs, prodHosts } from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,
@@ -18,7 +18,7 @@ const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.
 const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 await Promise.all([
   import('../../components/LoadingSpinner.js'),
-  loadStyle('/eds/components/LoadingSpinner.css'),
+  loadStyle(`${getEdsOrigin()}/eds/components/LoadingSpinner.css`),
 ]);
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
@@ -257,20 +257,22 @@ export default class AssetPreview extends LitElement {
   }
 
   getRealAssetUrl() {
+    const { search, origin, href, host } = window.location;
+
     if (this.blockData.isAEM) {
-      const assetPath = new URLSearchParams(window.location.search).get('assetPath') || '';
+      const assetPath = new URLSearchParams(search).get('assetPath') || '';
       if (!assetPath.startsWith('/content/dam/')) return null;
       try {
-        return new URL(`${window.location.origin}${assetPath}.assetmetadata.json`);
+        return new URL(`${origin}${assetPath}.assetmetadata.json`);
       } catch (error) {
         return null;
       }
     }
 
-    const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH).replace('.html', '/_jcr_content/metadata.assetmetadata.json');
+    const assetMetadataPath = href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH).replace('.html', '/_jcr_content/metadata.assetmetadata.json');
     try {
       const url = new URL(assetMetadataPath);
-      const isProd = prodHosts.includes(window.location.host);
+      const isProd = prodHosts.includes(host);
       url.hostname = isProd ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
       url.port = '';
       url.searchParams.delete('chapter');
@@ -284,8 +286,7 @@ export default class AssetPreview extends LitElement {
   // eslint-disable-next-line class-methods-use-this
   _handleImgError = (e) => {
     const img = e.currentTarget;
-    // Guard against an infinite error loop if the fallback image itself fails
-    // to load (e.g. blocked/offline) - only swap to the default once.
+    // Guard against an infinite error loop if the fallback image also fails to load.
     if (img.dataset.fallbackApplied === 'true') return;
     img.dataset.fallbackApplied = 'true';
     img.src = transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH);
