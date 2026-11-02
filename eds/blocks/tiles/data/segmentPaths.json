@@ -1,0 +1,1820 @@
+{
+  "admin-Solution": [
+    {
+      "id": 1,
+      "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 2,
+      "title": "Explore activation guides",
+      "condition": "1",
+      "neverCompletes": false
+    },
+    {
+      "id": 3,
+      "title": "Update your user profile",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 4,
+      "title": "Complete company profile",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 5,
+      "title": "Need help? Start here.",
+      "condition": "4",
+      "neverCompletes": true
+    },
+    {
+      "id": 6,
+      "title": "Review the user onboarding guide",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 7,
+      "title": "Review the partner admin's onboarding guide",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 8,
+      "title": "Explore Partner directory",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 9,
+      "title": "Start crafting your directory profile",
+      "condition": "8",
+      "neverCompletes": false
+    },
+    {
+      "id": 10,
+      "title": "ADMIN: Invite your team to the PxHub",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 11,
+      "title": "Explore contact management",
+      "condition": "10",
+      "neverCompletes": false
+    },
+    {
+      "id": 12,
+      "title": "Assign important roles to team members",
+      "condition": "11",
+      "neverCompletes": false
+    },
+    {
+      "id": 13,
+      "title": "Strategic business solutions from Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 14,
+      "title": "Explore Adobe's industry strategy",
+      "condition": "13",
+      "neverCompletes": false
+    },
+    {
+      "id": 15,
+      "title": "View and request sandboxes",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 16,
+      "title": "Follow Adobe Partners on LinkedIn",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 17,
+      "title": "Review the compliance requirement",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 18,
+      "title": "Explore levels & benefits",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 19,
+      "title": "Benefits Glossary",
+      "condition": "18",
+      "neverCompletes": false
+    },
+    {
+      "id": 20,
+      "title": "View your company's partner benefits/entitlements",
+      "condition": "19",
+      "neverCompletes": false
+    },
+    {
+      "id": 21,
+      "title": "Benefits Center",
+      "condition": "20",
+      "neverCompletes": true
+    },
+    {
+      "id": 22,
+      "title": "Discover a la carte benefits",
+      "condition": "21",
+      "neverCompletes": false
+    },
+    {
+      "id": 23,
+      "title": "Explore Adobe's end to end portfolio",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 24,
+      "title": "View product roadmaps",
+      "condition": "23",
+      "neverCompletes": false
+    },
+    {
+      "id": 25,
+      "title": "Promoting our partnership",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 26,
+      "title": "Review Adobe brand guidelines",
+      "condition": "25",
+      "neverCompletes": false
+    },
+    {
+      "id": 27,
+      "title": "Download your partner badge",
+      "condition": "26",
+      "neverCompletes": false
+    },
+    {
+      "id": 28,
+      "title": "Dive into learning options",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 29,
+      "title": "Boost your career with Adobe credentials",
+      "condition": "28",
+      "neverCompletes": false
+    },
+    {
+      "id": 30,
+      "title": "Drive application certifications with your team",
+      "condition": "29",
+      "neverCompletes": false
+    },
+    {
+      "id": 31,
+      "title": "Get certified on an Adobe product",
+      "condition": "30",
+      "neverCompletes": false
+    },
+    {
+      "id": 32,
+      "title": "View Certification exam study guides",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 33,
+      "title": "View or manage your credentials",
+      "condition": "32",
+      "neverCompletes": false
+    },
+    {
+      "id": 34,
+      "title": "Earn a Sales Excellence accreditation",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 35,
+      "title": "Earn a Technical Excellence integration accreditation",
+      "condition": "34",
+      "neverCompletes": false
+    },
+    {
+      "id": 36,
+      "title": "Browse on-demand learning courses",
+      "condition": "34",
+      "neverCompletes": false
+    },
+    {
+      "id": 37,
+      "title": "Discover demos",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 38,
+      "title": "View upcoming events",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 39,
+      "title": "Watch recorded event webinars",
+      "condition": "38",
+      "neverCompletes": false
+    },
+    {
+      "id": 40,
+      "title": "Catch up on the latest partner news",
+      "condition": "39",
+      "neverCompletes": false
+    },
+    {
+      "id": 41,
+      "title": "Learn how to sell with Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 42,
+      "title": "Co-selling strategies for success",
+      "condition": "41",
+      "neverCompletes": false
+    },
+    {
+      "id": 43,
+      "title": "Discover Sales Plays",
+      "condition": "42",
+      "neverCompletes": true
+    },
+    {
+      "id": 44,
+      "title": "Learn about the Partner Sales Center",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 45,
+      "title": "Join a deal registration training",
+      "condition": "44",
+      "neverCompletes": false
+    },
+    {
+      "id": 46,
+      "title": "View deal registration guidelines",
+      "condition": "45",
+      "neverCompletes": false
+    },
+    {
+      "id": 47,
+      "title": "Register a deal",
+      "condition": "46",
+      "neverCompletes": false
+    },
+    {
+      "id": 48,
+      "title": "Connect with Adobe on Crossbeam",
+      "condition": "47",
+      "neverCompletes": false
+    },
+    {
+      "id": 49,
+      "title": "Explore partner dashboard",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 50,
+      "title": "Monitor your partnership progress",
+      "condition": "49",
+      "neverCompletes": true
+    },
+    {
+      "id": 51,
+      "title": "Track your team's credentials",
+      "condition": "50",
+      "neverCompletes": true
+    },
+    {
+      "id": 52,
+      "title": "Review customer inquiries",
+      "condition": "51",
+      "neverCompletes": true
+    },
+    {
+      "id": 53,
+      "title": "Demonstrate your expertise with customer deployments",
+      "condition": "51",
+      "neverCompletes": false
+    },
+    {
+      "id": 54,
+      "title": "Specialization",
+      "condition": "53",
+      "neverCompletes": false
+    },
+    {
+      "id": 55,
+      "title": "Request a Partner Spotlight",
+      "condition": "54",
+      "neverCompletes": false
+    },
+    {
+      "id": 56,
+      "title": "Discover customer facing resources",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 57,
+      "title": "Browse reports & research",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 58,
+      "title": "Develop an Adobe solution offering",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 59,
+      "title": "Promote your solution offerings (exchange)",
+      "condition": "58",
+      "neverCompletes": false
+    },
+    {
+      "id": 60,
+      "title": "Create and update your App Listing using Developer Distribution",
+      "condition": "59",
+      "neverCompletes": false
+    },
+    {
+      "id": 61,
+      "title": "Solution validation",
+      "condition": "60",
+      "neverCompletes": false
+    }
+  ],
+  "admin-Technology": [
+    {
+      "id": 1,
+      "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 2,
+      "title": "Explore activation guides",
+      "condition": "1",
+      "neverCompletes": false
+    },
+    {
+      "id": 3,
+      "title": "Update your user profile",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 4,
+      "title": "Complete company profile",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 5,
+      "title": "Need help? Start here.",
+      "condition": "4",
+      "neverCompletes": true
+    },
+    {
+      "id": 6,
+      "title": "Review the user onboarding guide",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 7,
+      "title": "Review the partner admin's onboarding guide",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 8,
+      "title": "Explore Partner directory",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 9,
+      "title": "Start crafting your directory profile",
+      "condition": "8",
+      "neverCompletes": false
+    },
+    {
+      "id": 10,
+      "title": "ADMIN: Invite your team to the PxHub",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 11,
+      "title": "Explore contact management",
+      "condition": "10",
+      "neverCompletes": false
+    },
+    {
+      "id": 12,
+      "title": "Assign important roles to team members",
+      "condition": "11",
+      "neverCompletes": false
+    },
+    {
+      "id": 13,
+      "title": "Strategic business solutions from Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 14,
+      "title": "Explore Adobe's industry strategy",
+      "condition": "13",
+      "neverCompletes": false
+    },
+    {
+      "id": 15,
+      "title": "View and request sandboxes",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 16,
+      "title": "Follow Adobe Partners on LinkedIn",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 17,
+      "title": "Review the compliance requirement",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 18,
+      "title": "Explore levels & benefits",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 19,
+      "title": "Benefits Glossary",
+      "condition": "18",
+      "neverCompletes": false
+    },
+    {
+      "id": 20,
+      "title": "View your company's partner benefits/entitlements",
+      "condition": "19",
+      "neverCompletes": false
+    },
+    {
+      "id": 21,
+      "title": "Benefits Center",
+      "condition": "20",
+      "neverCompletes": true
+    },
+    {
+      "id": 22,
+      "title": "Discover a la carte benefits",
+      "condition": "21",
+      "neverCompletes": false
+    },
+    {
+      "id": 23,
+      "title": "Explore Adobe's end to end portfolio",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 24,
+      "title": "View product roadmaps",
+      "condition": "23",
+      "neverCompletes": false
+    },
+    {
+      "id": 25,
+      "title": "Promoting our partnership",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 26,
+      "title": "Review Adobe brand guidelines",
+      "condition": "25",
+      "neverCompletes": false
+    },
+    {
+      "id": 27,
+      "title": "Download your partner badge",
+      "condition": "26",
+      "neverCompletes": false
+    },
+    {
+      "id": 28,
+      "title": "Dive into learning options",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 29,
+      "title": "Boost your career with Adobe credentials",
+      "condition": "28",
+      "neverCompletes": false
+    },
+    {
+      "id": 30,
+      "title": "Drive application certifications with your team",
+      "condition": "29",
+      "neverCompletes": false
+    },
+    {
+      "id": 31,
+      "title": "Get certified on an Adobe product",
+      "condition": "30",
+      "neverCompletes": false
+    },
+    {
+      "id": 32,
+      "title": "View Certification exam study guides",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 33,
+      "title": "View or manage your credentials",
+      "condition": "32",
+      "neverCompletes": false
+    },
+    {
+      "id": 35,
+      "title": "Earn a Technical Excellence integration accreditation",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 34,
+      "title": "Earn a Sales Excellence accreditation",
+      "condition": "35",
+      "neverCompletes": false
+    },
+    {
+      "id": 36,
+      "title": "Browse on-demand learning courses",
+      "condition": "35",
+      "neverCompletes": false
+    },
+    {
+      "id": 37,
+      "title": "Discover demos",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 38,
+      "title": "View upcoming events",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 39,
+      "title": "Watch recorded event webinars",
+      "condition": "38",
+      "neverCompletes": false
+    },
+    {
+      "id": 40,
+      "title": "Catch up on the latest partner news",
+      "condition": "39",
+      "neverCompletes": false
+    },
+    {
+      "id": 49,
+      "title": "Explore partner dashboard",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 50,
+      "title": "Monitor your partnership progress",
+      "condition": "49",
+      "neverCompletes": true
+    },
+    {
+      "id": 51,
+      "title": "Track your team's credentials",
+      "condition": "50",
+      "neverCompletes": true
+    },
+    {
+      "id": 52,
+      "title": "Review customer inquiries",
+      "condition": "51",
+      "neverCompletes": true
+    },
+    {
+      "id": 53,
+      "title": "Demonstrate your expertise with customer deployments",
+      "condition": "51",
+      "neverCompletes": false
+    },
+    {
+      "id": 54,
+      "title": "Specialization",
+      "condition": "53",
+      "neverCompletes": false
+    },
+    {
+      "id": 55,
+      "title": "Request a Partner Spotlight",
+      "condition": "54",
+      "neverCompletes": false
+    },
+    {
+      "id": 58,
+      "title": "Develop an Adobe solution offering",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 59,
+      "title": "Promote your solution offerings (exchange)",
+      "condition": "58",
+      "neverCompletes": true
+    },
+    {
+      "id": 60,
+      "title": "Create and update your App Listing using Developer Distribution",
+      "condition": "59",
+      "neverCompletes": false
+    },
+    {
+      "id": 61,
+      "title": "Solution validation",
+      "condition": "60",
+      "neverCompletes": false
+    },
+    {
+      "id": 41,
+      "title": "Learn how to sell with Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 42,
+      "title": "Co-selling strategies for success",
+      "condition": "41",
+      "neverCompletes": false
+    },
+    {
+      "id": 43,
+      "title": "Discover Sales Plays",
+      "condition": "42",
+      "neverCompletes": true
+    },
+    {
+      "id": 48,
+      "title": "Connect with Adobe on Crossbeam",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 44,
+      "title": "Learn about the Partner Sales Center",
+      "condition": "48",
+      "neverCompletes": true
+    },
+    {
+      "id": 45,
+      "title": "Join a deal registration training",
+      "condition": "44",
+      "neverCompletes": false
+    },
+    {
+      "id": 46,
+      "title": "View deal registration guidelines",
+      "condition": "45",
+      "neverCompletes": false
+    },
+    {
+      "id": 47,
+      "title": "Register a deal",
+      "condition": "46",
+      "neverCompletes": false
+    },
+    {
+      "id": 56,
+      "title": "Discover customer facing resources",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 57,
+      "title": "Browse reports & research",
+      "condition": null,
+      "neverCompletes": false
+    }
+  ],
+  "admin-community": [
+    {
+      "id": 1,
+      "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 2,
+      "title": "Explore activation guides",
+      "condition": "1",
+      "neverCompletes": true
+    },
+    {
+      "id": 3,
+      "title": "Update your user profile",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 4,
+      "title": "Complete company profile",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 6,
+      "title": "Review the user onboarding guide",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 7,
+      "title": "Review the partner admin's onboarding guide",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 8,
+      "title": "Explore Partner directory",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 10,
+      "title": "ADMIN: Invite your team to the PxHub",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 11,
+      "title": "Explore contact management",
+      "condition": "10",
+      "neverCompletes": false
+    },
+    {
+      "id": 12,
+      "title": "Assign important roles to team members",
+      "condition": "11",
+      "neverCompletes": false
+    },
+    {
+      "id": 13,
+      "title": "Strategic business solutions from Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 14,
+      "title": "Explore Adobe's industry strategy",
+      "condition": "13",
+      "neverCompletes": false
+    },
+    {
+      "id": 5,
+      "title": "Need help? Start here.",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 16,
+      "title": "Follow Adobe Partners on LinkedIn",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 17,
+      "title": "Review the compliance requirement",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 18,
+      "title": "Explore levels & benefits",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 19,
+      "title": "Benefits Glossary",
+      "condition": "18",
+      "neverCompletes": false
+    },
+    {
+      "id": 20,
+      "title": "View your company's partner benefits/entitlements",
+      "condition": "19",
+      "neverCompletes": false
+    },
+    {
+      "id": 21,
+      "title": "Benefits Center",
+      "condition": "20",
+      "neverCompletes": true
+    },
+    {
+      "id": 22,
+      "title": "Discover a la carte benefits",
+      "condition": "21",
+      "neverCompletes": false
+    },
+    {
+      "id": 23,
+      "title": "Explore Adobe's end to end portfolio",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 24,
+      "title": "View product roadmaps",
+      "condition": "23",
+      "neverCompletes": false
+    },
+    {
+      "id": 25,
+      "title": "Promoting our partnership",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 26,
+      "title": "Review Adobe brand guidelines",
+      "condition": "25",
+      "neverCompletes": false
+    },
+    {
+      "id": 28,
+      "title": "Dive into learning options",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 29,
+      "title": "Boost your career with Adobe credentials",
+      "condition": "28",
+      "neverCompletes": false
+    },
+    {
+      "id": 36,
+      "title": "Browse on-demand learning courses",
+      "condition": "29",
+      "neverCompletes": false
+    },
+    {
+      "id": 37,
+      "title": "Discover demos",
+      "condition": "36",
+      "neverCompletes": true
+    },
+    {
+      "id": 38,
+      "title": "View upcoming events",
+      "condition": "29",
+      "neverCompletes": false
+    },
+    {
+      "id": 39,
+      "title": "Watch recorded event webinars",
+      "condition": "38",
+      "neverCompletes": false
+    },
+    {
+      "id": 40,
+      "title": "Catch up on the latest partner news",
+      "condition": "39",
+      "neverCompletes": false
+    },
+    {
+      "id": 49,
+      "title": "Explore partner dashboard",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 50,
+      "title": "Monitor your partnership progress",
+      "condition": "49",
+      "neverCompletes": true
+    },
+    {
+      "id": 52,
+      "title": "Review customer inquiries",
+      "condition": "50",
+      "neverCompletes": false
+    },
+    {
+      "id": 53,
+      "title": "Demonstrate your expertise with customer deployments",
+      "condition": "50",
+      "neverCompletes": false
+    },
+    {
+      "id": 54,
+      "title": "Specialization",
+      "condition": "53",
+      "neverCompletes": false
+    },
+    {
+      "id": 41,
+      "title": "Learn how to sell with Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 42,
+      "title": "Co-selling strategies for success",
+      "condition": "41",
+      "neverCompletes": false
+    },
+    {
+      "id": 43,
+      "title": "Discover Sales Plays",
+      "condition": "42",
+      "neverCompletes": true
+    },
+    {
+      "id": 48,
+      "title": "Connect with Adobe on Crossbeam",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 44,
+      "title": "Learn about the Partner Sales Center",
+      "condition": "48",
+      "neverCompletes": false
+    },
+    {
+      "id": 45,
+      "title": "Join a deal registration training",
+      "condition": "44",
+      "neverCompletes": false
+    },
+    {
+      "id": 46,
+      "title": "View deal registration guidelines",
+      "condition": "45",
+      "neverCompletes": false
+    },
+    {
+      "id": 47,
+      "title": "Register a deal",
+      "condition": "46",
+      "neverCompletes": true
+    },
+    {
+      "id": 58,
+      "title": "Develop an Adobe solution offering",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 59,
+      "title": "Promote your solution offerings (exchange)",
+      "condition": "58",
+      "neverCompletes": false
+    },
+    {
+      "id": 60,
+      "title": "Create and update your App Listing using Developer Distribution",
+      "condition": "59",
+      "neverCompletes": false
+    },
+    {
+      "id": 61,
+      "title": "Solution validation",
+      "condition": "60",
+      "neverCompletes": false
+    },
+    {
+      "id": 56,
+      "title": "Discover customer facing resources",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 57,
+      "title": "Browse reports & research",
+      "condition": null,
+      "neverCompletes": false
+    }
+  ],
+  "user-Solution": [
+    {
+      "id": 1,
+      "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 3,
+      "title": "Update your user profile",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 6,
+      "title": "Review the user onboarding guide",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 5,
+      "title": "Need help? Start here.",
+      "condition": "6",
+      "neverCompletes": true
+    },
+    {
+      "id": 8,
+      "title": "Explore Partner directory",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 16,
+      "title": "Follow Adobe Partners on LinkedIn",
+      "condition": "8",
+      "neverCompletes": false
+    },
+    {
+      "id": 2,
+      "title": "Explore activation guides",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 18,
+      "title": "Explore levels & benefits",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 19,
+      "title": "Benefits Glossary",
+      "condition": "18",
+      "neverCompletes": false
+    },
+    {
+      "id": 23,
+      "title": "Explore Adobe's end to end portfolio",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 24,
+      "title": "View product roadmaps",
+      "condition": "23",
+      "neverCompletes": false
+    },
+    {
+      "id": 13,
+      "title": "Strategic business solutions from Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 14,
+      "title": "Explore Adobe's industry strategy",
+      "condition": "13",
+      "neverCompletes": false
+    },
+    {
+      "id": 15,
+      "title": "View and request sandboxes",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 20,
+      "title": "View your company's partner benefits/entitlements",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 21,
+      "title": "Benefits Center",
+      "condition": "20",
+      "neverCompletes": true
+    },
+    {
+      "id": 22,
+      "title": "Discover a la carte benefits",
+      "condition": "21",
+      "neverCompletes": false
+    },
+    {
+      "id": 28,
+      "title": "Dive into learning options",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 29,
+      "title": "Boost your career with Adobe credentials",
+      "condition": "28",
+      "neverCompletes": true
+    },
+    {
+      "id": 31,
+      "title": "Get certified on an Adobe product",
+      "condition": "29",
+      "neverCompletes": false
+    },
+    {
+      "id": 32,
+      "title": "View Certification exam study guides",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 33,
+      "title": "View or manage your credentials",
+      "condition": "32",
+      "neverCompletes": false
+    },
+    {
+      "id": 34,
+      "title": "Earn a Sales Excellence accreditation",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 35,
+      "title": "Earn a Technical Excellence integration accreditation",
+      "condition": "34",
+      "neverCompletes": false
+    },
+    {
+      "id": 36,
+      "title": "Browse on-demand learning courses",
+      "condition": "34",
+      "neverCompletes": false
+    },
+    {
+      "id": 37,
+      "title": "Discover demos",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 38,
+      "title": "View upcoming events",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 39,
+      "title": "Watch recorded event webinars",
+      "condition": "38",
+      "neverCompletes": false
+    },
+    {
+      "id": 40,
+      "title": "Catch up on the latest partner news",
+      "condition": "39",
+      "neverCompletes": false
+    },
+    {
+      "id": 41,
+      "title": "Learn how to sell with Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 42,
+      "title": "Co-selling strategies for success",
+      "condition": "41",
+      "neverCompletes": false
+    },
+    {
+      "id": 43,
+      "title": "Discover Sales Plays",
+      "condition": "42",
+      "neverCompletes": true
+    },
+    {
+      "id": 44,
+      "title": "Learn about the Partner Sales Center",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 45,
+      "title": "Join a deal registration training",
+      "condition": "44",
+      "neverCompletes": false
+    },
+    {
+      "id": 46,
+      "title": "View deal registration guidelines",
+      "condition": "45",
+      "neverCompletes": false
+    },
+    {
+      "id": 47,
+      "title": "Register a deal",
+      "condition": "46",
+      "neverCompletes": false
+    },
+    {
+      "id": 48,
+      "title": "Connect with Adobe on Crossbeam",
+      "condition": "47",
+      "neverCompletes": false
+    },
+    {
+      "id": 56,
+      "title": "Discover customer facing resources",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 57,
+      "title": "Browse reports & research",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 58,
+      "title": "Develop an Adobe solution offering",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 59,
+      "title": "Promote your solution offerings (exchange)",
+      "condition": "58",
+      "neverCompletes": false
+    },
+    {
+      "id": 60,
+      "title": "Create and update your App Listing using Developer Distribution",
+      "condition": "59",
+      "neverCompletes": false
+    },
+    {
+      "id": 61,
+      "title": "Solution validation",
+      "condition": "60",
+      "neverCompletes": false
+    }
+  ],
+  "user-Technology": [
+    {
+      "id": 1,
+      "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 3,
+      "title": "Update your user profile",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 6,
+      "title": "Review the user onboarding guide",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 5,
+      "title": "Need help? Start here.",
+      "condition": "6",
+      "neverCompletes": false
+    },
+    {
+      "id": 8,
+      "title": "Explore Partner directory",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 16,
+      "title": "Follow Adobe Partners on LinkedIn",
+      "condition": "8",
+      "neverCompletes": false
+    },
+    {
+      "id": 2,
+      "title": "Explore activation guides",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 18,
+      "title": "Explore levels & benefits",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 19,
+      "title": "Benefits Glossary",
+      "condition": "18",
+      "neverCompletes": false
+    },
+    {
+      "id": 23,
+      "title": "Explore Adobe's end to end portfolio",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 24,
+      "title": "View product roadmaps",
+      "condition": "23",
+      "neverCompletes": false
+    },
+    {
+      "id": 13,
+      "title": "Strategic business solutions from Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 14,
+      "title": "Explore Adobe's industry strategy",
+      "condition": "13",
+      "neverCompletes": false
+    },
+    {
+      "id": 15,
+      "title": "View and request sandboxes",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 20,
+      "title": "View your company's partner benefits/entitlements",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 21,
+      "title": "Benefits Center",
+      "condition": "20",
+      "neverCompletes": true
+    },
+    {
+      "id": 22,
+      "title": "Discover a la carte benefits",
+      "condition": "21",
+      "neverCompletes": false
+    },
+    {
+      "id": 28,
+      "title": "Dive into learning options",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 29,
+      "title": "Boost your career with Adobe credentials",
+      "condition": "28",
+      "neverCompletes": true
+    },
+    {
+      "id": 31,
+      "title": "Get certified on an Adobe product",
+      "condition": "29",
+      "neverCompletes": false
+    },
+    {
+      "id": 32,
+      "title": "View Certification exam study guides",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 33,
+      "title": "View or manage your credentials",
+      "condition": "32",
+      "neverCompletes": true
+    },
+    {
+      "id": 35,
+      "title": "Earn a Technical Excellence integration accreditation",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 34,
+      "title": "Earn a Sales Excellence accreditation",
+      "condition": "35",
+      "neverCompletes": false
+    },
+    {
+      "id": 36,
+      "title": "Browse on-demand learning courses",
+      "condition": "35",
+      "neverCompletes": false
+    },
+    {
+      "id": 37,
+      "title": "Discover demos",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 38,
+      "title": "View upcoming events",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 39,
+      "title": "Watch recorded event webinars",
+      "condition": "38",
+      "neverCompletes": false
+    },
+    {
+      "id": 40,
+      "title": "Catch up on the latest partner news",
+      "condition": "39",
+      "neverCompletes": false
+    },
+    {
+      "id": 58,
+      "title": "Develop an Adobe solution offering",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 59,
+      "title": "Promote your solution offerings (exchange)",
+      "condition": "58",
+      "neverCompletes": true
+    },
+    {
+      "id": 60,
+      "title": "Create and update your App Listing using Developer Distribution",
+      "condition": "59",
+      "neverCompletes": false
+    },
+    {
+      "id": 61,
+      "title": "Solution validation",
+      "condition": "60",
+      "neverCompletes": false
+    },
+    {
+      "id": 41,
+      "title": "Learn how to sell with Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 42,
+      "title": "Co-selling strategies for success",
+      "condition": "41",
+      "neverCompletes": false
+    },
+    {
+      "id": 43,
+      "title": "Discover Sales Plays",
+      "condition": "42",
+      "neverCompletes": true
+    },
+    {
+      "id": 48,
+      "title": "Connect with Adobe on Crossbeam",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 44,
+      "title": "Learn about the Partner Sales Center",
+      "condition": "48",
+      "neverCompletes": true
+    },
+    {
+      "id": 45,
+      "title": "Join a deal registration training",
+      "condition": "44",
+      "neverCompletes": false
+    },
+    {
+      "id": 46,
+      "title": "View deal registration guidelines",
+      "condition": "45",
+      "neverCompletes": false
+    },
+    {
+      "id": 47,
+      "title": "Register a deal",
+      "condition": "46",
+      "neverCompletes": false
+    },
+    {
+      "id": 56,
+      "title": "Discover customer facing resources",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 57,
+      "title": "Browse reports & research",
+      "condition": null,
+      "neverCompletes": false
+    }
+  ],
+  "user-community": [
+    {
+      "id": 1,
+      "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 3,
+      "title": "Update your user profile",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 6,
+      "title": "Review the user onboarding guide",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 5,
+      "title": "Need help? Start here.",
+      "condition": "6",
+      "neverCompletes": true
+    },
+    {
+      "id": 8,
+      "title": "Explore Partner directory",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 16,
+      "title": "Follow Adobe Partners on LinkedIn",
+      "condition": "8",
+      "neverCompletes": false
+    },
+    {
+      "id": 2,
+      "title": "Explore activation guides",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 18,
+      "title": "Explore levels & benefits",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 19,
+      "title": "Benefits Glossary",
+      "condition": "18",
+      "neverCompletes": false
+    },
+    {
+      "id": 23,
+      "title": "Explore Adobe's end to end portfolio",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 24,
+      "title": "View product roadmaps",
+      "condition": "23",
+      "neverCompletes": false
+    },
+    {
+      "id": 13,
+      "title": "Strategic business solutions from Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 14,
+      "title": "Explore Adobe's industry strategy",
+      "condition": "13",
+      "neverCompletes": false
+    },
+    {
+      "id": 15,
+      "title": "View and request sandboxes",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 20,
+      "title": "View your company's partner benefits/entitlements",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 21,
+      "title": "Benefits Center",
+      "condition": "20",
+      "neverCompletes": true
+    },
+    {
+      "id": 22,
+      "title": "Discover a la carte benefits",
+      "condition": "21",
+      "neverCompletes": false
+    },
+    {
+      "id": 28,
+      "title": "Dive into learning options",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 29,
+      "title": "Boost your career with Adobe credentials",
+      "condition": "28",
+      "neverCompletes": false
+    },
+    {
+      "id": 31,
+      "title": "Get certified on an Adobe product",
+      "condition": "29",
+      "neverCompletes": false
+    },
+    {
+      "id": 32,
+      "title": "View Certification exam study guides",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 33,
+      "title": "View or manage your credentials",
+      "condition": "32",
+      "neverCompletes": false
+    },
+    {
+      "id": 34,
+      "title": "Earn a Sales Excellence accreditation",
+      "condition": "31",
+      "neverCompletes": false
+    },
+    {
+      "id": 35,
+      "title": "Earn a Technical Excellence integration accreditation",
+      "condition": "34",
+      "neverCompletes": false
+    },
+    {
+      "id": 36,
+      "title": "Browse on-demand learning courses",
+      "condition": "34",
+      "neverCompletes": false
+    },
+    {
+      "id": 37,
+      "title": "Discover demos",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 38,
+      "title": "View upcoming events",
+      "condition": "36",
+      "neverCompletes": false
+    },
+    {
+      "id": 39,
+      "title": "Watch recorded event webinars",
+      "condition": "38",
+      "neverCompletes": false
+    },
+    {
+      "id": 40,
+      "title": "Catch up on the latest partner news",
+      "condition": "39",
+      "neverCompletes": false
+    },
+    {
+      "id": 41,
+      "title": "Learn how to sell with Adobe",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 42,
+      "title": "Co-selling strategies for success",
+      "condition": "41",
+      "neverCompletes": false
+    },
+    {
+      "id": 43,
+      "title": "Discover Sales Plays",
+      "condition": "42",
+      "neverCompletes": true
+    },
+    {
+      "id": 48,
+      "title": "Connect with Adobe on Crossbeam",
+      "condition": null,
+      "neverCompletes": true
+    },
+    {
+      "id": 44,
+      "title": "Learn about the Partner Sales Center",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 45,
+      "title": "Join a deal registration training",
+      "condition": "44",
+      "neverCompletes": false
+    },
+    {
+      "id": 46,
+      "title": "View deal registration guidelines",
+      "condition": "45",
+      "neverCompletes": false
+    },
+    {
+      "id": 47,
+      "title": "Register a deal",
+      "condition": "46",
+      "neverCompletes": true
+    },
+    {
+      "id": 58,
+      "title": "Develop an Adobe solution offering",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 59,
+      "title": "Promote your solution offerings (exchange)",
+      "condition": "58",
+      "neverCompletes": false
+    },
+    {
+      "id": 60,
+      "title": "Create and update your App Listing using Developer Distribution",
+      "condition": "59",
+      "neverCompletes": false
+    },
+    {
+      "id": 61,
+      "title": "Solution validation",
+      "condition": "60",
+      "neverCompletes": false
+    },
+    {
+      "id": 56,
+      "title": "Discover customer facing resources",
+      "condition": null,
+      "neverCompletes": false
+    },
+    {
+      "id": 57,
+      "title": "Browse reports & research",
+      "condition": null,
+      "neverCompletes": false
+    }
+  ]
+}

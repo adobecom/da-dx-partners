@@ -67,18 +67,7 @@ const decorateBgRow = (el, background, remove = false) => {
   decorateBlockBg(el, background);
 };
 
-function initData(el) {
-  const rows = el.querySelectorAll(':scope > div');
-  const id = rows[4]?.innerText;
-  const displayAlways = rows[5]?.innerText;
-
-  Array.from(rows).slice(displayAlways ? -2 : -1).forEach((row) => row.remove());
-  console.log('id', id);
-  console.log('displayAlways', displayAlways);
-}
-
 export default async function init(el) {
-  initData(el);
   el.classList.add('con-block');
   // const hasOpenClass = el.className.includes('open');
   // handleOpenClasses(el, hasOpenClass);

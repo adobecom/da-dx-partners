@@ -1,0 +1,368 @@
+{
+  "1": {
+    "id": 1,
+    "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
+    "description": "some test content",
+    "actionLink": ""
+  },
+  "2": {
+    "id": 2,
+    "title": "Explore activation guides",
+    "description": "some test content ",
+    "actionLink": ""
+  },
+  "3": {
+    "id": 3,
+    "title": "Update your user profile",
+    "description": "some test content some test content some test content some test content some test content",
+    "actionLink": ""
+  },
+  "4": {
+    "id": 4,
+    "title": "Complete company profile",
+    "description": "some test contentsome test contentsome test contentsome test contentsome test contentsome test content",
+    "actionLink": ""
+  },
+  "5": {
+    "id": 5,
+    "title": "Need help? Start here.",
+    "description": "",
+    "actionLink": ""
+  },
+  "6": {
+    "id": 6,
+    "title": "Review the user onboarding guide",
+    "description": "",
+    "actionLink": ""
+  },
+  "7": {
+    "id": 7,
+    "title": "Review the partner admin's onboarding guide",
+    "description": "",
+    "actionLink": ""
+  },
+  "8": {
+    "id": 8,
+    "title": "Explore Partner directory",
+    "description": "",
+    "actionLink": ""
+  },
+  "9": {
+    "id": 9,
+    "title": "Start crafting your directory profile",
+    "description": "",
+    "actionLink": ""
+  },
+  "10": {
+    "id": 10,
+    "title": "ADMIN: Invite your team to the PxHub",
+    "description": "",
+    "actionLink": ""
+  },
+  "11": {
+    "id": 11,
+    "title": "Explore contact management",
+    "description": "",
+    "actionLink": ""
+  },
+  "12": {
+    "id": 12,
+    "title": "Assign important roles to team members",
+    "description": "",
+    "actionLink": ""
+  },
+  "13": {
+    "id": 13,
+    "title": "Strategic business solutions from Adobe",
+    "description": "",
+    "actionLink": ""
+  },
+  "14": {
+    "id": 14,
+    "title": "Explore Adobe's industry strategy",
+    "description": "",
+    "actionLink": ""
+  },
+  "15": {
+    "id": 15,
+    "title": "View and request sandboxes",
+    "description": "",
+    "actionLink": ""
+  },
+  "16": {
+    "id": 16,
+    "title": "Follow Adobe Partners on LinkedIn",
+    "description": "",
+    "actionLink": ""
+  },
+  "17": {
+    "id": 17,
+    "title": "Review the compliance requirement",
+    "description": "",
+    "actionLink": ""
+  },
+  "18": {
+    "id": 18,
+    "title": "Explore levels & benefits",
+    "description": "",
+    "actionLink": ""
+  },
+  "19": {
+    "id": 19,
+    "title": "Benefits Glossary",
+    "description": "",
+    "actionLink": ""
+  },
+  "20": {
+    "id": 20,
+    "title": "View your company's partner benefits/entitlements",
+    "description": "",
+    "actionLink": ""
+  },
+  "21": {
+    "id": 21,
+    "title": "Benefits Center",
+    "description": "",
+    "actionLink": ""
+  },
+  "22": {
+    "id": 22,
+    "title": "Discover a la carte benefits",
+    "description": "",
+    "actionLink": ""
+  },
+  "23": {
+    "id": 23,
+    "title": "Explore Adobe's end to end portfolio",
+    "description": "",
+    "actionLink": ""
+  },
+  "24": {
+    "id": 24,
+    "title": "View product roadmaps",
+    "description": "",
+    "actionLink": ""
+  },
+  "25": {
+    "id": 25,
+    "title": "Promoting our partnership",
+    "description": "",
+    "actionLink": ""
+  },
+  "26": {
+    "id": 26,
+    "title": "Review Adobe brand guidelines",
+    "description": "",
+    "actionLink": ""
+  },
+  "27": {
+    "id": 27,
+    "title": "Download your partner badge",
+    "description": "",
+    "actionLink": ""
+  },
+  "28": {
+    "id": 28,
+    "title": "Dive into  learning options",
+    "description": "",
+    "actionLink": ""
+  },
+  "29": {
+    "id": 29,
+    "title": "Boost your career with Adobe credentials",
+    "description": "",
+    "actionLink": ""
+  },
+  "30": {
+    "id": 30,
+    "title": "Drive application certifications with your team",
+    "description": "",
+    "actionLink": ""
+  },
+  "31": {
+    "id": 31,
+    "title": "Get certified on an Adobe product",
+    "description": "",
+    "actionLink": ""
+  },
+  "32": {
+    "id": 32,
+    "title": "View Certification exam study guides",
+    "description": "",
+    "actionLink": ""
+  },
+  "33": {
+    "id": 33,
+    "title": "View or manage your credentials",
+    "description": "",
+    "actionLink": ""
+  },
+  "34": {
+    "id": 34,
+    "title": "Earn a Sales Excellence accreditation",
+    "description": "",
+    "actionLink": ""
+  },
+  "35": {
+    "id": 35,
+    "title": "Earn a Technical Excellence integration accreditation",
+    "description": "",
+    "actionLink": ""
+  },
+  "36": {
+    "id": 36,
+    "title": "Browse on-demand learning courses",
+    "description": "",
+    "actionLink": ""
+  },
+  "37": {
+    "id": 37,
+    "title": "Discover demos",
+    "description": "",
+    "actionLink": ""
+  },
+  "38": {
+    "id": 38,
+    "title": "View upcoming events",
+    "description": "",
+    "actionLink": ""
+  },
+  "39": {
+    "id": 39,
+    "title": "Watch recorded event webinars",
+    "description": "",
+    "actionLink": ""
+  },
+  "40": {
+    "id": 40,
+    "title": "Catch up on the latest partner news",
+    "description": "",
+    "actionLink": ""
+  },
+  "41": {
+    "id": 41,
+    "title": "Learn how to sell with Adobe",
+    "description": "",
+    "actionLink": ""
+  },
+  "42": {
+    "id": 42,
+    "title": "Co-selling strategies for success",
+    "description": "",
+    "actionLink": ""
+  },
+  "43": {
+    "id": 43,
+    "title": "Discover Sales Plays",
+    "description": "",
+    "actionLink": ""
+  },
+  "44": {
+    "id": 44,
+    "title": "Learn about the Partner Sales Center",
+    "description": "",
+    "actionLink": ""
+  },
+  "45": {
+    "id": 45,
+    "title": "Join a deal registration training",
+    "description": "",
+    "actionLink": ""
+  },
+  "46": {
+    "id": 46,
+    "title": "View deal registration guidelines",
+    "description": "",
+    "actionLink": ""
+  },
+  "47": {
+    "id": 47,
+    "title": "Register a deal",
+    "description": "",
+    "actionLink": ""
+  },
+  "48": {
+    "id": 48,
+    "title": "Connect with Adobe on Crossbeam",
+    "description": "",
+    "actionLink": ""
+  },
+  "49": {
+    "id": 49,
+    "title": "Explore partner dashboard",
+    "description": "",
+    "actionLink": ""
+  },
+  "50": {
+    "id": 50,
+    "title": "Monitor your partnership progress",
+    "description": "",
+    "actionLink": ""
+  },
+  "51": {
+    "id": 51,
+    "title": "Track your team's credentials",
+    "description": "",
+    "actionLink": ""
+  },
+  "52": {
+    "id": 52,
+    "title": "Review customer inquiries",
+    "description": "",
+    "actionLink": ""
+  },
+  "53": {
+    "id": 53,
+    "title": "Demonstrate your expertise with customer deployments",
+    "description": "",
+    "actionLink": ""
+  },
+  "54": {
+    "id": 54,
+    "title": "Specialization",
+    "description": "",
+    "actionLink": ""
+  },
+  "55": {
+    "id": 55,
+    "title": "Request a Partner Spotlight",
+    "description": "",
+    "actionLink": ""
+  },
+  "56": {
+    "id": 56,
+    "title": "Discover customer facing resources",
+    "description": "",
+    "actionLink": ""
+  },
+  "57": {
+    "id": 57,
+    "title": "Browse reports & research",
+    "description": "",
+    "actionLink": ""
+  },
+  "58": {
+    "id": 58,
+    "title": "Develop an Adobe solution offering",
+    "description": "",
+    "actionLink": ""
+  },
+  "59": {
+    "id": 59,
+    "title": "Promote your solution offerings (exchange)",
+    "description": "",
+    "actionLink": ""
+  },
+  "60": {
+    "id": 60,
+    "title": "Create and update your App Listing using Developer Distribution",
+    "description": "",
+    "actionLink": ""
+  },
+  "61": {
+    "id": 61,
+    "title": "Solution validation",
+    "description": "",
+    "actionLink": ""
+  }
+}

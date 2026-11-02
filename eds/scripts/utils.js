@@ -314,6 +314,12 @@ export function hasPartnerAccountStateProperty(key) {
   return Object.prototype.hasOwnProperty.call(accountState, key);
 }
 
+export function hasPartnerUserStateProperty(key) {
+  const userState = getPartnerUserState();
+  if (!userState) return false;
+  return Object.prototype.hasOwnProperty.call(userState, key);
+}
+
 export function hasSalesCenterAccess() {
   return getPartnerCookieValue('salescenteraccess');
 }
