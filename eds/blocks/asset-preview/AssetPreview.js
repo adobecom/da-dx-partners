@@ -192,8 +192,7 @@ export default class AssetPreview extends LitElement {
     const mappedAssetUrl = this.getRealAssetUrl();
     if (!mappedAssetUrl) return;
     try {
-      // AssetMetadataServlet (used when isAEM) requires this header to identify
-      // the request as coming from a trusted internal caller.
+      // AssetMetadataServlet requires this header to identify a trusted caller.
       const fetchOptions = this.blockData.isAEM
         ? { headers: { 'X-Requested-With': 'EdgeWorkerGravity' } }
         : undefined;
