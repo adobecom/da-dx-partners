@@ -11,10 +11,16 @@ const cards = JSON.parse(cardsString);
 
 describe('dx-card-collection block', () => {
   beforeEach(async () => {
+    const fetchStub = sinon.stub(window, 'fetch').callThrough();
+    fetchStub.withArgs(sinon.match(/\/placeholders\.json(?:\?|$)/)).resolves({
+      ok: true,
+      json: async () => ({ data: [] }),
+    });
     sinon.stub(PartnerCards.prototype, 'fetchData').resolves({ cards });
     sinon.stub(PartnerCards.prototype, 'fetchTags').resolves({ tags });
 
     sinon.stub(PartnerCards.prototype, 'firstUpdated').callsFake(async function () {
+      this.urlSearchParams = new URLSearchParams();
       this.allCards = cards;
       this.cards = cards;
       this.paginatedCards = this.cards.slice(0, 3);
@@ -28,9 +34,8 @@ describe('dx-card-collection block', () => {
   });
 
   afterEach(() => {
-    PartnerCards.prototype.fetchData.restore();
-    PartnerCards.prototype.fetchTags.restore();
-    PartnerCards.prototype.firstUpdated.restore();
+    document.body.innerHTML = '';
+    sinon.restore();
   });
 
   const setupAndCommonTest = async (windowWidth) => {

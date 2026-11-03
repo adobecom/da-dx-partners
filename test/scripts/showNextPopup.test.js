@@ -3,9 +3,13 @@ import sinon from 'sinon';
 import showNextPopup from '../../eds/scripts/showNextPopup.js';
 
 describe('showNextPopup browser coverage', () => {
+  beforeEach(() => {
+    let cookie = '';
+    sinon.stub(document, 'cookie').get(() => cookie).set((value) => { cookie = value; });
+  });
+
   afterEach(() => {
     sinon.restore();
-    document.cookie = 'partner_data=; Path=/; Max-Age=0;';
   });
 
   it('does nothing for a signed-out visitor', async () => {
@@ -25,11 +29,13 @@ describe('showNextPopup browser coverage', () => {
   });
 
   it('routes directly to the partner agreement popup', async () => {
+    const consoleWarnStub = sinon.stub(console, 'warn');
     document.cookie = 'partner_data={"DXP":{"status":"MEMBER"}}; Path=/';
 
     const result = await showNextPopup('/libs', 'client-id', 'dxp:partnerAgreement');
 
     expect(result).to.equal(undefined);
+    expect(consoleWarnStub.calledOnceWithExactly('Partner agreement should be displayed but partner agreement meta path is not authored')).to.be.true;
   });
 
   it('routes directly to portal messaging and skips when no special state exists', async () => {
@@ -41,11 +47,13 @@ describe('showNextPopup browser coverage', () => {
   });
 
   it('runs the default chain with a non-displaying certification response', async () => {
+    const consoleWarnStub = sinon.stub(console, 'warn');
     document.cookie = 'partner_data={"DXP":{"status":"MEMBER"}}; Path=/';
     sinon.stub(window, 'fetch').resolves({ ok: true, json: async () => ({ credentials: [] }) });
 
     const result = await showNextPopup('/libs', 'client-id');
 
     expect(result).to.equal(undefined);
+    expect(consoleWarnStub.calledOnceWithExactly('Partner agreement should be displayed but partner agreement meta path is not authored')).to.be.true;
   });
 });
