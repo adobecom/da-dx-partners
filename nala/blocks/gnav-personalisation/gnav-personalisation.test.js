@@ -626,4 +626,33 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.newlyApprovedBanner).not.toBeVisible();
     });
   });
+
+  test(`${features[26].name},${features[26].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[26];
+
+    await test.step('Go to home page on mobile viewport', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible', timeout: 30000 });
+      await expect(gnavPersonalisationPage.nonSignedPartnerBanner).toBeVisible({ timeout: 30000 });
+    });
+
+    await test.step('Sign in as Gold user', async () => {
+      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(gnavPersonalisationPage.signedPartnerBanner).toBeVisible({ timeout: 30000 });
+    });
+  });
+
+  test(`${features[27].name},${features[27].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[27];
+
+    await setupNewlyApprovedTest({ page, baseURL, context, data, path });
+
+    await test.step('Verify segments on the page', async () => {
+      await expect(gnavPersonalisationPage.pxTeamButton).toBeVisible({ timeout: 30000 });
+    });
+  });
 });
