@@ -15,13 +15,11 @@ import DOMPurify from '../../libs/deps/purify-wrapper.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.min.js`);
-const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
-await Promise.all([
-  import('../../components/LoadingSpinner.js'),
-  loadStyle('/eds/components/LoadingSpinner.css'),
-]);
+await import('../../components/AssetVideoPlayer.js');
+
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
+
 export default class AssetPreview extends LitElement {
   static properties = {
     blockData: { type: Object },
@@ -37,15 +35,11 @@ export default class AssetPreview extends LitElement {
     backButtonLabel: { type: String },
     createdDate: { type: Date },
     assetHasData: { type: Boolean },
-    isVideoPlaying: { type: Boolean, reflect: true },
     isLoading: { type: Boolean, reflect: true },
     isVideoLoading: { type: Boolean, reflect: true },
     assetPartnerLevel: { type: Array },
     pdfPreviewUrl: { type: String },
     chapters: { type: Array },
-    selectedChapterIndex: { type: Number },
-    currentTime: { type: Number },
-    sharedChapterIndex: { type: Number },
   };
 
   constructor() {
@@ -54,39 +48,33 @@ export default class AssetPreview extends LitElement {
     this.tags = [];
     this.allAssetTags = [];
     this.allCaaSTags = [];
-    this.isVideoPlaying = false;
     this.isVideo = false;
     this.isLoading = true;
     this.isVideoLoading = false;
     this.assetPartnerLevel = [];
     this.pdfPreviewUrl = '';
     this.chapters = [];
-    this.selectedChapterIndex = 0;
-    this.currentTime = 0;
-    this.sharedChapterIndex = -1;
-    this.shareResetTimer = null;
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    clearTimeout(this.shareResetTimer);
   }
 
   createRenderRoot() {
     return this;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get _video() {
-    return document.querySelector('video');
+  async playVideo() {
+    const player = this.querySelector('asset-video-player');
+    if (!player) return;
+
+    window.scrollTo({ top: player.offsetTop, behavior: 'smooth' });
+    try {
+      await player.play();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to play video:', error);
+    }
   }
 
-  playVideo() {
-    if (this._video) {
-      const videoContainer = this._video.closest('.asset-preview-block-video');
-      window.scrollTo({ top: videoContainer.offsetTop, behavior: 'smooth' });
-      this._video.play();
-    }
+  handleVideoLoadingChange(event) {
+    this.isVideoLoading = event.detail.loading;
   }
 
   async connectedCallback() {
@@ -190,7 +178,11 @@ export default class AssetPreview extends LitElement {
     // but will always fetch asset metadata from stage
     // so we should delete assets from lower env if they make us problem on stage
     const mappedAssetUrl = this.getRealAssetUrl();
-    if (!mappedAssetUrl) return;
+    if (!mappedAssetUrl) {
+      this.isLoading = false;
+      return;
+    }
+
     try {
       await fetch(mappedAssetUrl).then(async (res) => {
         if (res && res.status === 200) {
@@ -208,7 +200,9 @@ export default class AssetPreview extends LitElement {
   async setData(assetMetadata) {
     const metadataChapters = assetMetadata.chapters || [];
     this.chapters = Array.isArray(metadataChapters) ? metadataChapters : [metadataChapters];
-    if (this.chapters.length) this.restoreChapterFromUrl();
+
+    this.isVideoLoading = false;
+
     this.title = DOMPurify.sanitize(assetMetadata.title);
     document.title = DOMPurify.sanitize(assetMetadata.title);
     this.summary = DOMPurify.sanitize(assetMetadata.summary)
@@ -228,7 +222,7 @@ export default class AssetPreview extends LitElement {
     this.ctaText = DOMPurify.sanitize(assetMetadata.ctaText);
     this.size = DOMPurify.sanitize(this.getSizeInMb(assetMetadata.size));
     this.assetPartnerLevel = assetMetadata.partnerLevel
-      ?.map((level) => DOMPurify.sanitize(level.toLowerCase()));
+      ?.map((level) => DOMPurify.sanitize(level.toLowerCase())) || [];
     this.createdDate = (() => {
       if (!assetMetadata.createdDate) return '';
 
@@ -275,210 +269,6 @@ export default class AssetPreview extends LitElement {
     img.src = transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH);
   };
 
-  // eslint-disable-next-line class-methods-use-this
-  timecodeToSeconds(timecode) {
-    const [hours, minutes, seconds] = timecode.split(':');
-    return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  getStartTime(timerange) {
-    return timerange.split(' - ')[0];
-  }
-
-  getChapterProgress(index) {
-    if (index < this.selectedChapterIndex) return 100;
-    if (index !== this.selectedChapterIndex) return 0;
-
-    const [startTime, endTime] = this.chapters[index].timerange.split(' - ');
-    const start = this.timecodeToSeconds(startTime);
-    const end = this.timecodeToSeconds(endTime);
-    const progress = ((this.currentTime - start) / (end - start)) * 100;
-
-    return Math.max(0, Math.min(100, progress));
-  }
-
-  handleVideoTimeUpdate(event) {
-    const video = event.currentTarget;
-    this.currentTime = video.currentTime;
-
-    if (video.paused || this.selectedChapterIndex >= this.chapters.length - 1) return;
-
-    const [, endTime] = this.chapters[this.selectedChapterIndex].timerange.split(' - ');
-    if (video.currentTime >= this.timecodeToSeconds(endTime)) {
-      this.selectChapter(this.selectedChapterIndex + 1);
-    }
-  }
-
-  formatTimecode(timecode) {
-    const totalSeconds = Math.floor(this.timecodeToSeconds(timecode));
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-
-    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  }
-
-  createChapterUrl(index) {
-    const url = new URL(window.location.href);
-
-    url.searchParams.set('chapter', String(index + 1));
-    url.searchParams.set(
-      't',
-      String(this.timecodeToSeconds(this.getStartTime(this.chapters[index].timerange))),
-    );
-
-    return url.toString();
-  }
-
-  markChapterShared(index) {
-    clearTimeout(this.shareResetTimer);
-    this.sharedChapterIndex = index;
-    this.shareResetTimer = setTimeout(() => {
-      this.sharedChapterIndex = -1;
-      this.shareResetTimer = null;
-    }, 2000);
-  }
-
-  async shareChapter(index, event) {
-    event.stopPropagation();
-
-    try {
-      await navigator.clipboard.writeText(this.createChapterUrl(index));
-      this.markChapterShared(index);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to copy chapter URL:', error);
-    }
-  }
-
-  restoreChapterFromUrl() {
-    const params = new URL(window.location.href).searchParams;
-    const chapterIndex = Number(params.get('chapter')) - 1;
-    const timestamp = params.has('t') && params.get('t').trim() !== ''
-      ? Number(params.get('t')) : NaN;
-    const timestampIndex = this.chapters.findIndex((chapter) => {
-      const [start, end] = chapter.timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
-      return Number.isFinite(timestamp) && timestamp >= start && timestamp < end;
-    });
-    const index = Number.isInteger(chapterIndex) && this.chapters[chapterIndex]
-      ? chapterIndex : timestampIndex;
-    if (index < 0) return;
-
-    this.selectedChapterIndex = index;
-    const [start, end] = this.chapters[index].timerange.split(' - ').map((time) => this.timecodeToSeconds(time));
-    this.currentTime = Number.isFinite(timestamp) && timestamp >= start && timestamp < end
-      ? timestamp : start;
-  }
-
-  handleVideoLoadedMetadata(event) {
-    event.currentTarget.currentTime = this.currentTime;
-  }
-
-  selectChapter(index) {
-    const chapter = this.chapters[index];
-    if (!chapter) return;
-
-    this.selectedChapterIndex = index;
-    const startTime = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
-    this.currentTime = startTime;
-
-    const video = this._video;
-    if (!video) return;
-
-    if (video.readyState >= 1) video.currentTime = startTime;
-
-    video.play().catch(() => {
-      // Playback may require user interaction in some browsers.
-    });
-  }
-
-  renderChapters() {
-    return this.chapters.map((chapter, index) => {
-      const [startTime, endTime] = chapter.timerange.split(' - ');
-      const shareLabel = this.sharedChapterIndex === index ? 'Link copied' : 'Copy link to this chapter';
-
-      /* eslint-disable indent */
-      return html`
-        <article
-          class="chapter ${this.selectedChapterIndex === index ? 'is-active' : ''}"
-          id="chapter-${index + 1}"
-          role="button"
-          @click="${() => this.selectChapter(index)}"
-        >
-          <div
-            class="chapter-time"
-          >
-            <span class="start-time">${this.formatTimecode(startTime)}</span>
-            <span class="duration-time">${this.formatTimecode(endTime)}</span>
-
-            <div class="chapter-actions">
-              <sp-action-button
-                class="share-button"
-                quiet
-                icon-only
-                label="${shareLabel}"
-                aria-describedby="chapter-share-tooltip-${index + 1}"
-                @click="${(event) => this.shareChapter(index, event)}"
-              >
-                ${this.sharedChapterIndex === index ? html`
-                  <svg
-                    slot="icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#268e6c"
-                    style="stroke: #268e6c;"
-                    stroke-width="1.75"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M5 12l4 4L19 6" />
-                  </svg>
-                ` : html`
-                  <svg
-                    class="copy-icon"
-                    slot="icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#707070"
-                    stroke-width="1.75"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M3 10v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8" />
-                    <path d="M12 13V3" />
-                    <path d="M7.5 7.5L12 3l4.5 4.5" />
-                  </svg>
-                `}
-              </sp-action-button>
-              <span class="chapter-share-tooltip" id="chapter-share-tooltip-${index + 1}" role="tooltip">
-                ${shareLabel}
-              </span>
-            </div>
-          </div>
-
-          <div class="chapter-content">
-            <h2 class="chapter-title">${chapter.title}</h2>
-            <p class="chapter-description">${chapter.summary}</p>
-            <div class="progress-track" aria-hidden="true">
-              <div
-                class="progress-fill"
-                style="width: ${this.getChapterProgress(index)}%;"
-              ></div>
-            </div>
-          </div>
-        </article>
-      `;
-    });
-  }
-
   render() {
     return html`<div class="asset-preview-block-container" daa-lh="Asset preview container | ${this.title}">
       ${this.assetHasData && !this.isLoading ? html`
@@ -490,7 +280,7 @@ export default class AssetPreview extends LitElement {
               ${this.summary ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Summary}}']}: </span>${unsafeHTML(this.summary)}</p>` : ''}
               ${this.getTagsTitlesString(this.fileFormatTags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Type}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.fileFormatTags))}</p>` : ''}
               ${this.getTagsTitlesString(this.tags) ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Tags}}']}: </span>${unsafeHTML(this.getTagsTitlesString(this.tags))}</p>` : ''}
-              ${this.size ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span class="bold">${unsafeHTML(this.size)}</p>` : ''}
+              ${this.size ? html`<p><span class="asset-preview-block-details-left-label">${this.blockData.localizedText['{{Size}}']}: </span>${unsafeHTML(this.size)}</p>` : ''}
 
               ${!this.isRestrictedAssetForUser() ? html`
               <div class="asset-preview-block-actions" daa-lh="Asset preview block actions">
@@ -498,7 +288,7 @@ export default class AssetPreview extends LitElement {
                   class="outline" ><a target="_blank" rel="noopener noreferrer" href="${this.getDownloadUrl()}" daa-ll="View"> View </a></button>` : ''}
                   ${!this.isVideo ? html`<button class="filled"><a download="${this.title}" href="${this.getDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.url)}}}`]}</a></button>` : ''}
                   ${this.webinarPresentation ? html`
-                    <button class="filled"><a  download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
+                    <button class="filled"><a download="${`${this.title}_presentation`}" href="${this.getWebinarPresentationDownloadUrl()}" daa-ll="${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}">${this.blockData.localizedText[`{{${this.getLabelBasedOnFileExtension(this.webinarPresentation)}}}`]}</a></button>
                   ` : ''}
 
                   ${this.isVideo ? html`
@@ -514,78 +304,24 @@ export default class AssetPreview extends LitElement {
 
             <div class="asset-preview-block-details-right">
             ${this.pdfPreviewUrl && !this.isRestrictedAssetForUser()
-                ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
-                : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`}
+    ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
+    : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`}
             </div>
           </div>
 
           ${this.isVideo && !this.isRestrictedAssetForUser() ? html`
-            <div class="asset-preview-block-video">
-              <div class="video-container video-holder">
-                ${this.isVideoLoading ? html`
-                  <div class="video-loading-overlay">
-                    <loading-spinner theme="dark"></loading-spinner>
-                  </div>
-                ` : ''}
-
-                <video
-                  preload="auto"
-                  @play="${() => { this.isVideoPlaying = true; }}"
-                  @pause="${() => { this.isVideoPlaying = false; }}"
-                  @timeupdate="${this.handleVideoTimeUpdate}"
-                  @loadedmetadata="${this.handleVideoLoadedMetadata}"
-                  @loadstart="${() => { this.isVideoLoading = true; }}"
-                  @seeking="${() => { this.isVideoLoading = true; }}"
-                  @waiting="${() => { this.isVideoLoading = true; }}"
-                  @playing="${() => { this.isVideoLoading = false; }}"
-                  @canplay="${() => { this.isVideoLoading = false; }}"
-                  @error="${() => { this.isVideoLoading = false; }}"
-                  playsinline
-                  loop
-                  data-video-source="${this.getDownloadUrl()}"
-                  oncontextmenu="return false;"
-                  controls
-                  controlsList="nodownload"
-                >
-                  <source
-                    src="${this.getDownloadUrl()}"
-                    type="${this.fileType}"
-                  />
-                  <source
-                    src="${this.getDownloadUrl()}"
-                    type="video/mp4"
-                  />
-                </video>
-              </div>
-
-              ${this.chapters.length ? html`
-              <div>
-                <sp-theme system="express" scale="medium" color="light">
-                  <section
-                    class="video-chapters"
-                    aria-label="Video chapters"
-                  >
-                    <header class="header">
-                      <h1 class="header-title">In this video</h1>
-                      <div class="chapter-count">
-                        Chapters: ${this.chapters.length}
-                      </div>
-                    </header>
-
-                    <div class="chapter-list">
-                      ${this.renderChapters()}
-                    </div>
-                  </section>
-                </sp-theme>
-              </div>
-              ` : ''}
-            </div>
+            <asset-video-player
+              .src="${this.getDownloadUrl()}"
+              .fileType="${this.fileType}"
+              .chapters="${this.chapters}"
+              @loading-change="${this.handleVideoLoadingChange}"
+            ></asset-video-player>
           ` : ''}
         ` : html`
           <div class="asset-preview-block-header">
             ${this.isLoading
-              ? this.blockData.localizedText['{{Loading data}}']
-              : this.blockData.localizedText['{{Asset data not found}}']}
+    ? this.blockData.localizedText['{{Loading data}}']
+    : this.blockData.localizedText['{{Asset data not found}}']}
           </div>
         `}
       </div>
