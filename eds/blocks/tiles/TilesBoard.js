@@ -1,23 +1,26 @@
+import { getLibs } from '../../scripts/utils.js';
+
+const miloLibs = getLibs();
+const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
+
 function toggleDisabledButtonsStates() {
   const buttons = document.querySelectorAll('.journey-card-toggle');
   buttons.forEach((button) => {
     const isDisabled = button.getAttribute('aria-disabled') === 'true';
     button.setAttribute('aria-disabled', String(!isDisabled));
-    // button.classList.toggle('is-loading', !isDisabled);
-    button.style.pointerEvents = isDisabled ? 'auto' : 'none';
   });
 }
 
-function createCardMarkup(card, onComplete) {
+function createCardMarkup(card, onComplete, index) {
   const title = String(card.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const description = String(card.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const actionLink = card.actionLink || '#';
 
   const root = document.createElement('div');
-  root.className = 'journey-card static-links-copy s-lockup light l-rounded-corners no-border click hover-scale con-block equal-height';
+  root.className = 'journey-card';
   root.setAttribute('data-card-id', card.id || '');
-  root.setAttribute('data-block-status', 'loaded');
-  root.setAttribute('daa-lh', 'b3|journey-card');
+  // set button label plus card title
+  root.setAttribute('daa-lh', `Journey Card ${card.id} | ${processTrackingLabels(card.title ?? '')}`);
 
   const buttonLabel = 'Mark as completed';
 
@@ -31,9 +34,12 @@ function createCardMarkup(card, onComplete) {
     <div class="card-footer">
       <div class="body-s action-area">
         <em>
-          <a href="${actionLink}" target="_blank" class="con-button outline fill" daa-ll="View-1--${title}">View</a>
+<!--        should it open on new tab or existing-->
+          <a href="${actionLink}" target="_blank" class="con-button outline fill" daa-ll="View-${card.id}--${processTrackingLabels(title)}">View</a>
         </em>
-        ${card.neverCompletesCard ? '' : `<em><a href="#" class="con-button outline fill journey-card-toggle" data-card-id="${card.id || ''}" data-action="complete" aria-disabled="false">
+        ${card.neverCompletesCard ? '' : `<em><a href="#" class="con-button outline fill journey-card-toggle" data-card-id="${card.id || ''}"
+daa-ll="Complete-${card.id}--${processTrackingLabels(title)}" 
+data-action="complete" aria-disabled="false">
           ${buttonLabel}
         </a></em>`}
       </div>
@@ -47,34 +53,54 @@ function createCardMarkup(card, onComplete) {
       event.stopPropagation();
       const { cardId, action } = event.currentTarget.dataset;
       const nextAction = action === 'complete' ? 'undo' : 'complete';
-      // event.currentTarget.dataset.action = nextAction;
       const button = event.currentTarget;
+      if (button?.getAttribute('aria-disabled') === 'true') {
+        return;
+      }
       if (typeof onComplete === 'function' && cardId) {
         button.textContent = 'Processing...';
         toggleDisabledButtonsStates();
         const success = await onComplete(Number(cardId), action);
-        const nextLabel = success && nextAction === 'undo' ? 'Undo' : 'Mark as completed';
+        console.log('success', success);
+        const nextLabel = success && nextAction === 'undo' ? 'Undo' : 'Complete';
         button.textContent = nextLabel;
-        button.dataset.action = nextAction;
+        if (success) button.dataset.action = nextAction;
+        button.setAttribute('daa-ll', `${nextLabel}-${card.id}--${processTrackingLabels(title)}`);
         toggleDisabledButtonsStates();
       }
     });
   }
-
+  root.addEventListener('click', () => {
+    // should it open in new tab or on existing : window.location.assign(links[0].href)
+    (() => (window.open(actionLink)))();
+  });
+  // will this be on block metadata or on card metadata? for now just hardcoeded
+  const backgroundMap = {
+    1: 'rgb(255, 250, 235)',
+    2: 'rgb(255, 247, 209)',
+    3: 'rgb(255, 238, 183)',
+    4: 'rgb(249, 241, 249)',
+    5: 'rgb(248, 230, 249)',
+    6: 'rgb(241, 213, 242)',
+    7: 'rgb(240, 255, 248)',
+    8: 'rgb(231, 255, 239)',
+    9: 'rgb(216, 255, 230)',
+  };
+  root.style.background = backgroundMap[index + 1];
   return root;
 }
 
 export default function renderBoard(cards, actionHandler) {
-  const section = document.createElement('div');
-  section.className = 'section three-up';
+  const journeyBoard = document.createElement('div');
+  journeyBoard.className = 'journey-board';
 
-  cards.forEach((card) => {
+  cards.forEach((card, index) => {
     const tile = createCardMarkup(
       card,
       actionHandler,
-      card.completed,
+      index,
     );
-    section.appendChild(tile);
+    journeyBoard.appendChild(tile);
   });
-  return section;
+  return journeyBoard;
 }
