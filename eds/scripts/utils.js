@@ -25,6 +25,8 @@ export const PARTNER_USER_STATE_COOKIE = 'partner_user_state';
 export const PARTNER_ACCOUNT_STATE_COOKIE = 'partner_account_state';
 
 const EDS_PROD_ORIGIN = 'https://partners.adobe.com';
+const EDS_STAGE_ORIGIN = 'https://partners.stage.adobe.com';
+const PROD_AEM_AUTHOR_HOST = 'dx-partner-author.prod.corp.adobe.com';
 const AEM_LOCAL_PORTS = ['4502', '7502'];
 
 export function isAemAuthorHost(origin) {
@@ -34,9 +36,11 @@ export function isAemAuthorHost(origin) {
 }
 
 // Rebases absolute `/eds/...` paths to the real EDS origin on AEM author hosts.
+// dev02, qa01, stage2, localhost on the AEM author ports 4502/7502 get the stage EDS site.
 export function getEdsOrigin(location) {
-  const { origin } = location || window.location;
-  return isAemAuthorHost(origin) ? EDS_PROD_ORIGIN : '';
+  const { origin, hostname } = location || window.location;
+  if (!isAemAuthorHost(origin)) return '';
+  return hostname === PROD_AEM_AUTHOR_HOST ? EDS_PROD_ORIGIN : EDS_STAGE_ORIGIN;
 }
 
 /**
