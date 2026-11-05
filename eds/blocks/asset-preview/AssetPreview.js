@@ -253,22 +253,17 @@ export default class AssetPreview extends LitElement {
 
   getRealAssetUrl() {
     const { search, origin, href, host } = window.location;
-
-    if (this.blockData.isAEM) {
-      const assetPath = new URLSearchParams(search).get('assetPath') || '';
-      if (!assetPath.startsWith('/content/dam/')) return null;
-      try {
-        return new URL(`${origin}${assetPath}.assetmetadata.json`);
-      } catch (error) {
-        return null;
-      }
-    }
-
-    const assetMetadataPath = href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH).replace('.html', '/_jcr_content/metadata.assetmetadata.json');
     try {
-      const url = new URL(assetMetadataPath);
-      const isProd = prodHosts.includes(host);
-      url.hostname = isProd ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
+      if (this.blockData.isAEM) {
+        const assetPath = new URLSearchParams(search).get('assetPath') || '';
+        const url = new URL(`${origin}${assetPath}.assetmetadata.json`);
+        return url.pathname.startsWith('/content/dam/') ? url : null;
+      }
+
+      const url = new URL(href
+        .replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH)
+        .replace('.html', '/_jcr_content/metadata.assetmetadata.json'));
+      url.hostname = prodHosts.includes(host) ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
       url.port = '';
       url.searchParams.delete('chapter');
       url.searchParams.delete('t');
