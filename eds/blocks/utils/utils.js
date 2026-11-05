@@ -98,7 +98,6 @@ export function generateRequestForSearchAPI(pageOptions, body) {
     method: 'POST',
     headers,
     body: JSON.stringify(body),
-    credentials: 'include',
   });
 }
 
