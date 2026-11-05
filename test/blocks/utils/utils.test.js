@@ -89,9 +89,9 @@ describe('block utility functions', () => {
   it('builds stage and production runtime action URLs', () => {
     const originalHosts = [...prodHosts];
     prodHosts.length = 0;
-    expect(getRuntimeActionUrl('/action').toString()).to.equal('https://io-partners-dx.stage.adobe.com/action');
+    expect(getRuntimeActionUrl('/action').toString()).to.equal('https://partners.stage.adobe.com/action');
     prodHosts.push(window.location.host);
-    expect(getRuntimeActionUrl('/action').toString()).to.equal('https://io-partners-dx.adobe.com/action');
+    expect(getRuntimeActionUrl('/action').toString()).to.equal('https://partners.adobe.com/action');
     prodHosts.length = 0;
     prodHosts.push(...originalHosts);
   });
