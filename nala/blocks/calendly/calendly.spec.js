@@ -23,7 +23,7 @@ export default {
       path: '/digitalexperience/drafts/automation/regression/calendly',
       tags: '@da-dx-calendly @regression @anonymous',
       data: {
-        stateManagementUrl: 'https://io-partners-dx.stage.adobe.com/api/v1/web/dx-partners-runtime/dxp-state-management',
+        stateManagementUrl: 'https://partners.stage.adobe.com/api/v1/web/dx-partners-runtime/dxp-state-management',
         partnerData: {
           partnerPortal: 'DXP',
           accessType: ['Billing Admin', 'Sales Center Admin', 'Admin'],
@@ -54,7 +54,7 @@ export default {
       path: '/digitalexperience/drafts/automation/regression/calendly',
       tags: '@da-dx-calendly @regression @anonymous',
       data: {
-        stateManagementUrl: 'https://io-partners-dx.stage.adobe.com/api/v1/web/dx-partners-runtime/dxp-state-management',
+        stateManagementUrl: 'https://partners.stage.adobe.com/api/v1/web/dx-partners-runtime/dxp-state-management',
         partnerData: {
           partnerPortal: 'DXP',
           accessType: ['Billing Admin', 'Sales Center Admin', 'Admin'],

@@ -73,7 +73,7 @@ export async function localizationPromises(localizedText, config) {
 
 export function getRuntimeActionUrl(action) {
   const isProdURL = prodHosts.includes(window.location.host);
-  const domain = isProdURL ? 'https://io-partners-dx.adobe.com' : 'https://io-partners-dx.stage.adobe.com';
+  const domain = isProdURL ? 'https://partners.adobe.com' : 'https://partners.stage.adobe.com';
   return new URL(
     `${domain}${action}`,
   );
