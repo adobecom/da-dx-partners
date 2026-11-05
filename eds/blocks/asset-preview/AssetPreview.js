@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { CAAS_TAGS_URL, getEdsOrigin, getLibs, prodHosts } from '../../scripts/utils.js';
+import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,
@@ -18,7 +18,7 @@ const { html, LitElement, unsafeHTML } = await import(`${miloLibs}/deps/lit-all.
 const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 await Promise.all([
   import('../../components/LoadingSpinner.js'),
-  loadStyle(`${getEdsOrigin()}/eds/components/LoadingSpinner.css`),
+  loadStyle('/eds/components/LoadingSpinner.css'),
 ]);
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';

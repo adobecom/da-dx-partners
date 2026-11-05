@@ -3,7 +3,6 @@ import {
   deleteCookieValue,
   formatDate,
   getCookieValue,
-  getEdsOrigin,
   getLocale,
   getMetadataContent,
   getNodesByXPath,
@@ -97,57 +96,6 @@ describe('Libs', () => {
     };
     const libs = setLibs('/libs', location);
     expect(libs).to.equal('https://awesome--milo--forkedowner.aem.live/libs');
-  });
-});
-
-describe('getEdsOrigin', () => {
-  it('resolves to empty string (same-origin) on the prod EDS host', () => {
-    const location = { hostname: 'partners.adobe.com', origin: 'https://partners.adobe.com' };
-    expect(getEdsOrigin(location)).to.equal('');
-  });
-  it('resolves to empty string (same-origin) on the stage EDS host', () => {
-    const location = { hostname: 'partners.stage.adobe.com', origin: 'https://partners.stage.adobe.com' };
-    expect(getEdsOrigin(location)).to.equal('');
-  });
-  it('rebases to the stage EDS origin on internal AEM author hosts (dev02)', () => {
-    const location = {
-      hostname: 'dx-partner-author.dev02.corp.adobe.com',
-      origin: 'https://dx-partner-author.dev02.corp.adobe.com',
-    };
-    expect(getEdsOrigin(location)).to.equal('https://partners.stage.adobe.com');
-  });
-  it('rebases to the stage EDS origin on internal AEM author hosts (qa01)', () => {
-    const location = {
-      hostname: 'dx-partner-author.qa01.corp.adobe.com',
-      origin: 'https://dx-partner-author.qa01.corp.adobe.com',
-    };
-    expect(getEdsOrigin(location)).to.equal('https://partners.stage.adobe.com');
-  });
-  it('rebases to the stage EDS origin on internal AEM author hosts (stage2)', () => {
-    const location = {
-      hostname: 'dx-partner-author.stage2.corp.adobe.com',
-      origin: 'https://dx-partner-author.stage2.corp.adobe.com',
-    };
-    expect(getEdsOrigin(location)).to.equal('https://partners.stage.adobe.com');
-  });
-  it('rebases to the prod EDS origin on the prod AEM author host', () => {
-    const location = {
-      hostname: 'dx-partner-author.prod.corp.adobe.com',
-      origin: 'https://dx-partner-author.prod.corp.adobe.com',
-    };
-    expect(getEdsOrigin(location)).to.equal('https://partners.adobe.com');
-  });
-  it('rebases to the stage EDS origin on local AEM author (port 4502)', () => {
-    const location = { hostname: 'localhost', origin: 'http://localhost:4502' };
-    expect(getEdsOrigin(location)).to.equal('https://partners.stage.adobe.com');
-  });
-  it('rebases to the stage EDS origin on local AEM author (port 7502)', () => {
-    const location = { hostname: 'localhost', origin: 'http://localhost:7502' };
-    expect(getEdsOrigin(location)).to.equal('https://partners.stage.adobe.com');
-  });
-  it('resolves to empty string (same-origin) on localhost dev server', () => {
-    const location = { hostname: 'localhost', origin: 'http://localhost:3000' };
-    expect(getEdsOrigin(location)).to.equal('');
   });
 });
 
