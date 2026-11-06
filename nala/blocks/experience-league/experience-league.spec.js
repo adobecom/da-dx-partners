@@ -1,4 +1,4 @@
-const PREVIEW_URL = 'https://experienceleague.adobe.com/en/docs/advertising/dsp/home';
+const PREVIEW_URL = /^https:\/\/experienceleague(\.stage)?\.adobe\.com\/en\/docs\/advertising\/dsp\/home$/;
 
 export default {
   FeatureName: 'Experience League Page',
