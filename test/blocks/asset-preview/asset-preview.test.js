@@ -174,6 +174,54 @@ describe('AssetPreview - loadPdfViewer()', () => {
 
     expect(el.pdfPreviewUrl).to.equal('');
   });
+
+  describe('AEM client id', () => {
+    let viewStub;
+    let savedAdobeDC;
+
+    beforeEach(() => {
+      savedAdobeDC = window.AdobeDC;
+      viewStub = sinon.stub().returns({ previewFile: sinon.stub() });
+      window.AdobeDC = { View: viewStub };
+      setConfig({ pdfViewerClientId: 'config-client-id' });
+      sinon.stub(window, 'fetch').resolves({
+        ok: true,
+        headers: { get: () => 'application/pdf' },
+      });
+    });
+
+    afterEach(() => {
+      window.AdobeDC = savedAdobeDC;
+      document.head.querySelectorAll('link[rel="stylesheet"]').forEach((l) => l.remove());
+    });
+
+    const load = async (isAEM) => {
+      const el = makeInstance();
+      el.blockData.isAEM = isAEM;
+      el.pdfPreviewUrl = 'https://example.com/file.pdf';
+      el.title = 'Test Asset';
+      await el.loadPdfViewer();
+    };
+
+    it('uses the config client id when isAEM is false', async () => {
+      await load(false);
+
+      expect(viewStub.firstCall.args[0].clientId).to.equal('config-client-id');
+    });
+
+    it('uses the config client id when isAEM is not set', async () => {
+      await load(undefined);
+
+      expect(viewStub.firstCall.args[0].clientId).to.equal('config-client-id');
+    });
+
+    it('falls back to the config client id when the AEM host is not mapped', async () => {
+      await load(true);
+
+      expect(window.location.hostname).to.equal('localhost');
+      expect(viewStub.firstCall.args[0].clientId).to.equal('config-client-id');
+    });
+  });
 });
 
 describe('AssetPreview - getAssetMetadata()', () => {
