@@ -52,6 +52,15 @@ export default class SearchPage {
     this.hubLogo = page.locator('a.feds-brand').filter({ has: page.locator('img[src*="px-hub-logo"]') });
     this.watchVideoButton = page.getByRole('button', { name: 'Watch Video' });
     this.videoPlayer = page.locator('asset-preview.asset-preview-block');
+    this.firstCard = page.locator('.card-header .card-title').first();
+    this.secondCard = page.locator('search-card:nth-child(2) > .search-card > .card-header');
+    this.thirdCard = page.locator('search-card:nth-child(3) > .search-card > .card-header');
+    this.regionFilter = page.getByRole('button', { name: 'Region' });
+    this.naRegionCheckBox = page.getByRole('checkbox', { name: 'North America' });
+    this.naRegionPreviewButton = page.locator('search-card').filter({ hasText: 'DXP-Automation-Regions-NA' }).getByLabel('Open in');
+    this.card1 = page.locator('.card-text').first();
+    this.card2 = page.locator('single-partner-card:nth-child(2) > .single-partner-card > .card-content > .card-text');
+    this.card3 = page.locator('single-partner-card:nth-child(3) > .single-partner-card > .card-content > .card-text');
   }
 
   async getCardTitle() {
@@ -283,5 +292,12 @@ export default class SearchPage {
     await expect(this.assetPreviewImage).toBeVisible({ timeout: 30000 });
     const src = await this.assetPreviewImage.getAttribute('src');
     expect(src).toContain(expectedThumbnailPath);
+  }
+
+  getRegionPreviewButton(assetTitle) {
+    return this.page
+      .locator('search-card')
+      .filter({ hasText: assetTitle })
+      .getByLabel('Open in');
   }
 }
