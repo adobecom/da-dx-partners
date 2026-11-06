@@ -22,6 +22,14 @@ await Promise.all([
 ]);
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
+
+const PDF_VIEWER_CLIENT_ID_BY_AEM_HOST = {
+  'dx-partner-author.dev02.corp.adobe.com': '39e4a6d95084446299434f49dfc62ebb',
+  'dx-partner-author.qa01.corp.adobe.com': 'f7124074460a49bc98d0df4844bdb5bb',
+  'dx-partner-author.stage2.corp.adobe.com': 'be93c91920564394a8fef2e8e3c104a4',
+  'dx-partner-author.prod.corp.adobe.com': 'ec5ba0be14344447beedfeeaaee8674b',
+};
+
 export default class AssetPreview extends LitElement {
   static properties = {
     blockData: { type: Object },
@@ -132,12 +140,17 @@ export default class AssetPreview extends LitElement {
         return;
       }
 
+      const clientId = this.blockData.isAEM
+        ? PDF_VIEWER_CLIENT_ID_BY_AEM_HOST[window.location.hostname]
+        : undefined;
+
       const { default: initPdfViewer } = await import('../../components/PdfViewer.js');
       await initPdfViewer({
         url: this.pdfPreviewUrl,
         fileName: `${this.title}.pdf`,
         divId: PDF_RENDER_DIV_ID,
         pdfEmbedMode: this.blockData.pdfEmbedMode,
+        clientId,
       });
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -257,13 +270,19 @@ export default class AssetPreview extends LitElement {
     this.aemPath = DOMPurify.sanitize(assetMetadata.aemPath);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   getRealAssetUrl() {
-    const assetMetadataPath = window.location.href.replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH).replace('.html', '/_jcr_content/metadata.assetmetadata.json');
+    const { search, origin, href, host } = window.location;
     try {
-      const url = new URL(assetMetadataPath);
-      const isProd = prodHosts.includes(window.location.host);
-      url.hostname = isProd ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
+      if (this.blockData.isAEM) {
+        const assetPath = new URLSearchParams(search).get('assetPath') || '';
+        const url = new URL(`${origin}${assetPath}.assetmetadata.json`);
+        return url.pathname.startsWith('/content/dam/') ? url : null;
+      }
+
+      const url = new URL(href
+        .replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH)
+        .replace('.html', '/_jcr_content/metadata.assetmetadata.json'));
+      url.hostname = prodHosts.includes(host) ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
       url.port = '';
       url.searchParams.delete('chapter');
       url.searchParams.delete('t');
@@ -278,6 +297,9 @@ export default class AssetPreview extends LitElement {
     // eslint-disable-next-line no-console
     console.log('error', e);
     const img = e.currentTarget;
+    // Guard against an infinite error loop if the fallback image also fails to load.
+    if (img.dataset.fallbackApplied === 'true') return;
+    img.dataset.fallbackApplied = 'true';
     img.src = transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH);
   };
 
@@ -676,6 +698,8 @@ export default class AssetPreview extends LitElement {
   }
 
   isRestrictedAssetForUser() {
+    if (this.blockData.isAEM) return false;
+
     return !(!this.assetPartnerLevel.length
       || this.assetPartnerLevel.includes('public')
       || this.assetPartnerLevel.includes(PARTNER_LEVEL));
