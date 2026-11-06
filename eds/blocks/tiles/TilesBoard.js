@@ -3,12 +3,50 @@ import { getLibs } from '../../scripts/utils.js';
 const miloLibs = getLibs();
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
 
-function toggleDisabledButtonsStates() {
-  const buttons = document.querySelectorAll('.journey-card-toggle');
-  buttons.forEach((button) => {
-    const isDisabled = button.getAttribute('aria-disabled') === 'true';
-    button.setAttribute('aria-disabled', String(!isDisabled));
-  });
+function getButtonLabel(action) {
+  return action === 'undo' ? 'Undo' : 'Mark as completed';
+}
+
+function setButtonState(button, { disabled, label }) {
+  button.setAttribute('aria-disabled', String(disabled));
+  if (typeof label !== 'undefined') {
+    button.textContent = label;
+  }
+}
+
+async function handleJourneyCardToggle(event, onComplete, title, cardId) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const button = event.currentTarget;
+  const { action = 'complete' } = button.dataset;
+  const nextAction = action === 'complete' ? 'undo' : 'complete';
+  const originalLabel = getButtonLabel(action);
+  const nextLabel = getButtonLabel(nextAction);
+
+  if (button.getAttribute('aria-disabled') === 'true') {
+    return;
+  }
+
+  if (typeof onComplete !== 'function' || !cardId) {
+    return;
+  }
+
+  setButtonState(button, { disabled: true, label: 'Processing...' });
+
+  try {
+    const success = await onComplete(Number(cardId), action);
+    if (!success) {
+      setButtonState(button, { disabled: false, label: originalLabel });
+      return;
+    }
+
+    button.dataset.action = nextAction;
+    button.setAttribute('daa-ll', `${nextLabel}-${cardId}--${processTrackingLabels(title)}`);
+    setButtonState(button, { disabled: false, label: nextLabel });
+  } catch (error) {
+    setButtonState(button, { disabled: false, label: originalLabel });
+  }
 }
 
 function createCardMarkup(card, onComplete, index) {
@@ -25,53 +63,34 @@ function createCardMarkup(card, onComplete, index) {
   const buttonLabel = 'Mark as completed';
 
   root.innerHTML = `
-    <div class="foreground">
-      <div class="body-s">
-        <h3 class="heading-l">${title}</h3>
-        <p class="body-s">${description}</p>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div class="body-s action-area">
-        <em>
+   <div class="foreground">
+     <div class="body-s">
+       <h3 class="heading-l">${title}</h3>
+       <p class="body-s">${description}</p>
+     </div>
+   </div>
+   <div class="card-footer">
+     <div class="body-s action-area">
+       <em>
 <!--        should it open on new tab or existing-->
-          <a href="${actionLink}" target="_blank" class="con-button outline fill" daa-ll="View-${card.id}--${processTrackingLabels(title)}">View</a>
-        </em>
-        ${card.neverCompletesCard ? '' : `<em><a href="#" class="con-button outline fill journey-card-toggle" data-card-id="${card.id || ''}"
+         <a href="${actionLink}" target="_blank" class="con-button outline fill" daa-ll="View-${card.id}--${processTrackingLabels(title)}">View</a>
+       </em>
+       ${card.neverCompletesCard ? '' : `<em><a href="#" class="con-button outline fill journey-card-toggle" data-card-id="${card.id || ''}"
 daa-ll="Complete-${card.id}--${processTrackingLabels(title)}" 
 data-action="complete" aria-disabled="false">
-          ${buttonLabel}
-        </a></em>`}
-      </div>
-    </div>
-  `;
+         ${buttonLabel}
+       </a></em>`}
+     </div>
+   </div>
+ `;
 
   const toggle = root.querySelector('.journey-card-toggle');
   if (toggle) {
-    toggle.addEventListener('click', async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const { cardId, action } = event.currentTarget.dataset;
-      const nextAction = action === 'complete' ? 'undo' : 'complete';
-      const button = event.currentTarget;
-      if (button?.getAttribute('aria-disabled') === 'true') {
-        return;
-      }
-      if (typeof onComplete === 'function' && cardId) {
-        button.textContent = 'Processing...';
-        toggleDisabledButtonsStates();
-        const success = await onComplete(Number(cardId), action);
-        console.log('success', success);
-        const nextLabel = success && nextAction === 'undo' ? 'Undo' : 'Complete';
-        button.textContent = nextLabel;
-        if (success) button.dataset.action = nextAction;
-        button.setAttribute('daa-ll', `${nextLabel}-${card.id}--${processTrackingLabels(title)}`);
-        toggleDisabledButtonsStates();
-      }
-    });
+    toggle.addEventListener('click', (event) => handleJourneyCardToggle(event, onComplete, title, card.id));
   }
   root.addEventListener('click', () => {
     // should it open in new tab or on existing : window.location.assign(links[0].href)
+    // should card be clickable
     (() => (window.open(actionLink)))();
   });
   // will this be on block metadata or on card metadata? for now just hardcoeded

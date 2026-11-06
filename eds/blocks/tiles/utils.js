@@ -89,13 +89,13 @@ export function getVisibleJourneyCards({
 
 export function buildCompletedJourneyCardState(
   cardId,
-  completedCardIds = getCompletedJourneyCardIds(),
-  completed = true,
+  completedCardIds,
+  action,
 ) {
   const normalizedCardId = Number(cardId);
   const normalizedCompletedCards = normalizeJourneyCardIds(completedCardIds);
 
-  if (completed) {
+  if (action === 'complete') {
     return normalizeJourneyCardIds([...normalizedCompletedCards, normalizedCardId]);
   }
 

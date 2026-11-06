@@ -17,13 +17,13 @@ function getTilesSegment() {
   }
   return `${isAdmin ? 'admin' : 'user'}-${partnerLevel === 'community' ? 'community' : programType}`;
 }
-async function handleCardComplete(cardId, completed) {
+async function handleUserAction(cardId, action) {
   // const normalizedCardId = Number(cardId);
   const completedCardIds = getCompletedJourneyCardIds();
   const nextCompletedCardIds = buildCompletedJourneyCardState(
     cardId,
     completedCardIds,
-    completed,
+    action,
   );
   console.log('nextCompletedCardIds', nextCompletedCardIds);
   // on first user action (if there is no firstAction in the state) set the date
@@ -47,7 +47,7 @@ export default async function init(el) {
     completedCardIds: getCompletedJourneyCardIds(),
   });
 
-  const tilesBoard = renderBoard(visibleCards, handleCardComplete);
+  const tilesBoard = renderBoard(visibleCards, handleUserAction);
   const root = document.createElement('div');
   root.className = 'tiles-block';
   root.appendChild(tilesBoard);
