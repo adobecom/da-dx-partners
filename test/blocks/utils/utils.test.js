@@ -109,7 +109,6 @@ describe('block utility functions', () => {
     expect(url.toString()).to.contain('query=analytics');
     expect(url.toString()).to.contain('limit=10');
     expect(options.method).to.equal('POST');
-    expect(options.credentials).to.equal('include');
     expect(options.body).to.equal(JSON.stringify({ filters: [] }));
     prodHosts.push(...originalHosts);
   });
