@@ -14,7 +14,7 @@ const {
   keepInlineFragmentInDOM,
   sidekickListener,
 } = await import('../../../eds/blocks/utils/utils.js');
-const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
+const { getConfig, setConfig, updateConfig } = await import(`${miloLibs}/utils/utils.js`);
 
 function makeButton({ href = '', text = '', modalPath = '', wcsOsi = false } = {}) {
   const button = document.createElement('a');
@@ -26,8 +26,16 @@ function makeButton({ href = '', text = '', modalPath = '', wcsOsi = false } = {
 }
 
 describe('block utility functions', () => {
+  let originalConfig;
+
+  beforeEach(() => {
+    originalConfig = getConfig();
+    setConfig({ env: { name: 'stage' } });
+  });
+
   afterEach(() => {
     sinon.restore();
+    updateConfig(originalConfig);
     document.body.innerHTML = '';
   });
 
@@ -39,7 +47,6 @@ describe('block utility functions', () => {
     let listenerSpy;
     let originalIMS;
     let originalUrl;
-    let originalHosts;
 
     before(async () => {
       await Promise.all([
@@ -51,8 +58,6 @@ describe('block utility functions', () => {
     beforeEach(async () => {
       originalIMS = window.adobeIMS;
       originalUrl = window.location.href;
-      originalHosts = [...prodHosts];
-      prodHosts.length = 0;
       window.adobeIMS = {
         isSignedInUser: sinon.stub().returns(true),
         getAccessToken: sinon.stub().returns({ token: 'test-token' }),
@@ -74,8 +79,6 @@ describe('block utility functions', () => {
     afterEach(() => {
       sinon.restore();
       window.adobeIMS = originalIMS;
-      prodHosts.length = 0;
-      prodHosts.push(...originalHosts);
       window.history.replaceState({}, '', originalUrl);
       document.body.innerHTML = '';
     });
@@ -156,12 +159,18 @@ describe('block utility functions', () => {
       expect(fetchStub.called).to.equal(false);
     });
 
-    it('uses the production runtime domain on a production host', async () => {
-      prodHosts.push(window.location.host);
+    it('uses the stage tooling runtime for CaaS unpublishing', async () => {
+      await runAction();
+
+      expect(fetchStub.firstCall.args[0].origin).to.equal('https://io-partners-tooling.stage.adobe.com');
+    });
+
+    it('uses the production tooling runtime when the configured environment is prod', async () => {
+      setConfig({ env: { name: 'prod' } });
 
       await runAction();
 
-      expect(fetchStub.firstCall.args[0].origin).to.equal('https://io-partners-dx.adobe.com');
+      expect(fetchStub.firstCall.args[0].origin).to.equal('https://io-partners-tooling.adobe.com');
     });
 
     it('renders card URLs as safe links and styles long toast content', async () => {
@@ -307,31 +316,33 @@ describe('block utility functions', () => {
     expect(localizedText['{{existing}}']).to.equal('Existing');
   });
 
-  it('builds stage and production runtime action URLs', () => {
-    const originalHosts = [...prodHosts];
-    prodHosts.length = 0;
-    expect(getRuntimeActionUrl('/action').toString()).to.equal('https://partners.stage.adobe.com/action');
-    prodHosts.push(window.location.host);
-    expect(getRuntimeActionUrl('/action').toString()).to.equal('https://partners.adobe.com/action');
-    prodHosts.length = 0;
-    prodHosts.push(...originalHosts);
+  [
+    { env: 'stage', dx: 'https://partners.stage.adobe.com', tooling: 'https://io-partners-tooling.stage.adobe.com' },
+    { env: 'prod', dx: 'https://partners.adobe.com', tooling: 'https://io-partners-tooling.adobe.com' },
+  ].forEach(({ env, dx, tooling }) => {
+    it(`builds default dx and explicit runtime URLs for the ${env} environment`, () => {
+      setConfig({ env: { name: env } });
+
+      expect(getRuntimeActionUrl('/action')).to.be.instanceOf(URL);
+      expect(getRuntimeActionUrl('/action').href).to.equal(`${dx}/action`);
+      expect(getRuntimeActionUrl('/action', 'dx').href).to.equal(`${dx}/action`);
+      expect(getRuntimeActionUrl('/action', 'tooling').href).to.equal(`${tooling}/action`);
+    });
   });
 
   it('generates a search request with locale and page options', async () => {
     const fetchStub = sinon.stub(window, 'fetch').resolves({ ok: true });
-    const originalHosts = [...prodHosts];
-    prodHosts.length = 0;
-    setConfig({ locales: { '': { ietf: 'en-US' } } });
+    setConfig({ env: { name: 'stage' }, locales: { '': { ietf: 'en-US' } } });
 
     await generateRequestForSearchAPI({ query: 'analytics', limit: 10 }, { filters: [] });
 
     const [url, options] = fetchStub.firstCall.args;
+    expect(new URL(url).origin).to.equal('https://partners.stage.adobe.com');
     expect(url.toString()).to.contain('language=en-US');
     expect(url.toString()).to.contain('query=analytics');
     expect(url.toString()).to.contain('limit=10');
     expect(options.method).to.equal('POST');
     expect(options.body).to.equal(JSON.stringify({ filters: [] }));
-    prodHosts.push(...originalHosts);
   });
 
   it('transforms relative and partner-host URLs for the current environment', () => {
