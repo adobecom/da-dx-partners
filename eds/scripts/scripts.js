@@ -23,7 +23,9 @@ import {
   setFeedback,
   SHOW_NEXT_POPUP,
   PARTNER_AGREEMENT_POPUP,
+  previewHosts,
 } from './utils.js';
+import { sidekickListener } from '../blocks/utils/utils.js';
 import { applyPagePersonalization } from './personalization.js';
 import { rewriteLinks } from './rewriteLinks.js';
 import { prependContent } from './portalMessaging.js';
@@ -151,6 +153,10 @@ async function loadPage() {
     }
   });
   await showNextPopup(miloLibs, imsClientId, PARTNER_AGREEMENT_POPUP);
+
+  if (previewHosts.includes(window.location.host)) {
+    sidekickListener();
+  }
 
   // Run when navigating back/forward
   window.addEventListener('pageshow', () => {

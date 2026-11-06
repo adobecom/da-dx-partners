@@ -677,3 +677,5 @@ export function preventModalClose(_modal) {
   };
   curtain.addEventListener('click', blockClickOutside, { capture: true });
 }
+
+export const previewHosts = ['partnerspreview.adobe.com', 'stage--da-dx-partners--adobecom.aem.live'];
