@@ -71,12 +71,21 @@ export async function localizationPromises(localizedText, config) {
   }));
 }
 
-export function getRuntimeActionUrl(action) {
-  const isProdURL = prodHosts.includes(window.location.host);
-  const domain = isProdURL ? 'https://partners.adobe.com' : 'https://partners.stage.adobe.com';
-  return new URL(
-    `${domain}${action}`,
-  );
+export function getRuntimeActionUrl(action, type = 'dx') {
+  const { env } = getConfig();
+  const isProdEnv = env.name === 'prod';
+  const domains = {
+    dx: {
+      stage: 'https://partners.stage.adobe.com',
+      prod: 'https://partners.adobe.com',
+    },
+    tooling: {
+      stage: 'https://io-partners-tooling.stage.adobe.com',
+      prod: 'https://io-partners-tooling.adobe.com',
+    },
+  };
+  const domain = isProdEnv ? domains[type].prod : domains[type].stage;
+  return new URL(`${domain}${action}`);
 }
 
 export function generateRequestForSearchAPI(pageOptions, body) {
