@@ -13,7 +13,7 @@ export default class GnavPersonalisationPage {
     this.globeIcon = page.getByRole('link', { name: 'Partner Directory' });
     this.searchIcon = page.getByRole('link', { name: 'Search' });
     this.menageUserIcon = page.getByRole('link', { name: 'Manage Profile' });
-    this.homeIcon = page.getByRole('link', { name: 'Home' });
+    this.homeIcon = page.locator('.shortcut-icons.shortcut-icons-desktop').getByRole('link', { name: 'Home' });
     this.navigationMenuButton = page.getByRole('button', { name: 'Navigation menu' });
     this.mainMenuButton = page.getByLabel('About').locator('div').filter({ hasText: 'Main menu' });
     this.newlyApprovedBanner = page.locator('.partner-newly-approved');
