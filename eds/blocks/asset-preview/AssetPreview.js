@@ -22,6 +22,14 @@ await Promise.all([
 ]);
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
+
+const PDF_VIEWER_CLIENT_ID_BY_AEM_HOST = {
+  'dx-partner-author.dev02.corp.adobe.com': '39e4a6d95084446299434f49dfc62ebb',
+  'dx-partner-author.qa01.corp.adobe.com': 'f7124074460a49bc98d0df4844bdb5bb',
+  'dx-partner-author.stage2.corp.adobe.com': 'be93c91920564394a8fef2e8e3c104a4',
+  'dx-partner-author.prod.corp.adobe.com': 'ec5ba0be14344447beedfeeaaee8674b',
+};
+
 export default class AssetPreview extends LitElement {
   static properties = {
     blockData: { type: Object },
@@ -132,12 +140,17 @@ export default class AssetPreview extends LitElement {
         return;
       }
 
+      const clientId = this.blockData.isAEM
+        ? PDF_VIEWER_CLIENT_ID_BY_AEM_HOST[window.location.hostname]
+        : undefined;
+
       const { default: initPdfViewer } = await import('../../components/PdfViewer.js');
       await initPdfViewer({
         url: this.pdfPreviewUrl,
         fileName: `${this.title}.pdf`,
         divId: PDF_RENDER_DIV_ID,
         pdfEmbedMode: this.blockData.pdfEmbedMode,
+        clientId,
       });
     } catch (e) {
       // eslint-disable-next-line no-console
