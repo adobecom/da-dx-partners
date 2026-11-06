@@ -174,6 +174,54 @@ describe('AssetPreview - loadPdfViewer()', () => {
 
     expect(el.pdfPreviewUrl).to.equal('');
   });
+
+  describe('AEM client id', () => {
+    let viewStub;
+    let savedAdobeDC;
+
+    beforeEach(() => {
+      savedAdobeDC = window.AdobeDC;
+      viewStub = sinon.stub().returns({ previewFile: sinon.stub() });
+      window.AdobeDC = { View: viewStub };
+      setConfig({ pdfViewerClientId: 'config-client-id' });
+      sinon.stub(window, 'fetch').resolves({
+        ok: true,
+        headers: { get: () => 'application/pdf' },
+      });
+    });
+
+    afterEach(() => {
+      window.AdobeDC = savedAdobeDC;
+      document.head.querySelectorAll('link[rel="stylesheet"]').forEach((l) => l.remove());
+    });
+
+    const load = async (isAEM) => {
+      const el = makeInstance();
+      el.blockData.isAEM = isAEM;
+      el.pdfPreviewUrl = 'https://example.com/file.pdf';
+      el.title = 'Test Asset';
+      await el.loadPdfViewer();
+    };
+
+    it('uses the config client id when isAEM is false', async () => {
+      await load(false);
+
+      expect(viewStub.firstCall.args[0].clientId).to.equal('config-client-id');
+    });
+
+    it('uses the config client id when isAEM is not set', async () => {
+      await load(undefined);
+
+      expect(viewStub.firstCall.args[0].clientId).to.equal('config-client-id');
+    });
+
+    it('falls back to the config client id when the AEM host is not mapped', async () => {
+      await load(true);
+
+      expect(window.location.hostname).to.equal('localhost');
+      expect(viewStub.firstCall.args[0].clientId).to.equal('config-client-id');
+    });
+  });
 });
 
 describe('AssetPreview - getAssetMetadata()', () => {
@@ -797,12 +845,54 @@ describe('AssetPreview - getRealAssetUrl()', () => {
     expect(result === null || result instanceof URL).to.be.true;
   });
 
+  it('builds the AEM metadata URL from the assetPath parameter', () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '/content/asset-ai-dashboard.html?assetPath=/content/dam/dxp/qatest/dragana/shortexample.mp4');
+      const el = new AssetPreview();
+      el.blockData = { isAEM: true };
+
+      const metadataUrl = el.getRealAssetUrl();
+
+      expect(metadataUrl).to.be.instanceOf(URL);
+      expect(metadataUrl.toString()).to.equal(`${window.location.origin}/content/dam/dxp/qatest/dragana/shortexample.mp4.assetmetadata.json`);
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
+
+  it('returns null for non-DAM AEM asset paths', () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '/content/asset-ai-dashboard.html?assetPath=/content/test/page');
+      const el = new AssetPreview();
+      el.blockData = { isAEM: true };
+
+      expect(el.getRealAssetUrl()).to.equal(null);
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
+
+  it('routes non-AEM preview URLs to the stage domain when not on prod', () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '/digitalexperience/preview/video.html?asset=example');
+      const metadataUrl = makeInstance().getRealAssetUrl();
+
+      expect(metadataUrl.hostname).to.equal('partners.stage.adobe.com');
+      expect(metadataUrl.pathname).to.include('/digitalexperience-assets/preview/video/_jcr_content/metadata.assetmetadata.json');
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
+
   it('removes client-only chapter parameters while preserving other query parameters', () => {
     const originalUrl = window.location.href;
     try {
       ['chapter=1&t=1.001', 'chapter=1', 't=1.001'].forEach((query) => {
         window.history.replaceState(null, '', `/digitalexperience/preview/video.html?${query}&asset=example`);
-        const metadataUrl = new AssetPreview().getRealAssetUrl();
+        const metadataUrl = makeInstance().getRealAssetUrl();
 
         expect(metadataUrl.searchParams.has('chapter')).to.be.false;
         expect(metadataUrl.searchParams.has('t')).to.be.false;
@@ -957,6 +1047,46 @@ describe('AssetPreview - chapter time helpers', () => {
     expect(el.formatTimecode('00:00:01.999')).to.equal('00:01');
     expect(el.formatTimecode('00:05:09.123')).to.equal('05:09');
     expect(el.formatTimecode('01:02:03.456')).to.equal('62:03');
+  });
+
+  it('restores the chapter from URL when the timestamp is inside a chapter range', () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '?chapter=2&t=35');
+      const el = new AssetPreview();
+      el.blockData = {};
+      el.chapters = [
+        { title: 'First', summary: 'First summary', timerange: '00:00:00.000 - 00:00:30.000' },
+        { title: 'Second', summary: 'Second summary', timerange: '00:00:30.000 - 00:01:00.000' },
+      ];
+
+      el.restoreChapterFromUrl();
+
+      expect(el.selectedChapterIndex).to.equal(1);
+      expect(el.currentTime).to.equal(35);
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
+
+  it('falls back to the chapter start when the URL timestamp is outside the selected chapter range', () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '?chapter=2&t=90');
+      const el = new AssetPreview();
+      el.blockData = {};
+      el.chapters = [
+        { title: 'First', summary: 'First summary', timerange: '00:00:00.000 - 00:00:30.000' },
+        { title: 'Second', summary: 'Second summary', timerange: '00:00:30.000 - 00:01:00.000' },
+      ];
+
+      el.restoreChapterFromUrl();
+
+      expect(el.selectedChapterIndex).to.equal(1);
+      expect(el.currentTime).to.equal(30);
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
   });
 });
 
