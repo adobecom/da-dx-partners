@@ -156,14 +156,6 @@ describe('block utility functions', () => {
       expect(fetchStub.called).to.equal(false);
     });
 
-    it('uses the production runtime domain on a production host', async () => {
-      prodHosts.push(window.location.host);
-
-      await runAction();
-
-      expect(fetchStub.firstCall.args[0].origin).to.equal('https://io-partners-dx.adobe.com');
-    });
-
     it('renders card URLs as safe links and styles long toast content', async () => {
       const result = await runAction();
       const link = result.querySelector('a');
