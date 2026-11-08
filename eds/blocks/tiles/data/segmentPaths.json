@@ -213,7 +213,7 @@
     {
       "id": 36,
       "title": "Browse on-demand learning courses",
-      "condition": "34",
+      "condition": "31",
       "neverCompletes": false
     },
     {
@@ -225,7 +225,7 @@
     {
       "id": 38,
       "title": "View upcoming events",
-      "condition": "36",
+      "condition": "31",
       "neverCompletes": false
     },
     {

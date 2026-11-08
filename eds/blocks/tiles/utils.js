@@ -6,8 +6,6 @@ import segmentPaths from './data/segmentPaths.json' with { type: 'json' };
 export const MAX_VISIBLE_JOURNEY_CARDS = 9;
 export const JOURNEY_CARD_DETAILS = allCards;
 export const JOURNEY_PATHS = segmentPaths;
-// todo evalueate if this is needed since we
-//  dont expect duplicates and we dont expect nothing than array
 export function normalizeJourneyCardIds(value) {
   if (!value) return [];
   const cardIds = Array.isArray(value) ? value : [value];
@@ -31,8 +29,7 @@ export function normalizeJourneyCardIds(value) {
 
 export function getJourneyPathForSegment(segment, paths = JOURNEY_PATHS) {
   if (paths[segment]) return paths[segment];
-  const [fallbackSegment] = Object.keys(paths || {});
-  return fallbackSegment ? paths[fallbackSegment] : [];
+  return null;
 }
 
 export function getCompletedJourneyCardIds(userState = getPartnerUserState()) {
@@ -58,6 +55,7 @@ export function getVisibleJourneyCards({
   cardDetails = JOURNEY_CARD_DETAILS,
 } = {}) {
   const path = getJourneyPathForSegment(segment, paths);
+  if (!path) return [];
   const normalizedCompletedCardIds = normalizeJourneyCardIds(completedCardIds);
   const completedSet = new Set(normalizedCompletedCardIds.map(String));
   const visibleCards = [];
@@ -96,7 +94,7 @@ export function buildCompletedJourneyCardState(
   const normalizedCompletedCards = normalizeJourneyCardIds(completedCardIds);
 
   if (action === 'complete') {
-    return normalizeJourneyCardIds([...normalizedCompletedCards, normalizedCardId]);
+    return [...normalizedCompletedCards, normalizedCardId];
   }
 
   return normalizedCompletedCards.filter((id) => id !== normalizedCardId);
