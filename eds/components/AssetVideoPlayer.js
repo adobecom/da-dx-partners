@@ -701,7 +701,7 @@ export default class AssetVideoPlayer extends LitElement {
                   <img
                     class="check-icon"
                     slot="icon"
-                    src="${`${edsOrigin}/eds/img/icons/player-check.svg` }"
+                    src="${`${edsOrigin}/eds/img/icons/player-check.svg`}"
                     alt=""
                     aria-hidden="true"
                     width="18"
@@ -711,7 +711,7 @@ export default class AssetVideoPlayer extends LitElement {
                   <img
                     class="copy-icon"
                     slot="icon"
-                    src="${`${edsOrigin}/eds/img/icons/player-share.svg` }"
+                    src="${`${edsOrigin}/eds/img/icons/player-share.svg`}"
                     alt=""
                     aria-hidden="true"
                     width="18"
