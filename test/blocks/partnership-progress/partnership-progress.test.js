@@ -27,7 +27,14 @@ function renderToNode(template) {
 }
 
 describe('partnership-progress', () => {
+  let fetchStub;
+
   beforeEach(async () => {
+    fetchStub = sinon.stub(window, 'fetch').callThrough();
+    fetchStub.withArgs(sinon.match(/\/placeholders\.json(?:\?|$)/)).resolves({
+      ok: true,
+      json: async () => ({ data: [] }),
+    });
     document.body.innerHTML = await readFile({ path: './mocks/body.html' });
     clearPartnerCookies();
     delete window.dxpImsReady;
@@ -86,7 +93,7 @@ describe('partnership-progress', () => {
       }],
     };
 
-    const fetchStub = sinon.stub(window, 'fetch').resolves({
+    const progressFetchStub = fetchStub.withArgs(sinon.match(/\/membership\/level-requirements$/)).resolves({
       ok: true,
       json: async () => apiResponse,
     });
@@ -99,7 +106,7 @@ describe('partnership-progress', () => {
     await waitFor(() => app.data && app.loading === false, 1000, 10);
     await app.updateComplete;
 
-    expect(fetchStub.calledOnce).to.equal(true);
+    expect(progressFetchStub.calledOnce).to.equal(true);
     expect(app.data).to.deep.equal(apiResponse);
     expect(app.loading).to.equal(false);
   });
