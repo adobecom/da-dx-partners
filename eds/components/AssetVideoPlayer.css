@@ -465,9 +465,25 @@ asset-video-player .chapter .share-button svg {
   fill: none;
 }
 
+asset-video-player .chapter .share-button .copy-icon,
+asset-video-player .chapter .share-button .check-icon {
+  display: block;
+}
+
+asset-video-player .chapter .share-button .copy-icon {
+  color: #707070;
+  stroke: currentColor;
+}
+
+asset-video-player .chapter .share-button .check-icon {
+  color: #2bb673;
+  stroke: currentColor;
+}
+
 asset-video-player .chapter .share-button:hover .copy-icon,
 asset-video-player .chapter .share-button:focus-visible .copy-icon {
   stroke: #1473e6;
+  color: #1473e6;
 }
 
 asset-video-player .chapter .chapter-share-tooltip {

@@ -699,13 +699,13 @@ export default class AssetVideoPlayer extends LitElement {
               >
                 ${this.sharedChapterIndex === index ? html`
                   <img
+                    class="check-icon"
                     slot="icon"
                     src="${`${getEdsOrigin()}/eds/img/icons/player-check.svg` }"
                     alt=""
                     aria-hidden="true"
                     width="18"
                     height="18"
-                    style="display:block;"
                   />
                 ` : html`
                   <img
@@ -716,7 +716,6 @@ export default class AssetVideoPlayer extends LitElement {
                     aria-hidden="true"
                     width="18"
                     height="18"
-                    style="display:block;"
                   />
                 `}
               </sp-action-button>
