@@ -176,6 +176,18 @@ asset-video-player .player-controls-right {
   grid-column: -2 / -1;
 }
 
+asset-video-player .player-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+asset-video-player .skip-svg {
+  width: 20px;
+  height: 20px;
+}
+
 asset-video-player .video-holder .player-control-button {
   width: 32px;
   height: 32px;

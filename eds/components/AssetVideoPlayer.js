@@ -2,12 +2,13 @@
 import { getEdsOrigin, getLibs } from '../scripts/utils.js';
 
 const miloLibs = getLibs();
+const edsOrigin = getEdsOrigin();
 const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 await Promise.all([
   import('./LoadingSpinner.js'),
-  loadStyle(`${getEdsOrigin()}/eds/components/LoadingSpinner.css`),
-  loadStyle(`${getEdsOrigin()}/eds/components/AssetVideoPlayer.css`),
+  loadStyle(`${edsOrigin}/eds/components/LoadingSpinner.css`),
+  loadStyle(`${edsOrigin}/eds/components/AssetVideoPlayer.css`),
 ]);
 
 export default class AssetVideoPlayer extends LitElement {
@@ -435,7 +436,7 @@ export default class AssetVideoPlayer extends LitElement {
     const icons = ['play', 'pause', 'volume', 'muted', 'next', 'chapters', 'fullscreen', 'back', 'forward'];
     if (!icons.includes(name)) return '';
     const isSkip = name === 'back' || name === 'forward';
-    const iconSrc = `${getEdsOrigin()}/eds/img/icons/player-${name}.svg`;
+    const iconSrc = `${edsOrigin}/eds/img/icons/player-${name}.svg`;
 
     return html`
       <img
@@ -444,8 +445,7 @@ export default class AssetVideoPlayer extends LitElement {
         aria-hidden="true"
         width="${isSkip ? 20 : 24}"
         height="${isSkip ? 20 : 24}"
-        class="${isSkip ? 'skip-svg' : ''}"
-        style="display: block; width: ${isSkip ? 20 : 24}px; height: ${isSkip ? 20 : 24}px; object-fit: contain;"
+        class="${isSkip ? 'skip-svg' : ''} player-icon"
       />
     `;
   }
@@ -701,7 +701,7 @@ export default class AssetVideoPlayer extends LitElement {
                   <img
                     class="check-icon"
                     slot="icon"
-                    src="${`${getEdsOrigin()}/eds/img/icons/player-check.svg` }"
+                    src="${`${edsOrigin}/eds/img/icons/player-check.svg` }"
                     alt=""
                     aria-hidden="true"
                     width="18"
@@ -711,7 +711,7 @@ export default class AssetVideoPlayer extends LitElement {
                   <img
                     class="copy-icon"
                     slot="icon"
-                    src="${`${getEdsOrigin()}/eds/img/icons/player-share.svg` }"
+                    src="${`${edsOrigin}/eds/img/icons/player-share.svg` }"
                     alt=""
                     aria-hidden="true"
                     width="18"
