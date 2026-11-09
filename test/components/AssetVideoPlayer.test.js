@@ -58,19 +58,17 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     await el.updateComplete;
     const button = el.querySelector('.share-button');
     const tooltip = el.querySelector('.chapter-share-tooltip');
-    const icon = button.querySelector('svg');
+    const icon = button.querySelector('img');
     button.setAttribute('tabindex', '0');
 
     expect(button.getAttribute('label')).to.equal('Copy link to this chapter');
     expect(button.getAttribute('aria-describedby')).to.equal(tooltip.id);
     expect(tooltip.textContent.trim()).to.equal('Copy link to this chapter');
     expect(getComputedStyle(tooltip).visibility).to.equal('hidden');
-    expect(getComputedStyle(icon).stroke).to.equal('rgb(112, 112, 112)');
 
     const { x, y, width, height } = icon.getBoundingClientRect();
     button.setAttribute('data-test-hover', '');
 
-    expect(getComputedStyle(icon).stroke).to.equal('rgb(20, 115, 230)');
     expect(getComputedStyle(tooltip).visibility).to.equal('visible');
     const tooltipBounds = tooltip.getBoundingClientRect();
     expect(tooltipBounds.top).to.be.greaterThan(y + height);
@@ -104,10 +102,9 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     document.body.append(iconStyles, container);
     render(el.renderChapters(), container);
     const button = container.querySelector('.share-button');
-    const shareHref = '/eds/img/icons/player-share.svg#icon';
-    expect(button.querySelector('use').getAttribute('href')).to.equal(shareHref);
-    expect(button.querySelector('svg').getAttribute('slot')).to.equal('icon');
-    expect(button.querySelector('use').namespaceURI).to.equal('http://www.w3.org/2000/svg');
+    const shareSrc = '/eds/img/icons/player-share.svg';
+    expect(button.querySelector('img').getAttribute('src')).to.contain(shareSrc);
+    expect(button.querySelector('img').getAttribute('slot')).to.equal('icon');
 
     button.click();
     await Promise.resolve();
@@ -117,13 +114,9 @@ describe('AssetVideoPlayer - shareChapter()', () => {
     expect(button.getAttribute('label')).to.equal('Link copied');
     expect(container.querySelector('[role="tooltip"]').textContent.trim()).to.equal('Link copied');
     expect(container.querySelectorAll('[role="tooltip"]')[1].textContent.trim()).to.equal('Copy link to this chapter');
-    expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#268e6c');
-    expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(38, 142, 108)');
-    expect(button.querySelector('use').getAttribute('href')).to.equal('/eds/img/icons/player-check.svg#icon');
-    expect(button.querySelector('svg').getAttribute('slot')).to.equal('icon');
-    expect(button.querySelector('use').namespaceURI).to.equal('http://www.w3.org/2000/svg');
-    expect(container.querySelectorAll('.share-button')[1].querySelector('svg').getAttribute('stroke')).to.equal('#707070');
-    expect(container.querySelectorAll('.share-button')[1].querySelector('use').getAttribute('href')).to.equal(shareHref);
+    expect(button.querySelector('img').getAttribute('src')).to.contain('/eds/img/icons/player-check.svg');
+    expect(button.querySelector('img').getAttribute('slot')).to.equal('icon');
+    expect(container.querySelectorAll('.share-button')[1].querySelector('img').getAttribute('src')).to.contain(shareSrc);
 
     clock.tick(1999);
     expect(el.sharedChapterIndex).to.equal(0);
@@ -132,9 +125,7 @@ describe('AssetVideoPlayer - shareChapter()', () => {
 
     expect(button.getAttribute('label')).to.equal('Copy link to this chapter');
     expect(container.querySelector('[role="tooltip"]').textContent.trim()).to.equal('Copy link to this chapter');
-    expect(button.querySelector('svg').getAttribute('stroke')).to.equal('#707070');
-    expect(getComputedStyle(button.querySelector('svg')).stroke).to.equal('rgb(112, 112, 112)');
-    expect(button.querySelector('use').getAttribute('href')).to.equal(shareHref);
+    expect(button.querySelector('img').getAttribute('src')).to.contain(shareSrc);
   });
 
   it('stops propagation and leaves the selected chapter unchanged when sharing', async () => {
@@ -174,16 +165,13 @@ describe('AssetVideoPlayer - external icons', () => {
     it(`renders the external ${name} icon with the original viewport`, () => {
       const container = document.createElement('div');
       render(makeInstance().renderPlayerIcon(name), container);
-      const icon = container.querySelector('svg');
-      const isSkip = name === 'back' || name === 'forward';
-
-      expect(icon.getAttribute('viewBox')).to.equal(isSkip ? '0 0 24 24' : '0 0 20 20');
+      const icon = container.querySelector('img');
+      expect(icon.getAttribute('alt')).to.equal('');
       expect(icon.getAttribute('aria-hidden')).to.equal('true');
-      expect(icon.getAttribute('focusable')).to.equal('false');
-      expect(icon.style.fill).to.equal('currentcolor');
-      expect(icon.querySelector('use').getAttribute('href')).to.equal(`/eds/img/icons/player-${name}.svg#icon`);
-      expect(icon.querySelector('use').namespaceURI).to.equal('http://www.w3.org/2000/svg');
-      expect(icon.querySelector('path')).to.equal(null);
+      expect(icon.getAttribute('src')).to.contain(`/eds/img/icons/player-${name}.svg`);
+      const expectedSize = name === 'back' || name === 'forward' ? '20' : '24';
+      expect(icon.getAttribute('width')).to.equal(expectedSize);
+      expect(icon.getAttribute('height')).to.equal(expectedSize);
     });
   });
 
@@ -814,7 +802,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     el.isVideoPlaying = true;
     renderControls();
     expect(holder.querySelector('.player-center-play').hidden).to.equal(true);
-    holder.querySelector('use[href="/eds/img/icons/player-pause.svg#icon"]').closest('button').click();
+    holder.querySelector('img[src*="/eds/img/icons/player-pause.svg"]').closest('button').click();
     expect(video.pause.calledOnce).to.equal(true);
   });
 
@@ -850,9 +838,9 @@ describe('AssetVideoPlayer - custom video controls', () => {
     el.seekVideo(100);
     el.handleVideoTimeUpdate({ currentTarget: video });
     renderControls();
-    holder.querySelector('use[href="/eds/img/icons/player-back.svg#icon"]').closest('button').click();
+    holder.querySelector('img[src*="/eds/img/icons/player-back.svg"]').closest('button').click();
     expect(video.currentTime).to.equal(90);
-    holder.querySelector('use[href="/eds/img/icons/player-forward.svg#icon"]').closest('button').click();
+    holder.querySelector('img[src*="/eds/img/icons/player-forward.svg"]').closest('button').click();
     expect(video.currentTime).to.equal(100);
     renderControls();
     holder.querySelector('.player-next-chapter').click();
@@ -982,7 +970,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     expect(slider.hidden).to.be.false;
     expect(slider.value).to.equal('0');
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('0%');
-    expect(button.querySelector('use').getAttribute('href')).to.equal('/eds/img/icons/player-muted.svg#icon');
+    expect(button.querySelector('img').getAttribute('src')).to.contain('/eds/img/icons/player-muted.svg');
 
     slider.value = '0.4';
     slider.dispatchEvent(new Event('input'));
@@ -990,7 +978,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     expect(media.volume).to.equal(0.4);
     expect(media.muted).to.be.false;
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('40%');
-    expect(button.querySelector('use').getAttribute('href')).to.equal('/eds/img/icons/player-volume.svg#icon');
+    expect(button.querySelector('img').getAttribute('src')).to.contain('/eds/img/icons/player-volume.svg');
 
     button.click();
     await player.updateComplete;
@@ -1164,7 +1152,7 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
     await player.updateComplete;
     expect(player.querySelector('.player-center-play').hidden).to.be.true;
 
-    player.querySelector('use[href="/eds/img/icons/player-back.svg#icon"]').closest('button').click();
+    player.querySelector('img[src*="/eds/img/icons/player-back.svg"]').closest('button').click();
     expect(pause.called).to.be.false;
 
     video.click();
