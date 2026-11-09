@@ -7,24 +7,17 @@ export const MAX_VISIBLE_JOURNEY_CARDS = 9;
 export const JOURNEY_CARD_DETAILS = allCards;
 export const JOURNEY_PATHS = segmentPaths;
 export function normalizeJourneyCardIds(value) {
-  if (!value) return [];
-  const cardIds = Array.isArray(value) ? value : [value];
+  if (value === null || value === undefined) return [];
+  if (!Array.isArray(value)) {
+    throw new Error(`Invalid journey card ids provided: ${value}`);
+  }
 
-  return [...new Set(cardIds
-    .flatMap((cardId) => (Array.isArray(cardId) ? cardId : [cardId]))
-    .map((cardId) => {
-      if (cardId === null || cardId === undefined) return null;
-      if (typeof cardId === 'number') return Number.isFinite(cardId) ? cardId : null;
-      if (typeof cardId === 'string') {
-        const trimmed = cardId.trim();
-        if (!trimmed) return null;
-        const numericValue = Number(trimmed);
-        return Number.isFinite(numericValue) ? numericValue : null;
-      }
-      const numericValue = Number(cardId);
-      return Number.isFinite(numericValue) ? numericValue : null;
-    })
-    .filter((cardId) => cardId !== null))];
+  return [...new Set(value.map((cardId) => {
+    if (typeof cardId !== 'number' || !Number.isInteger(cardId)) {
+      throw new Error(`Journey card ids must be numbers. Received: ${cardId}`);
+    }
+    return cardId;
+  }))];
 }
 
 export function getJourneyPathForSegment(segment, paths = JOURNEY_PATHS) {
@@ -36,15 +29,12 @@ export function getCompletedJourneyCardIds(userState = getPartnerUserState()) {
   if (!userState) return [];
 
   const { completedCards } = userState || {};
-  let normalizedCompletedCards = [];
-
-  if (Array.isArray(completedCards)) {
-    normalizedCompletedCards = completedCards;
-  } else if (completedCards) {
-    normalizedCompletedCards = [completedCards];
+  if (completedCards === undefined || completedCards === null) return [];
+  if (!Array.isArray(completedCards)) {
+    throw new Error('Invalid partner_user_state.completedCards: expected an array of numbers.');
   }
 
-  return normalizeJourneyCardIds(normalizedCompletedCards);
+  return normalizeJourneyCardIds(completedCards);
 }
 
 export function getVisibleJourneyCards({
@@ -91,11 +81,18 @@ export function buildCompletedJourneyCardState(
   action,
 ) {
   const normalizedCardId = Number(cardId);
-  const normalizedCompletedCards = normalizeJourneyCardIds(completedCardIds);
-
-  if (action === 'complete') {
-    return [...normalizedCompletedCards, normalizedCardId];
+  if (!Number.isInteger(normalizedCardId)) {
+    throw new Error(`Invalid journey card id provided: ${cardId}`);
   }
 
-  return normalizedCompletedCards.filter((id) => id !== normalizedCardId);
+  const normalizedCompletedCards = normalizeJourneyCardIds(completedCardIds);
+  const completedCardSet = new Set(normalizedCompletedCards);
+
+  if (action === 'complete') {
+    completedCardSet.add(normalizedCardId);
+    return [...completedCardSet];
+  }
+
+  completedCardSet.delete(normalizedCardId);
+  return [...completedCardSet];
 }

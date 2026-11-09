@@ -39,18 +39,24 @@ async function handleUserAction(cardId, action) {
   return true;
 }
 export default async function init(el) {
-  const segment = getTilesSegment();
-  const visibleCards = getVisibleJourneyCards({
-    segment,
-    completedCardIds: getCompletedJourneyCardIds(),
-  });
-  if (!visibleCards || visibleCards.length === 0) {
+  try {
+    const segment = getTilesSegment();
+    const visibleCards = getVisibleJourneyCards({
+      segment,
+      completedCardIds: getCompletedJourneyCardIds(),
+    });
+    if (!visibleCards || visibleCards.length === 0) {
+      el.remove();
+      return;
+    }
+    const tilesBoard = renderBoard(visibleCards, handleUserAction);
+    const root = document.createElement('div');
+    root.className = 'tiles-block';
+    root.appendChild(tilesBoard);
+    el.replaceWith(tilesBoard);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Unable to render journey cards:', error);
     el.remove();
-    return;
   }
-  const tilesBoard = renderBoard(visibleCards, handleUserAction);
-  const root = document.createElement('div');
-  root.className = 'tiles-block';
-  root.appendChild(tilesBoard);
-  el.replaceWith(tilesBoard);
 }

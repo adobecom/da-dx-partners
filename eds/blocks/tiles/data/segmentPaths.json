@@ -1,5 +1,5 @@
 {
-  "admin-Solution": [
+  "admin-solution": [
     {
       "id": 1,
       "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
@@ -367,7 +367,7 @@
       "neverCompletes": false
     }
   ],
-  "admin-Technology": [
+  "admin-technology": [
     {
       "id": 1,
       "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
@@ -1037,7 +1037,7 @@
       "neverCompletes": false
     }
   ],
-  "user-Solution": [
+  "user-solution": [
     {
       "id": 1,
       "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
@@ -1297,7 +1297,7 @@
       "neverCompletes": false
     }
   ],
-  "user-Technology": [
+  "user-technology": [
     {
       "id": 1,
       "title": "Leveraging the PxHub - Steer your partnership with the Partner Experience Hub",
