@@ -77,6 +77,27 @@ describe('PdfViewer', () => {
 
       expect(viewConstructorStub.firstCall.args[0].clientId).to.equal('expected-client-id');
     });
+
+    it('should use the clientId override instead of the config value', async () => {
+      setConfig({ pdfViewerClientId: 'config-client-id' });
+      await initPdfViewer({ url: TEST_URL, fileName: TEST_FILE_NAME, divId: TEST_DIV_ID, clientId: 'override-client-id' });
+
+      expect(viewConstructorStub.firstCall.args[0].clientId).to.equal('override-client-id');
+    });
+
+    it('should fall back to the config clientId when the override is undefined', async () => {
+      setConfig({ pdfViewerClientId: 'config-client-id' });
+      await initPdfViewer({ url: TEST_URL, fileName: TEST_FILE_NAME, divId: TEST_DIV_ID, clientId: undefined });
+
+      expect(viewConstructorStub.firstCall.args[0].clientId).to.equal('config-client-id');
+    });
+
+    it('should keep an empty-string override instead of falling back', async () => {
+      setConfig({ pdfViewerClientId: 'config-client-id' });
+      await initPdfViewer({ url: TEST_URL, fileName: TEST_FILE_NAME, divId: TEST_DIV_ID, clientId: '' });
+
+      expect(viewConstructorStub.firstCall.args[0].clientId).to.equal('');
+    });
   });
 
   // -------------------------------------------------------------------------
