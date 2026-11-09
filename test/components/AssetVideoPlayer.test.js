@@ -753,14 +753,18 @@ describe('AssetVideoPlayer - selectChapter()', () => {
   it('keeps the selection and seek time when playback is rejected', async () => {
     const video = document.createElement('video');
     sinon.stub(video, 'readyState').get(() => 1);
-    const playStub = sinon.stub(video, 'play').rejects(new Error('Playback requires interaction'));
+    const error = new Error('Playback requires interaction');
+    const playStub = sinon.stub(video, 'play').rejects(error);
+    const consoleStub = sinon.stub(console, 'error');
     const el = makeInstance();
     el.appendChild(video);
 
     el.selectChapter(2);
     await Promise.resolve();
+    await Promise.resolve();
 
     expect(playStub.calledOnce).to.be.true;
+    expect(consoleStub.calledOnceWithExactly('Failed to play video:', error)).to.be.true;
     expect(el.selectedChapterIndex).to.equal(2);
     expect(el.currentTime).to.equal(142.906);
     expect(video.currentTime).to.equal(142.906);
