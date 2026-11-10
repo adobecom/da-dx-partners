@@ -459,6 +459,7 @@ export default class AssetVideoPlayer extends LitElement {
     return html`
       <div class="video-tint"></div>
       <button class="player-center-play" type="button"
+        aria-label="Play video"
         ?hidden="${this.isVideoPlaying}" @click="${this.toggleVideoPlayback}">
         ${this.renderPlayerIcon('play')}
       </button>
@@ -472,6 +473,7 @@ export default class AssetVideoPlayer extends LitElement {
       </div>
       <div class="player-controls">
         <div class="player-progress" role="slider" tabindex="0"
+          aria-label="Video progress"
           style="position: relative; overflow: visible;"
           aria-valuemin="0" aria-valuemax="${duration}"
           aria-valuenow="${Math.min(this.currentTime, duration)}"
@@ -567,14 +569,17 @@ export default class AssetVideoPlayer extends LitElement {
         <div class="player-bottom-row">
           <div class="player-controls-left">
             <button class="player-control-button" type="button"
+              aria-label="${this.isVideoPlaying ? 'Pause video' : 'Play video'}"
               @click="${this.toggleVideoPlayback}">
               ${this.renderPlayerIcon(this.isVideoPlaying ? 'pause' : 'play')}
             </button>
             <button class="player-control-button" type="button"
+              aria-label="Rewind 10 seconds"
               @click="${() => this.seekVideo(this.currentTime - 10)}">
               ${this.renderPlayerIcon('back')}
             </button>
             <button class="player-control-button" type="button"
+              aria-label="Forward 10 seconds"
               @click="${() => this.seekVideo(this.currentTime + 10)}">
               ${this.renderPlayerIcon('forward')}
             </button>
@@ -591,6 +596,7 @@ export default class AssetVideoPlayer extends LitElement {
               }}"
               >
               <button class="player-control-button" type="button"
+                aria-label="${this.videoMuted || !this.videoVolume ? 'Unmute video' : 'Mute video'}"
                 @mouseenter="${() => { this.volumeExpanded = true; }}"
                 @click="${() => {
                   const video = this._video;
@@ -625,12 +631,14 @@ export default class AssetVideoPlayer extends LitElement {
           <div class="player-controls-right">
             ${this.chapters.length ? html`
               <button class="player-control-button" type="button"
+                aria-label="${this.chaptersVisible ? 'Hide chapters' : 'Show chapters'}"
                 aria-expanded="${this.chaptersVisible}" @click="${() => {
                   this.chaptersVisible = !this.chaptersVisible;
                   this.settingsMenuOpen = false;
                 }}">${this.renderPlayerIcon('chapters')}</button>
             ` : ''}
             <button class="player-control-button" type="button"
+              aria-label="Toggle fullscreen"
               @click="${this.toggleVideoFullscreen}">${this.renderPlayerIcon('fullscreen')}</button>
           </div>
         </div>
@@ -668,16 +676,6 @@ export default class AssetVideoPlayer extends LitElement {
         <article
           class="chapter ${this.selectedChapterIndex === index ? 'is-active' : ''}"
           id="chapter-${index + 1}"
-          role="button"
-          tabindex="0"
-          @click="${() => this.selectChapter(index)}"
-          @keydown="${(event) => {
-            if (event.target !== event.currentTarget) return;
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              this.selectChapter(index);
-            }
-          }}"
         >
           <div class="chapter-time">
             <span class="start-time">${this.formatTimecode(startTime)}</span>
@@ -735,7 +733,12 @@ export default class AssetVideoPlayer extends LitElement {
           </div>
 
           <div class="chapter-content">
-            <h2 class="chapter-title">${chapter.title}</h2>
+            <h2 class="chapter-title">
+              <button class="chapter-select" type="button"
+                aria-current="${this.selectedChapterIndex === index ? 'true' : 'false'}"
+                @click="${() => this.selectChapter(index)}"
+              >${chapter.title}</button>
+            </h2>
             <p class="chapter-description">${chapter.summary}</p>
             <div class="progress-track" aria-hidden="true">
               <div

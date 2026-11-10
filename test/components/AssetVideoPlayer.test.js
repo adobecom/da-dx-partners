@@ -1,4 +1,4 @@
-import { readFile } from '@web/test-runner-commands';
+import { readFile, sendKeys } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { setLibs } from '../../eds/scripts/utils.js';
@@ -319,6 +319,101 @@ describe('AssetVideoPlayer - chapter progress', () => {
     document.body.innerHTML = '';
   });
 
+  it('keeps chapter selection and sharing separate and supports native keyboard activation', async () => {
+    const el = makeInstance();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const selectChapter = sinon.stub(el, 'selectChapter');
+    const shareChapter = sinon.stub(el, 'shareChapter');
+    render(el.renderChapters(), container, { host: el });
+
+    const chapter = container.querySelector('#chapter-1');
+    const select = chapter.querySelector('.chapter-select');
+    const share = chapter.querySelector('.share-button');
+    expect(chapter.hasAttribute('role')).to.be.false;
+    expect(chapter.hasAttribute('tabindex')).to.be.false;
+    expect(select.tagName).to.equal('BUTTON');
+    expect(select.textContent.trim()).to.equal(el.chapters[0].title);
+    expect(select.getAttribute('aria-current')).to.equal('true');
+    expect(select.contains(share)).to.be.false;
+    expect(share.closest('button, [role="button"]')).not.to.equal(chapter);
+
+    select.focus();
+    expect(document.activeElement).to.equal(select);
+    await sendKeys({ press: 'Enter' });
+    expect(selectChapter.calledOnceWithExactly(0)).to.be.true;
+    await sendKeys({ press: 'Space' });
+    expect(selectChapter.callCount).to.equal(2);
+
+    share.setAttribute('tabindex', '0');
+    share.focus();
+    expect(document.activeElement).to.equal(share);
+    share.click();
+    expect(shareChapter.calledOnce).to.be.true;
+    expect(selectChapter.callCount).to.equal(2);
+
+    el.selectedChapterIndex = 1;
+    render(el.renderChapters(), container, { host: el });
+    expect(select.getAttribute('aria-current')).to.equal('false');
+    expect(container.querySelector('#chapter-2 .chapter-select').getAttribute('aria-current'))
+      .to.equal('true');
+  });
+
+  it('meets AA text contrast for chapter descriptions and timestamps in every card state', async () => {
+    const el = makeInstance();
+    const styles = document.createElement('style');
+    const css = await readFile({ path: '../../eds/components/AssetVideoPlayer.css' });
+    styles.textContent = css.replaceAll(':hover', '[data-test-hover]');
+    document.body.append(styles, el);
+    await el.updateComplete;
+
+    const chapter = el.querySelector('.chapter.is-active');
+    const luminance = (color) => {
+      const channels = color.match(/\d+/g).slice(0, 3).map((value) => {
+        const channel = Number(value) / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+    };
+    chapter.style.transition = 'none';
+    ['default', 'hover', 'active'].forEach((state) => {
+      chapter.classList.toggle('is-active', state === 'active');
+      chapter.toggleAttribute('data-test-hover', state === 'hover');
+      const cardBackground = getComputedStyle(chapter).backgroundColor;
+      const background = luminance(cardBackground === 'rgba(0, 0, 0, 0)'
+        ? getComputedStyle(el.querySelector('.video-chapters')).backgroundColor
+        : cardBackground);
+      ['.chapter-description', '.start-time', '.duration-time'].forEach((selector) => {
+        const foreground = luminance(getComputedStyle(chapter.querySelector(selector)).color);
+        const contrast = (Math.max(background, foreground) + 0.05)
+          / (Math.min(background, foreground) + 0.05);
+        expect(contrast, `${state} ${selector}`).to.be.at.least(4.5);
+      });
+    });
+  });
+
+  it('covers the chapter card with the selection target without covering Share', async () => {
+    const el = makeInstance();
+    const styles = document.createElement('style');
+    styles.textContent = await readFile({ path: '../../eds/components/AssetVideoPlayer.css' });
+    document.body.append(styles, el);
+    await el.updateComplete;
+
+    const chapter = el.querySelector('.chapter');
+    chapter.scrollIntoView({ block: 'center' });
+    const bounds = chapter.getBoundingClientRect();
+    expect(document.elementFromPoint(bounds.right - 8, bounds.top + 8))
+      .to.equal(chapter.querySelector('.chapter-select'));
+
+    const share = chapter.querySelector('.share-button');
+    const shareBounds = share.getBoundingClientRect();
+    const target = document.elementFromPoint(
+      shareBounds.left + shareBounds.width / 2,
+      shareBounds.top + shareBounds.height / 2,
+    );
+    expect(share === target || share.contains(target)).to.be.true;
+  });
+
   it('fills earlier tracks blue when clicking the third chapter', async () => {
     const el = makeInstance();
     const container = document.createElement('div');
@@ -328,7 +423,7 @@ describe('AssetVideoPlayer - chapter progress', () => {
     document.body.append(styles, el);
     render(el.renderChapters(), container);
 
-    container.querySelector('#chapter-3').click();
+    container.querySelector('#chapter-3 .chapter-select').click();
     render(el.renderChapters(), container);
 
     const fills = container.querySelectorAll('.progress-fill');
@@ -806,8 +901,59 @@ describe('AssetVideoPlayer - custom video controls', () => {
     render(el.renderVideoControls(), controls, { host: el });
   }
 
+  it('names every icon-only control and updates names to reflect player state', () => {
+    renderControls();
+    const buttons = holder.querySelectorAll('.player-control-button');
+    expect(Array.from(buttons, (button) => button.getAttribute('aria-label'))).to.deep.equal([
+      'Play video',
+      'Rewind 10 seconds',
+      'Forward 10 seconds',
+      'Mute video',
+      'Hide chapters',
+      'Toggle fullscreen',
+    ]);
+
+    el.isVideoPlaying = true;
+    el.videoMuted = true;
+    el.chaptersVisible = false;
+    renderControls();
+    expect(buttons[0].getAttribute('aria-label')).to.equal('Pause video');
+    expect(buttons[3].getAttribute('aria-label')).to.equal('Unmute video');
+    expect(buttons[4].getAttribute('aria-label')).to.equal('Show chapters');
+
+    el.videoMuted = false;
+    el.videoVolume = 0;
+    renderControls();
+    expect(buttons[3].getAttribute('aria-label')).to.equal('Unmute video');
+
+    el.isVideoPlaying = false;
+    el.videoVolume = 1;
+    el.chaptersVisible = true;
+    renderControls();
+    expect(buttons[0].getAttribute('aria-label')).to.equal('Play video');
+    expect(buttons[3].getAttribute('aria-label')).to.equal('Mute video');
+    expect(buttons[4].getAttribute('aria-label')).to.equal('Hide chapters');
+  });
+
+  it('names the progress slider and preserves its time value after seeking', () => {
+    renderControls();
+    const progress = holder.querySelector('.player-progress');
+    expect(progress.getAttribute('role')).to.equal('slider');
+    expect(progress.getAttribute('aria-label')).to.equal('Video progress');
+    expect(progress.getAttribute('aria-valuenow')).to.equal('0');
+    expect(progress.getAttribute('aria-valuetext')).to.equal('0:00 of 58:11');
+
+    el.seekVideo(100);
+    renderControls();
+    expect(progress.getAttribute('aria-label')).to.equal('Video progress');
+    expect(progress.getAttribute('aria-valuenow')).to.equal('100');
+    expect(progress.getAttribute('aria-valuetext')).to.equal('1:40 of 58:11');
+  });
+
   it('toggles playback from both play buttons and reflects playing state', () => {
     renderControls();
+    expect(holder.querySelector('.player-center-play').getAttribute('aria-label'))
+      .to.equal('Play video');
     holder.querySelector('.player-center-play').click();
     expect(video.play.calledOnce).to.equal(true);
     sinon.stub(video, 'paused').get(() => false);
