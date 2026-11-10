@@ -187,9 +187,14 @@ asset-video-player .video-holder .player-control-button {
   border-radius: 6px;
 }
 
-asset-video-player .video-holder .player-control-button:hover,
+asset-video-player .video-holder .player-control-button:not(:disabled):hover,
 asset-video-player .video-holder .player-next-chapter:hover {
   background: rgb(255 255 255 / 12%);
+}
+
+asset-video-player .video-holder .player-control-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 asset-video-player .video-holder .player-volume .player-control-button:hover,

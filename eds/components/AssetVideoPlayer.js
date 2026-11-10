@@ -28,6 +28,7 @@ export default class AssetVideoPlayer extends LitElement {
     settingsMenuOpen: { type: Boolean },
     volumeExpanded: { type: Boolean },
     progressHover: { state: true },
+    isFullscreen: { state: true },
   };
 
   constructor() {
@@ -50,6 +51,8 @@ export default class AssetVideoPlayer extends LitElement {
     this.volumeExpanded = false;
     this.chaptersTrackUrl = null;
     this.progressHover = null;
+    this.isFullscreen = false;
+    this.fullscreenScrollPosition = null;
     this.scrollToRestoredChapter = false;
   }
 
@@ -412,6 +415,39 @@ export default class AssetVideoPlayer extends LitElement {
     this.settingsMenuOpen = false;
   }
 
+  async toggleChapters() {
+    const position = { left: window.scrollX, top: window.scrollY };
+    this.chaptersVisible = !this.chaptersVisible;
+    this.settingsMenuOpen = false;
+    await this.updateComplete;
+    const controls = this.querySelector('.player-controls').getBoundingClientRect();
+    const controlsTop = controls.top + window.scrollY;
+    const controlsBottom = controls.bottom + window.scrollY;
+    const top = Math.max(
+      controlsBottom - window.innerHeight,
+      Math.min(position.top, controlsTop),
+    );
+    window.scrollTo({ left: position.left, top, behavior: 'instant' });
+  }
+
+  async handleFullscreenChange(event) {
+    const wasFullscreen = this.isFullscreen;
+    this.isFullscreen = document.fullscreenElement === event.currentTarget;
+    if (!wasFullscreen || this.isFullscreen) return;
+
+    const position = this.fullscreenScrollPosition;
+    this.fullscreenScrollPosition = null;
+    if (!position) return;
+
+    await this.updateComplete;
+    // Restore after the browser has finished the fullscreen layout and focus changes.
+    requestAnimationFrame(() => {
+      if (this.isConnected && !this.isFullscreen && !document.fullscreenElement) {
+        window.scrollTo({ ...position, behavior: 'instant' });
+      }
+    });
+  }
+
   async toggleVideoFullscreen() {
     const container = this._video?.closest('.video-container');
     if (!container) return;
@@ -420,11 +456,13 @@ export default class AssetVideoPlayer extends LitElement {
       if (document.fullscreenElement) {
         await document.exitFullscreen();
       } else if (container.requestFullscreen) {
+        this.fullscreenScrollPosition = { left: window.scrollX, top: window.scrollY };
         await container.requestFullscreen();
       } else if (this._video.webkitEnterFullscreen) {
         this._video.webkitEnterFullscreen();
       }
     } catch (error) {
+      this.fullscreenScrollPosition = null;
       // eslint-disable-next-line no-console
       console.error('Failed to toggle fullscreen:', error);
     }
@@ -632,10 +670,9 @@ export default class AssetVideoPlayer extends LitElement {
             ${this.chapters.length ? html`
               <button class="player-control-button" type="button"
                 aria-label="${this.chaptersVisible ? 'Hide chapters' : 'Show chapters'}"
-                aria-expanded="${this.chaptersVisible}" @click="${() => {
-                  this.chaptersVisible = !this.chaptersVisible;
-                  this.settingsMenuOpen = false;
-                }}">${this.renderPlayerIcon('chapters')}</button>
+                ?disabled="${this.isFullscreen}"
+                aria-expanded="${this.chaptersVisible}"
+                @click="${this.toggleChapters}">${this.renderPlayerIcon('chapters')}</button>
             ` : ''}
             <button class="player-control-button" type="button"
               aria-label="Toggle fullscreen"
@@ -757,7 +794,8 @@ export default class AssetVideoPlayer extends LitElement {
     /* eslint-disable indent */
     return html`
       <div class="video-player-layout ${this.chapters.length && this.chaptersVisible ? 'chapters-open' : 'chapters-collapsed'}">
-        <div class="video-container video-holder" tabindex="0" role="group">
+        <div class="video-container video-holder" tabindex="0" role="group"
+          @fullscreenchange="${this.handleFullscreenChange}">
           ${this.isVideoLoading ? html`
             <div class="video-loading-overlay">
               <loading-spinner theme="dark"></loading-spinner>

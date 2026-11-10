@@ -769,6 +769,83 @@ describe('AssetVideoPlayer - chapter scrolling', () => {
     expect(scrollIntoView.called).to.be.false;
   });
 
+  it('keeps the player and timeline in view on the first and subsequent chapter toggles', async () => {
+    window.history.replaceState(null, '', '?asset=example');
+    const styles = document.createElement('style');
+    styles.textContent = (await readFile({ path: '../../eds/components/AssetVideoPlayer.css' }))
+      .replace('(min-width: 900px)', '(min-width: 0px)');
+    const before = document.createElement('div');
+    const after = document.createElement('div');
+    before.style.height = '1200px';
+    after.style.height = '2000px';
+    const player = makeInstance();
+    document.body.append(styles, before, player, after);
+    await player.updateComplete;
+    const container = player.querySelector('.video-container');
+    const button = player.querySelector('.player-controls-right .player-control-button');
+    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    window.scrollTo(0, window.scrollY + container.getBoundingClientRect().top + 100);
+    await nextFrame();
+    await nextFrame();
+    const initialTop = container.getBoundingClientRect().top;
+    const initialScroll = window.scrollY;
+    button.focus({ preventScroll: true });
+
+    for (let index = 0; index < 4; index += 1) {
+      button.click();
+      await player.updateComplete;
+      await nextFrame();
+      await nextFrame();
+      expect(window.scrollY).to.be.closeTo(initialScroll, 1);
+      expect(container.getBoundingClientRect().top).to.be.closeTo(initialTop, 1);
+      const progressBounds = player.querySelector('.player-progress').getBoundingClientRect();
+      expect(progressBounds.top).to.be.at.least(0);
+      expect(progressBounds.bottom).to.be.at.most(window.innerHeight);
+    }
+  });
+
+  it('keeps the entire control bar visible when expanding the video past the viewport bottom', async () => {
+    window.history.replaceState(null, '', '?asset=example');
+    const styles = document.createElement('style');
+    styles.textContent = (await readFile({ path: '../../eds/components/AssetVideoPlayer.css' }))
+      .replace('(min-width: 900px)', '(min-width: 0px)');
+    const before = document.createElement('div');
+    const after = document.createElement('div');
+    before.style.height = '1200px';
+    after.style.height = '2000px';
+    const player = makeInstance();
+    document.body.append(styles, before, player, after);
+    await player.updateComplete;
+    const container = player.querySelector('.video-container');
+    const controls = player.querySelector('.player-controls');
+    const button = player.querySelector('.player-controls-right .player-control-button');
+    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    window.scrollTo(0, window.scrollY + container.getBoundingClientRect().bottom
+      - window.innerHeight + 16);
+    await nextFrame();
+    await nextFrame();
+    button.focus({ preventScroll: true });
+    const originalScroll = window.scrollY;
+    const originalHeight = container.getBoundingClientRect().height;
+
+    for (let index = 0; index < 4; index += 1) {
+      button.click();
+      await player.updateComplete;
+      await nextFrame();
+      await nextFrame();
+      const bounds = controls.getBoundingClientRect();
+      expect(bounds.top).to.be.at.least(0);
+      expect(bounds.bottom).to.be.at.most(window.innerHeight + 1);
+      expect(player.querySelector('.player-progress').getBoundingClientRect().bottom)
+        .to.be.at.most(window.innerHeight);
+      if (index === 0) {
+        expect(container.getBoundingClientRect().height).to.be.greaterThan(originalHeight);
+        const growth = container.getBoundingClientRect().height - originalHeight;
+        expect(window.scrollY - originalScroll).to.be.closeTo(growth - 16, 1);
+      }
+    }
+  });
+
   it('does not scroll for ordinary page visits or invalid chapter links', async () => {
     for (const query of ['?asset=example', '?chapter=999&t=-1', '?t=invalid']) {
       window.history.replaceState(null, '', query);
@@ -863,6 +940,90 @@ describe('AssetVideoPlayer - selectChapter()', () => {
     expect(el.selectedChapterIndex).to.equal(2);
     expect(el.currentTime).to.equal(142.906);
     expect(video.currentTime).to.equal(142.906);
+  });
+});
+
+describe('AssetVideoPlayer - fullscreen chapter control', () => {
+  [true, false].forEach((useButton) => {
+    it(`restores the page position after exiting fullscreen with ${useButton ? 'the button' : 'Escape'}`, async () => {
+      const el = makeInstance();
+      document.body.append(el);
+      await el.updateComplete;
+      const container = el.querySelector('.video-container');
+      let fullscreenElement = null;
+      sinon.stub(document, 'fullscreenElement').get(() => fullscreenElement);
+      sinon.stub(window, 'scrollX').get(() => 15);
+      sinon.stub(window, 'scrollY').get(() => 850);
+      const scrollTo = sinon.stub(window, 'scrollTo');
+      sinon.stub(container, 'requestFullscreen').callsFake(async () => {
+        fullscreenElement = container;
+        container.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
+      });
+      const exitFullscreen = sinon.stub(document, 'exitFullscreen').callsFake(async () => {
+        fullscreenElement = null;
+        container.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
+      });
+
+      await el.toggleVideoFullscreen();
+      await el.updateComplete;
+      expect(scrollTo.called).to.be.false;
+      expect(el.isFullscreen).to.be.true;
+
+      if (useButton) {
+        await el.toggleVideoFullscreen();
+        expect(exitFullscreen.calledOnce).to.be.true;
+      } else {
+        fullscreenElement = null;
+        container.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
+      }
+      await el.updateComplete;
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      expect(el.isFullscreen).to.be.false;
+      expect(scrollTo.calledOnceWithExactly({ left: 15, top: 850, behavior: 'instant' })).to.be.true;
+      expect(el.fullscreenScrollPosition).to.equal(null);
+    });
+  });
+
+  [true, false].forEach((chaptersVisible) => {
+    it(`disables chapters in fullscreen and restores the ${chaptersVisible ? 'open' : 'collapsed'} panel state on exit`, async () => {
+      const el = makeInstance();
+      el.chaptersVisible = chaptersVisible;
+      const styles = document.createElement('style');
+      styles.textContent = (await readFile({ path: '../../eds/components/AssetVideoPlayer.css' }))
+        .replaceAll(':hover', '[data-test-hover]');
+      document.body.append(styles, el);
+      await el.updateComplete;
+      const container = el.querySelector('.video-container');
+      const button = el.querySelector('.player-controls-right .player-control-button');
+      let fullscreenElement = null;
+      sinon.stub(document, 'fullscreenElement').get(() => fullscreenElement);
+
+      expect(button.disabled).to.be.false;
+      fullscreenElement = container;
+      container.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
+      await el.updateComplete;
+
+      expect(button.disabled).to.be.true;
+      expect(getComputedStyle(button).opacity).to.equal('0.4');
+      expect(getComputedStyle(button).cursor).to.equal('not-allowed');
+      button.setAttribute('data-test-hover', '');
+      expect(getComputedStyle(button).backgroundColor).to.equal('rgba(0, 0, 0, 0)');
+      button.click();
+      await el.updateComplete;
+      expect(el.chaptersVisible).to.equal(chaptersVisible);
+
+      fullscreenElement = null;
+      container.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
+      await el.updateComplete;
+
+      expect(button.disabled).to.be.false;
+      expect(getComputedStyle(button).opacity).to.equal('1');
+      expect(el.chaptersVisible).to.equal(chaptersVisible);
+      button.click();
+      await el.updateComplete;
+      expect(el.chaptersVisible).to.equal(!chaptersVisible);
+    });
   });
 });
 
@@ -1013,7 +1174,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     el.currentTime = 100;
     const container = document.createElement('div');
     document.body.appendChild(container);
-    render(el.render(), container);
+    render(el.render(), container, { host: el });
     const player = container.querySelector('.video-holder');
     const playerVideo = player.querySelector('video');
     expect(container.querySelectorAll('.chapter').length).to.equal(4);
@@ -1021,14 +1182,14 @@ describe('AssetVideoPlayer - custom video controls', () => {
       .to.equal('true');
 
     player.querySelector('.player-controls-right [aria-expanded]').click();
-    render(el.render(), container);
+    render(el.render(), container, { host: el });
     expect(container.querySelector('.video-chapters').parentElement.parentElement.hidden).to.equal(true);
     expect(player.querySelector('.player-controls-right [aria-expanded]').getAttribute('aria-expanded'))
       .to.equal('false');
     expect(player.querySelector('.player-chapter-menu')).to.equal(null);
 
     player.querySelector('.player-controls-right [aria-expanded]').click();
-    render(el.render(), container);
+    render(el.render(), container, { host: el });
     expect(container.querySelectorAll('.chapter').length).to.equal(4);
     expect(player.querySelector('.player-controls-right [aria-expanded]').getAttribute('aria-expanded'))
       .to.equal('true');
