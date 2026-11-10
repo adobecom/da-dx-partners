@@ -4,6 +4,7 @@ import {
   deleteCookieValue,
   formatDate,
   getCookieValue,
+  getEdsOrigin,
   getLocale,
   getMetadataContent,
   getNodesByXPath,
@@ -59,6 +60,17 @@ describe('Libs', () => {
     };
     const libs = setLibs('/libs', location);
     expect(libs).to.equal('https://partners.adobe.com/libs');
+  });
+  it('Resolves EDS asset URLs to the correct origin on author hosts', () => {
+    const location = {
+      hostname: 'dx-partner-author.dev02.corp.adobe.com',
+      origin: 'https://dx-partner-author.dev02.corp.adobe.com',
+    };
+    expect(getEdsOrigin(location)).to.equal('https://partners.stage.adobe.com');
+  });
+  it('Leaves regular site URLs alone', () => {
+    const location = { hostname: 'partners.adobe.com', origin: 'https://partners.adobe.com' };
+    expect(getEdsOrigin(location)).to.equal('');
   });
   it('Routes local AEM author (port 4502) to the prod EDS origin for libs', () => {
     const location = { hostname: 'localhost', origin: 'http://localhost:4502', search: '' };
