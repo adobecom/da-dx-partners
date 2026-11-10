@@ -471,6 +471,9 @@ asset-video-player .chapter .chapter-actions {
 
 asset-video-player .chapter .share-button {
   --spectrum-actionbutton-edge-to-visual-only: 0;
+
+  min-width: 20px;
+  min-height: 20px;
 }
 
 asset-video-player .chapter .share-button svg {
@@ -480,6 +483,10 @@ asset-video-player .chapter .share-button svg {
 asset-video-player .chapter .share-button .copy-icon,
 asset-video-player .chapter .share-button .check-icon {
   display: block;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  max-width: none;
 }
 
 asset-video-player .chapter .share-button .copy-icon {
