@@ -24,6 +24,25 @@ export const NEXT_POPUP_PLACEHOLDER = 'dxp:nextPopupPlaceholder';
 export const PARTNER_USER_STATE_COOKIE = 'partner_user_state';
 export const PARTNER_ACCOUNT_STATE_COOKIE = 'partner_account_state';
 
+const EDS_PROD_ORIGIN = 'https://partners.adobe.com';
+const EDS_STAGE_ORIGIN = 'https://partners.stage.adobe.com';
+const PROD_AEM_AUTHOR_HOST = 'dx-partner-author.prod.corp.adobe.com';
+const AEM_LOCAL_PORTS = ['4502', '7502'];
+
+export function isAemAuthorHost(origin) {
+  if (origin.endsWith('.corp.adobe.com')) return true;
+  const { hostname, port } = new URL(origin);
+  return hostname === 'localhost' && AEM_LOCAL_PORTS.includes(port);
+}
+
+// Rebases absolute `/eds/...` paths to the real EDS origin on AEM author hosts.
+// dev02, qa01, stage2, localhost on the AEM author ports 4502/7502 get the stage EDS site.
+export function getEdsOrigin(location = window.location) {
+  const { origin, hostname } = location;
+  if (!isAemAuthorHost(origin)) return '';
+  return hostname === PROD_AEM_AUTHOR_HOST ? EDS_PROD_ORIGIN : EDS_STAGE_ORIGIN;
+}
+
 /**
  * The decision engine for where to get Milo's libs from.
  */
@@ -33,6 +52,9 @@ export const [setLibs, getLibs] = (() => {
     (prodLibs, location) => {
       libs = (() => {
         const { hostname, search, origin } = location || window.location;
+        if (isAemAuthorHost(origin)) {
+          return EDS_PROD_ORIGIN + prodLibs;
+        }
         if (origin.endsWith('adobe.com')) {
           return origin + prodLibs;
         }
@@ -677,3 +699,5 @@ export function preventModalClose(_modal) {
   };
   curtain.addEventListener('click', blockClickOutside, { capture: true });
 }
+
+export const previewHosts = ['partnerspreview.adobe.com', 'stage--da-dx-partners--adobecom.aem.live'];

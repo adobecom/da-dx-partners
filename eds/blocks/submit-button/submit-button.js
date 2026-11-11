@@ -19,10 +19,7 @@ async function handleClick(e, link) {
   try {
     link.classList.add('disabled');
 
-    const response = await fetch(link.href, {
-      method: 'GET',
-      credentials: 'include',
-    });
+    const response = await fetch(link.href, { method: 'GET' });
 
     if (!response.ok) {
       throw new Error(`HTTP error: ${response.status}`);

@@ -1,8 +1,10 @@
 import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
 import {
   deleteCookieValue,
   formatDate,
   getCookieValue,
+  getEdsOrigin,
   getLocale,
   getMetadataContent,
   getNodesByXPath,
@@ -14,6 +16,7 @@ import {
   getUserRegionParams,
   isMember,
   matchesAccountNameMapping,
+  partnerCookieContainsValue,
   setLibs,
 } from '../../eds/scripts/utils.js';
 
@@ -31,24 +34,54 @@ describe('Libs', () => {
     expect(libs).to.equal('https://main--milo--adobecom.aem.live/libs');
   });
   it('Returns prod milo for prod', () => {
-    const location = { origin: 'https://partners.adobe.com' };
+    const location = { hostname: 'partners.adobe.com', origin: 'https://partners.adobe.com' };
     const libs = setLibs('/libs', location);
     expect(libs).to.equal('https://partners.adobe.com/libs');
   });
   it('Returns stage milo for stage', () => {
-    const location = { origin: 'https://partners.stage.adobe.com' };
+    const location = { hostname: 'partners.stage.adobe.com', origin: 'https://partners.stage.adobe.com' };
     const libs = setLibs('/libs', location);
     expect(libs).to.equal('https://partners.stage.adobe.com/libs');
   });
   it('Does not support milolibs query param on prod', () => {
     const location = {
+      hostname: 'partners.adobe.com',
       origin: 'https://partners.adobe.com',
       search: '?milolibs=foo',
     };
     const libs = setLibs('/libs', location);
     expect(libs).to.equal('https://partners.adobe.com/libs');
   });
-
+  it('Routes internal AEM author hosts to the prod EDS origin for libs', () => {
+    const location = {
+      hostname: 'dx-partner-author.dev02.corp.adobe.com',
+      origin: 'https://dx-partner-author.dev02.corp.adobe.com',
+      search: '',
+    };
+    const libs = setLibs('/libs', location);
+    expect(libs).to.equal('https://partners.adobe.com/libs');
+  });
+  it('Resolves EDS asset URLs to the correct origin on author hosts', () => {
+    const location = {
+      hostname: 'dx-partner-author.dev02.corp.adobe.com',
+      origin: 'https://dx-partner-author.dev02.corp.adobe.com',
+    };
+    expect(getEdsOrigin(location)).to.equal('https://partners.stage.adobe.com');
+  });
+  it('Leaves regular site URLs alone', () => {
+    const location = { hostname: 'partners.adobe.com', origin: 'https://partners.adobe.com' };
+    expect(getEdsOrigin(location)).to.equal('');
+  });
+  it('Routes local AEM author (port 4502) to the prod EDS origin for libs', () => {
+    const location = { hostname: 'localhost', origin: 'http://localhost:4502', search: '' };
+    const libs = setLibs('/libs', location);
+    expect(libs).to.equal('https://partners.adobe.com/libs');
+  });
+  it('Routes local AEM author (port 7502) to the prod EDS origin for libs', () => {
+    const location = { hostname: 'localhost', origin: 'http://localhost:7502', search: '' };
+    const libs = setLibs('/libs', location);
+    expect(libs).to.equal('https://partners.adobe.com/libs');
+  });
   it('Supports milolibs query param', () => {
     const location = {
       hostname: 'localhost',
@@ -82,6 +115,7 @@ describe('Libs', () => {
 
 describe('utils browser coverage', () => {
   afterEach(() => {
+    sinon.restore();
     document.head.innerHTML = '';
     document.body.innerHTML = '';
     document.cookie = 'partner_data=; Path=/; Max-Age=0;';
@@ -112,6 +146,16 @@ describe('utils browser coverage', () => {
     expect(getPartnerCookieValue('status')).to.equal('member');
     expect(getUserRegionParams('dxp')).to.contain('region/europe');
     expect(isMember()).to.equal(true);
+  });
+
+  it('checks partner cookie values case-insensitively and rejects missing values', () => {
+    const partnerData = { DXP: { specialState: 'Locked-Compliance-Past' } };
+    sinon.stub(document, 'cookie').get(() => `partner_data=${encodeURIComponent(JSON.stringify(partnerData))}`);
+
+    expect(partnerCookieContainsValue('specialstate', 'LOCKED')).to.be.true;
+    expect(partnerCookieContainsValue('specialstate', 'compliance-past')).to.be.true;
+    expect(partnerCookieContainsValue('specialstate', 'submitted-in-review')).to.be.false;
+    expect(partnerCookieContainsValue('missing', 'locked')).to.be.false;
   });
 
   it('matches account names against the account name mapping', () => {
