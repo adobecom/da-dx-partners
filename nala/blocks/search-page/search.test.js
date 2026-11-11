@@ -897,5 +897,33 @@ test.describe('Search Page', () => {
         });
       });
     });
+
+    test(`${features[36].name},${features[36].tags}`, async ({ page }) => {
+      const { data, path } = features[36];
+
+      await test.step('Go to search page', async () => {
+        await goTo(page, path);
+      });
+
+      await test.step('Log in and validate 13 assets are present', async () => {
+        await signInAs(page, signInPage, data.partnerLevel);
+        await searchPage.waitForResultsToSettle();
+        await expect(searchPage.searchAllResults).toHaveText(data.assetCount, { timeout: 30000 });
+      });
+
+      await data.cards.reduce(
+        (prev, { title, tags, previewTags }) => prev.then(async () => {
+          const expandedCard = await test.step(
+            `Click "${title}" and validate tags`,
+            () => searchPage.validateExpandedCardTags(title, tags),
+          );
+          await test.step(
+            `Preview "${title}" and validate tags`,
+            () => searchPage.validatePreviewTags(expandedCard, previewTags),
+          );
+        }),
+        Promise.resolve(),
+      );
+    });
   });
 });
