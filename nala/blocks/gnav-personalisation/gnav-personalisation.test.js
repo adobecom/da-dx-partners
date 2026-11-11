@@ -655,4 +655,58 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.pxTeamButton).toBeVisible({ timeout: 30000 });
     });
   });
+
+  test(`${features[28].name},${features[28].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[28];
+
+    await test.step('Go to page and sign in as Accenture user', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Validate Accenture segment is displayed', async () => {
+      const segment = gnavPersonalisationPage.getPersonalizationSegment(data.segmentClass);
+      await expect(segment).toBeVisible({ timeout: 30000 });
+      await expect(segment).toContainText(data.segmentText);
+      await expect(segment).toContainText(data.accountName);
+    });
+
+    await test.step('Open Personalization in gnav and validate Accenture link is present', async () => {
+      await gnavPersonalisationPage.openGnavMenu(data.gnavMenu);
+      const link = await gnavPersonalisationPage.getVisibleNavMenuLink(data.accentureLink);
+      await expect(link).toHaveAttribute('href', new RegExp(data.accentureLink));
+    });
+  });
+
+  test(`${features[29].name},${features[29].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[29];
+
+    await test.step('Go to page and sign in as Silver user', async () => {
+      await page.goto(`${baseURL}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      await signInPage.signInButton.click();
+      await signInPage.signIn(page, data.partnerLevel);
+      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+    });
+
+    await test.step('Validate Accenture segment is not displayed', async () => {
+      await expect(gnavPersonalisationPage.processedPersonalizationBlocks.first())
+        .toBeAttached({ timeout: 30000 });
+      await expect(gnavPersonalisationPage.getPersonalizationSegment(data.segmentClass))
+        .toHaveCount(0);
+    });
+
+    await test.step('Open Personalization in gnav and validate Accenture link is not present', async () => {
+      await gnavPersonalisationPage.openGnavMenu(data.gnavMenu);
+      await expect.poll(
+        () => gnavPersonalisationPage.countVisible(
+          gnavPersonalisationPage.navMenuLink(data.accentureLink),
+        ),
+        { timeout: 10000 },
+      ).toBe(0);
+    });
+  });
 });

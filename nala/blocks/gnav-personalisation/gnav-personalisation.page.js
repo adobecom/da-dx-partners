@@ -410,4 +410,30 @@ export default class GnavPersonalisationPage {
     await this.openAboutTab();
     await this.verifyMyPartnershipVisible(true);
   }
+
+  getPersonalizationSegment(segmentClass) {
+    return this.page.locator(`.notification.${segmentClass}`);
+  }
+
+  get processedPersonalizationBlocks() {
+    return this.page.locator('.partner-personalization-processed');
+  }
+
+  getGnavMenuButton(menuName) {
+    return this.page
+      .locator('.feds-navLink[aria-haspopup="true"]')
+      .filter({ hasText: menuName })
+      .first();
+  }
+
+  async openGnavMenu(menuName) {
+    const menu = this.getGnavMenuButton(menuName);
+    await expect(menu).toBeVisible({ timeout: 30000 });
+    await expect(async () => {
+      if (await menu.getAttribute('aria-expanded') !== 'true') {
+        await menu.click();
+      }
+      await expect(menu).toHaveAttribute('aria-expanded', 'true', { timeout: 3000 });
+    }).toPass({ timeout: 20000, intervals: [500, 1000, 2000] });
+  }
 }
