@@ -771,10 +771,10 @@ describe('AssetVideoPlayer - chapter scrolling', () => {
     await player.updateComplete;
     const container = player.querySelector('.video-container');
     const button = player.querySelector('.player-controls-right .player-control-button');
-    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    const nextTask = () => new Promise((resolve) => setTimeout(resolve, 0));
     window.scrollTo(0, window.scrollY + container.getBoundingClientRect().top + 100);
-    await nextFrame();
-    await nextFrame();
+    await nextTask();
+    await nextTask();
     const initialTop = container.getBoundingClientRect().top;
     const initialScroll = window.scrollY;
     button.focus({ preventScroll: true });
@@ -782,8 +782,8 @@ describe('AssetVideoPlayer - chapter scrolling', () => {
     for (let index = 0; index < 4; index += 1) {
       button.click();
       await player.updateComplete;
-      await nextFrame();
-      await nextFrame();
+      await nextTask();
+      await nextTask();
       expect(window.scrollY).to.be.closeTo(initialScroll, 1);
       expect(container.getBoundingClientRect().top).to.be.closeTo(initialTop, 1);
       const progressBounds = player.querySelector('.player-progress').getBoundingClientRect();
@@ -807,11 +807,11 @@ describe('AssetVideoPlayer - chapter scrolling', () => {
     const container = player.querySelector('.video-container');
     const controls = player.querySelector('.player-controls');
     const button = player.querySelector('.player-controls-right .player-control-button');
-    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    const nextTask = () => new Promise((resolve) => setTimeout(resolve, 0));
     window.scrollTo(0, window.scrollY + container.getBoundingClientRect().bottom
       - window.innerHeight + 16);
-    await nextFrame();
-    await nextFrame();
+    await nextTask();
+    await nextTask();
     button.focus({ preventScroll: true });
     const originalScroll = window.scrollY;
     const originalHeight = container.getBoundingClientRect().height;
@@ -819,8 +819,8 @@ describe('AssetVideoPlayer - chapter scrolling', () => {
     for (let index = 0; index < 4; index += 1) {
       button.click();
       await player.updateComplete;
-      await nextFrame();
-      await nextFrame();
+      await nextTask();
+      await nextTask();
       const bounds = controls.getBoundingClientRect();
       expect(bounds.top).to.be.at.least(0);
       expect(bounds.bottom).to.be.at.most(window.innerHeight + 1);
@@ -943,6 +943,7 @@ describe('AssetVideoPlayer - fullscreen chapter control', () => {
       sinon.stub(window, 'scrollX').get(() => 15);
       sinon.stub(window, 'scrollY').get(() => 850);
       const scrollTo = sinon.stub(window, 'scrollTo');
+      const requestFrame = sinon.stub(window, 'requestAnimationFrame');
       sinon.stub(container, 'requestFullscreen').callsFake(async () => {
         fullscreenElement = container;
         container.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
@@ -965,7 +966,9 @@ describe('AssetVideoPlayer - fullscreen chapter control', () => {
         container.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
       }
       await el.updateComplete;
-      await new Promise((resolve) => requestAnimationFrame(resolve));
+      expect(requestFrame.calledOnce).to.be.true;
+      expect(scrollTo.called).to.be.false;
+      requestFrame.firstCall.args[0](0);
 
       expect(el.isFullscreen).to.be.false;
       expect(scrollTo.calledOnceWithExactly({ left: 15, top: 850, behavior: 'instant' })).to.be.true;
