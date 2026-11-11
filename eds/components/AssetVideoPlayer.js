@@ -1,13 +1,14 @@
 /* eslint-disable no-underscore-dangle */
-import { getLibs } from '../scripts/utils.js';
+import { getEdsOrigin, getLibs } from '../scripts/utils.js';
 
 const miloLibs = getLibs();
+const edsOrigin = getEdsOrigin();
 const { html, LitElement } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { loadStyle } = await import(`${miloLibs}/utils/utils.js`);
 await Promise.all([
   import('./LoadingSpinner.js'),
-  loadStyle('/eds/components/LoadingSpinner.css'),
-  loadStyle('/eds/components/AssetVideoPlayer.css'),
+  loadStyle(`${edsOrigin}/eds/components/LoadingSpinner.css`),
+  loadStyle(`${edsOrigin}/eds/components/AssetVideoPlayer.css`),
 ]);
 
 export default class AssetVideoPlayer extends LitElement {
@@ -473,13 +474,17 @@ export default class AssetVideoPlayer extends LitElement {
     const icons = ['play', 'pause', 'volume', 'muted', 'next', 'chapters', 'fullscreen', 'back', 'forward'];
     if (!icons.includes(name)) return '';
     const isSkip = name === 'back' || name === 'forward';
+    const iconSrc = `${edsOrigin}/eds/img/icons/player-${name}.svg`;
 
     return html`
-      <svg class="${isSkip ? 'skip-svg' : ''}" viewBox="${isSkip ? '0 0 24 24' : '0 0 20 20'}"
-        width="${isSkip ? 20 : 24}" height="${isSkip ? 20 : 24}" aria-hidden="true" focusable="false"
-        style="fill: currentColor; stroke: none;">
-        <use href="/eds/img/icons/player-${name}.svg#icon"></use>
-      </svg>
+      <img
+        src="${iconSrc}"
+        alt=""
+        aria-hidden="true"
+        width="${isSkip ? 20 : 24}"
+        height="${isSkip ? 20 : 24}"
+        class="${isSkip ? 'skip-svg' : ''} player-icon"
+      />
     `;
   }
 
@@ -728,39 +733,25 @@ export default class AssetVideoPlayer extends LitElement {
                 @click="${(event) => this.shareChapter(index, event)}"
               >
                 ${this.sharedChapterIndex === index ? html`
-                  <svg
+                  <img
+                    class="check-icon"
                     slot="icon"
-                    xmlns="http://www.w3.org/2000/svg"
+                    src="${`${edsOrigin}/eds/img/icons/player-check.svg`}"
+                    alt=""
+                    aria-hidden="true"
                     width="18"
                     height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#268e6c"
-                    style="stroke: #268e6c;"
-                    stroke-width="1.75"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <use href="/eds/img/icons/player-check.svg#icon"></use>
-                  </svg>
+                  />
                 ` : html`
-                  <svg
+                  <img
                     class="copy-icon"
                     slot="icon"
-                    xmlns="http://www.w3.org/2000/svg"
+                    src="${`${edsOrigin}/eds/img/icons/player-share.svg`}"
+                    alt=""
+                    aria-hidden="true"
                     width="18"
                     height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#707070"
-                    stroke-width="1.75"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <use href="/eds/img/icons/player-share.svg#icon"></use>
-                  </svg>
+                  />
                 `}
               </sp-action-button>
               <span class="chapter-share-tooltip" id="chapter-share-tooltip-${index + 1}" role="tooltip">

@@ -176,6 +176,18 @@ asset-video-player .player-controls-right {
   grid-column: -2 / -1;
 }
 
+asset-video-player .player-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+asset-video-player .skip-svg {
+  width: 20px;
+  height: 20px;
+}
+
 asset-video-player .video-holder .player-control-button {
   width: 32px;
   height: 32px;
@@ -492,15 +504,38 @@ asset-video-player .chapter .chapter-actions {
 
 asset-video-player .chapter .share-button {
   --spectrum-actionbutton-edge-to-visual-only: 0;
+
+  min-width: 20px;
+  min-height: 20px;
 }
 
 asset-video-player .chapter .share-button svg {
   fill: none;
 }
 
+asset-video-player .chapter .share-button .copy-icon,
+asset-video-player .chapter .share-button .check-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  max-width: none;
+}
+
+asset-video-player .chapter .share-button .copy-icon {
+  color: #707070;
+  stroke: currentcolor;
+}
+
+asset-video-player .chapter .share-button .check-icon {
+  color: #2bb673;
+  stroke: currentcolor;
+}
+
 asset-video-player .chapter .share-button:hover .copy-icon,
 asset-video-player .chapter .share-button:focus-visible .copy-icon {
   stroke: #1473e6;
+  color: #1473e6;
 }
 
 asset-video-player .chapter .chapter-share-tooltip {
