@@ -1,5 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
+import { getCaasTagsUrl } from '../../eds/scripts/utils.js';
 import PartnerCards from '../../eds/components/PartnerCards.js';
 import PartnerCardsWithDateFilter from '../../eds/components/PartnerCardsWithDateFilter.js';
 
@@ -54,6 +55,20 @@ describe('PartnerCards unit behavior', () => {
   afterEach(() => {
     sinon.restore();
     document.body.innerHTML = '';
+  });
+
+  it('fetches tags using the resolved tags URL', async () => {
+    const component = makeCardsInstance();
+    const tags = { product: { tagID: 'product', title: 'Product' } };
+    const fetchStub = sinon.stub(window, 'fetch').resolves({
+      ok: true,
+      json: async () => ({ namespaces: { caas: { tags } } }),
+    });
+
+    await component.fetchTags();
+
+    expect(fetchStub.calledOnceWithExactly(getCaasTagsUrl())).to.be.true;
+    expect(component.allTagsFlatMap.get('product').title).to.equal('Product');
   });
 
   it('retries first-update setup after filters become available', async () => {

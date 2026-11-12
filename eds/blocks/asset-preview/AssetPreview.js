@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { getCaasTagsUrl, getLibs, prodHosts} from '../../scripts/utils.js';
+import { getCaasTagsUrl, getLibs, prodHosts } from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,

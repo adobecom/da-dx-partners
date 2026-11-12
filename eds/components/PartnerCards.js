@@ -1,4 +1,4 @@
-import { getLibs, prodHosts, loadPageToAnchor } from '../scripts/utils.js';
+import { getCaasTagsUrl, getLibs, prodHosts, loadPageToAnchor } from '../scripts/utils.js';
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';

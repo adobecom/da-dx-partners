@@ -619,7 +619,7 @@ export async function preloadResources(locales, miloLibs) {
     };
     const caasUrl = getCaasUrl(block);
     preload(caasUrl);
-    preload(CAAS_TAGS_URL);
+    preload(getCaasTagsUrl());
   });
 }
 
