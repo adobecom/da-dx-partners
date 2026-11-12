@@ -1,4 +1,4 @@
-import { CAAS_TAGS_URL, getLibs, prodHosts, loadPageToAnchor } from '../scripts/utils.js';
+import { getLibs, prodHosts, loadPageToAnchor } from '../scripts/utils.js';
 import './SinglePartnerCard.js';
 import './SinglePartnerCardHalfHeight.js';
 import { extractFilterData } from '../blocks/utils/caasUtils.js';
@@ -66,7 +66,7 @@ export default class PartnerCards extends LitElement {
     try {
       // todo milo have some default response stored if this fetch is not succesfull, do we need it
       const caasTagsResponse = await fetch(
-        CAAS_TAGS_URL,
+        getCaasTagsUrl(),
       );
       if (!caasTagsResponse.ok) {
         throw new Error(`Get caas tags HTTP error! Status: ${caasTagsResponse.status}`);

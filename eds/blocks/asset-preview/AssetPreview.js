@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { CAAS_TAGS_URL, getLibs, prodHosts } from '../../scripts/utils.js';
+import { getCaasTagsUrl, getLibs, prodHosts} from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,
@@ -89,7 +89,7 @@ export default class AssetPreview extends LitElement {
     this.setBlockData();
     try {
       const caasTagsResponse = await fetch(
-        CAAS_TAGS_URL,
+        getCaasTagsUrl(),
       );
       if (!caasTagsResponse.ok) {
         throw new Error(`Get caas tags HTTP error! Status: ${caasTagsResponse.status}`);
