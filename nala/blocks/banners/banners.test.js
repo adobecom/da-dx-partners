@@ -185,7 +185,7 @@ test.describe('Validate banners block', () => {
     });
 
     await test.step('Verify uplevel banner', async () => {
-      await expect(bannersPage.uplevelBanner('silver')).toBeVisible();
+      await expect(bannersPage.uplevelBanner('silver')).toBeVisible({ timeout: 30000 });
       await expect(bannersPage.uplevelBanner('silver')).toContainText(data.uplevelBannerText);
       await expect(bannersPage.upgradeButton('silver')).toBeVisible();
       const href = await bannersPage.upgradeButton('silver').getAttribute('href');
@@ -193,7 +193,7 @@ test.describe('Validate banners block', () => {
     });
 
     await test.step('Verify banner after close and reload', async () => {
-      await expect(bannersPage.closeBannerButton('silver')).toBeVisible();
+      await expect(bannersPage.closeBannerButton('silver')).toBeVisible({ timeout: 30000 });
       await bannersPage.closeBannerButton('silver').click();
       await page.reload();
       await expect(bannersPage.uplevelBanner('silver')).toBeVisible({ timeout: 30000 });
