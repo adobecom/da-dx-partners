@@ -641,5 +641,31 @@ export default {
         },
       },
     },
+    {
+      tcid: '29',
+      name: '@account-name-personalization-accenture-account',
+      path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav#',
+      tags: '@da-dx-personalisation @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-accenture:',
+        segmentClass: 'partner-account-name-accenture',
+        segmentText: 'Partner Accenture:',
+        gnavMenu: 'Personalization',
+        accountName: '"accountName":"Accenture Test"',
+        accentureLink: '/digitalexperience/drafts/automation/regression/personalization/personalisation-account-name',
+      },
+    },
+    {
+      tcid: '30',
+      name: '@account-name-personalization-non-accenture-account',
+      path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav#',
+      tags: '@da-dx-personalisation @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-silver:',
+        gnavMenu: 'Personalization',
+        segmentText: 'partner-account-name-accenture',
+        accentureLink: '/digitalexperience/drafts/automation/regression/personalization/personalisation-account-name',
+      },
+    },
   ],
 };

@@ -13,7 +13,7 @@ export default class GnavPersonalisationPage {
     this.globeIcon = page.getByRole('link', { name: 'Partner Directory' });
     this.searchIcon = page.getByRole('link', { name: 'Search' });
     this.menageUserIcon = page.getByRole('link', { name: 'Manage Profile' });
-    this.homeIcon = page.getByRole('link', { name: 'Home' });
+    this.homeIcon = page.locator('.shortcut-icons').getByRole('link', { name: 'Home' });
     this.navigationMenuButton = page.getByRole('button', { name: 'Navigation menu' });
     this.mainMenuButton = page.getByLabel('About').locator('div').filter({ hasText: 'Main menu' });
     this.newlyApprovedBanner = page.locator('.partner-newly-approved');
@@ -409,5 +409,31 @@ export default class GnavPersonalisationPage {
   async verifyMobileRestrictedGnavAboutTab() {
     await this.openAboutTab();
     await this.verifyMyPartnershipVisible(true);
+  }
+
+  getPersonalizationSegment(segmentClass) {
+    return this.page.locator(`.notification.${segmentClass}`);
+  }
+
+  get processedPersonalizationBlocks() {
+    return this.page.locator('.partner-personalization-processed');
+  }
+
+  getGnavMenuButton(menuName) {
+    return this.page
+      .locator('.feds-navLink[aria-haspopup="true"]')
+      .filter({ hasText: menuName })
+      .first();
+  }
+
+  async openGnavMenu(menuName) {
+    const menu = this.getGnavMenuButton(menuName);
+    await expect(menu).toBeVisible({ timeout: 30000 });
+    await expect(async () => {
+      if (await menu.getAttribute('aria-expanded') !== 'true') {
+        await menu.click();
+      }
+      await expect(menu).toHaveAttribute('aria-expanded', 'true', { timeout: 3000 });
+    }).toPass({ timeout: 20000, intervals: [500, 1000, 2000] });
   }
 }
