@@ -605,7 +605,6 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.newlyApprovedBanner).toBeVisible();
     });
   });
-
   test(`${features[24].name},${features[24].tags}`, async ({ page, baseURL, context }) => {
     const { data, path } = features[24];
 
@@ -616,7 +615,6 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.newlyApprovedBanner).toBeVisible();
     });
   });
-
   test(`${features[25].name},${features[25].tags}`, async ({ page, baseURL, context }) => {
     const { data, path } = features[25];
 
@@ -626,7 +624,6 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.newlyApprovedBanner).not.toBeVisible();
     });
   });
-
   test(`${features[26].name},${features[26].tags}`, async ({ page, baseURL }) => {
     const { data, path } = features[26];
 
@@ -645,7 +642,6 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.signedPartnerBanner).toBeVisible({ timeout: 30000 });
     });
   });
-
   test(`${features[27].name},${features[27].tags}`, async ({ page, baseURL, context }) => {
     const { data, path } = features[27];
 
@@ -655,7 +651,6 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.pxTeamButton).toBeVisible({ timeout: 30000 });
     });
   });
-
   test(`${features[28].name},${features[28].tags}`, async ({ page, baseURL }) => {
     const { data, path } = features[28];
 
@@ -680,7 +675,6 @@ test.describe('Gnav Personalisation', () => {
       await expect(link).toHaveAttribute('href', new RegExp(data.accentureLink));
     });
   });
-
   test(`${features[29].name},${features[29].tags}`, async ({ page, baseURL }) => {
     const { data, path } = features[29];
 
