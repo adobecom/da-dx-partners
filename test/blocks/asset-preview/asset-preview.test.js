@@ -354,7 +354,53 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
     });
     expect(el.pdfPreviewUrl).to.equal('https://example.com/rendition.pdf');
   });
+  it('uses the connected PDF as the preview for video assets', async () => {
+    const el = makeInstance();
+    const loadPdfViewerStub = sinon.stub(el, 'loadPdfViewer');
+    el.allCaaSTags = {
+      namespaces: {
+        caas: {
+          tags: {
+            'file-format': {
+              tags: {
+                video: { tagId: 'caas:file-format/video', title: 'Video' },
+              },
+            },
+          },
+        },
+      },
+    };
+    el.assetPartnerLevel = ['public'];
+    await el.setData({
+      title: 'Webinar Video',
+      url: 'https://example.com/video.mp4',
+      webinarPresentation: 'https://example.com/connected-presentation.pdf',
+      tags: ['caas:file-format/video'],
+    });
 
+    expect(el.isVideo).to.be.true;
+    expect(el.webinarPresentation).to.equal('https://example.com/connected-presentation.pdf');
+    expect(el.pdfPreviewUrl).to.equal('https://example.com/connected-presentation.pdf');
+    el.assetPartnerLevel = ['public'];
+    el.updated(new Map([['pdfPreviewUrl', ''] ]));
+    expect(loadPdfViewerStub.calledOnce).to.be.true;
+  });
+
+  it('renders the thumbnail when the user is restricted', () => {
+    const el = makeInstance();
+    el.assetHasData = true;
+    el.isLoading = false;
+    el.assetPartnerLevel = ['partner'];
+    el.pdfPreviewUrl = 'https://example.com/connected-presentation.pdf';
+    el.isVideo = true;
+    el.previewImage = 'https://example.com/preview.jpg';
+
+    const container = document.createElement('div');
+    render(el.render(), container);
+
+    expect(container.querySelector('#adobe-dc-view')).to.equal(null);
+    expect(container.querySelector('img')).to.exist;
+  });
   it('defaults pdfEmbedMode to full-window when not set', async () => {
     const el = makeInstance();
     sinon.stub(el, 'loadPdfViewer');
