@@ -432,6 +432,19 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
 });
 
 describe('AssetPreview - render() metadata details', () => {
+  it('marks the redundant asset thumbnail as decorative', () => {
+    const el = makeInstance();
+    el.assetHasData = true;
+    el.isLoading = false;
+    const container = document.createElement('div');
+    render(el.render(), container);
+
+    const image = container.querySelector('.asset-preview-block-details-right > img');
+    expect(image).to.exist;
+    expect(image.getAttribute('src')).to.equal(mockPreviewImage);
+    expect(image.getAttribute('alt')).to.equal('');
+  });
+
   [
     {
       property: 'createdDate',

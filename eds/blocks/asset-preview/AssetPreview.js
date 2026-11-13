@@ -328,7 +328,7 @@ export default class AssetPreview extends LitElement {
             <div class="asset-preview-block-details-right">
             ${this.pdfPreviewUrl && !this.isRestrictedAssetForUser()
     ? html`<div id="${PDF_RENDER_DIV_ID}" class="asset-preview-pdf-viewer"></div>`
-    : html`<img src="${transformCardUrl(this.previewImage)}" @error="${this._handleImgError}"/>`}
+    : html`<img src="${transformCardUrl(this.previewImage)}" alt="" @error="${this._handleImgError}"/>`}
             </div>
           </div>
 
