@@ -357,19 +357,7 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
   it('uses the connected PDF as the preview for video assets', async () => {
     const el = makeInstance();
     const loadPdfViewerStub = sinon.stub(el, 'loadPdfViewer');
-    el.allCaaSTags = {
-      namespaces: {
-        caas: {
-          tags: {
-            'file-format': {
-              tags: {
-                video: { tagId: 'caas:file-format/video', title: 'Video' },
-              },
-            },
-          },
-        },
-      },
-    };
+    el.allCaaSTags = { namespaces: { caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } } } };
     el.assetPartnerLevel = ['public'];
     await el.setData({
       title: 'Webinar Video',
@@ -382,7 +370,7 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
     expect(el.webinarPresentation).to.equal('https://example.com/connected-presentation.pdf');
     expect(el.pdfPreviewUrl).to.equal('https://example.com/connected-presentation.pdf');
     el.assetPartnerLevel = ['public'];
-    el.updated(new Map([['pdfPreviewUrl', ''] ]));
+    el.updated(new Map([['pdfPreviewUrl', '']]));
     expect(loadPdfViewerStub.calledOnce).to.be.true;
   });
 
