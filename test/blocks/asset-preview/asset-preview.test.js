@@ -381,7 +381,7 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
     expect(el.webinarPresentation).to.equal('https://example.com/connected-presentation.pdf');
     expect(el.pdfPreviewUrl).to.equal('https://example.com/connected-presentation.pdf');
     el.assetPartnerLevel = ['public'];
-    el.updated(new Map([['pdfPreviewUrl', ''] ]));
+    el.updated(new Map([['pdfPreviewUrl', '']]));
     expect(loadPdfViewerStub.calledOnce).to.be.true;
   });
 
