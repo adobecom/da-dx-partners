@@ -361,8 +361,7 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
       namespaces: {
         caas: {
           tags: {
-            'file-format': {
-              tags: { video: { tagId: 'caas:file-format/video', title: 'Video' },},},
+            'file-format': {tags: { video: { tagId: 'caas:file-format/video', title: 'Video' },},},
           },
         },
       },
