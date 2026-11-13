@@ -247,8 +247,10 @@ export default class AssetPreview extends LitElement {
     })();
     this.audienceTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:audience') : [];
     this.fileFormatTags = assetMetadata.tags ? this.getTagChildTagsObjects(assetMetadata.tags, this.allCaaSTags, 'caas:file-format') : [];
-    this.pdfPreviewUrl = DOMPurify.sanitize(assetMetadata.pdfPreviewUrl);
     this.isVideo = this.fileFormatTags && this.fileFormatTags.length && this.fileFormatTags[0].tagId === 'caas:file-format/video';
+    this.pdfPreviewUrl = DOMPurify.sanitize(
+      assetMetadata.pdfPreviewUrl || (this.isVideo ? assetMetadata.webinarPresentation : ''),
+    );
     if (!assetMetadata.title || !assetMetadata.url) {
       this.assetHasData = false;
     } else {
