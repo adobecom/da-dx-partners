@@ -362,8 +362,7 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
         caas: {
           tags: {
             'file-format': {
-              tags: { video: { tagId: 'caas:file-format/video', title: 'Video' },
-              },
+              tags: { video: { tagId: 'caas:file-format/video', title: 'Video' },},
             },
           },
         },
