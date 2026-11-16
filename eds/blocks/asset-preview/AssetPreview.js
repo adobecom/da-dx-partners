@@ -118,12 +118,7 @@ export default class AssetPreview extends LitElement {
 
   async loadPdfViewer() {
     try {
-      if (this.blockData.isAEM) {
-        const pdfUrl = new URL(this.pdfPreviewUrl);
-        pdfUrl.protocol = 'https:';
-        pdfUrl.port = '';
-        this.pdfPreviewUrl = pdfUrl.toString();
-      }
+      this.pdfPreviewUrl = this.normalizeAssetUrlForEnvironment(this.pdfPreviewUrl);
 
       // Check if the PDF URL is reachable first
       const res = await fetch(this.pdfPreviewUrl, { method: 'HEAD' });
@@ -425,14 +420,25 @@ export default class AssetPreview extends LitElement {
     return tags?.map((tag) => DOMPurify.sanitize(tag.title)).join(', ');
   }
 
+  normalizeAssetUrlForEnvironment(url) {
+    if (!url) return '#';
+
+    if (this.blockData?.isAEM) {
+      const normalizedUrl = new URL(url);
+      normalizedUrl.protocol = 'https:';
+      normalizedUrl.port = '';
+      return normalizedUrl.toString();
+    }
+
+    return url;
+  }
+
   getDownloadUrl() {
-    if (!this.url) return '#';
-    return this.url;
+    return this.normalizeAssetUrlForEnvironment(this.url);
   }
 
   getWebinarPresentationDownloadUrl() {
-    if (!this.webinarPresentation) return '#';
-    return this.webinarPresentation;
+    return this.normalizeAssetUrlForEnvironment(this.webinarPresentation);
   }
 
   isRestrictedAssetForUser() {
