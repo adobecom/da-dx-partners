@@ -135,6 +135,7 @@ export default class AssetVideoPlayer extends LitElement {
     super.disconnectedCallback();
     clearTimeout(this.shareResetTimer);
     this.releaseChaptersTrack();
+    this.querySelector('.video-player-layout')?.style.removeProperty('min-height');
   }
 
   connectedCallback() {
@@ -436,6 +437,7 @@ export default class AssetVideoPlayer extends LitElement {
     this.isFullscreen = document.fullscreenElement === event.currentTarget;
     if (!wasFullscreen || this.isFullscreen) return;
 
+    this.querySelector('.video-player-layout').style.removeProperty('min-height');
     const position = this.fullscreenScrollPosition;
     this.fullscreenScrollPosition = null;
     if (!position) return;
@@ -458,11 +460,15 @@ export default class AssetVideoPlayer extends LitElement {
         await document.exitFullscreen();
       } else if (container.requestFullscreen) {
         this.fullscreenScrollPosition = { left: window.scrollX, top: window.scrollY };
+        // Fullscreen removes the video from flow; keep the page from shrinking.
+        const layout = this.querySelector('.video-player-layout');
+        layout.style.minHeight = `${layout.getBoundingClientRect().height}px`;
         await container.requestFullscreen();
       } else if (this._video.webkitEnterFullscreen) {
         this._video.webkitEnterFullscreen();
       }
     } catch (error) {
+      this.querySelector('.video-player-layout').style.removeProperty('min-height');
       this.fullscreenScrollPosition = null;
       // eslint-disable-next-line no-console
       console.error('Failed to toggle fullscreen:', error);

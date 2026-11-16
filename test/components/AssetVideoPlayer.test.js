@@ -932,6 +932,64 @@ describe('AssetVideoPlayer - selectChapter()', () => {
 });
 
 describe('AssetVideoPlayer - fullscreen chapter control', () => {
+  [true, false].forEach((chaptersVisible) => {
+    it(`preserves page height and scroll while fullscreen removes the video from the ${chaptersVisible ? 'open' : 'collapsed'} layout`, async () => {
+      const el = makeInstance();
+      el.chaptersVisible = chaptersVisible;
+      const styles = document.createElement('style');
+      styles.textContent = (await readFile({ path: '../../eds/components/AssetVideoPlayer.css' }))
+        .replace('(min-width: 900px)', '(min-width: 0px)');
+      const before = document.createElement('div');
+      before.style.height = '1200px';
+      document.body.append(styles, before, el);
+      await el.updateComplete;
+      const layout = el.querySelector('.video-player-layout');
+      const container = el.querySelector('.video-container');
+      const { height } = layout.getBoundingClientRect();
+      window.scrollTo(0, document.documentElement.scrollHeight);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const position = window.scrollY;
+      let fullscreenElement = null;
+      sinon.stub(document, 'fullscreenElement').get(() => fullscreenElement);
+      sinon.stub(container, 'requestFullscreen').callsFake(async () => {
+        container.style.position = 'fixed';
+        fullscreenElement = container;
+        container.dispatchEvent(new Event('fullscreenchange', { bubbles: true }));
+      });
+
+      await el.toggleVideoFullscreen();
+      await el.updateComplete;
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      expect(layout.getBoundingClientRect().height).to.be.closeTo(height, 1);
+      expect(window.scrollY).to.be.closeTo(position, 1);
+
+      container.style.removeProperty('position');
+      fullscreenElement = null;
+      await el.handleFullscreenChange({ currentTarget: container });
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      expect(layout.style.minHeight).to.equal('');
+      expect(window.scrollY).to.be.closeTo(position, 1);
+    });
+  });
+
+  it('releases the reserved layout height when requesting fullscreen fails', async () => {
+    const el = makeInstance();
+    document.body.append(el);
+    await el.updateComplete;
+    const error = new Error('Fullscreen permission denied');
+    sinon.stub(el.querySelector('.video-container'), 'requestFullscreen').rejects(error);
+    const logError = sinon.stub(console, 'error');
+
+    await el.toggleVideoFullscreen();
+
+    expect(el.querySelector('.video-player-layout').style.minHeight).to.equal('');
+    expect(el.fullscreenScrollPosition).to.equal(null);
+    expect(logError.calledOnceWithExactly('Failed to toggle fullscreen:', error)).to.be.true;
+  });
+
   [true, false].forEach((useButton) => {
     it(`restores the page position after exiting fullscreen with ${useButton ? 'the button' : 'Escape'}`, async () => {
       const el = makeInstance();
