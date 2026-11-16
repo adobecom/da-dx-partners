@@ -118,6 +118,13 @@ export default class AssetPreview extends LitElement {
 
   async loadPdfViewer() {
     try {
+      if (this.blockData.isAEM) {
+        const pdfUrl = new URL(this.pdfPreviewUrl);
+        pdfUrl.protocol = 'https:';
+        pdfUrl.port = '';
+        this.pdfPreviewUrl = pdfUrl.toString();
+      }
+
       // Check if the PDF URL is reachable first
       const res = await fetch(this.pdfPreviewUrl, { method: 'HEAD' });
       const contentType = res.headers.get('Content-Type');
