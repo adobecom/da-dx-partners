@@ -55,13 +55,13 @@ function createCardMarkup(card, onComplete, index) {
   const actionLink = card.actionLink || '#';
 
   const root = document.createElement('div');
-  root.className = 'journey-card';
+  const backgroundColorStyle = index === 0 ? 'recommended' : '';
+  root.className = `journey-card ${backgroundColorStyle}`;
   root.setAttribute('data-card-id', card.id || '');
   // set button label plus card title
   root.setAttribute('daa-lh', `Journey Card ${card.id} | ${processTrackingLabels(card.title ?? '')}`);
 
   const buttonLabel = 'Mark as completed';
-
   root.innerHTML = `
    <div class="foreground">
      <div class="body-s">
@@ -93,19 +93,6 @@ data-action="complete" aria-disabled="false">
     // should card be clickable
     (() => (window.open(actionLink)))();
   });
-  // will this be on block metadata or on card metadata? for now just hardcoeded
-  const backgroundMap = {
-    1: 'rgb(255, 250, 235)',
-    2: 'rgb(255, 247, 209)',
-    3: 'rgb(255, 238, 183)',
-    4: 'rgb(249, 241, 249)',
-    5: 'rgb(248, 230, 249)',
-    6: 'rgb(241, 213, 242)',
-    7: 'rgb(240, 255, 248)',
-    8: 'rgb(231, 255, 239)',
-    9: 'rgb(216, 255, 230)',
-  };
-  root.style.background = backgroundMap[index + 1];
   return root;
 }
 
