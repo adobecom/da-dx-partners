@@ -4,6 +4,7 @@ import {
   deleteCookieValue,
   formatDate,
   getCookieValue,
+  getDaysFromRegistration,
   getEdsOrigin,
   getLocale,
   getMetadataContent,
@@ -14,7 +15,9 @@ import {
   getProgramHomePage,
   getProgramType,
   getUserRegionParams,
+  isAccountLocked,
   isMember,
+  isReturningUser,
   matchesAccountNameMapping,
   partnerCookieContainsValue,
   setLibs,
@@ -156,6 +159,44 @@ describe('utils browser coverage', () => {
     expect(partnerCookieContainsValue('specialstate', 'compliance-past')).to.be.true;
     expect(partnerCookieContainsValue('specialstate', 'submitted-in-review')).to.be.false;
     expect(partnerCookieContainsValue('missing', 'locked')).to.be.false;
+  });
+
+  it('detects locked accounts only for signed-in partners with a locked special state', () => {
+    const setSpecialState = (specialState) => {
+      document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { specialState } }))}; Path=/`;
+    };
+
+    expect(isAccountLocked()).to.be.false;
+
+    setSpecialState('Locked');
+    expect(isAccountLocked()).to.be.true;
+
+    setSpecialState('Locked-Payment-Future');
+    expect(isAccountLocked()).to.be.true;
+
+    setSpecialState('submitted-in-review');
+    expect(isAccountLocked()).to.be.false;
+  });
+
+  it('calculates days from registration and returning user windows', () => {
+    const dayMs = 1000 * 60 * 60 * 24;
+    const setCreatedDate = (createdDate) => {
+      document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { createdDate } }))}; Path=/`;
+    };
+
+    expect(getDaysFromRegistration()).to.be.null;
+    expect(isReturningUser(60)).to.be.false;
+
+    document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { status: 'MEMBER' } }))}; Path=/`;
+    expect(getDaysFromRegistration()).to.be.null;
+
+    setCreatedDate(new Date(Date.now() + 10 * dayMs).toISOString().slice(0, 10));
+    expect(getDaysFromRegistration()).to.be.null;
+
+    setCreatedDate(new Date(Date.now() - 45 * dayMs).toISOString().slice(0, 10));
+    expect(getDaysFromRegistration()).to.be.within(44, 46);
+    expect(isReturningUser(60)).to.be.true;
+    expect(isReturningUser(90)).to.be.false;
   });
 
   it('matches account names against the account name mapping', () => {
