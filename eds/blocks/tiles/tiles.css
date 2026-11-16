@@ -89,7 +89,7 @@
 .journey-card .card-footer > .action-area {
   display: flex;
   align-items: center;
-  justify-content: right;
+  justify-content: space-between;
   gap: var(--spacing-xs) var(--spacing-s);
   flex-flow: wrap;
   flex-direction: row;

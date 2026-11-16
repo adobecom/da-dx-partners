@@ -49,22 +49,23 @@ async function handleJourneyCardToggle(event, onComplete, title, cardId) {
   }
 }
 
-function createCardMarkup(card, onComplete, index) {
+function createCardMarkup(card, onComplete, index, tab = 0) {
   const title = String(card.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const description = String(card.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const actionLink = card.actionLink || '#';
 
   const root = document.createElement('div');
-  const backgroundColorStyle = index === 0 ? 'recommended' : '';
+  const backgroundColorStyle = index === 0 && tab === 0 ? 'recommended' : '';
   root.className = `journey-card ${backgroundColorStyle}`;
   root.setAttribute('data-card-id', card.id || '');
   // set button label plus card title
   root.setAttribute('daa-lh', `Journey Card ${card.id} | ${processTrackingLabels(card.title ?? '')}`);
 
-  const buttonLabel = 'Mark as completed';
+  const buttonLabel = tab === 0 ? 'Mark as completed' : 'Revisit task';
   root.innerHTML = `
    <div class="foreground">
      <div class="body-s">
+     ${backgroundColorStyle ? '<p class="detail-m">Recommended</p>' : ''}
        <h3 class="heading-l">${title}</h3>
        <p class="body-s">${description}</p>
      </div>
@@ -73,9 +74,9 @@ function createCardMarkup(card, onComplete, index) {
      <div class="body-s action-area">
        <em>
 <!--        should it open on new tab or existing-->
-         <a href="${actionLink}" target="_blank" class="con-button outline fill" daa-ll="View-${card.id}--${processTrackingLabels(title)}">View</a>
+         <a href="${actionLink}" target="_blank" class="con-button outline fill" daa-ll="Open-task-${card.id}--${processTrackingLabels(title)}">Open task</a>
        </em>
-       ${card.neverCompletesCard ? '' : `<em><a href="#" class="con-button outline fill journey-card-toggle" data-card-id="${card.id || ''}"
+       ${card.neverCompletesCard && tab === 0 ? '' : `<em><a href="#" class="con-button outline fill journey-card-toggle" data-card-id="${card.id || ''}"
 daa-ll="Complete-${card.id}--${processTrackingLabels(title)}" 
 data-action="complete" aria-disabled="false">
          ${buttonLabel}
@@ -105,6 +106,7 @@ export default function renderBoard(cards, actionHandler) {
       card,
       actionHandler,
       index,
+      0,
     );
     journeyBoard.appendChild(tile);
   });
