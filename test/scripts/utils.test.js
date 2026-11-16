@@ -133,6 +133,22 @@ describe('utils browser coverage', () => {
     expect(url.searchParams.get('s')).to.equal(window.location.host);
   });
 
+  ['partners.stage.adobe.com', 'partnerspreview.adobe.com'].forEach((hostname) => {
+    it(`omits the tags site parameter on ${hostname}`, () => {
+      expect(getCaasTagsUrl(new URL(`https://${hostname}:8443`)))
+        .to.equal('https://www.adobe.com/chimera-api/tags');
+    });
+  });
+
+  ['partners.adobe.com', 'partnerspreview.adobe.com.example.com'].forEach((hostname) => {
+    it(`preserves the tags site parameter on ${hostname}`, () => {
+      const location = new URL(`https://${hostname}:8443`);
+      const url = new URL(getCaasTagsUrl(location));
+
+      expect(url.searchParams.get('s')).to.equal(location.host);
+    });
+  });
+
   it('preloads the same tags URL used by card components', async () => {
     document.body.innerHTML = '<div class="dx-card-collection"></div>';
     const appendStub = sinon.stub(document.head, 'appendChild').callsFake((node) => node);
