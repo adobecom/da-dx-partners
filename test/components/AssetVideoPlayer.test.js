@@ -1532,7 +1532,7 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
     expect(player.querySelector('.player-center-play').hidden).to.be.false;
   });
 
-  it('hides the center play button and tint during playback and restores them on pause or end', async () => {
+  it('toggles the center play button without a video tint during playback, pause or end', async () => {
     const styles = document.createElement('style');
     styles.textContent = await readFile({ path: '../../eds/components/AssetVideoPlayer.css' });
     document.body.append(styles);
@@ -1544,9 +1544,8 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
       video.dispatchEvent(new Event('play'));
     });
     const playButton = player.querySelector('.player-center-play');
-    const tint = player.querySelector('.video-tint');
     expect(getComputedStyle(playButton).display).not.to.equal('none');
-    expect(getComputedStyle(tint).display).not.to.equal('none');
+    expect(player.querySelector('.video-tint')).to.equal(null);
 
     video.click();
     await player.updateComplete;
@@ -1556,22 +1555,22 @@ describe('AssetVideoPlayer - component lifecycle and progress', () => {
     expect(player.isVideoPlaying).to.be.true;
     expect(playButton.hidden).to.be.true;
     expect(getComputedStyle(playButton).display).to.equal('none');
-    expect(getComputedStyle(tint).display).to.equal('none');
+    expect(player.querySelector('.video-tint')).to.equal(null);
 
     video.dispatchEvent(new Event('pause'));
     await player.updateComplete;
     expect(playButton.hidden).to.be.false;
     expect(getComputedStyle(playButton).display).not.to.equal('none');
-    expect(getComputedStyle(tint).display).not.to.equal('none');
+    expect(player.querySelector('.video-tint')).to.equal(null);
 
     video.dispatchEvent(new Event('play'));
     await player.updateComplete;
     expect(getComputedStyle(playButton).display).to.equal('none');
-    expect(getComputedStyle(tint).display).to.equal('none');
+    expect(player.querySelector('.video-tint')).to.equal(null);
     video.dispatchEvent(new Event('ended'));
     await player.updateComplete;
     expect(getComputedStyle(playButton).display).not.to.equal('none');
-    expect(getComputedStyle(tint).display).not.to.equal('none');
+    expect(player.querySelector('.video-tint')).to.equal(null);
   });
 
   it('leaves video clicks to native controls when there are no chapters', async () => {
