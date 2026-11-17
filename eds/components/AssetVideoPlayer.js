@@ -72,7 +72,8 @@ export default class AssetVideoPlayer extends LitElement {
       this.fetchChapters();
     }
 
-    if (changedProperties.has('src') || changedProperties.has('chapters')) {
+    const sourceChanged = changedProperties.has('src') || changedProperties.has('chaptersUrl');
+    if (sourceChanged || changedProperties.has('chapters')) {
       clearTimeout(this.shareResetTimer);
       this.shareResetTimer = null;
       this.sharedChapterIndex = -1;
@@ -81,12 +82,17 @@ export default class AssetVideoPlayer extends LitElement {
       this.currentTime = 0;
       this.progressHover = null;
       this.scrollToRestoredChapter = false;
-      if (changedProperties.has('src')) {
+      if (changedProperties.has('src') && this.src) {
+        this.chapters = [];
         this.videoDuration = 0;
         this.isVideoPlaying = false;
         this.isVideoLoading = false;
         this.settingsMenuOpen = false;
         this.volumeExpanded = false;
+      }
+
+      if (this.chapters.length && (changedProperties.has('chapters') || changedProperties.has('src') || changedProperties.has('chaptersUrl'))) {
+        this.restoreChapterFromUrl();
       }
     }
   }

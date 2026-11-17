@@ -310,29 +310,25 @@ describe('AssetPreview - getAssetMetadata()', () => {
     expect(fetchStub.called).to.be.false;
   });
 
-  it('fetches metadata without chapter parameters and preserves chapters for the player', async () => {
+  it('fetches metadata without chapter parameters and keeps chapter URL generation in preview', async () => {
     const originalUrl = window.location.href;
     try {
       window.history.replaceState(null, '', '/digitalexperience/preview/video.html?chapter=2&t=35');
       const el = new AssetPreview();
       el.blockData = {};
-      const chapters = [
-        { title: 'First', summary: 'First summary', timerange: '00:00:00.000 - 00:00:30.000' },
-        { title: 'Second', summary: 'Second summary', timerange: '00:00:30.000 - 00:01:00.000' },
-      ];
       const fetchStub = sinon.stub(window, 'fetch').resolves({
         status: 200,
-        json: async () => ({ title: 'Video', url: 'https://example.com/video.mp4', chapters }),
+        json: async () => ({ title: 'Video', url: 'https://example.com/video.mp4' }),
       });
 
-      expect(el.chapters).to.deep.equal([]);
+      expect(el).to.not.have.property('chapters');
       await el.getAssetMetadata();
 
       const metadataUrl = fetchStub.firstCall.args[0];
       expect(metadataUrl.pathname).to.equal('/digitalexperience-assets/preview/video/_jcr_content/metadata.assetmetadata.json');
       expect(metadataUrl.search).to.equal('');
       expect(window.location.search).to.equal('?chapter=2&t=35');
-      expect(el.chapters).to.deep.equal(chapters);
+      expect(el.chaptersUrl).to.equal(el.getRealAssetChaptersUrl()?.toString());
       expect(el.isLoading).to.be.false;
     } finally {
       window.history.replaceState(null, '', originalUrl);
@@ -530,31 +526,16 @@ describe('AssetPreview - render() metadata details', () => {
 });
 
 describe('AssetPreview - setData() chapters', () => {
-  it('starts without chapters before metadata arrives', () => {
-    expect(new AssetPreview().chapters).to.deep.equal([]);
+  it('starts without chapter state on the preview', () => {
+    expect(new AssetPreview()).to.not.have.property('chapters');
   });
 
   it('passes the chapters URL and video properties to the player', async () => {
     const el = makeInstance();
-    const chapters = [{
-      title: 'API chapter',
-      summary: 'API summary',
-      timerange: '00:00:10.000 - 00:00:20.000',
-    }];
-    sinon.stub(window, 'fetch').resolves({
-      ok: true,
-      json: async () => ({ chapters }),
-    });
-    await el.setData({
-      title: 'Test',
-      url: 'https://example.com/video.mp4',
-      previewImage: mockPreviewImage,
-      chapters,
-    });
-    expect(el.chapters).to.deep.equal(chapters);
     el.isVideo = true;
     el.isLoading = false;
     el.fileType = 'video/mp4';
+    el.chaptersUrl = 'https://example.com/chapters.json';
 
     const container = document.createElement('div');
     render(el.render(), container);
@@ -565,23 +546,11 @@ describe('AssetPreview - setData() chapters', () => {
     expect(player.fileType).to.equal('video/mp4');
   });
 
-  it('accepts a single chapter object from metadata', async () => {
+  it('does not keep chapter metadata on the preview model', async () => {
     const el = makeInstance();
-    const chapter = {
-      title: 'Introduction',
-      summary: 'Welcome.',
-      timerange: '00:00:01.001 - 00:01:31.625',
-    };
-    await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters: chapter });
-    expect(el.chapters).to.deep.equal([chapter]);
-  });
-
-  it('clears chapters when metadata has no chapters', async () => {
-    const el = makeInstance();
-    for (const chapters of [undefined, null, []]) {
-      await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters });
-      expect(el.chapters).to.deep.equal([]);
-    }
+    await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters: [{ title: 'Intro' }] });
+    expect(el).to.not.have.property('chapters');
+    expect(el.chaptersUrl).to.equal('');
   });
 
   it('renders a player without optional chapters and handles its loading events', async () => {
@@ -620,19 +589,15 @@ describe('AssetPreview - setData() chapters', () => {
     }
   });
 
-  it('preserves chapter links while setting chapter metadata', async () => {
+  it('preserves chapter query params while preview creates the chapter servlet URL', async () => {
     const originalUrl = window.location.href;
     try {
       window.history.replaceState(null, '', '?chapter=2&t=35');
       const el = new AssetPreview();
       el.blockData = {};
-      const chapters = [
-        { title: 'First', summary: 'First summary', timerange: '00:00:00.000 - 00:00:30.000' },
-        { title: 'Second', summary: 'Second summary', timerange: '00:00:30.000 - 00:01:00.000' },
-      ];
-      expect(el.chapters).to.deep.equal([]);
-      await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters });
-      expect(el.chapters).to.deep.equal(chapters);
+      await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters: [{ title: 'Intro' }] });
+      expect(el).to.not.have.property('chapters');
+      expect(el.chaptersUrl).to.equal(el.getRealAssetChaptersUrl()?.toString());
       expect(window.location.search).to.equal('?chapter=2&t=35');
     } finally {
       window.history.replaceState(null, '', originalUrl);
