@@ -911,6 +911,35 @@ describe('AssetPreview - getRealAssetUrl()', () => {
     expect(result === null || result instanceof URL).to.be.true;
   });
 
+  it('builds the AEM chapter servlet URL from the assetPath parameter', () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '/content/asset-ai-dashboard.html?assetPath=/content/dam/dxp/qatest/dragana/shortexample.mp4');
+      const el = new AssetPreview();
+      el.blockData = { isAEM: true };
+
+      const chaptersUrl = el.getRealAssetChaptersUrl();
+
+      expect(chaptersUrl).to.be.instanceOf(URL);
+      expect(chaptersUrl.toString()).to.equal(`${window.location.origin}/content/dam/dxp/qatest/dragana/shortexample.mp4/_jcr_content/videoProcessingResults.assetchapters.json`);
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
+
+  it('returns null for non-DAM AEM chapter asset paths', () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '/content/asset-ai-dashboard.html?assetPath=/content/test/page');
+      const el = new AssetPreview();
+      el.blockData = { isAEM: true };
+
+      expect(el.getRealAssetChaptersUrl()).to.equal(null);
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
+
   it('builds the AEM metadata URL from the assetPath parameter', () => {
     const originalUrl = window.location.href;
     try {
