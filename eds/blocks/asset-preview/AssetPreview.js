@@ -46,7 +46,6 @@ export default class AssetPreview extends LitElement {
     isVideoLoading: { type: Boolean, reflect: true },
     assetPartnerLevel: { type: Array },
     pdfPreviewUrl: { type: String },
-    chapters: { type: Array },
     chaptersUrl: { type: String },
   };
 
@@ -61,7 +60,6 @@ export default class AssetPreview extends LitElement {
     this.isVideoLoading = false;
     this.assetPartnerLevel = [];
     this.pdfPreviewUrl = '';
-    this.chapters = [];
     this.chaptersUrl = '';
   }
 

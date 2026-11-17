@@ -81,7 +81,6 @@ export default class AssetVideoPlayer extends LitElement {
       this.currentTime = 0;
       this.progressHover = null;
       this.scrollToRestoredChapter = false;
-      this.restoreChapterFromUrl();
       if (changedProperties.has('src')) {
         this.videoDuration = 0;
         this.isVideoPlaying = false;
@@ -103,6 +102,7 @@ export default class AssetVideoPlayer extends LitElement {
       const payload = await response.json();
       const metadataChapters = payload.chapters || [];
       this.chapters = Array.isArray(metadataChapters) ? metadataChapters : [metadataChapters];
+      this.restoreChapterFromUrl();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Failed to load video chapters:', error);
