@@ -50,14 +50,6 @@ asset-video-player .video-player-layout .video-container.video-holder video {
   background-color: var(--video-player-black);
 }
 
-asset-video-player .video-holder .video-tint {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgb(78 20 123 / 60%), rgb(34 7 48 / 86%));
-  mix-blend-mode: multiply;
-}
-
 asset-video-player .video-holder button {
   font: inherit;
   color: inherit;
