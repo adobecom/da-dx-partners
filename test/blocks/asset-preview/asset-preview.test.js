@@ -1,7 +1,7 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { CAAS_TAGS_URL, setLibs } from '../../../eds/scripts/utils.js';
+import { getCaasTagsUrl, setLibs } from '../../../eds/scripts/utils.js';
 import AssetPreview from '../../../eds/blocks/asset-preview/AssetPreview.js';
 
 const miloLibs = setLibs('/libs');
@@ -51,7 +51,7 @@ function makeInstance() {
 describe('asset-preview block', () => {
   beforeEach(async () => {
     const fetchStub = sinon.stub(window, 'fetch').resolves({ ok: false, json: async () => ({ data: [] }) });
-    fetchStub.withArgs(CAAS_TAGS_URL).resolves({
+    fetchStub.withArgs(getCaasTagsUrl()).resolves({
       ok: true,
       status: 200,
       json: async () => ({ namespaces: { caas: { tags: {} } } }),
@@ -113,7 +113,7 @@ describe('AssetPreview - connectedCallback() errors', () => {
 
     await el.connectedCallback();
 
-    expect(fetchStub.calledOnceWithExactly(CAAS_TAGS_URL)).to.be.true;
+    expect(fetchStub.calledOnceWithExactly(getCaasTagsUrl())).to.be.true;
     expect(consoleStub.calledOnce).to.be.true;
     expect(consoleStub.firstCall.args[0]).to.equal('error');
     expect(consoleStub.firstCall.args[1]).to.be.instanceOf(Error);

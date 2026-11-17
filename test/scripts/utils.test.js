@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import {
   deleteCookieValue,
   formatDate,
+  getCaasTagsUrl,
   getCookieValue,
   getDaysFromRegistration,
   getEdsOrigin,
@@ -20,6 +21,7 @@ import {
   isReturningUser,
   matchesAccountNameMapping,
   partnerCookieContainsValue,
+  preloadResources,
   setLibs,
 } from '../../eds/scripts/utils.js';
 
@@ -124,6 +126,42 @@ describe('utils browser coverage', () => {
     document.cookie = 'partner_data=; Path=/; Max-Age=0;';
     document.cookie = 'partner_info=; Path=/; Max-Age=0;';
     document.cookie = 'test=; Path=/; Max-Age=0;';
+  });
+
+  it('resolves the tags URL with the current site host', () => {
+    const url = new URL(getCaasTagsUrl());
+
+    expect(url.origin).to.equal('https://www.adobe.com');
+    expect(url.pathname).to.equal('/chimera-api/tags');
+    expect(url.searchParams.get('s')).to.equal(window.location.host);
+  });
+
+  it('omits the tags site parameter on the tags host', () => {
+    expect(getCaasTagsUrl(new URL('https://www.adobe.com')))
+      .to.equal('https://www.adobe.com/chimera-api/tags');
+  });
+
+  ['partners.stage.adobe.com', 'partnerspreview.adobe.com', 'partners.adobe.com', 'partnerspreview.adobe.com.example.com'].forEach((hostname) => {
+    it(`preserves the tags site parameter on ${hostname}`, () => {
+      const location = new URL(`https://${hostname}:8443`);
+      const url = new URL(getCaasTagsUrl(location));
+
+      expect(url.searchParams.get('s')).to.equal(location.host);
+    });
+  });
+
+  it('preloads the same tags URL used by card components', async () => {
+    document.body.innerHTML = '<div class="dx-card-collection"></div>';
+    const appendStub = sinon.stub(document.head, 'appendChild').callsFake((node) => node);
+
+    await preloadResources(undefined, '/libs');
+
+    const tagsPreload = appendStub.getCalls()
+      .map((call) => call.args[0])
+      .find((link) => new URL(link.href).pathname === '/chimera-api/tags');
+    expect(tagsPreload.href).to.equal(getCaasTagsUrl());
+    expect(tagsPreload.rel).to.equal('preload');
+    expect(tagsPreload.as).to.equal('fetch');
   });
 
   it('formats regular and event dates', () => {
