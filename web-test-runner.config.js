@@ -1,5 +1,5 @@
 import { importMapsPlugin } from '@web/dev-server-import-maps';
-import { defaultReporter } from '@web/test-runner';
+import { chromeLauncher, defaultReporter } from '@web/test-runner';
 
 function customReporter() {
   return {
@@ -14,7 +14,14 @@ function customReporter() {
     },
   };
 }
+
+async function createIsolatedPage({ browser }) {
+  const context = await browser.createBrowserContext();
+  return context.newPage();
+}
+
 export default {
+  browsers: [chromeLauncher({ createPage: createIsolatedPage })],
   coverageConfig: {
     exclude: [
       '**/mocks/**',
@@ -32,6 +39,11 @@ export default {
     <html>
       <head>
         <script type='module'>
+          document.cookie.split(';').forEach((cookie) => {
+            const name = cookie.split('=')[0].trim();
+            if (name) document.cookie = name + '=; Path=/; Max-Age=0';
+          });
+
           const oldFetch = window.fetch;
           window.fetch = async (resource, options) => {
             if (!resource.startsWith('/') && !resource.startsWith('http://localhost')) {

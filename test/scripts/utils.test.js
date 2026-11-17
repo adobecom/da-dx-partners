@@ -3,7 +3,9 @@ import sinon from 'sinon';
 import {
   deleteCookieValue,
   formatDate,
+  getCaasTagsUrl,
   getCookieValue,
+  getDaysFromRegistration,
   getEdsOrigin,
   getLocale,
   getMetadataContent,
@@ -14,9 +16,12 @@ import {
   getProgramHomePage,
   getProgramType,
   getUserRegionParams,
+  isAccountLocked,
   isMember,
+  isReturningUser,
   matchesAccountNameMapping,
   partnerCookieContainsValue,
+  preloadResources,
   setLibs,
 } from '../../eds/scripts/utils.js';
 
@@ -123,6 +128,42 @@ describe('utils browser coverage', () => {
     document.cookie = 'test=; Path=/; Max-Age=0;';
   });
 
+  it('resolves the tags URL with the current site host', () => {
+    const url = new URL(getCaasTagsUrl());
+
+    expect(url.origin).to.equal('https://www.adobe.com');
+    expect(url.pathname).to.equal('/chimera-api/tags');
+    expect(url.searchParams.get('s')).to.equal(window.location.host);
+  });
+
+  it('omits the tags site parameter on the tags host', () => {
+    expect(getCaasTagsUrl(new URL('https://www.adobe.com')))
+      .to.equal('https://www.adobe.com/chimera-api/tags');
+  });
+
+  ['partners.stage.adobe.com', 'partnerspreview.adobe.com', 'partners.adobe.com', 'partnerspreview.adobe.com.example.com'].forEach((hostname) => {
+    it(`preserves the tags site parameter on ${hostname}`, () => {
+      const location = new URL(`https://${hostname}:8443`);
+      const url = new URL(getCaasTagsUrl(location));
+
+      expect(url.searchParams.get('s')).to.equal(location.host);
+    });
+  });
+
+  it('preloads the same tags URL used by card components', async () => {
+    document.body.innerHTML = '<div class="dx-card-collection"></div>';
+    const appendStub = sinon.stub(document.head, 'appendChild').callsFake((node) => node);
+
+    await preloadResources(undefined, '/libs');
+
+    const tagsPreload = appendStub.getCalls()
+      .map((call) => call.args[0])
+      .find((link) => new URL(link.href).pathname === '/chimera-api/tags');
+    expect(tagsPreload.href).to.equal(getCaasTagsUrl());
+    expect(tagsPreload.rel).to.equal('preload');
+    expect(tagsPreload.as).to.equal('fetch');
+  });
+
   it('formats regular and event dates', () => {
     expect(formatDate('2024-07-09T12:35:03.000Z')).to.contain('Jul 9, 2024');
     expect(formatDate('2024-07-09T12:35:03.000Z', 'en-US', true)).to.contain('Jul 9, 2024 |');
@@ -156,6 +197,44 @@ describe('utils browser coverage', () => {
     expect(partnerCookieContainsValue('specialstate', 'compliance-past')).to.be.true;
     expect(partnerCookieContainsValue('specialstate', 'submitted-in-review')).to.be.false;
     expect(partnerCookieContainsValue('missing', 'locked')).to.be.false;
+  });
+
+  it('detects locked accounts only for signed-in partners with a locked special state', () => {
+    const setSpecialState = (specialState) => {
+      document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { specialState } }))}; Path=/`;
+    };
+
+    expect(isAccountLocked()).to.be.false;
+
+    setSpecialState('Locked');
+    expect(isAccountLocked()).to.be.true;
+
+    setSpecialState('Locked-Payment-Future');
+    expect(isAccountLocked()).to.be.true;
+
+    setSpecialState('submitted-in-review');
+    expect(isAccountLocked()).to.be.false;
+  });
+
+  it('calculates days from registration and returning user windows', () => {
+    const dayMs = 1000 * 60 * 60 * 24;
+    const setCreatedDate = (createdDate) => {
+      document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { createdDate } }))}; Path=/`;
+    };
+
+    expect(getDaysFromRegistration()).to.be.null;
+    expect(isReturningUser(60)).to.be.false;
+
+    document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { status: 'MEMBER' } }))}; Path=/`;
+    expect(getDaysFromRegistration()).to.be.null;
+
+    setCreatedDate(new Date(Date.now() + 10 * dayMs).toISOString().slice(0, 10));
+    expect(getDaysFromRegistration()).to.be.null;
+
+    setCreatedDate(new Date(Date.now() - 45 * dayMs).toISOString().slice(0, 10));
+    expect(getDaysFromRegistration()).to.be.within(44, 46);
+    expect(isReturningUser(60)).to.be.true;
+    expect(isReturningUser(90)).to.be.false;
   });
 
   it('matches account names against the account name mapping', () => {

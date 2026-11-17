@@ -43,6 +43,14 @@ export function getEdsOrigin(location = window.location) {
   return hostname === PROD_AEM_AUTHOR_HOST ? EDS_PROD_ORIGIN : EDS_STAGE_ORIGIN;
 }
 
+export function getCaasTagsUrl(location = window.location) {
+  const urlObj = new URL(CAAS_TAGS_URL);
+
+  if (urlObj.hostname !== location.hostname && !urlObj.searchParams.has('s')) {
+    urlObj.searchParams.set('s', location.host);
+  }
+  return urlObj.toString();
+}
 /**
  * The decision engine for where to get Milo's libs from.
  */
@@ -612,7 +620,7 @@ export async function preloadResources(locales, miloLibs) {
     };
     const caasUrl = getCaasUrl(block);
     preload(caasUrl);
-    preload(CAAS_TAGS_URL);
+    preload(getCaasTagsUrl());
   });
 }
 
