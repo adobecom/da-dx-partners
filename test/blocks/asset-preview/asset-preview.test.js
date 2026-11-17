@@ -294,11 +294,7 @@ describe('AssetPreview - getAssetMetadata()', () => {
       window.history.replaceState(null, '', '/digitalexperience/preview/video.html?chapter=2&t=35');
       const el = new AssetPreview();
       el.blockData = {};
-      el.allCaaSTags = {
-        namespaces: {
-          caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
-        },
-      };
+      el.allCaaSTags = { namespaces: { caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } } } };
       const fetchStub = sinon.stub(window, 'fetch').resolves({
         status: 200,
         json: async () => ({
@@ -519,11 +515,7 @@ describe('AssetPreview - setData() chapters', () => {
 
   it('passes the chapters URL and video properties to the player', async () => {
     const el = makeInstance();
-    el.allCaaSTags = {
-      namespaces: {
-        caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
-      },
-    };
+    el.allCaaSTags = { namespaces: { caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } } } };
     await el.setData({
       title: 'Test',
       url: 'https://example.com/video.mp4',
@@ -548,11 +540,7 @@ describe('AssetPreview - setData() chapters', () => {
 
   it('does not keep chapter metadata on the preview model', async () => {
     const el = makeInstance();
-    el.allCaaSTags = {
-      namespaces: {
-        caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
-      },
-    };
+    el.allCaaSTags = { namespaces: { caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } } } };
     await el.setData({
       title: 'Test',
       url: 'https://example.com/video.mp4',
@@ -565,11 +553,7 @@ describe('AssetPreview - setData() chapters', () => {
 
   it('renders a player without optional chapters and handles its loading events', async () => {
     const el = makeInstance();
-    el.allCaaSTags = {
-      namespaces: {
-        caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
-      },
-    };
+    el.allCaaSTags = { namespaces: { caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } } } };
     for (const chapters of [undefined, null, []]) {
       await el.setData({
         title: 'Video without chapters',
@@ -605,11 +589,7 @@ describe('AssetPreview - setData() chapters', () => {
       window.history.replaceState(null, '', '?chapter=2&t=35');
       const el = new AssetPreview();
       el.blockData = {};
-      el.allCaaSTags = {
-        namespaces: {
-          caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
-        },
-      };
+      el.allCaaSTags = { namespaces: { caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } } } };
       await el.setData({
         title: 'Test',
         url: 'https://example.com/video.mp4',
