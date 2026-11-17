@@ -23,28 +23,6 @@ function makeInstance() {
   el.previewImage = mockPreviewImage;
   el.url = '';
   el.webinarPresentation = '';
-  el.chapters = [
-    {
-      title: 'Welcome And Speaker Introductions',
-      summary: 'Welcome and introductions.',
-      timerange: '00:00:01.001 - 00:01:31.625',
-    },
-    {
-      title: 'Agenda And Session Goals',
-      summary: 'Session agenda and goals.',
-      timerange: '00:01:31.625 - 00:02:22.906',
-    },
-    {
-      title: 'Why Partners Should Be Excited',
-      summary: 'Partner opportunities.',
-      timerange: '00:02:22.906 - 00:05:22.223',
-    },
-    {
-      title: 'Market Headwinds And Loyalty Importance',
-      summary: 'Market trends.',
-      timerange: '00:05:22.959 - 00:07:12.258',
-    },
-  ];
   return el;
 }
 
@@ -316,9 +294,18 @@ describe('AssetPreview - getAssetMetadata()', () => {
       window.history.replaceState(null, '', '/digitalexperience/preview/video.html?chapter=2&t=35');
       const el = new AssetPreview();
       el.blockData = {};
+      el.allCaaSTags = {
+        namespaces: {
+          caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
+        },
+      };
       const fetchStub = sinon.stub(window, 'fetch').resolves({
         status: 200,
-        json: async () => ({ title: 'Video', url: 'https://example.com/video.mp4' }),
+        json: async () => ({
+          title: 'Video',
+          url: 'https://example.com/video.mp4',
+          tags: ['caas:file-format/video'],
+        }),
       });
 
       expect(el).to.not.have.property('chapters');
@@ -532,10 +519,23 @@ describe('AssetPreview - setData() chapters', () => {
 
   it('passes the chapters URL and video properties to the player', async () => {
     const el = makeInstance();
-    el.isVideo = true;
+    el.allCaaSTags = {
+      namespaces: {
+        caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
+      },
+    };
+    await el.setData({
+      title: 'Test',
+      url: 'https://example.com/video.mp4',
+      previewImage: mockPreviewImage,
+      tags: ['caas:file-format/video'],
+      fileType: 'video/mp4',
+      partnerLevel: ['public'],
+    });
     el.isLoading = false;
-    el.fileType = 'video/mp4';
-    el.chaptersUrl = 'https://example.com/chapters.json';
+    el.assetHasData = true;
+    el.isVideo = true;
+    el.chaptersUrl = el.getRealAssetChaptersUrl()?.toString() || '';
 
     const container = document.createElement('div');
     render(el.render(), container);
@@ -548,17 +548,26 @@ describe('AssetPreview - setData() chapters', () => {
 
   it('does not keep chapter metadata on the preview model', async () => {
     const el = makeInstance();
-    await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters: [{ title: 'Intro' }] });
+    el.allCaaSTags = {
+      namespaces: {
+        caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
+      },
+    };
+    await el.setData({
+      title: 'Test',
+      url: 'https://example.com/video.mp4',
+      tags: ['caas:file-format/video'],
+      chapters: [{ title: 'Intro' }],
+    });
     expect(el).to.not.have.property('chapters');
-    expect(el.chaptersUrl).to.equal('');
+    expect(el.chaptersUrl).to.equal(el.getRealAssetChaptersUrl()?.toString());
   });
 
   it('renders a player without optional chapters and handles its loading events', async () => {
     const el = makeInstance();
     el.allCaaSTags = {
       namespaces: {
-        // eslint-disable-next-line object-curly-newline
-        caas: { tags: { 'file-format': { tags: { video: { title: 'Video' } } } } },
+        caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
       },
     };
     for (const chapters of [undefined, null, []]) {
@@ -572,6 +581,7 @@ describe('AssetPreview - setData() chapters', () => {
         chapters,
       });
       el.isLoading = false;
+      el.assetHasData = true;
       const container = document.createElement('div');
       render(el.render(), container, { host: el });
       const player = container.querySelector('asset-video-player');
@@ -595,7 +605,17 @@ describe('AssetPreview - setData() chapters', () => {
       window.history.replaceState(null, '', '?chapter=2&t=35');
       const el = new AssetPreview();
       el.blockData = {};
-      await el.setData({ title: 'Test', url: 'https://example.com/video.mp4', chapters: [{ title: 'Intro' }] });
+      el.allCaaSTags = {
+        namespaces: {
+          caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } },
+        },
+      };
+      await el.setData({
+        title: 'Test',
+        url: 'https://example.com/video.mp4',
+        tags: ['caas:file-format/video'],
+        chapters: [{ title: 'Intro' }],
+      });
       expect(el).to.not.have.property('chapters');
       expect(el.chaptersUrl).to.equal(el.getRealAssetChaptersUrl()?.toString());
       expect(window.location.search).to.equal('?chapter=2&t=35');
