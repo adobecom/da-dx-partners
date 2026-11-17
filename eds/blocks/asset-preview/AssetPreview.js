@@ -46,7 +46,7 @@ export default class AssetPreview extends LitElement {
     isVideoLoading: { type: Boolean, reflect: true },
     assetPartnerLevel: { type: Array },
     pdfPreviewUrl: { type: String },
-    chapters: { type: Array },
+    chaptersUrl: { type: String },
   };
 
   constructor() {
@@ -60,7 +60,7 @@ export default class AssetPreview extends LitElement {
     this.isVideoLoading = false;
     this.assetPartnerLevel = [];
     this.pdfPreviewUrl = '';
-    this.chapters = [];
+    this.chaptersUrl = '';
   }
 
   createRenderRoot() {
@@ -212,9 +212,6 @@ export default class AssetPreview extends LitElement {
   }
 
   async setData(assetMetadata) {
-    const metadataChapters = assetMetadata.chapters || [];
-    this.chapters = Array.isArray(metadataChapters) ? metadataChapters : [metadataChapters];
-
     this.isVideoLoading = false;
 
     this.title = DOMPurify.sanitize(assetMetadata.title);
@@ -253,6 +250,7 @@ export default class AssetPreview extends LitElement {
     this.pdfPreviewUrl = DOMPurify.sanitize(
       assetMetadata.pdfPreviewUrl || (this.isVideo ? assetMetadata.webinarPresentation : ''),
     );
+    this.chaptersUrl = this.isVideo ? this.getRealAssetChaptersUrl()?.toString() || '' : '';
     if (!assetMetadata.title || !assetMetadata.url) {
       this.assetHasData = false;
     } else {
@@ -273,6 +271,28 @@ export default class AssetPreview extends LitElement {
       const url = new URL(href
         .replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH)
         .replace('.html', '/_jcr_content/metadata.assetmetadata.json'));
+      url.hostname = prodHosts.includes(host) ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
+      url.port = '';
+      url.searchParams.delete('chapter');
+      url.searchParams.delete('t');
+      return url;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  getRealAssetChaptersUrl() {
+    const { search, origin, href, host } = window.location;
+    try {
+      if (this.blockData.isAEM) {
+        const assetPath = new URLSearchParams(search).get('assetPath') || '';
+        const url = new URL(`${origin}${assetPath}/_jcr_content/videoProcessingResults.assetchapters.json`);
+        return url.pathname.startsWith('/content/dam/') ? url : null;
+      }
+
+      const url = new URL(href
+        .replace(DIGITALEXPERIENCE_PREVIEW_PATH, PX_ASSETS_PREVIEW_PATH)
+        .replace('.html', '/_jcr_content/videoProcessingResults.assetchapters.json'));
       url.hostname = prodHosts.includes(host) ? PARTNERS_PROD_DOMAIN : PARTNERS_STAGE_DOMAIN;
       url.port = '';
       url.searchParams.delete('chapter');
@@ -338,7 +358,7 @@ export default class AssetPreview extends LitElement {
             <asset-video-player
               .src="${this.getDownloadUrl()}"
               .fileType="${this.fileType}"
-              .chapters="${this.chapters}"
+              .chaptersUrl="${this.chaptersUrl}"
               @loading-change="${this.handleVideoLoadingChange}"
             ></asset-video-player>
           ` : ''}

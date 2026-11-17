@@ -192,6 +192,64 @@ describe('AssetVideoPlayer - external icons', () => {
   });
 });
 
+describe('AssetVideoPlayer - fetchChapters()', () => {
+  it('returns early when the chapter URL is missing or chapters are already loaded', async () => {
+    const el = new AssetVideoPlayer();
+    const fetchStub = sinon.stub(window, 'fetch');
+
+    await el.fetchChapters();
+    expect(fetchStub.called).to.be.false;
+    expect(el.isVideoLoading).to.be.false;
+
+    el.chaptersUrl = 'https://example.com/chapters.json';
+    el.chapters = [{ title: 'Already loaded', timerange: '00:00:00 - 00:00:10' }];
+
+    await el.fetchChapters();
+    expect(fetchStub.called).to.be.false;
+    expect(el.isVideoLoading).to.be.false;
+  });
+
+  it('loads and restores chapter metadata from the servlet response', async () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '?chapter=2&t=35');
+      const el = new AssetVideoPlayer();
+      el.chaptersUrl = 'https://example.com/chapters.json';
+      const restoreStub = sinon.stub(el, 'restoreChapterFromUrl');
+      sinon.stub(window, 'fetch').resolves({ ok: true, json: async () => ({ chapters: [{ title: 'Intro', timerange: '00:00:00.000 - 00:00:30.000' }] }) });
+
+      await el.fetchChapters();
+
+      expect(el.isVideoLoading).to.be.false;
+      expect(el.chapters).to.deep.equal([{ title: 'Intro', timerange: '00:00:00.000 - 00:00:30.000' }]);
+      expect(restoreStub.calledOnce).to.be.true;
+      expect(window.location.search).to.equal('?chapter=2&t=35');
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
+
+  it('returns early for non-ok responses and logs when the request fails', async () => {
+    const el = new AssetVideoPlayer();
+    el.chaptersUrl = 'https://example.com/chapters.json';
+    sinon.stub(window, 'fetch').resolves({ ok: false, json: async () => ({ chapters: [{ title: 'Ignored' }] }) });
+
+    await el.fetchChapters();
+    expect(el.chapters).to.deep.equal([]);
+    expect(el.isVideoLoading).to.be.false;
+
+    sinon.restore();
+    const logError = sinon.stub(console, 'error');
+    sinon.stub(window, 'fetch').rejects(new Error('Network failed'));
+
+    await el.fetchChapters();
+
+    expect(logError.calledOnce).to.be.true;
+    expect(el.chapters).to.deep.equal([]);
+    expect(el.isVideoLoading).to.be.false;
+  });
+});
+
 describe('AssetVideoPlayer - chapter time helpers', () => {
   it('converts hours, minutes and fractional seconds to seconds', () => {
     expect(makeInstance().timecodeToSeconds('01:02:03.456')).to.be.closeTo(3723.456, 0.001);

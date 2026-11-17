@@ -15,6 +15,7 @@ export default class AssetVideoPlayer extends LitElement {
   static properties = {
     src: { type: String },
     fileType: { type: String },
+    chaptersUrl: { type: String },
     chapters: { type: Array },
     isVideoPlaying: { state: true },
     isVideoLoading: { state: true },
@@ -36,6 +37,7 @@ export default class AssetVideoPlayer extends LitElement {
     super();
     this.src = '';
     this.fileType = '';
+    this.chaptersUrl = '';
     this.chapters = [];
     this.isVideoPlaying = false;
     this.isVideoLoading = false;
@@ -66,7 +68,12 @@ export default class AssetVideoPlayer extends LitElement {
   }
 
   willUpdate(changedProperties) {
-    if (changedProperties.has('src') || changedProperties.has('chapters')) {
+    if (this.chaptersUrl && changedProperties.has('chaptersUrl') && !this.chapters.length) {
+      this.fetchChapters();
+    }
+
+    const sourceChanged = changedProperties.has('src') || changedProperties.has('chaptersUrl');
+    if (sourceChanged || changedProperties.has('chapters')) {
       clearTimeout(this.shareResetTimer);
       this.shareResetTimer = null;
       this.sharedChapterIndex = -1;
@@ -75,14 +82,39 @@ export default class AssetVideoPlayer extends LitElement {
       this.currentTime = 0;
       this.progressHover = null;
       this.scrollToRestoredChapter = false;
-      this.restoreChapterFromUrl();
-      if (changedProperties.has('src')) {
+      if (changedProperties.has('src') && this.src) {
+        this.chapters = [];
         this.videoDuration = 0;
         this.isVideoPlaying = false;
         this.isVideoLoading = false;
         this.settingsMenuOpen = false;
         this.volumeExpanded = false;
       }
+
+      if (this.chapters.length && (changedProperties.has('chapters') || changedProperties.has('src') || changedProperties.has('chaptersUrl'))) {
+        this.restoreChapterFromUrl();
+      }
+    }
+  }
+
+  async fetchChapters() {
+    if (!this.chaptersUrl || this.chapters.length) return;
+
+    this.isVideoLoading = true;
+    try {
+      const response = await fetch(this.chaptersUrl);
+      if (!response.ok) return;
+
+      const payload = await response.json();
+      const metadataChapters = payload.chapters || [];
+      this.chapters = Array.isArray(metadataChapters) ? metadataChapters : [metadataChapters];
+      this.restoreChapterFromUrl();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load video chapters:', error);
+      this.chapters = [];
+    } finally {
+      this.isVideoLoading = false;
     }
   }
 
