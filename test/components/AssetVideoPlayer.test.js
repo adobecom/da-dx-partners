@@ -934,6 +934,8 @@ describe('AssetVideoPlayer - selectChapter()', () => {
 describe('AssetVideoPlayer - fullscreen chapter control', () => {
   [true, false].forEach((chaptersVisible) => {
     it(`preserves page height and scroll while fullscreen removes the video from the ${chaptersVisible ? 'open' : 'collapsed'} layout`, async () => {
+      // Native animation frames can pause in background tabs during concurrent test runs.
+      const clock = sinon.useFakeTimers({ toFake: ['requestAnimationFrame'] });
       const el = makeInstance();
       el.chaptersVisible = chaptersVisible;
       const styles = document.createElement('style');
@@ -947,7 +949,7 @@ describe('AssetVideoPlayer - fullscreen chapter control', () => {
       const container = el.querySelector('.video-container');
       const { height } = layout.getBoundingClientRect();
       window.scrollTo(0, document.documentElement.scrollHeight);
-      await new Promise((resolve) => requestAnimationFrame(resolve));
+      clock.runToFrame();
       const position = window.scrollY;
       let fullscreenElement = null;
       sinon.stub(document, 'fullscreenElement').get(() => fullscreenElement);
@@ -959,7 +961,7 @@ describe('AssetVideoPlayer - fullscreen chapter control', () => {
 
       await el.toggleVideoFullscreen();
       await el.updateComplete;
-      await new Promise((resolve) => requestAnimationFrame(resolve));
+      clock.runToFrame();
 
       expect(layout.getBoundingClientRect().height).to.be.closeTo(height, 1);
       expect(window.scrollY).to.be.closeTo(position, 1);
@@ -967,8 +969,7 @@ describe('AssetVideoPlayer - fullscreen chapter control', () => {
       container.style.removeProperty('position');
       fullscreenElement = null;
       await el.handleFullscreenChange({ currentTarget: container });
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-      await new Promise((resolve) => requestAnimationFrame(resolve));
+      clock.runToFrame();
 
       expect(layout.style.minHeight).to.equal('');
       expect(window.scrollY).to.be.closeTo(position, 1);
