@@ -216,12 +216,7 @@ describe('AssetVideoPlayer - fetchChapters()', () => {
       const el = new AssetVideoPlayer();
       el.chaptersUrl = 'https://example.com/chapters.json';
       const restoreStub = sinon.stub(el, 'restoreChapterFromUrl');
-      sinon.stub(window, 'fetch').resolves({
-        ok: true,
-        json: async () => ({
-          chapters: [{ title: 'Intro', timerange: '00:00:00.000 - 00:00:30.000' }],
-        }),
-      });
+      sinon.stub(window, 'fetch').resolves({ ok: true, json: async () => ({ chapters: [{ title: 'Intro', timerange: '00:00:00.000 - 00:00:30.000' }] }) });
 
       await el.fetchChapters();
 
