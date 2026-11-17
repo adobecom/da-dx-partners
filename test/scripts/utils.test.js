@@ -133,14 +133,12 @@ describe('utils browser coverage', () => {
     expect(url.searchParams.get('s')).to.equal(window.location.host);
   });
 
-  ['partners.stage.adobe.com', 'partnerspreview.adobe.com'].forEach((hostname) => {
-    it(`omits the tags site parameter on ${hostname}`, () => {
-      expect(getCaasTagsUrl(new URL(`https://${hostname}:8443`)))
-        .to.equal('https://www.adobe.com/chimera-api/tags');
-    });
+  it('omits the tags site parameter on the tags host', () => {
+    expect(getCaasTagsUrl(new URL('https://www.adobe.com')))
+      .to.equal('https://www.adobe.com/chimera-api/tags');
   });
 
-  ['partners.adobe.com', 'partnerspreview.adobe.com.example.com'].forEach((hostname) => {
+  ['partners.stage.adobe.com', 'partnerspreview.adobe.com', 'partners.adobe.com', 'partnerspreview.adobe.com.example.com'].forEach((hostname) => {
     it(`preserves the tags site parameter on ${hostname}`, () => {
       const location = new URL(`https://${hostname}:8443`);
       const url = new URL(getCaasTagsUrl(location));

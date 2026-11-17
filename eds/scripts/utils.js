@@ -26,7 +26,6 @@ export const PARTNER_ACCOUNT_STATE_COOKIE = 'partner_account_state';
 
 const EDS_PROD_ORIGIN = 'https://partners.adobe.com';
 const EDS_STAGE_ORIGIN = 'https://partners.stage.adobe.com';
-const PARTNERS_PREVIEW_DOMAIN = 'https://partnerspreview.adobe.com';
 const PROD_AEM_AUTHOR_HOST = 'dx-partner-author.prod.corp.adobe.com';
 const AEM_LOCAL_PORTS = ['4502', '7502'];
 
@@ -46,10 +45,8 @@ export function getEdsOrigin(location = window.location) {
 
 export function getCaasTagsUrl(location = window.location) {
   const urlObj = new URL(CAAS_TAGS_URL);
-  const excludedHosts = [EDS_STAGE_ORIGIN, PARTNERS_PREVIEW_DOMAIN]
-    .map((origin) => new URL(origin).hostname);
 
-  if (urlObj.hostname !== location.hostname && !excludedHosts.includes(location.hostname) && !urlObj.searchParams.has('s')) {
+  if (urlObj.hostname !== location.hostname && !urlObj.searchParams.has('s')) {
     urlObj.searchParams.set('s', location.host);
   }
   return urlObj.toString();
