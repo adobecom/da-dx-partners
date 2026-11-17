@@ -374,6 +374,22 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
     expect(loadPdfViewerStub.calledOnce).to.be.true;
   });
 
+  it('builds the video chapters servlet URL without the chapter query params', () => {
+    const originalUrl = window.location.href;
+    try {
+      window.history.replaceState(null, '', '/digitalexperience/preview/video.html?chapter=2&t=35');
+      const el = new AssetPreview();
+      el.blockData = { isAEM: false };
+
+      const chaptersUrl = el.getRealAssetChaptersUrl();
+
+      expect(chaptersUrl.pathname).to.equal('/digitalexperience-assets/preview/video/_jcr_content/videoProcessingResults.assetchapters.json');
+      expect(chaptersUrl.search).to.equal('');
+    } finally {
+      window.history.replaceState(null, '', originalUrl);
+    }
+  });
+
   it('renders the thumbnail when the user is restricted', () => {
     const el = makeInstance();
     el.assetHasData = true;
@@ -518,13 +534,17 @@ describe('AssetPreview - setData() chapters', () => {
     expect(new AssetPreview().chapters).to.deep.equal([]);
   });
 
-  it('passes chapter metadata and video properties to the player', async () => {
+  it('passes the chapters URL and video properties to the player', async () => {
     const el = makeInstance();
     const chapters = [{
       title: 'API chapter',
       summary: 'API summary',
       timerange: '00:00:10.000 - 00:00:20.000',
     }];
+    sinon.stub(window, 'fetch').resolves({
+      ok: true,
+      json: async () => ({ chapters }),
+    });
     await el.setData({
       title: 'Test',
       url: 'https://example.com/video.mp4',
@@ -540,7 +560,7 @@ describe('AssetPreview - setData() chapters', () => {
     render(el.render(), container);
     const player = container.querySelector('asset-video-player');
     expect(player).to.exist;
-    expect(player.chapters).to.deep.equal(chapters);
+    expect(player.chaptersUrl).to.equal(el.chaptersUrl);
     expect(player.src).to.equal('https://example.com/video.mp4');
     expect(player.fileType).to.equal('video/mp4');
   });
