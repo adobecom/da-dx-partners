@@ -506,7 +506,7 @@ export default class AssetVideoPlayer extends LitElement {
 
     /* eslint-disable indent */
     return html`
-      <div class="video-tint"></div>
+      <div class="video-tint" ?hidden="${this.isVideoPlaying}"></div>
       <button class="player-center-play" type="button"
         aria-label="Play video"
         ?hidden="${this.isVideoPlaying}" @click="${this.toggleVideoPlayback}">
