@@ -312,7 +312,7 @@ describe('AssetVideoPlayer - handleVideoTimeUpdate()', () => {
     expect(selectChapter.called).to.be.false;
   });
 
-  it('advances to the next chapter at or after the end time', () => {
+  it('advances to the next chapter only once at the boundary, ignoring repeated end-time crossings', () => {
     const el = makeInstance();
     const selectChapter = sinon.stub(el, 'selectChapter');
 
@@ -320,9 +320,27 @@ describe('AssetVideoPlayer - handleVideoTimeUpdate()', () => {
       el.handleVideoTimeUpdate({ currentTarget: { currentTime, paused: false } });
     });
 
-    expect(selectChapter.calledTwice).to.be.true;
-    expect(selectChapter.alwaysCalledWithExactly(3)).to.be.true;
+    // Guards against an infinite seek loop: if the forced seek snaps behind the
+    // target (e.g. non-keyframe-aligned chapter boundary) and currentTime briefly
+    // falls back into this chapter's range on a later tick, we must not retrigger
+    // the same forced advance again.
+    expect(selectChapter.calledOnce).to.be.true;
+    expect(selectChapter.calledWithExactly(3)).to.be.true;
     expect(el.currentTime).to.equal(322.5);
+  });
+
+  it('does not retry a forced advance once attempted, even if currentTime falls back into the previous chapter range', () => {
+    const el = makeInstance();
+    const selectChapter = sinon.stub(el, 'selectChapter');
+
+    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 322.223, paused: false } });
+    expect(selectChapter.calledOnceWithExactly(3)).to.be.true;
+
+    // Simulate the browser's seek snapping to a keyframe before the requested
+    // target, so currentTime briefly reads as still inside the previous chapter.
+    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 322.1, paused: false } });
+
+    expect(selectChapter.calledOnce).to.be.true;
   });
 
   it('updates time but does not advance while paused', () => {

@@ -57,6 +57,7 @@ export default class AssetVideoPlayer extends LitElement {
     this.isFullscreen = false;
     this.fullscreenScrollPosition = null;
     this.scrollToRestoredChapter = false;
+    this.autoAdvancedToIndex = -1;
   }
 
   createRenderRoot() {
@@ -82,6 +83,7 @@ export default class AssetVideoPlayer extends LitElement {
       this.currentTime = 0;
       this.progressHover = null;
       this.scrollToRestoredChapter = false;
+      this.autoAdvancedToIndex = -1;
       if (changedProperties.has('src') && this.src) {
         this.chapters = [];
         this.videoDuration = 0;
@@ -238,9 +240,21 @@ export default class AssetVideoPlayer extends LitElement {
 
     if (video.paused || this.selectedChapterIndex >= this.chapters.length - 1) return;
 
+    const nextIndex = this.selectedChapterIndex + 1;
+    if (this.autoAdvancedToIndex >= nextIndex) {
+      // Already attempted this forced advance. If the browser's seek snapped
+      // to a keyframe before the target (common for non-keyframe-aligned
+      // chapter boundaries), currentTime can briefly fall back into this
+      // chapter's range on the next tick. Retrying here would force the same
+      // seek again, causing an infinite seeking/waiting loop at this exact
+      // boundary. Let natural playback catch up instead.
+      return;
+    }
+
     const [, endTime] = this.chapters[this.selectedChapterIndex].timerange.split(' - ');
     if (video.currentTime >= this.timecodeToSeconds(endTime)) {
-      this.selectChapter(this.selectedChapterIndex + 1);
+      this.autoAdvancedToIndex = nextIndex;
+      this.selectChapter(nextIndex);
     }
   }
 
@@ -731,6 +745,7 @@ export default class AssetVideoPlayer extends LitElement {
     if (!chapter) return;
 
     this.selectedChapterIndex = index;
+    this.autoAdvancedToIndex = index;
     const startTime = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
     this.currentTime = startTime;
 
