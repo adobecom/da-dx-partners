@@ -248,9 +248,9 @@ export default {
       data: {
         partnerLevel: 'dxp-platinum:',
         searchKeyword: 'Webinar Presentation: LLM Optimizer and Sites Optimizer',
-        title: 'Webinar Presentation: Adobe LLM Optimizer Partner Enablement',
-        previewURL: '/digitalexperience/preview/restricted/we/1/webinar-presentation-llm-optimizer-partner-enablement.pdf.html',
-        expectedURL: '/digitalexperience-assets/restricted/we/1/webinar-presentation-llm-optimizer-partner-enablement.pdf',
+        title: 'Webinar Presentation: LLM Optimizer and Sites Optimizer',
+        previewURL: '/digitalexperience/preview/restricted/we/1/webinar-presentation-llm-site-optimizer.pdf.html',
+        expectedURL: '/digitalexperience-assets/restricted/we/1/webinar-presentation-llm-site-optimizer.pdf',
       },
     },
     {
@@ -292,6 +292,13 @@ export default {
       path: '/digitalexperience/',
       tags: '@da-dx-smoke-test',
       data: { partnerLevel: 'dxp-agreement:' },
+    },
+    {
+      tcid: '29',
+      name: '@smoke-test-px-icon-not-adobe-account',
+      path: '/digitalexperience/',
+      tags: '@da-dx-smoke-test',
+      data: { partnerLevel: 'dxp-platinum:' },
     },
   ],
 };

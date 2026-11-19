@@ -38,8 +38,7 @@ export default class ExperienceLeaguePage {
       link.click(),
     ]);
 
-    await newPage.waitForLoadState('domcontentloaded');
-    expect(newPage.url()).toBe(previewUrl);
+    await expect(newPage).toHaveURL(previewUrl, { timeout: 30000 });
     await newPage.close();
   }
 

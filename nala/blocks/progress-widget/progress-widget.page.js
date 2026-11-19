@@ -8,9 +8,17 @@ export default class ProgressWidgetPage {
     this.technologyTable = this.progressWidget.locator('table').filter({ hasText: 'Technology' });
     this.solutionHeading = this.progressWidget.getByText('Solution', { exact: true });
     this.technologyHeading = this.progressWidget.getByText('Technology', { exact: true });
-    this.progressBars = this.progressWidget.locator(
-      '[role="progressbar"], progress, .progress-bar, .progress-bar-fill, .meter',
-    );
+    this.progressBars = this.progressWidget.locator('[role="progressbar"], progress, .progress-bar, .progress-bar-fill, .meter');
+    this.dashboardBtn = page.getByRole('link', { name: 'Go to dashboard' });
+    this.solutionColumn = this.progressWidget.getByText('Solution Requirements');
+    this.solutionSpecializations = this.solutionColumn.getByText('Specializations').locator('..').locator('.partnership-progress-metric-helper-text');
+    this.solutionCredentials = this.solutionColumn.getByText('Credentials').locator('..').locator('.partnership-progress-metric-helper-text');
+    this.solutionCustomerDeployments = this.solutionColumn.getByText('Active Customer Deployments').locator('..').locator('.partnership-progress-metric-helper-text');
+    this.tehnologyColumn = this.progressWidget.getByText('Technology Requirements');
+    this.technologyExchangeMarketplace = this.tehnologyColumn.getByText('Exchange Marketplace listings').locator('..').locator('.partnership-progress-metric-helper-text');
+    this.technologyCredentials = this.tehnologyColumn.getByText('Credentials').locator('..').locator('.partnership-progress-metric-helper-text');
+    this.technologyCustomerDeployments = this.tehnologyColumn.getByText('Active Customer Deployments').locator('..').locator('.partnership-progress-metric-helper-text');
+    this.technologyAppAssured = this.tehnologyColumn.getByText('App Assured').locator('..').locator('.partnership-progress-metric-helper-text');
   }
 
   async verifyProgressionLevel(level) {

@@ -1,8 +1,12 @@
 import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
 import {
   deleteCookieValue,
   formatDate,
+  getCaasTagsUrl,
   getCookieValue,
+  getDaysFromRegistration,
+  getEdsOrigin,
   getLocale,
   getMetadataContent,
   getNodesByXPath,
@@ -12,8 +16,12 @@ import {
   getProgramHomePage,
   getProgramType,
   getUserRegionParams,
+  isAccountLocked,
   isMember,
+  isReturningUser,
   matchesAccountNameMapping,
+  partnerCookieContainsValue,
+  preloadResources,
   setLibs,
 } from '../../eds/scripts/utils.js';
 
@@ -31,24 +39,54 @@ describe('Libs', () => {
     expect(libs).to.equal('https://main--milo--adobecom.aem.live/libs');
   });
   it('Returns prod milo for prod', () => {
-    const location = { origin: 'https://partners.adobe.com' };
+    const location = { hostname: 'partners.adobe.com', origin: 'https://partners.adobe.com' };
     const libs = setLibs('/libs', location);
     expect(libs).to.equal('https://partners.adobe.com/libs');
   });
   it('Returns stage milo for stage', () => {
-    const location = { origin: 'https://partners.stage.adobe.com' };
+    const location = { hostname: 'partners.stage.adobe.com', origin: 'https://partners.stage.adobe.com' };
     const libs = setLibs('/libs', location);
     expect(libs).to.equal('https://partners.stage.adobe.com/libs');
   });
   it('Does not support milolibs query param on prod', () => {
     const location = {
+      hostname: 'partners.adobe.com',
       origin: 'https://partners.adobe.com',
       search: '?milolibs=foo',
     };
     const libs = setLibs('/libs', location);
     expect(libs).to.equal('https://partners.adobe.com/libs');
   });
-
+  it('Routes internal AEM author hosts to the prod EDS origin for libs', () => {
+    const location = {
+      hostname: 'dx-partner-author.dev02.corp.adobe.com',
+      origin: 'https://dx-partner-author.dev02.corp.adobe.com',
+      search: '',
+    };
+    const libs = setLibs('/libs', location);
+    expect(libs).to.equal('https://partners.adobe.com/libs');
+  });
+  it('Resolves EDS asset URLs to the correct origin on author hosts', () => {
+    const location = {
+      hostname: 'dx-partner-author.dev02.corp.adobe.com',
+      origin: 'https://dx-partner-author.dev02.corp.adobe.com',
+    };
+    expect(getEdsOrigin(location)).to.equal('https://partners.stage.adobe.com');
+  });
+  it('Leaves regular site URLs alone', () => {
+    const location = { hostname: 'partners.adobe.com', origin: 'https://partners.adobe.com' };
+    expect(getEdsOrigin(location)).to.equal('');
+  });
+  it('Routes local AEM author (port 4502) to the prod EDS origin for libs', () => {
+    const location = { hostname: 'localhost', origin: 'http://localhost:4502', search: '' };
+    const libs = setLibs('/libs', location);
+    expect(libs).to.equal('https://partners.adobe.com/libs');
+  });
+  it('Routes local AEM author (port 7502) to the prod EDS origin for libs', () => {
+    const location = { hostname: 'localhost', origin: 'http://localhost:7502', search: '' };
+    const libs = setLibs('/libs', location);
+    expect(libs).to.equal('https://partners.adobe.com/libs');
+  });
   it('Supports milolibs query param', () => {
     const location = {
       hostname: 'localhost',
@@ -82,11 +120,48 @@ describe('Libs', () => {
 
 describe('utils browser coverage', () => {
   afterEach(() => {
+    sinon.restore();
     document.head.innerHTML = '';
     document.body.innerHTML = '';
     document.cookie = 'partner_data=; Path=/; Max-Age=0;';
     document.cookie = 'partner_info=; Path=/; Max-Age=0;';
     document.cookie = 'test=; Path=/; Max-Age=0;';
+  });
+
+  it('resolves the tags URL with the current site host', () => {
+    const url = new URL(getCaasTagsUrl());
+
+    expect(url.origin).to.equal('https://www.adobe.com');
+    expect(url.pathname).to.equal('/chimera-api/tags');
+    expect(url.searchParams.get('s')).to.equal(window.location.host);
+  });
+
+  it('omits the tags site parameter on the tags host', () => {
+    expect(getCaasTagsUrl(new URL('https://www.adobe.com')))
+      .to.equal('https://www.adobe.com/chimera-api/tags');
+  });
+
+  ['partners.stage.adobe.com', 'partnerspreview.adobe.com', 'partners.adobe.com', 'partnerspreview.adobe.com.example.com'].forEach((hostname) => {
+    it(`preserves the tags site parameter on ${hostname}`, () => {
+      const location = new URL(`https://${hostname}:8443`);
+      const url = new URL(getCaasTagsUrl(location));
+
+      expect(url.searchParams.get('s')).to.equal(location.host);
+    });
+  });
+
+  it('preloads the same tags URL used by card components', async () => {
+    document.body.innerHTML = '<div class="dx-card-collection"></div>';
+    const appendStub = sinon.stub(document.head, 'appendChild').callsFake((node) => node);
+
+    await preloadResources(undefined, '/libs');
+
+    const tagsPreload = appendStub.getCalls()
+      .map((call) => call.args[0])
+      .find((link) => new URL(link.href).pathname === '/chimera-api/tags');
+    expect(tagsPreload.href).to.equal(getCaasTagsUrl());
+    expect(tagsPreload.rel).to.equal('preload');
+    expect(tagsPreload.as).to.equal('fetch');
   });
 
   it('formats regular and event dates', () => {
@@ -112,6 +187,54 @@ describe('utils browser coverage', () => {
     expect(getPartnerCookieValue('status')).to.equal('member');
     expect(getUserRegionParams('dxp')).to.contain('region/europe');
     expect(isMember()).to.equal(true);
+  });
+
+  it('checks partner cookie values case-insensitively and rejects missing values', () => {
+    const partnerData = { DXP: { specialState: 'Locked-Compliance-Past' } };
+    sinon.stub(document, 'cookie').get(() => `partner_data=${encodeURIComponent(JSON.stringify(partnerData))}`);
+
+    expect(partnerCookieContainsValue('specialstate', 'LOCKED')).to.be.true;
+    expect(partnerCookieContainsValue('specialstate', 'compliance-past')).to.be.true;
+    expect(partnerCookieContainsValue('specialstate', 'submitted-in-review')).to.be.false;
+    expect(partnerCookieContainsValue('missing', 'locked')).to.be.false;
+  });
+
+  it('detects locked accounts only for signed-in partners with a locked special state', () => {
+    const setSpecialState = (specialState) => {
+      document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { specialState } }))}; Path=/`;
+    };
+
+    expect(isAccountLocked()).to.be.false;
+
+    setSpecialState('Locked');
+    expect(isAccountLocked()).to.be.true;
+
+    setSpecialState('Locked-Payment-Future');
+    expect(isAccountLocked()).to.be.true;
+
+    setSpecialState('submitted-in-review');
+    expect(isAccountLocked()).to.be.false;
+  });
+
+  it('calculates days from registration and returning user windows', () => {
+    const dayMs = 1000 * 60 * 60 * 24;
+    const setCreatedDate = (createdDate) => {
+      document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { createdDate } }))}; Path=/`;
+    };
+
+    expect(getDaysFromRegistration()).to.be.null;
+    expect(isReturningUser(60)).to.be.false;
+
+    document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { status: 'MEMBER' } }))}; Path=/`;
+    expect(getDaysFromRegistration()).to.be.null;
+
+    setCreatedDate(new Date(Date.now() + 10 * dayMs).toISOString().slice(0, 10));
+    expect(getDaysFromRegistration()).to.be.null;
+
+    setCreatedDate(new Date(Date.now() - 45 * dayMs).toISOString().slice(0, 10));
+    expect(getDaysFromRegistration()).to.be.within(44, 46);
+    expect(isReturningUser(60)).to.be.true;
+    expect(isReturningUser(90)).to.be.false;
   });
 
   it('matches account names against the account name mapping', () => {

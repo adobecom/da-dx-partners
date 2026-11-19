@@ -24,6 +24,7 @@ describe('certificationExpiresPopup browser coverage', () => {
     delete window.dxpImsReady;
     delete window.adobeIMS;
     localStorage.removeItem('last-certification-popup-shown');
+    document.querySelectorAll('meta[name="certification-modal"]').forEach((meta) => meta.remove());
   });
 
   it('skips the certification popup when the partner agreement is displayed', async () => {
@@ -76,22 +77,33 @@ describe('certificationExpiresPopup browser coverage', () => {
   });
 
   it('skips when the directory request rejects', async () => {
-    sinon.stub(window, 'fetch').rejects(new Error('directory unavailable'));
+    const error = new Error('directory unavailable');
+    sinon.stub(window, 'fetch').rejects(error);
+    const consoleErrorStub = sinon.stub(console, 'error');
+    const consoleWarnStub = sinon.stub(console, 'warn');
 
     const result = await certificationExpiresPopup(miloLibs, false, false, 'test-client-id');
 
     expect(result).to.equal(undefined);
+    expect(consoleErrorStub.calledOnceWithExactly(error.message)).to.be.true;
+    expect(consoleWarnStub.calledOnceWithExactly('certification popup skipped')).to.be.true;
   });
 
   it('handles malformed credentials data without showing a modal', async () => {
     sinon.stub(window, 'fetch').resolves({ ok: true, json: async () => ({}) });
+    const consoleErrorStub = sinon.stub(console, 'error');
+    const consoleWarnStub = sinon.stub(console, 'warn');
 
     const result = await certificationExpiresPopup(miloLibs, false, false, 'test-client-id');
 
     expect(result).to.equal(undefined);
+    expect(consoleErrorStub.calledOnce).to.be.true;
+    expect(consoleErrorStub.firstCall.args[0]).to.include('some');
+    expect(consoleWarnStub.calledOnceWithExactly('certification popup skipped')).to.be.true;
   });
 
   it('checks milestone dates and skips when certification metadata is absent', async () => {
+    const consoleWarnStub = sinon.stub(console, 'warn');
     const eventSpy = sinon.spy();
     window.addEventListener('dxp:showNextPopup', eventSpy);
     sinon.stub(window, 'fetch').resolves({
@@ -103,10 +115,12 @@ describe('certificationExpiresPopup browser coverage', () => {
 
     expect(result).to.equal(undefined);
     expect(eventSpy.called).to.equal(true);
+    expect(consoleWarnStub.calledOnceWithExactly('certification-modal should be displayed but popup fragment path is not found')).to.be.true;
     window.removeEventListener('dxp:showNextPopup', eventSpy);
   });
 
   it('skips when a certification popup fragment has no content', async () => {
+    const consoleWarnStub = sinon.stub(console, 'warn');
     const meta = document.createElement('meta');
     meta.name = 'certification-modal';
     meta.content = '/fragments/certification-modal';
@@ -121,5 +135,6 @@ describe('certificationExpiresPopup browser coverage', () => {
     const result = await certificationExpiresPopup(miloLibs, false, false, 'test-client-id');
 
     expect(result).to.equal(undefined);
+    expect(consoleWarnStub.calledOnceWithExactly('Popup fragment for /fragments/certification-modal not found')).to.be.true;
   });
 });

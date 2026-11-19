@@ -55,9 +55,9 @@ export const getPdfConfig = () => {
   return config.env?.consumer?.pdfViewerClientId || config.pdfViewerClientId;
 };
 
-const initPdfViewer = async ({ url, fileName, divId, pdfEmbedMode = 'full-window' }) => {
+const initPdfViewer = async ({ url, fileName, divId, pdfEmbedMode = 'full-window', clientId: clientIdOverride }) => {
   await loadStyle('/eds/components/PdfViewer.css');
-  const clientId = getPdfConfig();
+  const clientId = clientIdOverride ?? getPdfConfig();
 
   const embedMode = PDF_EMBED_MODE_CONFIG[pdfEmbedMode] ? pdfEmbedMode : 'full-window';
   const pdfEmbedConfig = PDF_EMBED_MODE_CONFIG[embedMode];
