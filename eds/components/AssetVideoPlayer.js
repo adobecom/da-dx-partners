@@ -210,10 +210,6 @@ export default class AssetVideoPlayer extends LitElement {
     const chapter = this.chapters[index];
     if (!chapter) return 0;
 
-    // Use the next chapter's start (not this chapter's own declared end) as the
-    // progress denominator. This matches the classification logic in
-    // handleVideoTimeUpdate() and stays correct even if a chapter's own end
-    // timecode is missing or malformed (e.g. before its start).
     const next = this.chapters[index + 1];
     const start = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
     const end = next
@@ -232,12 +228,6 @@ export default class AssetVideoPlayer extends LitElement {
 
     if (!this.chapters.length) return;
 
-    // Classify by the *next* chapter's start, not this chapter's own end, so
-    // natural playback through any gap between chapters keeps highlighting the
-    // current chapter and is never force-seeked past unplayed content. This
-    // also avoids forcing a seek to an exact (possibly non-keyframe-aligned)
-    // timestamp during normal playback, which previously caused a seek/settle
-    // loop at some chapter boundaries.
     const index = this.chapters.findIndex((chapter, chapterIndex) => {
       const next = this.chapters[chapterIndex + 1];
       const start = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
