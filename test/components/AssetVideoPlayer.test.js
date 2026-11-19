@@ -312,35 +312,30 @@ describe('AssetVideoPlayer - handleVideoTimeUpdate()', () => {
     expect(selectChapter.called).to.be.false;
   });
 
-  it('advances to the next chapter only once at the boundary, ignoring repeated end-time crossings', () => {
+  it('keeps highlighting the current chapter through a gap and never forces a seek', () => {
     const el = makeInstance();
     const selectChapter = sinon.stub(el, 'selectChapter');
 
-    [322.223, 322.5].forEach((currentTime) => {
+    // Chapter 3 (index 2) ends at 322.223 and chapter 4 (index 3) does not
+    // start until 322.959 - a 0.736s gap. Playback should continue through it
+    // uninterrupted, still attributed to chapter 3, with no forced seek.
+    [322.223, 322.5, 322.9].forEach((currentTime) => {
       el.handleVideoTimeUpdate({ currentTarget: { currentTime, paused: false } });
+      expect(el.selectedChapterIndex).to.equal(2);
     });
 
-    // Guards against an infinite seek loop: if the forced seek snaps behind the
-    // target (e.g. non-keyframe-aligned chapter boundary) and currentTime briefly
-    // falls back into this chapter's range on a later tick, we must not retrigger
-    // the same forced advance again.
-    expect(selectChapter.calledOnce).to.be.true;
-    expect(selectChapter.calledWithExactly(3)).to.be.true;
-    expect(el.currentTime).to.equal(322.5);
+    expect(selectChapter.called).to.be.false;
+    expect(el.currentTime).to.equal(322.9);
   });
 
-  it('does not retry a forced advance once attempted, even if currentTime falls back into the previous chapter range', () => {
+  it('advances the highlighted chapter once playback naturally reaches the next chapter start', () => {
     const el = makeInstance();
     const selectChapter = sinon.stub(el, 'selectChapter');
 
-    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 322.223, paused: false } });
-    expect(selectChapter.calledOnceWithExactly(3)).to.be.true;
+    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 322.959, paused: false } });
 
-    // Simulate the browser's seek snapping to a keyframe before the requested
-    // target, so currentTime briefly reads as still inside the previous chapter.
-    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 322.1, paused: false } });
-
-    expect(selectChapter.calledOnce).to.be.true;
+    expect(el.selectedChapterIndex).to.equal(3);
+    expect(selectChapter.called).to.be.false;
   });
 
   it('updates time but does not advance while paused', () => {
@@ -503,7 +498,12 @@ describe('AssetVideoPlayer - chapter progress', () => {
   it('preserves partial progress for the active chapter and empty future tracks', () => {
     const el = makeInstance();
     el.selectChapter(2);
-    el.currentTime = (142.906 + 322.223) / 2;
+    // Progress is now measured against the next chapter's start (322.959),
+    // not this chapter's own declared end (322.223), so it stays accurate
+    // through any gap between chapters.
+    const nextStart = 322.959;
+    const start = 142.906;
+    el.currentTime = (start + nextStart) / 2;
 
     expect(el.getChapterProgress(0)).to.equal(100);
     expect(el.getChapterProgress(1)).to.equal(100);
@@ -518,6 +518,19 @@ describe('AssetVideoPlayer - chapter progress', () => {
     expect(el.getChapterProgress(2)).to.equal(0);
     el.currentTime = 4000;
     expect(el.getChapterProgress(2)).to.equal(100);
+  });
+
+  it('still reports progress when a chapter end timecode is malformed (before its start)', () => {
+    const el = makeInstance();
+    el.chapters = [
+      { title: 'A', timerange: '00:00:00.000 - 00:00:10.000' },
+      { title: 'B', timerange: '00:00:10.000 - 00:00:05.000' },
+      { title: 'C', timerange: '00:00:20.000 - 00:00:30.000' },
+    ];
+    el.selectChapter(1);
+    el.currentTime = 15;
+
+    expect(el.getChapterProgress(1)).to.be.closeTo(50, 0.001);
   });
 });
 

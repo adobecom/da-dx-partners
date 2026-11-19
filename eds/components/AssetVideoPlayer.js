@@ -57,7 +57,6 @@ export default class AssetVideoPlayer extends LitElement {
     this.isFullscreen = false;
     this.fullscreenScrollPosition = null;
     this.scrollToRestoredChapter = false;
-    this.autoAdvancedToIndex = -1;
   }
 
   createRenderRoot() {
@@ -83,7 +82,6 @@ export default class AssetVideoPlayer extends LitElement {
       this.currentTime = 0;
       this.progressHover = null;
       this.scrollToRestoredChapter = false;
-      this.autoAdvancedToIndex = -1;
       if (changedProperties.has('src') && this.src) {
         this.chapters = [];
         this.videoDuration = 0;
@@ -212,10 +210,16 @@ export default class AssetVideoPlayer extends LitElement {
     const chapter = this.chapters[index];
     if (!chapter) return 0;
 
-    const [startTime, endTime] = chapter.timerange.split(' - ');
-    const start = this.timecodeToSeconds(startTime);
-    const end = this.timecodeToSeconds(endTime);
-    if (end <= start) return 0;
+    // Use the next chapter's start (not this chapter's own declared end) as the
+    // progress denominator. This matches the classification logic in
+    // handleVideoTimeUpdate() and stays correct even if a chapter's own end
+    // timecode is missing or malformed (e.g. before its start).
+    const next = this.chapters[index + 1];
+    const start = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
+    const end = next
+      ? this.timecodeToSeconds(this.getStartTime(next.timerange))
+      : this.playerDuration;
+    if (!(end > start)) return 0;
 
     const progress = ((this.currentTime - start) / (end - start)) * 100;
     return Math.max(0, Math.min(100, progress));
@@ -228,6 +232,12 @@ export default class AssetVideoPlayer extends LitElement {
 
     if (!this.chapters.length) return;
 
+    // Classify by the *next* chapter's start, not this chapter's own end, so
+    // natural playback through any gap between chapters keeps highlighting the
+    // current chapter and is never force-seeked past unplayed content. This
+    // also avoids forcing a seek to an exact (possibly non-keyframe-aligned)
+    // timestamp during normal playback, which previously caused a seek/settle
+    // loop at some chapter boundaries.
     const index = this.chapters.findIndex((chapter, chapterIndex) => {
       const next = this.chapters[chapterIndex + 1];
       const start = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
@@ -237,25 +247,6 @@ export default class AssetVideoPlayer extends LitElement {
       return video.currentTime >= start && video.currentTime < nextStart;
     });
     this.selectedChapterIndex = Math.max(0, index);
-
-    if (video.paused || this.selectedChapterIndex >= this.chapters.length - 1) return;
-
-    const nextIndex = this.selectedChapterIndex + 1;
-    if (this.autoAdvancedToIndex >= nextIndex) {
-      // Already attempted this forced advance. If the browser's seek snapped
-      // to a keyframe before the target (common for non-keyframe-aligned
-      // chapter boundaries), currentTime can briefly fall back into this
-      // chapter's range on the next tick. Retrying here would force the same
-      // seek again, causing an infinite seeking/waiting loop at this exact
-      // boundary. Let natural playback catch up instead.
-      return;
-    }
-
-    const [, endTime] = this.chapters[this.selectedChapterIndex].timerange.split(' - ');
-    if (video.currentTime >= this.timecodeToSeconds(endTime)) {
-      this.autoAdvancedToIndex = nextIndex;
-      this.selectChapter(nextIndex);
-    }
   }
 
   formatTimecode(timecode) {
@@ -745,7 +736,6 @@ export default class AssetVideoPlayer extends LitElement {
     if (!chapter) return;
 
     this.selectedChapterIndex = index;
-    this.autoAdvancedToIndex = index;
     const startTime = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
     this.currentTime = startTime;
 
