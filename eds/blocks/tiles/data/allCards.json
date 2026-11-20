@@ -23,7 +23,7 @@
   "4": {
     "id": 4,
     "title": "Complete your company profile",
-    "description": "",
+    "description": "Add more information and create or update your Partner Directory listing to promote your company",
     "actionLink": "https://partners.adobe.com/digitalexperience/m/manageprofile/companyinfo/information",
     "color": "Light blue"
   },
@@ -149,9 +149,8 @@
   "22": {
     "original title": "Discover a la carte benefits",
     "id": 22,
-    "title": "[Remya/Abdel, is there any page other than Benefits Center that lists the actual a la carte benefits options? (I don't see one.) If not, we should discard this CTA and just use the Benefits Center one.]",
-    "description": "",
-    "actionLink": "",
+    "description": "Adjust your partner membership level and customize your partnership with a la carte benefits",
+    "actionLink": "https://partnerbenefitscenter.adobe.com/benefits-center.html",
     "color": "Light blue"
   },
   "23": {

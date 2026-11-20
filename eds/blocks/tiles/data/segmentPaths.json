@@ -941,6 +941,12 @@
       "neverCompletes": false
     },
     {
+      "id": 51,
+      "title": "Track your team's credentials",
+      "condition": "52",
+      "neverCompletes": true
+    },
+    {
       "id": 53,
       "title": "Demonstrate your expertise with customer deployments",
       "condition": "50",
@@ -1185,7 +1191,7 @@
     {
       "id": 36,
       "title": "Browse on-demand learning courses",
-      "condition": "34",
+      "condition": "31",
       "neverCompletes": false
     },
     {
@@ -1197,7 +1203,7 @@
     {
       "id": 38,
       "title": "View upcoming events",
-      "condition": "36",
+      "condition": "31",
       "neverCompletes": false
     },
     {
@@ -1445,7 +1451,7 @@
     {
       "id": 36,
       "title": "Browse on-demand learning courses",
-      "condition": "35",
+      "condition": "31",
       "neverCompletes": false
     },
     {
@@ -1457,7 +1463,7 @@
     {
       "id": 38,
       "title": "View upcoming events",
-      "condition": "36",
+      "condition": "31",
       "neverCompletes": false
     },
     {
@@ -1691,6 +1697,18 @@
       "neverCompletes": false
     },
     {
+      "id": 50,
+      "title": "Monitor your partnership progress",
+      "condition": "33",
+      "neverCompletes": true
+    },
+    {
+      "id": 51,
+      "title": "Track your team's credentials",
+      "condition": "50",
+      "neverCompletes": true
+    },
+    {
       "id": 34,
       "title": "Earn a Sales Excellence accreditation",
       "condition": "31",
@@ -1705,7 +1723,7 @@
     {
       "id": 36,
       "title": "Browse on-demand learning courses",
-      "condition": "34",
+      "condition": "31",
       "neverCompletes": false
     },
     {
@@ -1717,7 +1735,7 @@
     {
       "id": 38,
       "title": "View upcoming events",
-      "condition": "36",
+      "condition": "31",
       "neverCompletes": false
     },
     {
