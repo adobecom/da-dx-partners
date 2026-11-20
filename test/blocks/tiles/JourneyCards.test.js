@@ -13,7 +13,7 @@ declareJourneyCards();
 
 function makeInstance(cards, actionHandler) {
   const el = document.createElement('journey-cards');
-  el.cards = cards;
+  el.toDoCards = cards;
   el.actionHandler = actionHandler;
   document.body.appendChild(el);
   return el;

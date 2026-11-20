@@ -37,17 +37,30 @@ export function getCompletedJourneyCardIds(userState = getPartnerUserState()) {
   return normalizeJourneyCardIds(completedCards);
 }
 
-export function getVisibleJourneyCards({
+export function getCompletedCards({
   segment,
-  completedCardIds = getCompletedJourneyCardIds(),
+  completedCardIds,
+  paths = JOURNEY_PATHS,
+  cardDetails = JOURNEY_CARD_DETAILS,
+} = {}) {
+  const path = getJourneyPathForSegment(segment, paths);
+  if (!path) return [];
+  const completedCardsDetails = [];
+  completedCardIds.forEach((cardId) => {
+    completedCardsDetails.push(cardDetails[cardId]);
+  });
+  return completedCardsDetails;
+}
+
+export function getToDoCards({
+  segment,
+  completedCardIds,
   maxCards = MAX_VISIBLE_JOURNEY_CARDS,
   paths = JOURNEY_PATHS,
   cardDetails = JOURNEY_CARD_DETAILS,
 } = {}) {
   const path = getJourneyPathForSegment(segment, paths);
   if (!path) return [];
-  const normalizedCompletedCardIds = normalizeJourneyCardIds(completedCardIds);
-  const completedSet = new Set(normalizedCompletedCardIds.map(String));
   const visibleCards = [];
   const completedFallbackCards = [];
 
@@ -58,8 +71,8 @@ export function getVisibleJourneyCards({
     const conditionKey = journeyCard.condition !== null && journeyCard.condition !== undefined
       ? Number(journeyCard.condition)
       : null;
-    const conditionMet = !journeyCard.condition || completedSet.has(String(conditionKey));
-    const cardCompleted = completedSet.has(String(journeyCard.id));
+    const conditionMet = !journeyCard.condition || completedCardIds.has(String(conditionKey));
+    const cardCompleted = completedCardIds.has(String(journeyCard.id));
 
     if (journeyCard.neverCompletes && cardCompleted) {
       detail.neverCompletesCard = true;
@@ -85,14 +98,11 @@ export function buildCompletedJourneyCardState(
     throw new Error(`Invalid journey card id provided: ${cardId}`);
   }
 
-  const normalizedCompletedCards = normalizeJourneyCardIds(completedCardIds);
-  const completedCardSet = new Set(normalizedCompletedCards);
-
   if (action === 'complete') {
-    completedCardSet.add(normalizedCardId);
-    return [...completedCardSet];
+    completedCardIds.add(normalizedCardId);
+    return [...completedCardIds];
   }
 
-  completedCardSet.delete(normalizedCardId);
-  return [...completedCardSet];
+  completedCardIds.delete(normalizedCardId);
+  return [...completedCardIds];
 }

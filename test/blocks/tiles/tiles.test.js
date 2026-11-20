@@ -4,7 +4,7 @@ import { setLibs } from '../../../eds/scripts/utils.js';
 import {
   buildCompletedJourneyCardState,
   getCompletedJourneyCardIds,
-  getVisibleJourneyCards,
+  getToDoCards,
   normalizeJourneyCardIds,
 } from '../../../eds/blocks/tiles/utils.js';
 
@@ -31,7 +31,7 @@ describe('tiles block logic', () => {
   });
 
   it('returns only the visible journey cards for the current path', () => {
-    const cards = getVisibleJourneyCards({
+    const cards = getToDoCards({
       segment: 'demo',
       completedCardIds: [1],
       maxCards: 9,
@@ -98,7 +98,7 @@ describe('tiles block logic', () => {
 
     const app = document.querySelector('journey-cards');
     expect(app).to.exist;
-    expect(app.cards).to.deep.equal([{ id: 2, title: 'Visible card', description: 'Example' }]);
+    expect(app.toDoCards).to.deep.equal([{ id: 2, title: 'Visible card', description: 'Example' }]);
     expect(app.actionHandler).to.equal(handleUserAction);
     await app.updateComplete;
     expect(app.shadowRoot.querySelector('.journey-card')).to.exist;

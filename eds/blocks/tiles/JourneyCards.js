@@ -1,12 +1,8 @@
-import { getLibs } from '../../scripts/utils.js';
+import {getLibs} from "../../scripts/utils.js";
 
 const miloLibs = getLibs();
 const { html, LitElement, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
 const { processTrackingLabels } = await import(`${miloLibs}/martech/attributes.js`);
-await Promise.all([
-  import(`${miloLibs}/features/spectrum-web-components/dist/theme.js`),
-  import(`${miloLibs}/features/spectrum-web-components/dist/button.js`),
-]);
 
 function getButtonLabel(action) {
   return action === 'undo' ? 'Undo' : 'Mark as completed';
@@ -14,20 +10,24 @@ function getButtonLabel(action) {
 
 export default class JourneyCards extends LitElement {
   static properties = {
-    cards: { type: Array },
+    toDoCards: { type: Array },
+    completedCards: { type: Array },
     actionHandler: { type: Object },
     // Reserved for the upcoming to-do/completed tabs; defaults to the
     // current single-board behavior until tab switching is wired up.
     tab: { type: Number },
     cardStates: { state: true },
+    blockData: { type: Object },
   };
 
   constructor() {
     super();
-    this.cards = [];
+    this.toDoCards = [];
+    this.completedCards = [];
     this.actionHandler = null;
     this.tab = 0;
     this.cardStates = new Map();
+    this.blockData = {};
   }
 
   willUpdate(changedProperties) {
@@ -42,7 +42,7 @@ export default class JourneyCards extends LitElement {
 
   syncCardStates() {
     const nextStates = new Map();
-    this.cards.forEach((card, index) => {
+    this.toDoCards.forEach((card, index) => {
       nextStates.set(card.id, this.cardStates.get(card.id) || {
         action: 'complete',
         disabled: false,
@@ -149,15 +149,44 @@ export default class JourneyCards extends LitElement {
     /* eslint-enable indent */
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  renderHeader() {
+    return html`
+      <div class="journey-tabs">
+          <sp-theme theme="spectrum" color="light" scale="medium">
+            <sp-button-group>
+              <sp-button variant="${this.tab === 0 ? 'primary' : 'secondary'}" size="m" @click="${() => this.setTab(0)}" aria-label="${this.blockData.localizedText['{{to-do}}']}">
+                ${this.blockData.localizedText['{{to-do}}']}</sp-button>
+              <sp-button variant="${this.tab === 1 ? 'primary' : 'secondary'}" size="m" @click="${() => this.setTab(1)}" aria-label="${this.blockData.localizedText['{{completed}}']}">
+                ${this.blockData.localizedText['{{completed}}']} (${this.completedCards.length})</sp-button>
+            </sp-button-group>
+          </sp-theme>
+        </div>
+    `;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   render() {
     return html`
-      <div class="journey-board">
+      ${this.renderHeader()}
+      ${this.tab === 0
+    ? html`<div class="journey-board">
         ${repeat(
-    this.cards,
+    this.toDoCards,
     (card) => card.id,
     (card, index) => this.renderCard(card, index),
   )}
-      </div>
+      </div>` : html`<div class="journey-board">
+        ${repeat(
+    this.completedCards,
+    (card) => card.id,
+    (card, index) => this.renderCard(card, index),
+  )}
+      </div>`}
     `;
+  }
+
+  setTab(number) {
+    this.tab = number;
   }
 }
