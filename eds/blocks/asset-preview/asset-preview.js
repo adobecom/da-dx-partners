@@ -1,5 +1,6 @@
 import AssetPreview from './AssetPreview.js';
 import { getConfig, populateLocalizedTextFromListItems, replaceText, keepInlineFragmentInDOM } from '../utils/utils.js';
+import { isAemAuthorHost } from '../../scripts/utils.js';
 
 function declareAssetPreview() {
   if (customElements.get('asset-preview')) return;
@@ -16,9 +17,10 @@ async function localizationPromises(localizedText, config) {
 export default async function init(el) {
   performance.mark('asset-preview:start');
 
-  const config = getConfig();
+  const isAEM = isAemAuthorHost(window.location.origin);
+  const config = isAEM ? null : getConfig();
 
-  const sectionIndex = el.parentNode.getAttribute('data-idx');
+  const sectionIndex = el.parentNode?.getAttribute('data-idx');
 
   const localizedText = {
     '{{Date}}': 'Date',
@@ -44,20 +46,21 @@ export default async function init(el) {
   };
   populateLocalizedTextFromListItems(el, localizedText);
 
-  const deps = await Promise.all([
+  const deps = isAEM ? Promise.resolve() : Promise.all([
     localizationPromises(localizedText, config),
   ]);
 
   const blockData = {
     localizedText,
     tableData: el.children,
+    isAEM,
   };
 
   declareAssetPreview();
   const app = document.createElement('asset-preview');
   app.className = 'asset-preview-block';
   app.blockData = blockData;
-  app.setAttribute('data-idx', sectionIndex);
+  if (sectionIndex) app.setAttribute('data-idx', sectionIndex);
   app.setAttribute('daa-lh', 'Asset Preview Block');
   keepInlineFragmentInDOM(Array.from(blockData.tableData), app, 'fragment-link');
   el.replaceWith(app);

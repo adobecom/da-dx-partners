@@ -52,6 +52,15 @@ export default class SearchPage {
     this.hubLogo = page.locator('a.feds-brand').filter({ has: page.locator('img[src*="px-hub-logo"]') });
     this.watchVideoButton = page.getByRole('button', { name: 'Watch Video' });
     this.videoPlayer = page.locator('asset-preview.asset-preview-block');
+    this.firstCard = page.locator('.card-header .card-title').first();
+    this.secondCard = page.locator('search-card:nth-child(2) > .search-card > .card-header');
+    this.thirdCard = page.locator('search-card:nth-child(3) > .search-card > .card-header');
+    this.regionFilter = page.getByRole('button', { name: 'Region' });
+    this.naRegionCheckBox = page.getByRole('checkbox', { name: 'North America' });
+    this.naRegionPreviewButton = page.locator('search-card').filter({ hasText: 'DXP-Automation-Regions-NA' }).getByLabel('Open in');
+    this.card1 = page.locator('.card-text').first();
+    this.card2 = page.locator('single-partner-card:nth-child(2) > .single-partner-card > .card-content > .card-text');
+    this.card3 = page.locator('single-partner-card:nth-child(3) > .single-partner-card > .card-content > .card-text');
   }
 
   async getCardTitle() {
@@ -283,5 +292,88 @@ export default class SearchPage {
     await expect(this.assetPreviewImage).toBeVisible({ timeout: 30000 });
     const src = await this.assetPreviewImage.getAttribute('src');
     expect(src).toContain(expectedThumbnailPath);
+  }
+
+  getRegionPreviewButton(assetTitle) {
+    return this.page
+      .locator('search-card')
+      .filter({ hasText: assetTitle })
+      .getByLabel('Open in');
+  }
+
+  async expandCardByTitle(title) {
+    const card = this.getCardByTitle(title);
+    await expect(card).toBeVisible({ timeout: 5000 });
+    await this.clickCard(card, 5000);
+    await expect(card).toHaveClass(/expanded/, { timeout: 5000 });
+    const expandedCard = this.getExpandedCard().filter({ hasText: title }).first();
+    await expect(expandedCard).toBeVisible({ timeout: 5000 });
+    return expandedCard;
+  }
+
+  getPreviewButton(expandedCard) {
+    return expandedCard.getByLabel('Open in').first();
+  }
+
+  async openPreview(expandedCard) {
+    const previewButton = this.getPreviewButton(expandedCard);
+    await expect(previewButton).toBeVisible({ timeout: 10000 });
+
+    const [previewPage] = await Promise.all([
+      this.page.context().waitForEvent('page', { timeout: 30000 }),
+      previewButton.click(),
+    ]);
+    await previewPage.waitForLoadState('domcontentloaded');
+    return previewPage;
+  }
+
+  getPreviewTags(previewPage) {
+    return previewPage
+      .locator('.asset-preview-block-details-left p')
+      .filter({ hasText: 'Tags:' });
+  }
+
+  get collectionCards() {
+    return this.page.locator('.card-wrapper');
+  }
+
+  async loadAllCollectionCards({ stableChecks = 3, interval = 1000, maxTime = 30000 } = {}) {
+    const start = Date.now();
+    let lastCount = -1;
+    let stable = 0;
+
+    while (stable < stableChecks && Date.now() - start < maxTime) {
+      await this.collectionCards.last().scrollIntoViewIfNeeded();
+      await this.page.mouse.wheel(0, 2000);
+      await this.page.waitForTimeout(interval);
+
+      const count = await this.collectionCards.count();
+      stable = count === lastCount ? stable + 1 : 0;
+      lastCount = count;
+    }
+
+    return lastCount;
+  }
+
+  async validateExpandedCardTags(title, tags) {
+    await expect(async () => {
+      const card = await this.expandCardByTitle(title);
+      await Promise.all(
+        tags.map((tagText) => expect(this.getCardTagByText(card, tagText))
+          .toBeVisible({ timeout: 5000 })),
+      );
+    }).toPass({ timeout: 45000, intervals: [1000, 2000, 5000] });
+
+    return this.getExpandedCard().filter({ hasText: title }).first();
+  }
+
+  async validatePreviewTags(expandedCard, previewTags) {
+    const previewPage = await this.openPreview(expandedCard);
+    try {
+      await expect(this.getPreviewTags(previewPage))
+        .toHaveText(previewTags, { timeout: 30000 });
+    } finally {
+      await previewPage.close();
+    }
   }
 }

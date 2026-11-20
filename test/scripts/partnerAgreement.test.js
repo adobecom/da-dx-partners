@@ -9,11 +9,15 @@ setConfig({ codeRoot: '/eds', miloLibs, locales: { '': { ietf: 'en-US' } } });
 const { partnerAgreement } = await import('../../eds/scripts/partnerAgreement.js');
 
 describe('partnerAgreement browser coverage', () => {
+  beforeEach(() => {
+    let cookie = '';
+    sinon.stub(document, 'cookie').get(() => cookie).set((value) => { cookie = value; });
+  });
+
   afterEach(() => {
     sinon.restore();
     document.head.innerHTML = '';
     document.body.innerHTML = '';
-    document.cookie = 'partner_data=; Path=/; Max-Age=0;';
   });
 
   it('redirects only to an allowed domain', () => {
@@ -55,12 +59,15 @@ describe('partnerAgreement browser coverage', () => {
   });
 
   it('skips when agreement metadata is not authored', async () => {
+    const consoleWarnStub = sinon.stub(console, 'warn');
     const result = await partnerAgreement(miloLibs);
 
     expect(result).to.equal(false);
+    expect(consoleWarnStub.calledOnceWithExactly('Partner agreement should be displayed but partner agreement meta path is not authored')).to.be.true;
   });
 
   it('skips when agreement metadata cannot be fetched', async () => {
+    const consoleErrorStub = sinon.stub(console, 'error');
     const meta = document.createElement('meta');
     meta.name = 'partner-agreement-meta';
     meta.content = '/fragments/agreement-meta';
@@ -70,9 +77,11 @@ describe('partnerAgreement browser coverage', () => {
     const result = await partnerAgreement(miloLibs);
 
     expect(result).to.equal(false);
+    expect(consoleErrorStub.calledOnceWithExactly('Fetching partner agreement metadata failed, status 404')).to.be.true;
   });
 
   it('skips when the agreement terms response is empty', async () => {
+    const consoleErrorStub = sinon.stub(console, 'error');
     const meta = document.createElement('meta');
     meta.name = 'partner-agreement-meta';
     meta.content = '/fragments/agreement-meta';
@@ -87,9 +96,11 @@ describe('partnerAgreement browser coverage', () => {
     const result = await partnerAgreement(miloLibs);
 
     expect(result).to.equal(false);
+    expect(consoleErrorStub.calledOnceWithExactly('Partner Agreement response is empty')).to.be.true;
   });
 
   it('skips when the agreement API returns a non-success response', async () => {
+    const consoleErrorStub = sinon.stub(console, 'error');
     const meta = document.createElement('meta');
     meta.name = 'partner-agreement-meta';
     meta.content = '/fragments/agreement-meta';
@@ -102,9 +113,12 @@ describe('partnerAgreement browser coverage', () => {
     });
 
     expect(await partnerAgreement(miloLibs)).to.equal(false);
+    expect(consoleErrorStub.calledOnceWithExactly('fetch Partner Agreement failed, status: 500')).to.be.true;
   });
 
   it('skips when the agreement API request rejects', async () => {
+    const consoleErrorStub = sinon.stub(console, 'error');
+    const error = new Error('agreement unavailable');
     const meta = document.createElement('meta');
     meta.name = 'partner-agreement-meta';
     meta.content = '/fragments/agreement-meta';
@@ -113,10 +127,11 @@ describe('partnerAgreement browser coverage', () => {
       if (String(url).includes('agreement-meta')) {
         return { ok: true, text: async () => '<html><head></head></html>' };
       }
-      throw new Error('agreement unavailable');
+      throw error;
     });
 
     expect(await partnerAgreement(miloLibs)).to.equal(false);
+    expect(consoleErrorStub.calledOnceWithExactly('Partner Agreement fetch error', error)).to.be.true;
   });
 
   it('renders a partner agreement modal from metadata and terms', async () => {

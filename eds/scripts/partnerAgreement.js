@@ -56,7 +56,6 @@ async function handleAgreement(action) {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           programType: getCurrentProgramType().toUpperCase(),
           action,
