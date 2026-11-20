@@ -63,7 +63,7 @@ export function getToDoCards({
   if (!path) return [];
   const visibleCards = [];
   const completedFallbackCards = [];
-
+  console.log('completed cards', completedCardIds);
   path.forEach((journeyCard) => {
     const detail = cardDetails[journeyCard.id];
     if (!detail) return;
@@ -71,8 +71,8 @@ export function getToDoCards({
     const conditionKey = journeyCard.condition !== null && journeyCard.condition !== undefined
       ? Number(journeyCard.condition)
       : null;
-    const conditionMet = !journeyCard.condition || completedCardIds.has(String(conditionKey));
-    const cardCompleted = completedCardIds.has(String(journeyCard.id));
+    const conditionMet = !journeyCard.condition || completedCardIds.has(conditionKey);
+    const cardCompleted = completedCardIds.has(journeyCard.id);
 
     if (journeyCard.neverCompletes && cardCompleted) {
       detail.neverCompletesCard = true;

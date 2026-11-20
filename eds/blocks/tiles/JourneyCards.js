@@ -32,7 +32,10 @@ export default class JourneyCards extends LitElement {
 
   willUpdate(changedProperties) {
     if (changedProperties.has('cards') || changedProperties.has('tab')) {
-      this.syncCardStates();
+      console.log('tab changed');
+console.log('this.completedc ards', this.completedCards);
+console.log('this todo', this.toDoCards);
+this.syncCardStates();
     }
   }
 
