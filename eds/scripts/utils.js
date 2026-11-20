@@ -91,6 +91,21 @@ export const prodHosts = [
  * Note: This file should have no self-invoking functions.
  * ------------------------------------------------------------
  */
+export function optimizeImageUrl(imageUrl) {
+  const imagePath = imageUrl.toString();
+  if (imagePath.includes('media_')
+    && (imagePath.includes('/digitalexperience/')
+      || imagePath.includes('business.adobe.com')
+      || imagePath.includes('business.stage.adobe.com'))) {
+    const optimizedUrl = new URL(imageUrl);
+    optimizedUrl.searchParams.set('width', '400');
+    optimizedUrl.searchParams.set('format', 'webp');
+    optimizedUrl.searchParams.set('optimize', 'small');
+    return optimizedUrl;
+  }
+  return imageUrl;
+}
+
 export function formatDate(cardDate, locale = 'en-US', isEventCard = false) {
   if (!cardDate) return;
 

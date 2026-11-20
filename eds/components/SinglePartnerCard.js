@@ -1,4 +1,4 @@
-import { formatDate, getLibs } from '../scripts/utils.js';
+import { formatDate, getLibs, optimizeImageUrl } from '../scripts/utils.js';
 import { getConfig, transformCardUrl } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
@@ -32,9 +32,11 @@ class SinglePartnerCard extends LitElement {
   }
 
   render() {
+    const backgroundImage = optimizeImageUrl(transformCardUrl(this.data.styles?.backgroundImage));
+
     return html`
       <div class="single-partner-card">
-        <div class="card-header" style="background-image: url(${transformCardUrl(this.data.styles?.backgroundImage)}), url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})">
+        <div class="card-header" style="background-image: url(${backgroundImage}), url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})">
         </div>
         <div class="card-content">
           <div class="card-text">
