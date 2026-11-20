@@ -37,20 +37,38 @@ export function getCompletedJourneyCardIds(userState = getPartnerUserState()) {
   return normalizeJourneyCardIds(completedCards);
 }
 
-export function getVisibleJourneyCards({
+export function getCompletedCards({
   segment,
-  completedCardIds = getCompletedJourneyCardIds(),
+  completedCardIds,
+  paths = JOURNEY_PATHS,
+  cardDetails = JOURNEY_CARD_DETAILS,
+} = {}) {
+  const path = getJourneyPathForSegment(segment, paths);
+  if (!path) return [];
+  const completedCardsDetails = [];
+  completedCardIds.forEach((cardId) => {
+    const cardPathData = path.filter((journeyCard) => journeyCard.id === cardId)[0];
+    const cardData = cardDetails[cardId];
+    if (!cardPathData) return;
+    if (cardPathData.neverCompletes) {
+      cardData.neverCompletesCard = true;
+    }
+    completedCardsDetails.push(cardData);
+  });
+  return completedCardsDetails;
+}
+
+export function getToDoCards({
+  segment,
+  completedCardIds,
   maxCards = MAX_VISIBLE_JOURNEY_CARDS,
   paths = JOURNEY_PATHS,
   cardDetails = JOURNEY_CARD_DETAILS,
 } = {}) {
   const path = getJourneyPathForSegment(segment, paths);
   if (!path) return [];
-  const normalizedCompletedCardIds = normalizeJourneyCardIds(completedCardIds);
-  const completedSet = new Set(normalizedCompletedCardIds.map(String));
   const visibleCards = [];
   const completedFallbackCards = [];
-
   path.forEach((journeyCard) => {
     const detail = cardDetails[journeyCard.id];
     if (!detail) return;
@@ -58,8 +76,8 @@ export function getVisibleJourneyCards({
     const conditionKey = journeyCard.condition !== null && journeyCard.condition !== undefined
       ? Number(journeyCard.condition)
       : null;
-    const conditionMet = !journeyCard.condition || completedSet.has(String(conditionKey));
-    const cardCompleted = completedSet.has(String(journeyCard.id));
+    const conditionMet = !journeyCard.condition || completedCardIds.has(conditionKey);
+    const cardCompleted = completedCardIds.has(journeyCard.id);
 
     if (journeyCard.neverCompletes && cardCompleted) {
       detail.neverCompletesCard = true;
@@ -85,14 +103,13 @@ export function buildCompletedJourneyCardState(
     throw new Error(`Invalid journey card id provided: ${cardId}`);
   }
 
-  const normalizedCompletedCards = normalizeJourneyCardIds(completedCardIds);
-  const completedCardSet = new Set(normalizedCompletedCards);
+  const completedCardIdsSet = new Set(completedCardIds);
 
   if (action === 'complete') {
-    completedCardSet.add(normalizedCardId);
-    return [...completedCardSet];
+    completedCardIdsSet.add(normalizedCardId);
+    return [...completedCardIdsSet];
   }
 
-  completedCardSet.delete(normalizedCardId);
-  return [...completedCardSet];
+  completedCardIdsSet.delete(normalizedCardId);
+  return [...completedCardIdsSet];
 }

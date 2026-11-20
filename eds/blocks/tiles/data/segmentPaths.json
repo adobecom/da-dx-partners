@@ -1174,7 +1174,7 @@
       "id": 33,
       "title": "View or manage your credentials",
       "condition": "32",
-      "neverCompletes": false
+      "neverCompletes": true
     },
     {
       "id": 34,

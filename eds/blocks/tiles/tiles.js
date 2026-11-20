@@ -1,19 +1,33 @@
 import {
   buildCompletedJourneyCardState,
-  getCompletedJourneyCardIds,
-  getVisibleJourneyCards,
+  getCompletedCards,
+  getCompletedJourneyCardIds, getJourneyPathForSegment,
+  getToDoCards, JOURNEY_PATHS,
+  normalizeJourneyCardIds,
 } from './utils.js';
 import {
   getCookieValue,
   getCurrentProgramType,
   getPartnerCookieValue,
   hasPartnerUserStateProperty,
-  partnerCookieContainsValue,
   PARTNER_USER_STATE_COOKIE,
+  partnerCookieContainsValue,
+  getLibs,
 } from '../../scripts/utils.js';
-import { DX_ACCESS_TYPE, DX_PROGRAM_TYPE } from '../utils/dxConstants.js';
+import {DX_ACCESS_TYPE, DX_PROGRAM_TYPE} from '../utils/dxConstants.js';
 import JourneyCards from './JourneyCards.js';
+import { getConfig, localizationPromises, populateLocalizedTextFromListItems } from '../utils/utils.js';
 
+const miloLibs = getLibs();
+const localizedText = {
+  '{{to-do}}': 'To Do',
+  '{{completed}}': 'Completed',
+  '{{suggested-next}}': 'Suggested next',
+  '{{open}}': 'Open',
+  '{{mark-complete}}': 'Mark complete',
+  '{{undo}}': 'Undo',
+  '{{revisit-task}}': 'Revisit task',
+};
 function declareJourneyCards() {
   if (customElements.get('journey-cards')) return;
   customElements.define('journey-cards', JourneyCards);
@@ -75,22 +89,45 @@ export default async function init(el, deps = {}) {
     const {
       segment = getTilesSegment(),
       getCompletedCardIds = getCompletedJourneyCardIds,
-      getVisibleCards = getVisibleJourneyCards,
+      getVisibleCards = getToDoCards,
     } = deps;
 
-    const visibleCards = getVisibleCards({
+    const completedCardIds = getCompletedCardIds();
+    const normalizedCompletedCards = normalizeJourneyCardIds(completedCardIds);
+    const completedCardSet = new Set(normalizedCompletedCards);
+
+    const toDoCards = getVisibleCards({
       segment,
-      completedCardIds: getCompletedCardIds(),
+      completedCardIds: completedCardSet,
     });
-    if (!visibleCards || visibleCards.length === 0) {
+    if (!toDoCards || toDoCards.length === 0) {
       el.remove();
       return;
     }
+    const completedCards = getCompletedCards({
+      segment,
+      completedCardIds: completedCardSet,
+    });
 
     declareJourneyCards();
+    populateLocalizedTextFromListItems(el, localizedText);
+    const config = getConfig();
+    const blockDeps = await Promise.all([
+      localizationPromises(localizedText, config),
+      import(`${miloLibs}/features/spectrum-web-components/dist/theme.js`),
+      import(`${miloLibs}/features/spectrum-web-components/dist/button.js`),
+      import(`${miloLibs}/features/spectrum-web-components/dist/button-group.js`),
+    ]);
+    await blockDeps;
+    const blockData = { localizedText };
     const app = document.createElement('journey-cards');
+    app.blockData = blockData;
     app.className = 'tiles-block';
-    app.cards = visibleCards;
+    app.toDoCards = toDoCards;
+    app.completedCards = completedCards;
+    app.segment = segment;
+    app.segmentTotalCards = getJourneyPathForSegment(segment, JOURNEY_PATHS)?.length;
+
     app.actionHandler = handleUserAction;
     el.replaceWith(app);
   } catch (error) {
