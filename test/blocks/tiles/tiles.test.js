@@ -7,15 +7,18 @@ import {
   getVisibleJourneyCards,
   normalizeJourneyCardIds,
 } from '../../../eds/blocks/tiles/utils.js';
-import {
+
+// tiles.js (via JourneyCards.js) resolves miloLibs-relative imports at module
+// load time, so setLibs must run before the static import below executes.
+setLibs('/libs');
+const {
   getTilesSegment,
   handleUserAction,
-  default as init,
-} from '../../../eds/blocks/tiles/tiles.js';
+  default: init,
+} = await import('../../../eds/blocks/tiles/tiles.js');
 
 describe('tiles block logic', () => {
   beforeEach(() => {
-    setLibs('/libs');
     document.cookie = 'partner_data=; Path=/; Max-Age=0;';
     document.cookie = 'partner_info=; Path=/; Max-Age=0;';
     document.cookie = 'partner_user_state=; Path=/; Max-Age=0;';
@@ -32,9 +35,7 @@ describe('tiles block logic', () => {
       segment: 'demo',
       completedCardIds: [1],
       maxCards: 9,
-      paths: {
-        demo: [{ id: 1, condition: null }, { id: 2, condition: null }, { id: 3, condition: null }],
-      },
+      paths: { demo: [{ id: 1, condition: null }, { id: 2, condition: null }, { id: 3, condition: null }] },
       cardDetails: {
         1: { id: 1 },
         2: { id: 2 },
@@ -75,29 +76,7 @@ describe('tiles block logic', () => {
     expect(updateState.firstCall.args[0].firstAction).to.be.a('string');
   });
 
-  it('renders a journey board and handles toggle actions', async () => {
-    const { default: renderBoard } = await import('../../../eds/blocks/tiles/TilesBoard.js');
-    const onComplete = sinon.stub().callsFake(async (cardId, action) => {
-      expect(cardId).to.equal(5);
-      expect(action).to.equal('complete');
-      return true;
-    });
-    const board = renderBoard([{ id: 5, title: 'Title', description: 'Description' }], onComplete);
-    const card = board.querySelector('.journey-card');
-    const button = card.querySelector('.journey-card-toggle');
-
-    expect(card.getAttribute('data-card-id')).to.equal('5');
-    expect(button.getAttribute('data-action')).to.equal('complete');
-
-    button.click();
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(onComplete.calledOnce).to.be.true;
-    expect(button.dataset.action).to.equal('undo');
-    expect(button.textContent.trim()).to.equal('Undo');
-  });
-
-  it('removes the host element when visible cards are empty and renders when cards exist', async () => {
+  it('renders the journey-cards component with the computed visible cards', async () => {
     const host = document.createElement('div');
     document.body.appendChild(host);
 
@@ -116,6 +95,12 @@ describe('tiles block logic', () => {
       getVisibleCards: () => [{ id: 2, title: 'Visible card', description: 'Example' }],
     });
     expect(nextHost.isConnected).to.be.false;
-    expect(document.querySelector('.journey-board')).to.exist;
+
+    const app = document.querySelector('journey-cards');
+    expect(app).to.exist;
+    expect(app.cards).to.deep.equal([{ id: 2, title: 'Visible card', description: 'Example' }]);
+    expect(app.actionHandler).to.equal(handleUserAction);
+    await app.updateComplete;
+    expect(app.shadowRoot.querySelector('.journey-card')).to.exist;
   });
 });

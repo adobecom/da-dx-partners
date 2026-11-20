@@ -1,12 +1,23 @@
-import { updatePartnerUserState } from '../../scripts/partnerStateUtils.js';
 import {
   buildCompletedJourneyCardState,
   getCompletedJourneyCardIds,
   getVisibleJourneyCards,
 } from './utils.js';
-import { getPartnerCookieValue, hasPartnerUserStateProperty, partnerCookieContainsValue } from '../../scripts/utils.js';
+import {
+  getCookieValue,
+  getCurrentProgramType,
+  getPartnerCookieValue,
+  hasPartnerUserStateProperty,
+  partnerCookieContainsValue,
+  PARTNER_USER_STATE_COOKIE,
+} from '../../scripts/utils.js';
 import { DX_ACCESS_TYPE, DX_PROGRAM_TYPE } from '../utils/dxConstants.js';
-import renderBoard from './TilesBoard.js';
+import JourneyCards from './JourneyCards.js';
+
+function declareJourneyCards() {
+  if (customElements.get('journey-cards')) return;
+  customElements.define('journey-cards', JourneyCards);
+}
 
 export function getTilesSegment() {
   const isAdmin = partnerCookieContainsValue('accesstype', DX_ACCESS_TYPE.ADMIN);
@@ -18,12 +29,24 @@ export function getTilesSegment() {
   return `${isAdmin ? 'admin' : 'user'}-${partnerLevel === 'community' ? 'community' : programType}`;
 }
 
+// TODO: local-testing only - writes the completed cards directly into the
+// partner_user_state cookie instead of calling the state-management API.
+// Replace with updatePartnerUserState from partnerStateUtils.js before merging.
+function updatePartnerUserStateCookie(stateUpdates) {
+  const programType = getCurrentProgramType().toUpperCase();
+  const existingCookie = getCookieValue(PARTNER_USER_STATE_COOKIE);
+  const stateByProgram = existingCookie ? JSON.parse(decodeURIComponent(existingCookie)) : {};
+  stateByProgram[programType] = { ...stateByProgram[programType], ...stateUpdates };
+  document.cookie = `${PARTNER_USER_STATE_COOKIE}=${encodeURIComponent(JSON.stringify(stateByProgram))}; Path=/`;
+  return { success: true };
+}
+
 export async function handleUserAction(cardId, action, deps = {}) {
   const {
     getCompletedCardIds = getCompletedJourneyCardIds,
     buildState = buildCompletedJourneyCardState,
     hasFirstAction = hasPartnerUserStateProperty,
-    updateState = updatePartnerUserState,
+    updateState = updatePartnerUserStateCookie,
   } = deps;
 
   const completedCardIds = getCompletedCardIds();
@@ -53,7 +76,6 @@ export default async function init(el, deps = {}) {
       segment = getTilesSegment(),
       getCompletedCardIds = getCompletedJourneyCardIds,
       getVisibleCards = getVisibleJourneyCards,
-      renderJourneyBoard = renderBoard,
     } = deps;
 
     const visibleCards = getVisibleCards({
@@ -64,11 +86,13 @@ export default async function init(el, deps = {}) {
       el.remove();
       return;
     }
-    const tilesBoard = renderJourneyBoard(visibleCards, handleUserAction);
-    const root = document.createElement('div');
-    root.className = 'tiles-block';
-    root.appendChild(tilesBoard);
-    el.replaceWith(tilesBoard);
+
+    declareJourneyCards();
+    const app = document.createElement('journey-cards');
+    app.className = 'tiles-block';
+    app.cards = visibleCards;
+    app.actionHandler = handleUserAction;
+    el.replaceWith(app);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Unable to render journey cards:', error);
