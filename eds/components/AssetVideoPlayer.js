@@ -210,10 +210,12 @@ export default class AssetVideoPlayer extends LitElement {
     const chapter = this.chapters[index];
     if (!chapter) return 0;
 
-    const [startTime, endTime] = chapter.timerange.split(' - ');
-    const start = this.timecodeToSeconds(startTime);
-    const end = this.timecodeToSeconds(endTime);
-    if (end <= start) return 0;
+    const next = this.chapters[index + 1];
+    const start = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
+    const end = next
+      ? this.timecodeToSeconds(this.getStartTime(next.timerange))
+      : this.playerDuration;
+    if (!(end > start)) return 0;
 
     const progress = ((this.currentTime - start) / (end - start)) * 100;
     return Math.max(0, Math.min(100, progress));
@@ -235,13 +237,6 @@ export default class AssetVideoPlayer extends LitElement {
       return video.currentTime >= start && video.currentTime < nextStart;
     });
     this.selectedChapterIndex = Math.max(0, index);
-
-    if (video.paused || this.selectedChapterIndex >= this.chapters.length - 1) return;
-
-    const [, endTime] = this.chapters[this.selectedChapterIndex].timerange.split(' - ');
-    if (video.currentTime >= this.timecodeToSeconds(endTime)) {
-      this.selectChapter(this.selectedChapterIndex + 1);
-    }
   }
 
   formatTimecode(timecode) {
