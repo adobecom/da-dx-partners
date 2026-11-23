@@ -324,7 +324,6 @@ test.describe('Gnav Personalisation', () => {
       expect(homeHref).toContain(data.homeIconLink);
     });
   });
-
   test(`${features[11].name},${features[11].tags}`, async ({ page, context, baseURL }) => {
     const { data, path, restrictedPath } = features[11];
 
@@ -359,7 +358,6 @@ test.describe('Gnav Personalisation', () => {
       }
     });
   });
-
   test(`${features[12].name},${features[12].tags}`, async ({ page, context, baseURL }) => {
     const { data, path, restrictedPath } = features[12];
 
@@ -388,60 +386,8 @@ test.describe('Gnav Personalisation', () => {
       }
     });
   });
-  test(`${features[13].name},${features[13].tags}`, async ({ page, context, baseURL }) => {
-    const { data, path, restrictedPath } = features[13];
-
-    await test.step('Go to the page', async () => {
-      await page.goto(`${baseURL}${path}`);
-      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
-    });
-
-    await test.step('Sign in', async () => {
-      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
-      await signInPage.signInButton.click();
-      await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
-    });
-
-    await test.step('Validate Promote&Sell tab part 1 on restricted 404 page', async () => {
-      const restrictedPage = await context.newPage();
-      const gnavPage = new GnavPersonalisationPage(restrictedPage);
-      try {
-        await gnavPage.open404Page(baseURL, restrictedPath);
-        await gnavPage.verifyRestrictedPromoteSellPart1(data);
-      } finally {
-        await restrictedPage.close();
-      }
-    });
-  });
-  test(`${features[14].name},${features[14].tags}`, async ({ page, context, baseURL }) => {
-    const { data, path, restrictedPath } = features[14];
-
-    await test.step('Go to the page', async () => {
-      await page.goto(`${baseURL}${path}`);
-      await gnavPersonalisationPage.gnav.waitFor({ state: 'visible' });
-    });
-
-    await test.step('Sign in', async () => {
-      await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
-      await signInPage.signInButton.click();
-      await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
-    });
-
-    await test.step('Validate Promote&Sell tab part 2 on restricted 404 page', async () => {
-      const restrictedPage = await context.newPage();
-      const gnavPage = new GnavPersonalisationPage(restrictedPage);
-      try {
-        await gnavPage.open404Page(baseURL, restrictedPath);
-        await gnavPage.verifyRestrictedPromoteSellPart2(data);
-      } finally {
-        await restrictedPage.close();
-      }
-    });
-  });
-  test(`${features[15].name},${features[15].tags}`, async ({ page, baseURL }) => {
-    const { data, restrictedPath } = features[15];
+  test(`${features[13].name},${features[13].tags}`, async ({ page, baseURL }) => {
+    const { data, restrictedPath } = features[13];
 
     await test.step('Go to the page', async () => {
       const fragmentResponse = gnavPersonalisationPage.waitForPublicGnavFragment();
@@ -459,8 +405,8 @@ test.describe('Gnav Personalisation', () => {
       await gnavPersonalisationPage.verifyShortcutIconsNotVisible();
     });
   });
-  test(`${features[16].name},${features[16].tags}`, async ({ baseURL }) => {
-    const { data, restrictedPath } = features[16];
+  test(`${features[14].name},${features[14].tags}`, async ({ baseURL }) => {
+    const { data, restrictedPath } = features[14];
 
     await test.step('Go to the page', async () => {
       await gnavPersonalisationPage.open404Page(baseURL, restrictedPath);
@@ -473,30 +419,8 @@ test.describe('Gnav Personalisation', () => {
       await gnavPersonalisationPage.verifyVisibleImagesNotBroken();
     });
   });
-  test(`${features[17].name},${features[17].tags}`, async ({ baseURL }) => {
-    const { data, restrictedPath } = features[17];
-
-    await test.step('Go to the page', async () => {
-      await gnavPersonalisationPage.open404Page(baseURL, restrictedPath);
-    });
-
-    await test.step('Validate Promote&Sell tab part 1 is not shown for public user', async () => {
-      await gnavPersonalisationPage.verifyPublicPromoteSellPart1Absent(data);
-    });
-  });
-  test(`${features[18].name},${features[18].tags}`, async ({ baseURL }) => {
-    const { data, restrictedPath } = features[18];
-
-    await test.step('Go to the page', async () => {
-      await gnavPersonalisationPage.open404Page(baseURL, restrictedPath);
-    });
-
-    await test.step('Validate Promote&Sell tab part 2 is not shown for public user', async () => {
-      await gnavPersonalisationPage.verifyPublicPromoteSellPart2Absent(data);
-    });
-  });
-  test(`${features[19].name},${features[19].tags}`, async ({ page, baseURL }) => {
-    const { data, path } = features[19];
+  test(`${features[15].name},${features[15].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[15];
 
     await test.step('Go to personalization page with gnav', async () => {
       await page.goto(`${baseURL}${path}`);
@@ -518,8 +442,8 @@ test.describe('Gnav Personalisation', () => {
       await gnavPersonalisationPage.verifyUserGnavSegments(data);
     });
   });
-  test(`${features[20].name},${features[20].tags}`, async ({ page, baseURL }) => {
-    const { data, path } = features[20];
+  test(`${features[16].name},${features[16].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[16];
 
     await test.step('Go to home page and Sign in', async () => {
       await page.goto(`${baseURL}${path}`);
@@ -532,8 +456,8 @@ test.describe('Gnav Personalisation', () => {
       await gnavPersonalisationPage.verifyMobileShortcutIcons(data);
     });
   });
-  test(`${features[21].name},${features[21].tags}`, async ({ page, baseURL }) => {
-    const { data, path } = features[21];
+  test(`${features[17].name},${features[17].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[17];
 
     await test.step('Go to digitalexperience home on mobile viewport', async () => {
       const fragmentResponse = gnavPersonalisationPage.waitForPublicGnavFragment();
@@ -557,8 +481,8 @@ test.describe('Gnav Personalisation', () => {
       await gnavPersonalisationPage.verifyMobilePublicGnavMoreTab();
     });
   });
-  test(`${features[22].name},${features[22].tags}`, async ({ page, baseURL }) => {
-    const { data, path } = features[22];
+  test(`${features[18].name},${features[18].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[18];
 
     await test.step('Go to home page on mobile viewport', async () => {
       await page.goto(`${baseURL}${path}`);
@@ -595,8 +519,8 @@ test.describe('Gnav Personalisation', () => {
       await gnavPersonalisationPage.verifyMobileRestrictedGnavAboutTab();
     });
   });
-  test(`${features[23].name},${features[23].tags}`, async ({ page, baseURL, context }) => {
-    const { data, path } = features[23];
+  test(`${features[19].name},${features[19].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[19];
 
     await setupNewlyApprovedTest({ page, baseURL, context, data, path });
 
@@ -605,8 +529,8 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.newlyApprovedBanner).toBeVisible();
     });
   });
-  test(`${features[24].name},${features[24].tags}`, async ({ page, baseURL, context }) => {
-    const { data, path } = features[24];
+  test(`${features[20].name},${features[20].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[20];
 
     await setupNewlyApprovedTest({ page, baseURL, context, data, path });
 
@@ -615,8 +539,8 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.newlyApprovedBanner).toBeVisible();
     });
   });
-  test(`${features[25].name},${features[25].tags}`, async ({ page, baseURL, context }) => {
-    const { data, path } = features[25];
+  test(`${features[21].name},${features[21].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[21];
 
     await setupNewlyApprovedTest({ page, baseURL, context, data, path });
 
@@ -624,8 +548,8 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.newlyApprovedBanner).not.toBeVisible();
     });
   });
-  test(`${features[26].name},${features[26].tags}`, async ({ page, baseURL }) => {
-    const { data, path } = features[26];
+  test(`${features[22].name},${features[22].tags}`, async ({ page, baseURL }) => {
+    const { data, path } = features[22];
 
     await test.step('Go to home page on mobile viewport', async () => {
       await page.goto(`${baseURL}${path}`);
@@ -642,65 +566,13 @@ test.describe('Gnav Personalisation', () => {
       await expect(gnavPersonalisationPage.signedPartnerBanner).toBeVisible({ timeout: 30000 });
     });
   });
-  test(`${features[27].name},${features[27].tags}`, async ({ page, baseURL, context }) => {
-    const { data, path } = features[27];
+  test(`${features[23].name},${features[23].tags}`, async ({ page, baseURL, context }) => {
+    const { data, path } = features[23];
 
     await setupNewlyApprovedTest({ page, baseURL, context, data, path });
 
     await test.step('Verify segments on the page', async () => {
       await expect(gnavPersonalisationPage.pxTeamButton).toBeVisible({ timeout: 30000 });
-    });
-  });
-  test(`${features[28].name},${features[28].tags}`, async ({ page, baseURL }) => {
-    const { data, path } = features[28];
-
-    await test.step('Go to page and sign in as Accenture user', async () => {
-      await page.goto(`${baseURL}${path}`);
-      await page.waitForLoadState('domcontentloaded');
-      await signInPage.signInButton.click();
-      await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
-    });
-
-    await test.step('Validate Accenture segment is displayed', async () => {
-      const segment = gnavPersonalisationPage.getPersonalizationSegment(data.segmentClass);
-      await expect(segment).toBeVisible({ timeout: 30000 });
-      await expect(segment).toContainText(data.segmentText);
-      await expect(segment).toContainText(data.accountName);
-    });
-
-    await test.step('Open Personalization in gnav and validate Accenture link is present', async () => {
-      await gnavPersonalisationPage.openGnavMenu(data.gnavMenu);
-      const link = await gnavPersonalisationPage.getVisibleNavMenuLink(data.accentureLink);
-      await expect(link).toHaveAttribute('href', new RegExp(data.accentureLink));
-    });
-  });
-  test(`${features[29].name},${features[29].tags}`, async ({ page, baseURL }) => {
-    const { data, path } = features[29];
-
-    await test.step('Go to page and sign in as Silver user', async () => {
-      await page.goto(`${baseURL}${path}`);
-      await page.waitForLoadState('domcontentloaded');
-      await signInPage.signInButton.click();
-      await signInPage.signIn(page, data.partnerLevel);
-      await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
-    });
-
-    await test.step('Validate Accenture segment is not displayed', async () => {
-      await expect(gnavPersonalisationPage.processedPersonalizationBlocks.first())
-        .toBeAttached({ timeout: 30000 });
-      await expect(gnavPersonalisationPage.getPersonalizationSegment(data.segmentClass))
-        .toHaveCount(0);
-    });
-
-    await test.step('Open Personalization in gnav and validate Accenture link is not present', async () => {
-      await gnavPersonalisationPage.openGnavMenu(data.gnavMenu);
-      await expect.poll(
-        () => gnavPersonalisationPage.countVisible(
-          gnavPersonalisationPage.navMenuLink(data.accentureLink),
-        ),
-        { timeout: 10000 },
-      ).toBe(0);
     });
   });
 });

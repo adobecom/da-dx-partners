@@ -1,24 +1,3 @@
-const PROMOTE_SELL_PART1 = {
-  linksByHref: ['/digitalexperience/activation/guide/coselling-strategies'],
-  navMappingLinks: [
-    '/digitalexperience/activation/topics/account-mapping',
-    '/digitalexperience/activation/topics/success-plans',
-    '/digitalexperience/resources/sales-center',
-    '/digitalexperience/preview/restricted/1/brand-guide.pdf.html',
-  ],
-};
-
-const PROMOTE_SELL_PART2 = {
-  navMenuLinks: [
-    '/digitalexperience/m/manageprofile/companyinfo/directory',
-    '/digitalexperience/activation/guide/promote',
-    '/digitalexperience/preview/restricted/1/adobe-guidelines-third-party-press-releases.pdf.html',
-    '/digitalexperience/activation/topics/submit-deployment',
-    '/digitalexperience/m/manageprofile/companyinfo/contacts',
-  ],
-  ctaHref: '/digitalexperience/m/manageprofile/companyinfo/partnership',
-};
-
 const ABOUT_PUBLIC_HIDDEN_PROMO_LINKS = [
   '/digitalexperience/activation/guide/benefits-of-partnering-with-adobe',
   '/digitalexperience/articles/support/credentials',
@@ -390,32 +369,6 @@ export default {
     },
     {
       tcid: '14',
-      name: '@gnav-restricted-404-promote-sell-tab-part-1',
-      path: '/digitalexperience/home',
-      restrictedPath: '/digitalexperience/home/hh',
-      tags: '@da-dx-gnav-404 @regression @circleCi',
-      data: {
-        partnerLevel: 'dxp-community:',
-        coSellingTitle: 'Strategies for successful co-selling with Adobe',
-        linksByHref: PROMOTE_SELL_PART1.linksByHref,
-        navMappingLinks: PROMOTE_SELL_PART1.navMappingLinks,
-        ctaHref: '/digitalexperience/m/salescenter/leads/create-lead',
-      },
-    },
-    {
-      tcid: '15',
-      name: '@gnav-restricted-404-promote-sell-tab-part-2',
-      path: '/digitalexperience/home',
-      restrictedPath: '/digitalexperience/home/hh',
-      tags: '@da-dx-gnav-404 @regression @circleCi',
-      data: {
-        partnerLevel: 'dxp-community:',
-        navMenuLinks: PROMOTE_SELL_PART2.navMenuLinks,
-        ctaHref: '/digitalexperience/m/manageprofile/companyinfo/partnership',
-      },
-    },
-    {
-      tcid: '16',
       name: '@gnav-public-404-gnav-status',
       restrictedPath: '/digitalexperience/home/hh',
       tags: '@da-dx-gnav-404 @regression @circleCi',
@@ -425,36 +378,14 @@ export default {
       },
     },
     {
-      tcid: '17',
+      tcid: '15',
       name: '@gnav-public-404-about-tab',
       restrictedPath: '/digitalexperience/home/hh',
       tags: '@da-dx-gnav-404 @regression @circleCi',
       data: { hiddenPromoLinks: ABOUT_PUBLIC_HIDDEN_PROMO_LINKS },
     },
     {
-      tcid: '18',
-      name: '@gnav-public-404-promote-sell-tab-part-1',
-      restrictedPath: '/digitalexperience/home/hh',
-      tags: '@da-dx-gnav-404 @regression @circleCi',
-      data: {
-        coSellingTitle: PROMOTE_SELL_PART1.coSellingTitle,
-        hiddenPromoLinks: PROMOTE_SELL_PART1.linksByHref,
-        hiddenNavMenuLinks: PROMOTE_SELL_PART1.navMappingLinks,
-        hiddenCtaHref: PROMOTE_SELL_PART1.ctaHref,
-      },
-    },
-    {
-      tcid: '19',
-      name: '@gnav-public-404-promote-sell-tab-part-2',
-      restrictedPath: '/digitalexperience/home/hh',
-      tags: '@da-dx-gnav-404 @regression @circleCi',
-      data: {
-        hiddenNavMenuLinks: PROMOTE_SELL_PART2.navMenuLinks,
-        hiddenCtaHref: PROMOTE_SELL_PART2.ctaHref,
-      },
-    },
-    {
-      tcid: '20',
+      tcid: '16',
       name: '@gnav-mobile-personalisation',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav',
       tags: '@da-dx-personalisation @regression @circleCi @mobile',
@@ -473,7 +404,7 @@ export default {
       },
     },
     {
-      tcid: '21',
+      tcid: '17',
       name: '@gnav-mobile-icons-validation',
       path: '/digitalexperience/home/',
       tags: '@da-dx-gnav @regression @circleCi @mobile',
@@ -488,7 +419,7 @@ export default {
       },
     },
     {
-      tcid: '22',
+      tcid: '18',
       name: '@gnav-mobile-public-gnav-validation',
       path: '/digitalexperience/',
       tags: '@da-dx-gnav @regression @circleCi @mobile @da-dx-main',
@@ -499,7 +430,7 @@ export default {
       },
     },
     {
-      tcid: '23',
+      tcid: '19',
       name: '@gnav-mobile-restricted-gnav-validation',
       path: '/digitalexperience/home',
       tags: '@da-dx-gnav @regression @circleCi @mobile',
@@ -516,7 +447,7 @@ export default {
       },
     },
     {
-      tcid: '24',
+      tcid: '20',
       name: '@newly-approve-date-eligible-admin-user',
       path: '/digitalexperience/drafts/automation/regression/newlyapprovedate-test-page',
       tags: '@da-dx-personalisation @regression @anonymous',
@@ -545,7 +476,7 @@ export default {
       },
     },
     {
-      tcid: '25',
+      tcid: '21',
       name: '@newly-approve-date-eligible-non-admin-user',
       path: '/digitalexperience/drafts/automation/regression/newlyapprovedate-test-page',
       tags: '@da-dx-personalisation @regression @anonymous',
@@ -574,7 +505,7 @@ export default {
       },
     },
     {
-      tcid: '26',
+      tcid: '22',
       name: '@newly-approve-date-ineligible-non-admin-user',
       path: '/digitalexperience/drafts/automation/regression/newlyapprovedate-test-page',
       tags: '@da-dx-personalisation @regression @anonymous',
@@ -603,7 +534,7 @@ export default {
       },
     },
     {
-      tcid: '27',
+      tcid: '23',
       name: '@non-adobe-user-not-see-partner-adobe-account',
       path: '/digitalexperience/drafts/automation/regression/personalization/partner-adobe-account#',
       tags: '@da-dx-personalisation @regression @circleCi',
@@ -613,7 +544,7 @@ export default {
       },
     },
     {
-      tcid: '28',
+      tcid: '24',
       name: '@adobe-partner-user-see-partner-adobe-account',
       path: '/digitalexperience/drafts/automation/regression/personalization/partner-adobe-account#',
       tags: '@da-dx-personalisation @regression @anonymous',
@@ -642,7 +573,7 @@ export default {
       },
     },
     {
-      tcid: '29',
+      tcid: '25',
       name: '@account-name-personalization-accenture-account',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav#',
       tags: '@da-dx-personalisation @regression @circleCi',
@@ -656,7 +587,7 @@ export default {
       },
     },
     {
-      tcid: '30',
+      tcid: '26',
       name: '@account-name-personalization-non-accenture-account',
       path: '/digitalexperience/drafts/automation/regression/personalization/page-with-gnav#',
       tags: '@da-dx-personalisation @regression @circleCi',

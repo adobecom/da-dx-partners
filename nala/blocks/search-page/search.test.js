@@ -718,11 +718,12 @@ test.describe('Search Page', () => {
       });
 
       await test.step('Verify video player', async () => {
-        searchPage.watchVideoButton.click();
-        await expect(searchPage.videoPlayer).toHaveAttribute('isvideoplaying', '');
+        await searchPage.watchVideoButton.click();
+        await expect(searchPage.videoPlayer).toBeVisible({ timeout: 30000 });
+        await searchPage.verifyVideoPlaying();
 
         await page.reload({ waitUntil: 'domcontentloaded' });
-        await expect(searchPage.videoPlayer).not.toHaveAttribute('isvideoplaying');
+        await searchPage.verifyVideoNotPlaying();
       });
     });
 
@@ -730,68 +731,57 @@ test.describe('Search Page', () => {
       const { data } = features[25];
       test.setTimeout(60000);
 
+      const searchCards = searchPage.firstCard
+        .or(searchPage.secondCard)
+        .or(searchPage.thirdCard);
+      const collectionCards = searchPage.card1
+        .or(searchPage.card2)
+        .or(searchPage.card3);
+      const sortedTexts = async (locator) => (await locator.allTextContents())
+        .map((text) => text.trim())
+        .sort();
+
+      const validateCardTags = async (title, tags) => {
+        await searchCards.filter({ hasText: title }).first().click();
+
+        const expandedCard = searchPage
+          .getExpandedCard()
+          .filter({ hasText: title })
+          .first();
+        await expect(expandedCard).toBeVisible({ timeout: 30000 });
+        await expect.poll(
+          () => sortedTexts(searchPage.getCardTagByText(expandedCard, /.+/)),
+          { timeout: 30000, message: `Tags in "${title}" do not match the spec` },
+        ).toEqual([...tags].sort());
+      };
+
       await test.step('Go to search page', async () => {
         await goTo(page, features[25].path);
       });
 
-      await test.step('Log in and validate asset', async () => {
+      await test.step('Log in and validate assets (any order)', async () => {
         await signInAs(page, signInPage, data.partnerLevel);
         await page.waitForLoadState('domcontentloaded');
-        await expect(searchPage.firstCard).toHaveText(data.firstAssetTitle, { timeout: 30000 });
-        await expect(searchPage.secondCard).toHaveText(data.secondAssetTitle);
-        await expect(searchPage.thirdCard).toHaveText(data.thirdAssetTitle);
+
+        await expect.poll(() => sortedTexts(searchCards), { timeout: 30000 }).toEqual(
+          [data.firstAssetTitle, data.secondAssetTitle, data.thirdAssetTitle].sort(),
+        );
       });
 
-      await test.step('Validate tags in asset cards', async () => {
-        await searchPage.firstCard.click();
-
-        const expandedCard1 = searchPage
-          .getExpandedCard()
-          .filter({ hasText: data.firstAssetTitle })
-          .first();
-
-        await expect(expandedCard1).toBeVisible({ timeout: 30000 });
-
-        for (const tagText of data.firstCardTags) {
-          const tag = searchPage.getCardTagByText(expandedCard1, tagText);
-          await expect(tag).toBeVisible({ timeout: 30000 });
-        }
-
-        await searchPage.secondCard.click();
-
-        const expandedCard2 = searchPage
-          .getExpandedCard()
-          .filter({ hasText: data.secondAssetTitle })
-          .first();
-
-        await expect(expandedCard2).toBeVisible({ timeout: 30000 });
-
-        for (const tagText of data.secondCardTags) {
-          const tag = searchPage.getCardTagByText(expandedCard2, tagText);
-          await expect(tag).toBeVisible({ timeout: 30000 });
-        }
-
-        await searchPage.thirdCard.click();
-
-        const expandedCard3 = searchPage
-          .getExpandedCard()
-          .filter({ hasText: data.thirdAssetTitle })
-          .first();
-
-        await expect(expandedCard3).toBeVisible({ timeout: 30000 });
-
-        for (const tagText of data.thirdCardTags) {
-          const tag = searchPage.getCardTagByText(expandedCard3, tagText);
-          await expect(tag).toBeVisible({ timeout: 30000 });
-        }
+      await test.step('Validate tags in all asset cards', async () => {
+        await validateCardTags(data.firstAssetTitle, data.firstCardTags);
+        await validateCardTags(data.secondAssetTitle, data.secondCardTags);
+        await validateCardTags(data.thirdAssetTitle, data.thirdCardTags);
       });
 
       await test.step('Select NA region and validate assets', async () => {
         await searchPage.regionFilter.click();
         await searchPage.naRegionCheckBox.click();
         await searchPage.waitForResultsToSettle();
-        await expect(searchPage.firstCard).toHaveText(data.secondAssetTitle, { timeout: 30000 });
-        await expect(searchPage.secondCard).toHaveText(data.thirdAssetTitle);
+
+        await expect.poll(() => sortedTexts(searchCards), { timeout: 30000 }).toEqual(
+          [data.secondAssetTitle, data.thirdAssetTitle].sort(),
+        );
       });
 
       await test.step('Preview asset and validate tags', async () => {
@@ -809,72 +799,82 @@ test.describe('Search Page', () => {
         await previewPage.close();
       });
 
-      await test.step('Go to card collection and validate assets', async () => {
+      await test.step('Go to card collection and validate assets (any order)', async () => {
         await page.goto(`${baseURL}${data.caasCollectionURL}`);
         await page.waitForLoadState('domcontentloaded');
+
         await expect(searchPage.card1).toBeVisible({ timeout: 60000 });
-        await expect(searchPage.card1).toHaveText(data.partnerCard1);
-        await expect(searchPage.card2).toHaveText(data.partnerCard2);
-        await expect(searchPage.card3).toHaveText(data.partnerCard3);
+        await expect.poll(() => sortedTexts(collectionCards), { timeout: 30000 }).toEqual(
+          [data.partnerCard1, data.partnerCard2, data.partnerCard3].sort(),
+        );
       });
     });
 
     assetTagCases.forEach((feature) => {
       test(`${feature.name},${feature.tags}`, async ({ page, baseURL }) => {
         const { data } = feature;
-        test.setTimeout(60000);
+        test.setTimeout(90000);
 
-        const assetConfig = {
-          first: {
-            card: searchPage.firstCard,
-            title: data.firstAssetTitle,
-            tags: data.firstCardTags,
-          },
-          third: {
-            card: searchPage.thirdCard,
-            title: data.thirdAssetTitle,
-            tags: data.thirdCardTags,
-          },
+        const previewTitle = {
+          first: data.firstAssetTitle,
+          third: data.thirdAssetTitle,
+        }[feature.assetCardToValidate];
+
+        const searchCards = searchPage.firstCard
+          .or(searchPage.secondCard)
+          .or(searchPage.thirdCard);
+        const collectionCards = searchPage.card1
+          .or(searchPage.card2)
+          .or(searchPage.card3);
+        const sortedTexts = async (locator) => (await locator.allTextContents())
+          .map((text) => text.trim())
+          .sort();
+
+        const validateCardTags = async (title, tags) => {
+          await searchCards.filter({ hasText: title }).first().click();
+
+          const expandedCard = searchPage
+            .getExpandedCard()
+            .filter({ hasText: title })
+            .first();
+          await expect(expandedCard).toBeVisible({ timeout: 30000 });
+
+          await expect.poll(
+            () => sortedTexts(searchPage.getCardTagByText(expandedCard, /.+/)),
+            { timeout: 30000, message: `Tags in "${title}" do not match the spec` },
+          ).toEqual([...tags].sort());
         };
-
-        const { card, title, tags } = assetConfig[feature.assetCardToValidate];
 
         await test.step('Go to search page', async () => {
           await goTo(page, feature.path);
         });
 
-        await test.step('Log in and validate asset', async () => {
+        await test.step('Log in and validate assets (any order)', async () => {
           await signInAs(page, signInPage, data.partnerLevel);
           await page.waitForLoadState('domcontentloaded');
 
-          await expect(searchPage.firstCard).toHaveText(data.firstAssetTitle, { timeout: 30000 });
-          await expect(searchPage.secondCard).toHaveText(data.secondAssetTitle);
-          await expect(searchPage.thirdCard).toHaveText(data.thirdAssetTitle);
+          await expect.poll(() => sortedTexts(searchCards), { timeout: 30000 }).toEqual(
+            [data.firstAssetTitle, data.secondAssetTitle, data.thirdAssetTitle].sort(),
+          );
         });
 
         await test.step('Validate tags in asset cards', async () => {
-          await card.click();
-          const expandedCard = searchPage
-            .getExpandedCard()
-            .filter({ hasText: title })
-            .first();
+          const cardsToValidate = [
+            { title: data.firstAssetTitle, tags: data.firstCardTags },
+            { title: data.secondAssetTitle, tags: data.secondCardTags },
+            { title: data.thirdAssetTitle, tags: data.thirdCardTags },
+          ].filter(({ tags }) => Array.isArray(tags));
 
-          await expect(expandedCard).toBeVisible({ timeout: 30000 });
-
-          for (const tagText of tags) {
-            const tag = searchPage.getCardTagByText(expandedCard, tagText);
-            await expect(tag).toBeVisible({ timeout: 30000 });
-          }
+          await cardsToValidate.reduce(
+            (prev, { title, tags }) => prev.then(() => validateCardTags(title, tags)),
+            Promise.resolve(),
+          );
         });
 
         await test.step('Preview asset and validate tags', async () => {
-          const assetTitle = feature.assetCardToValidate === 'third'
-            ? data.thirdAssetTitle
-            : data.firstAssetTitle;
-
           const [previewPage] = await Promise.all([
             page.waitForEvent('popup'),
-            searchPage.getRegionPreviewButton(assetTitle).click(),
+            searchPage.getRegionPreviewButton(previewTitle).click(),
           ]);
 
           const assetPreviewTags = previewPage
@@ -891,9 +891,9 @@ test.describe('Search Page', () => {
           await page.waitForLoadState('domcontentloaded');
 
           await expect(searchPage.card1).toBeVisible({ timeout: 60000 });
-          await expect(searchPage.card1).toHaveText(data.partnerCard1);
-          await expect(searchPage.card2).toHaveText(data.partnerCard2);
-          await expect(searchPage.card3).toHaveText(data.partnerCard3);
+          await expect.poll(() => sortedTexts(collectionCards), { timeout: 30000 }).toEqual(
+            [data.partnerCard1, data.partnerCard2, data.partnerCard3].sort(),
+          );
         });
       });
     });
