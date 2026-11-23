@@ -1397,6 +1397,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     expect(slider.hidden).to.be.false;
     expect(slider.value).to.equal('0');
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('0%');
+    expect(slider.style.getPropertyValue('--volume-ratio').trim()).to.equal('0');
     expect(button.querySelector('img').getAttribute('src')).to.contain('/eds/img/icons/player-muted.svg');
 
     slider.value = '0.4';
@@ -1405,6 +1406,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     expect(media.volume).to.equal(0.4);
     expect(media.muted).to.be.false;
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('40%');
+    expect(slider.style.getPropertyValue('--volume-ratio').trim()).to.equal('0.4');
     expect(button.querySelector('img').getAttribute('src')).to.contain('/eds/img/icons/player-volume.svg');
 
     button.click();
@@ -1420,6 +1422,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     await player.updateComplete;
     expect(slider.value).to.equal('0.8');
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('80%');
+    expect(slider.style.getPropertyValue('--volume-ratio').trim()).to.equal('0.8');
 
     slider.value = '0';
     slider.dispatchEvent(new Event('input'));
@@ -1434,6 +1437,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     styles.textContent = css.replaceAll('::-webkit-slider-thumb', '[data-test-webkit-thumb]')
       .replaceAll('::-moz-range-thumb', '[data-test-moz-thumb]')
       .replaceAll(':hover', '[data-test-hover]')
+      .replaceAll(':active', '[data-test-active]')
       .replaceAll(':focus-visible', '[data-test-focus-visible]');
     const player = makeInstance();
     player.volumeExpanded = true;
@@ -1442,31 +1446,39 @@ describe('AssetVideoPlayer - custom video controls', () => {
     const control = player.querySelector('.player-volume');
     const button = control.querySelector('button');
     const slider = control.querySelector('input');
+    slider.style.transition = 'none';
 
     expect(getComputedStyle(slider).appearance).to.equal('none');
     expect(getComputedStyle(slider).height).to.equal('2px');
     const sliderStyle = getComputedStyle(slider);
     expect(Number.parseFloat(sliderStyle.width)
       - Number.parseFloat(sliderStyle.getPropertyValue('--volume-thumb-size'))).to.equal(54);
-    expect(getComputedStyle(control).getPropertyValue('--video-player-controls-background').trim())
-      .to.equal('26 5 39');
     const rules = [...styles.sheet.cssRules];
     ['webkit', 'moz'].forEach((engine) => {
-      const hoverColor = engine === 'webkit' ? 'rgb(41, 41, 41)' : 'rgb(80, 80, 80)';
+      const hoverColor = 'rgb(41, 41, 41)';
       const selector = `asset-video-player .player-volume input[data-test-${engine}-thumb]`;
       const thumb = rules.find((rule) => rule.selectorText === selector);
       const hoveredThumb = rules.find((rule) => rule.selectorText === `${selector}[data-test-hover]`);
-      expect(thumb.style.background).to.equal('rgb(var(--video-player-controls-background))');
+      expect(thumb.style.background).to.equal('transparent');
       expect(hoveredThumb.style.borderColor).to.equal(hoverColor);
       slider.setAttribute(`data-test-${engine}-thumb`, '');
-      expect(getComputedStyle(slider).backgroundColor).to.equal('rgb(26, 5, 39)');
+      expect(getComputedStyle(slider).backgroundColor).to.equal('rgba(0, 0, 0, 0)');
       expect(getComputedStyle(slider).borderTopColor).to.equal('rgb(255, 255, 255)');
-      expect(getComputedStyle(slider).boxShadow).to.equal('rgb(26, 5, 39) 0px 0px 0px 4px');
+      expect(getComputedStyle(slider).boxShadow).to.equal('none');
       slider.setAttribute('data-test-hover', '');
-      expect(getComputedStyle(slider).backgroundColor).to.equal('rgb(26, 5, 39)');
+      expect(getComputedStyle(slider).backgroundColor).to.equal('rgba(0, 0, 0, 0)');
       expect(getComputedStyle(slider).borderTopColor).to.equal(hoverColor);
-      expect(getComputedStyle(slider).boxShadow).to.equal('rgb(26, 5, 39) 0px 0px 0px 4px');
+      expect(getComputedStyle(slider).boxShadow).to.equal('none');
+      expect(getComputedStyle(slider).borderTopWidth).to.equal('2px');
+      slider.setAttribute('data-test-active', '');
+      expect(getComputedStyle(slider).backgroundColor).to.equal('rgba(0, 0, 0, 0)');
+      expect(getComputedStyle(slider).borderTopColor).to.equal(hoverColor);
+      expect(getComputedStyle(slider).borderTopWidth).to.equal('6px');
+      slider.removeAttribute('data-test-active');
+      expect(getComputedStyle(slider).borderTopColor).to.equal(hoverColor);
+      expect(getComputedStyle(slider).borderTopWidth).to.equal('2px');
       slider.removeAttribute('data-test-hover');
+      expect(getComputedStyle(slider).borderTopColor).to.equal('rgb(255, 255, 255)');
       slider.removeAttribute(`data-test-${engine}-thumb`);
     });
 

@@ -689,7 +689,7 @@ export default class AssetVideoPlayer extends LitElement {
               <input type="range" min="0" max="1" step="0.01"
                 ?hidden="${!this.volumeExpanded}"
                 .value="${String(this.videoMuted ? 0 : this.videoVolume)}"
-                style="--volume: ${(this.videoMuted ? 0 : this.videoVolume) * 100}%"
+                style="--volume: ${(this.videoMuted ? 0 : this.videoVolume) * 100}%; --volume-ratio: ${this.videoMuted ? 0 : this.videoVolume}"
                 @input="${(event) => {
                   const video = this._video;
                   if (!video) return;
