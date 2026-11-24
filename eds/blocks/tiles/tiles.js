@@ -72,9 +72,11 @@ export async function handleUserAction(cardId, action, deps = {}) {
   // on first user action (if there is no firstAction in the state) set the date
   const firstUserAction = !hasFirstAction('firstAction');
   const stateUpdates = { completedCards: nextCompletedCardIds };
+  const now = new Date().toISOString();
   if (firstUserAction) {
-    stateUpdates.firstAction = new Date().toISOString();
+    stateUpdates.firstAction = now;
   }
+  stateUpdates.lastAction = now;
   try {
     const result = await updateState(stateUpdates);
     if (!result?.success) return false;
@@ -122,7 +124,7 @@ export default async function init(el, deps = {}) {
     const blockData = { localizedText };
     const app = document.createElement('journey-cards');
     app.blockData = blockData;
-    app.className = 'tiles-block';
+    app.className = 'journey-board-block';
     app.toDoCards = toDoCards;
     app.completedCards = completedCards;
     app.segment = segment;
