@@ -20,15 +20,21 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   feedbackButton.classList.add('hidden');
   const feedbackDialog = document.createElement('div');
   feedbackDialog.className = 'feedback-dialog';
+  feedbackDialog.setAttribute('role', 'dialog');
+  feedbackDialog.setAttribute('aria-labelledby', 'feedback-title');
+  feedbackDialog.setAttribute('aria-describedby', 'feedback-description');
+  feedbackDialog.setAttribute('tabindex', '-1');
   feedbackDialog.setAttribute('daa-lh', 'Feedback Dialog');
   const dialogBody = document.createElement('div');
   dialogBody.className = 'feedback-dialog-body';
   const title = document.createElement('h4');
+  title.id = 'feedback-title';
   title.className = 'feedback-title';
   title.textContent = config.dialogTitle;
   const divider = document.createElement('hr');
 
   const description = document.createElement('span');
+  description.id = 'feedback-description';
   description.className = 'feedback-description';
   description.textContent = config.dialogText;
 
@@ -162,6 +168,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   const closeDialog = () => {
     feedbackDialog.remove();
     feedbackButton.classList.remove('hidden');
+    feedbackButton.focus();
   };
   const close = () => {
     config.savedRating = selectedRating;
@@ -170,6 +177,13 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
     closeDialog();
   };
   cancelButton.addEventListener('click', close);
+  feedbackDialog.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+    }
+  });
   feedbackDialog.addEventListener('click', (e) => {
     if (e.target === feedbackDialog) {
       close();
@@ -264,6 +278,7 @@ async function renderDialog(feedbackButton, formDefinitionUrl, config) {
   feedbackDialog.appendChild(dialogBody);
   feedbackDialog.appendChild(buttonsContainer);
   document.body.appendChild(feedbackDialog);
+  feedbackDialog.focus();
 }
 
 export default async function init(el) {
@@ -345,6 +360,7 @@ export default async function init(el) {
   const stickyFeedbackButton = document.createElement('button');
   stickyFeedbackButton.className = 'sticky-feedback-button sticky-cta';
   stickyFeedbackButton.textContent = config.feedbackStickyButton;
+  stickyFeedbackButton.setAttribute('aria-haspopup', 'dialog');
   stickyFeedbackButton.setAttribute('daa-ll', processTrackingLabels(config.feedbackStickyButton, getConfig(), 30));
   app.appendChild(stickyFeedbackButton);
   stickyFeedbackButton.addEventListener('click', () => renderDialog(stickyFeedbackButton, url, config));
