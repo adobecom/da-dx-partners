@@ -13,10 +13,10 @@ import {
   hasPartnerUserStateProperty,
   partnerCookieContainsValue,
 } from '../../scripts/utils.js';
-import {DX_ACCESS_TYPE, DX_PROGRAM_TYPE} from '../utils/dxConstants.js';
+import { DX_ACCESS_TYPE, DX_PROGRAM_TYPE } from '../utils/dxConstants.js';
 import JourneyCards from './JourneyCards.js';
-import {getConfig, localizationPromises, populateLocalizedTextFromListItems} from '../utils/utils.js';
-import {updatePartnerUserState} from "../../scripts/partnerStateUtils.js";
+import { getConfig, localizationPromises, populateLocalizedTextFromListItems } from '../utils/utils.js';
+import { updatePartnerUserState } from '../../scripts/partnerStateUtils.js';
 
 const miloLibs = getLibs();
 const localizedText = {

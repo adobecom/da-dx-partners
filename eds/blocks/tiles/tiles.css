@@ -151,12 +151,6 @@
   flex-direction: row;
 }
 
-@container (min-width: 333px) {
-  .card-footer .action-area {
-    justify-content: end;
-  }
-}
-
 .journey-card .background {
   position: absolute;
   inset: 0;

@@ -10,7 +10,9 @@ import {
 
 // tiles.js (via JourneyCards.js) resolves miloLibs-relative imports at module
 // load time, so setLibs must run before the static import below executes.
-setLibs('/libs');
+const miloLibs = setLibs('/libs');
+const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
+setConfig({ locales: { '': { ietf: 'en-US' } }, miloLibs });
 const {
   getTilesSegment,
   handleUserAction,
@@ -33,7 +35,7 @@ describe('tiles block logic', () => {
   it('returns only the visible journey cards for the current path', () => {
     const cards = getCurrentJourneyToDoCards({
       segment: 'demo',
-      completedCardIds: [1],
+      completedCardIds: new Set([1]),
       maxCards: 9,
       paths: { demo: [{ id: 1, condition: null }, { id: 2, condition: null }, { id: 3, condition: null }] },
       cardDetails: {
@@ -101,6 +103,6 @@ describe('tiles block logic', () => {
     expect(app.toDoCards).to.deep.equal([{ id: 2, title: 'Visible card', description: 'Example' }]);
     expect(app.actionHandler).to.equal(handleUserAction);
     await app.updateComplete;
-    expect(app.shadowRoot.querySelector('.journey-card')).to.exist;
+    expect(app.querySelector('.journey-card')).to.exist;
   });
 });
