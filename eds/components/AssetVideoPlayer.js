@@ -742,7 +742,7 @@ export default class AssetVideoPlayer extends LitElement {
 
   renderChapters() {
     return this.chapters.map((chapter, index) => {
-      const [startTime, endTime] = chapter.timerange.split(' - ');
+      const startTime = this.getStartTime(chapter.timerange);
       const shareLabel = this.sharedChapterIndex === index ? 'Link copied' : 'Copy link to this chapter';
 
       /* eslint-disable indent */
@@ -753,7 +753,6 @@ export default class AssetVideoPlayer extends LitElement {
         >
           <div class="chapter-time">
             <span class="start-time">${this.formatTimecode(startTime)}</span>
-            <span class="duration-time">${this.formatTimecode(endTime)}</span>
 
             <div class="chapter-actions">
               <sp-action-button

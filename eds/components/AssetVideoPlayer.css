@@ -462,10 +462,6 @@ asset-video-player .chapter .chapter-time .start-time {
   font-weight: 700;
 }
 
-asset-video-player .chapter .chapter-time .duration-time {
-  margin-top: 8px;
-}
-
 asset-video-player .chapter .chapter-content {
   min-width: 0;
   width: calc(100% - 18px);
@@ -526,7 +522,7 @@ asset-video-player .chapter .chapter-actions {
   justify-content: center;
   width: 20px;
   height: 20px;
-  margin-top: 16px;
+  margin-top: 38px;
 }
 
 asset-video-player .chapter .share-button {

@@ -442,7 +442,7 @@ describe('AssetVideoPlayer - chapter progress', () => {
       const background = luminance(cardBackground === 'rgba(0, 0, 0, 0)'
         ? getComputedStyle(el.querySelector('.video-chapters')).backgroundColor
         : cardBackground);
-      ['.chapter-description', '.start-time', '.duration-time'].forEach((selector) => {
+      ['.chapter-description', '.start-time'].forEach((selector) => {
         const foreground = luminance(getComputedStyle(chapter.querySelector(selector)).color);
         const contrast = (Math.max(background, foreground) + 0.05)
           / (Math.min(background, foreground) + 0.05);
