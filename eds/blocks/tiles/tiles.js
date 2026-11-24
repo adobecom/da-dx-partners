@@ -1,22 +1,22 @@
 import {
   buildCompletedJourneyCardState,
+  getCompletedJourneyCardIds,
   getCurrentJourneyCompletedCards,
-  getCompletedJourneyCardIds, getJourneyPathForSegment,
-  getCurrentJourneyToDoCards, JOURNEY_PATHS,
+  getCurrentJourneyToDoCards,
+  getJourneyPathForSegment,
+  JOURNEY_PATHS,
   normalizeJourneyCardIds,
 } from './utils.js';
 import {
-  getCookieValue,
-  getCurrentProgramType,
+  getLibs,
   getPartnerCookieValue,
   hasPartnerUserStateProperty,
-  PARTNER_USER_STATE_COOKIE,
   partnerCookieContainsValue,
-  getLibs,
 } from '../../scripts/utils.js';
-import { DX_ACCESS_TYPE, DX_PROGRAM_TYPE } from '../utils/dxConstants.js';
+import {DX_ACCESS_TYPE, DX_PROGRAM_TYPE} from '../utils/dxConstants.js';
 import JourneyCards from './JourneyCards.js';
-import { getConfig, localizationPromises, populateLocalizedTextFromListItems } from '../utils/utils.js';
+import {getConfig, localizationPromises, populateLocalizedTextFromListItems} from '../utils/utils.js';
+import {updatePartnerUserState} from "../../scripts/partnerStateUtils.js";
 
 const miloLibs = getLibs();
 const localizedText = {
@@ -43,24 +43,12 @@ export function getTilesSegment() {
   return `${isAdmin ? 'admin' : 'user'}-${partnerLevel === 'community' ? 'community' : programType}`;
 }
 
-// TODO: local-testing only - writes the completed cards directly into the
-// partner_user_state cookie instead of calling the state-management API.
-// Replace with updatePartnerUserState from partnerStateUtils.js before merging.
-function updatePartnerUserStateCookie(stateUpdates) {
-  const programType = getCurrentProgramType().toUpperCase();
-  const existingCookie = getCookieValue(PARTNER_USER_STATE_COOKIE);
-  const stateByProgram = existingCookie ? JSON.parse(decodeURIComponent(existingCookie)) : {};
-  stateByProgram[programType] = { ...stateByProgram[programType], ...stateUpdates };
-  document.cookie = `${PARTNER_USER_STATE_COOKIE}=${encodeURIComponent(JSON.stringify(stateByProgram))}; Path=/`;
-  return { success: true };
-}
-
 export async function handleUserAction(cardId, action, deps = {}) {
   const {
     getCompletedCardIds = getCompletedJourneyCardIds,
     buildState = buildCompletedJourneyCardState,
     hasFirstAction = hasPartnerUserStateProperty,
-    updateState = updatePartnerUserStateCookie,
+    updateState = updatePartnerUserState,
   } = deps;
 
   const completedCardIds = getCompletedCardIds();
