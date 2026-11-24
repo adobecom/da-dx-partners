@@ -132,21 +132,25 @@ export default class JourneyCards extends LitElement {
         </div>
         <div class="card-footer">
           <div class="body-s action-area">
-            <em>
-              <a
-                href="${actionLink}"
-                target="_blank"
-                class="open-task-link con-button outline fill"
+            <sp-theme theme="spectrum" color="light" scale="medium">
+              <sp-button
+                class="open-task-link"
+                variant="primary"
+                size="m"
+                data-card-id="${card.id || ''}"
                 daa-ll="${processTrackingLabels(this.getButtonLabel('open', tab))}"
-              >${this.getButtonLabel('open', tab)}<img
-                  class="open-task-icon"
+                @click="${() => window.open(actionLink, '_blank', 'noopener')}"
+              >  <span class="btn-content">
+
+                ${this.getButtonLabel('open', tab)} <img
+                  class="journey-card-btn-icon open-task-icon"
                   src="/eds/img/icons/open-task-arrow.svg"
                   alt=""
                   aria-hidden="true"
-                  width="20"
-                  height="20"
-                /></a>
-            </em>
+                  width="14"
+                  height="14"
+                /></span></sp-button>
+            </sp-theme>
             ${tab === 0 && !card.neverCompletesCard ? html`
               <sp-theme theme="spectrum" color="light" scale="medium">
                 <sp-button
@@ -159,14 +163,15 @@ export default class JourneyCards extends LitElement {
                   aria-disabled="${state.disabled}"
                   daa-ll="${processTrackingLabels(this.getButtonLabel(state.action, tab))}"
                   @click="${(event) => this.handleToggle(card, event)}"
-                ><img
-                    class="journey-card-toggle-icon"
+                >  <span class="btn-content">
+                  <img
+                    class="journey-card-btn-icon"
                     src="${getToggleIconSrc(state.action)}"
                     alt=""
                     aria-hidden="true"
                     width="18"
                     height="18"
-                  /> ${this.getButtonLabel(state.action, tab)}</sp-button>
+                  /> ${this.getButtonLabel(state.action, tab)}</span></sp-button>
               </sp-theme>
             ` : ''}
           </div>

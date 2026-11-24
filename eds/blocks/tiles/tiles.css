@@ -98,9 +98,14 @@
   transform: rotate(-45deg);
 }
 
-.journey-card .journey-card-toggle-icon {
-  margin-inline-start: var(--spacing-xxs);
-  vertical-align: middle;
+.journey-card .btn-content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+}
+
+.journey-card .journey-card-btn-icon {
+  flex-shrink: 0;
 }
 
 .journey-card .foreground,
