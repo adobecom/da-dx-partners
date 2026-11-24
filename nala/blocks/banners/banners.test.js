@@ -7,7 +7,12 @@ let bannersPage;
 let signInPage;
 const { features } = banners;
 
-const mockProgress = async (page, type, appAssurancesPercentage = 100) => {
+const mockProgress = async (
+  page,
+  type,
+  appAssurancesPercentage = 100,
+  solutionPercentage = null,
+) => {
   await page.route('**/level-requirements**', async (route) => {
     const response = await route.fetch();
     const body = await response.json();
@@ -57,6 +62,17 @@ const mockProgress = async (page, type, appAssurancesPercentage = 100) => {
           }),
         }),
       })),
+
+      ...(type === 'technology' && solutionPercentage !== null && {
+        solution: body.solution.map((level) => ({
+          ...level,
+          specializations: {
+            ...level.specializations,
+            total: Math.floor((level.specializations.required * solutionPercentage) / 100),
+            percentage: solutionPercentage,
+          },
+        })),
+      }),
     };
 
     await route.fulfill({
@@ -313,6 +329,62 @@ test.describe('Validate banners block', () => {
 
     await test.step('Verify uplevel banner not visible on the page', async () => {
       await expect(bannersPage.uplevelBanner('gold')).not.toBeVisible();
+    });
+  });
+
+  [
+    { feature: features[9], userLabel: 'Gold', bannerLevel: 'gold' },
+    { feature: features[10], userLabel: 'Silver', bannerLevel: 'silver' },
+  ].forEach(({ feature, userLabel, bannerLevel }) => {
+    test(`${feature.name},${feature.tags}`, async ({ page }) => {
+      const { data, path } = feature;
+      let mockedBody;
+
+      await test.step('Mock level-requirements: technology complete except App Assurances, solution incomplete', async () => {
+        await mockProgress(
+          page,
+          data.mockType,
+          data.appAssurancesPercentage,
+          data.solutionPercentage,
+        );
+      });
+
+      await test.step('Go to uplevel banner test page', async () => {
+        await page.goto(path);
+        await signInPage.signInButton.waitFor({ state: 'visible', timeout: 30000 });
+        await signInPage.signInButton.click();
+      });
+
+      await test.step(`Sign in as ${userLabel} user`, async () => {
+        const levelRequirements = page.waitForResponse(
+          (res) => res.url().includes('level-requirements'),
+          { timeout: 60000 },
+        );
+        await signInPage.signIn(page, data.partnerLevel);
+        await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 30000 });
+        mockedBody = await (await levelRequirements).json();
+      });
+
+      await test.step('Verify Technology requirements are mocked correctly', async () => {
+        mockedBody.technology.forEach((level) => {
+          expect(level.customerDeployments.percentage).toBe(100);
+          expect(level.credentials.percentage).toBe(100);
+          expect(level.solutions.percentage).toBe(100);
+          if (level.appAssurances) {
+            expect(level.appAssurances.percentage).toBeLessThan(100);
+          }
+        });
+      });
+
+      await test.step('Verify Solution track is not fully complete', async () => {
+        mockedBody.solution.forEach((level) => {
+          expect(level.specializations.percentage).toBeLessThan(100);
+        });
+      });
+
+      await test.step('Verify uplevel banner not visible on the page', async () => {
+        await expect(bannersPage.uplevelBanner(bannerLevel)).not.toBeVisible();
+      });
     });
   });
 });
