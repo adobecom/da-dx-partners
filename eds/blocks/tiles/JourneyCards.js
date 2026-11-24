@@ -112,7 +112,6 @@ export default class JourneyCards extends LitElement {
     return html`
       <div
         class="journey-card ${state.recommended && !card.neverCompletesCard ? 'recommended' : ''} ${state.completed ? 'completed' : ''}"
-        data-card-id="${card.id || ''}"
         daa-lh="Journey card | ${card.id} | ${trackingTitle}"
       >
         <div class="foreground">
@@ -137,7 +136,6 @@ export default class JourneyCards extends LitElement {
                 class="open-task-link"
                 variant="primary"
                 size="m"
-                data-card-id="${card.id || ''}"
                 daa-ll="${processTrackingLabels(this.getButtonLabel('open', tab))}"
                 @click="${() => window.open(actionLink, '_blank', 'noopener')}"
               >  <span class="btn-content">
@@ -158,8 +156,6 @@ export default class JourneyCards extends LitElement {
                   variant="secondary"
                   size="m"
                   ?disabled="${state.disabled}"
-                  data-card-id="${card.id || ''}"
-                  data-action="${state.action}"
                   aria-disabled="${state.disabled}"
                   daa-ll="${processTrackingLabels(this.getButtonLabel(state.action, tab))}"
                   @click="${(event) => this.handleToggle(card, event)}"
@@ -213,7 +209,7 @@ export default class JourneyCards extends LitElement {
     this.completedCards,
     (card) => card.id,
     (card, index) => {
-      if (!card.neverCompletesCard) return this.renderCard(card, index, 1); 
+      if (!card.neverCompletesCard) return this.renderCard(card, index, 1);
       return undefined;
     },
   )}
