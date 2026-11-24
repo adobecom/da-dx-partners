@@ -182,9 +182,9 @@ export default class JourneyCards extends LitElement {
       <div class="journey-tabs">
           <sp-theme theme="spectrum" color="light" scale="medium">
             <sp-button-group>
-              <sp-button variant="${this.tab === 0 ? 'primary' : 'secondary'}" size="m" @click="${() => this.setTab(0)}" aria-label="${this.blockData.localizedText['{{to-do}}']}">
+              <sp-button daa-ll="Journey tab | to do"  variant="${this.tab === 0 ? 'primary' : 'secondary'}" size="m" class="journey-board-tab-btn" @click="${() => this.setTab(0)}" aria-label="${this.blockData.localizedText['{{to-do}}']}">
                 ${this.blockData.localizedText['{{to-do}}']}</sp-button>
-              <sp-button variant="${this.tab === 1 ? 'primary' : 'secondary'}" size="m" @click="${() => this.setTab(1)}" aria-label="${this.blockData.localizedText['{{completed}}']}">
+              <sp-button daa-ll="Journey tab | completed" variant="${this.tab === 1 ? 'primary' : 'secondary'}" size="m" class="journey-board-tab-btn" @click="${() => this.setTab(1)}" aria-label="${this.blockData.localizedText['{{completed}}']}">
                 ${this.blockData.localizedText['{{completed}}']} (${this.completedCards.filter((card) => !card.neverCompletesCard).length})</sp-button>
             </sp-button-group>
           </sp-theme>

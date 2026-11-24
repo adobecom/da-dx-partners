@@ -23,7 +23,7 @@
   display: flex;
   flex-direction: column;
   transform: translateZ(0);
-  background: rgb(250 250 250);
+  background: #F3F3F3;
   border-radius: 16px;
   border: none;
   max-width: none;
@@ -36,13 +36,34 @@
   transition: all .2s ease-in-out;
 }
 
+.journey-board-tab-btn[variant="primary"] {
+  background: #F3F3F3;
+  color: black;
+  font-size: 20px;
+}
+
+.journey-board-tab-btn[variant="secondary"] {
+  background: transparent;
+  color: #707070;
+  font-size: 20px;
+
+}
+
 .journey-card-toggle {
   background: transparent;
-  padding: 0;
+  padding-left: 0;
 }
 
 .journey-card.recommended {
-  background: rgb(255 247 209);
+  background: #FFF2CF;
+}
+
+.journey-card.completed .detail-m {
+  text-transform: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .journey-card,
