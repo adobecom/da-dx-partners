@@ -1,8 +1,8 @@
 import {
   buildCompletedJourneyCardState,
-  getCompletedCards,
+  getCurrentJourneyCompletedCards,
   getCompletedJourneyCardIds, getJourneyPathForSegment,
-  getToDoCards, JOURNEY_PATHS,
+  getCurrentJourneyToDoCards, JOURNEY_PATHS,
   normalizeJourneyCardIds,
 } from './utils.js';
 import {
@@ -14,7 +14,7 @@ import {
   partnerCookieContainsValue,
   getLibs,
 } from '../../scripts/utils.js';
-import {DX_ACCESS_TYPE, DX_PROGRAM_TYPE} from '../utils/dxConstants.js';
+import { DX_ACCESS_TYPE, DX_PROGRAM_TYPE } from '../utils/dxConstants.js';
 import JourneyCards from './JourneyCards.js';
 import { getConfig, localizationPromises, populateLocalizedTextFromListItems } from '../utils/utils.js';
 
@@ -91,7 +91,7 @@ export default async function init(el, deps = {}) {
     const {
       segment = getTilesSegment(),
       getCompletedCardIds = getCompletedJourneyCardIds,
-      getVisibleCards = getToDoCards,
+      getVisibleCards = getCurrentJourneyToDoCards,
     } = deps;
 
     const completedCardIds = getCompletedCardIds();
@@ -106,7 +106,7 @@ export default async function init(el, deps = {}) {
       el.remove();
       return;
     }
-    const completedCards = getCompletedCards({
+    const completedCards = getCurrentJourneyCompletedCards({
       segment,
       completedCardIds: completedCardSet,
     });
@@ -129,7 +129,6 @@ export default async function init(el, deps = {}) {
     app.completedCards = completedCards;
     app.segment = segment;
     app.segmentTotalCards = getJourneyPathForSegment(segment, JOURNEY_PATHS)?.length;
-
     app.actionHandler = handleUserAction;
     el.replaceWith(app);
   } catch (error) {

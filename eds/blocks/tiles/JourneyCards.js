@@ -212,7 +212,10 @@ export default class JourneyCards extends LitElement {
         ${repeat(
     this.completedCards,
     (card) => card.id,
-    (card, index) => { if (!card.neverCompletesCard) return this.renderCard(card, index, 1); },
+    (card, index) => {
+      if (!card.neverCompletesCard) return this.renderCard(card, index, 1); 
+      return undefined;
+    },
   )}
       </div>`}
     `;

@@ -4,7 +4,7 @@ import { setLibs } from '../../../eds/scripts/utils.js';
 import {
   buildCompletedJourneyCardState,
   getCompletedJourneyCardIds,
-  getToDoCards,
+  getCurrentJourneyToDoCards,
   normalizeJourneyCardIds,
 } from '../../../eds/blocks/tiles/utils.js';
 
@@ -31,7 +31,7 @@ describe('tiles block logic', () => {
   });
 
   it('returns only the visible journey cards for the current path', () => {
-    const cards = getToDoCards({
+    const cards = getCurrentJourneyToDoCards({
       segment: 'demo',
       completedCardIds: [1],
       maxCards: 9,

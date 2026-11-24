@@ -37,7 +37,7 @@ export function getCompletedJourneyCardIds(userState = getPartnerUserState()) {
   return normalizeJourneyCardIds(completedCards);
 }
 
-export function getCompletedCards({
+export function getCurrentJourneyCompletedCards({
   segment,
   completedCardIds,
   paths = JOURNEY_PATHS,
@@ -58,7 +58,7 @@ export function getCompletedCards({
   return completedCardsDetails;
 }
 
-export function getToDoCards({
+export function getCurrentJourneyToDoCards({
   segment,
   completedCardIds,
   maxCards = MAX_VISIBLE_JOURNEY_CARDS,
