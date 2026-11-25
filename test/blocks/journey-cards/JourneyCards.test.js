@@ -57,7 +57,7 @@ describe('JourneyCards', () => {
   it('renders cards with title, description and an open task link button', async () => {
     const el = makeInstance({
       toDoCards: [
-        { id: 5, title: 'Title', description: 'Description', actionLink: 'https://example.com' },
+        { id: 5, title: 'Title', description: 'Description', actionLink: 'https://example.com/task' },
       ],
     });
     await el.updateComplete;
@@ -69,7 +69,7 @@ describe('JourneyCards', () => {
 
     const link = card.querySelector('.open-task-link');
     expect(link.textContent.trim()).to.contain('Open');
-    expect(link.getAttribute('href')).to.equal('https://example.com');
+    expect(link.getAttribute('href')).to.equal('https://example.com/task');
     expect(link.getAttribute('target')).to.equal('_blank');
     expect(link.getAttribute('rel')).to.equal('noopener');
   });
@@ -232,6 +232,22 @@ describe('JourneyCards', () => {
       expect(toggle.hasAttribute('disabled')).to.be.false;
       expect(toggle.textContent.trim()).to.contain('Mark complete');
     });
+  });
+
+  it('rewrites action links for cards on the completed tab even though it is not in the DOM at page load', async () => {
+    const el = makeInstance({
+      toDoCards: [{ id: 1, title: 'To do card', description: 'd' }],
+      completedCards: [
+        { id: 2, title: 'Completed card', description: 'd', actionLink: 'https://partners.adobe.com/task' },
+      ],
+    });
+    await el.updateComplete;
+
+    el.setTab(1);
+    await el.updateComplete;
+
+    const link = el.querySelector('.journey-card .open-task-link');
+    expect(link.getAttribute('href')).to.equal('https://partners.stage.adobe.com/task');
   });
 
   it('switches tabs and renders the completed cards list', async () => {

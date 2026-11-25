@@ -1,4 +1,5 @@
 import { getLibs } from '../../scripts/utils.js';
+import { getUpdatedHref } from '../../scripts/rewriteLinks.js';
 
 const miloLibs = getLibs();
 const { html, LitElement, repeat } = await import(`${miloLibs}/deps/lit-all.min.js`);
@@ -114,7 +115,7 @@ export default class JourneyCards extends LitElement {
 
   renderCard(card, index, tab) {
     const state = tab === 0 ? this.cardStates.get(card.id) : { completed: true };
-    const actionLink = card.actionLink || '#';
+    const actionLink = getUpdatedHref(card.actionLink || '#');
     const trackingTitle = processTrackingLabels(card.title ?? '');
 
     return html`
