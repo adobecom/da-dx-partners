@@ -130,7 +130,8 @@ describe('tiles block logic', () => {
     expect(result).to.be.true;
     expect(updateState.calledOnce).to.be.true;
     expect(updateState.firstCall.args[0].completedCards).to.deep.equal([1, 2, 7]);
-    expect(updateState.firstCall.args[0].firstAction).to.be.a('string');
+    expect(updateState.firstCall.args[0].firstAction).to.be.a('number');
+    expect(updateState.firstCall.args[0].lastAction).to.be.a('number');
   });
 
   it('renders the journey-cards component with the computed visible cards', async () => {

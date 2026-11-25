@@ -60,7 +60,7 @@ export async function handleUserAction(cardId, action, deps = {}) {
   // on first user action (if there is no firstAction in the state) set the date
   const firstUserAction = !hasFirstAction('firstAction');
   const stateUpdates = { completedCards: nextCompletedCardIds };
-  const now = new Date().toISOString();
+  const now = Date.now();
   if (firstUserAction) {
     stateUpdates.firstAction = now;
   }
