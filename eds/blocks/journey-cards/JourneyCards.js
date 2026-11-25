@@ -139,15 +139,13 @@ export default class JourneyCards extends LitElement {
         </div>
         <div class="card-footer">
           <div class="body-s action-area">
-            <sp-theme theme="spectrum" color="light" scale="medium">
-              <sp-button
-                class="open-task-link"
-                variant="primary"
-                size="m"
-                daa-ll="${processTrackingLabels(this.getButtonLabel('open', tab))}"
-                @click="${() => window.open(actionLink, '_blank', 'noopener')}"
-              >  <span class="btn-content">
-
+            <a
+              class="open-task-link con-button outline fill"
+              href="${actionLink}"
+              target="_blank"
+              rel="noopener"
+              daa-ll="${processTrackingLabels(this.getButtonLabel('open', tab))}"
+            ><span class="btn-content">
                 ${this.getButtonLabel('open', tab)} <img
                   class="journey-card-btn-icon open-task-icon"
                   src="/eds/img/icons/open-task-arrow.svg"
@@ -155,8 +153,7 @@ export default class JourneyCards extends LitElement {
                   aria-hidden="true"
                   width="14"
                   height="14"
-                /></span></sp-button>
-            </sp-theme>
+                /></span></a>
             ${tab === 0 && !card.neverCompletesCard ? html`
               <sp-theme theme="spectrum" color="light" scale="medium">
                 <sp-button

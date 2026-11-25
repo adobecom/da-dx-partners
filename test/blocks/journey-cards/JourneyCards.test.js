@@ -54,7 +54,7 @@ describe('JourneyCards', () => {
     document.body.innerHTML = '';
   });
 
-  it('renders cards with title, description and an open task button', async () => {
+  it('renders cards with title, description and an open task link button', async () => {
     const el = makeInstance({
       toDoCards: [
         { id: 5, title: 'Title', description: 'Description', actionLink: 'https://example.com' },
@@ -67,11 +67,11 @@ describe('JourneyCards', () => {
     expect(card.querySelector('.heading-l').textContent).to.equal('Title');
     expect(card.querySelector('p.body-s').textContent).to.equal('Description');
 
-    const openStub = sinon.stub(window, 'open');
     const link = card.querySelector('.open-task-link');
     expect(link.textContent.trim()).to.contain('Open');
-    link.click();
-    expect(openStub.calledOnceWithExactly('https://example.com', '_blank', 'noopener')).to.be.true;
+    expect(link.getAttribute('href')).to.equal('https://example.com');
+    expect(link.getAttribute('target')).to.equal('_blank');
+    expect(link.getAttribute('rel')).to.equal('noopener');
   });
 
   it('marks the first card as recommended on the default tab', async () => {
