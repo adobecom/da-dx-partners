@@ -10,7 +10,7 @@ await Promise.all([
   import(`${miloLibs}/features/spectrum-web-components/dist/button.js`),
   import(`${miloLibs}/features/spectrum-web-components/dist/button-group.js`),
 ]);
-const { default: JourneyCards } = await import('../../../eds/blocks/tiles/JourneyCards.js');
+const { default: JourneyCards } = await import('../../../eds/blocks/journey-cards/JourneyCards.js');
 
 function declareJourneyCards() {
   if (customElements.get('journey-cards')) return;

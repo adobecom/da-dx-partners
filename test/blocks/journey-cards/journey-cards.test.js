@@ -4,9 +4,10 @@ import { setLibs } from '../../../eds/scripts/utils.js';
 import {
   buildCompletedJourneyCardState,
   getCompletedJourneyCardIds,
+  getCurrentJourneyCompletedCards,
   getCurrentJourneyToDoCards,
   normalizeJourneyCardIds,
-} from '../../../eds/blocks/tiles/utils.js';
+} from '../../../eds/blocks/journey-cards/utils.js';
 
 // tiles.js (via JourneyCards.js) resolves miloLibs-relative imports at module
 // load time, so setLibs must run before the static import below executes.
@@ -17,7 +18,7 @@ const {
   getTilesSegment,
   handleUserAction,
   default: init,
-} = await import('../../../eds/blocks/tiles/tiles.js');
+} = await import('../../../eds/blocks/journey-cards/journey-cards.js');
 
 describe('tiles block logic', () => {
   beforeEach(() => {
@@ -46,6 +47,60 @@ describe('tiles block logic', () => {
     });
 
     expect(cards.map((card) => Number(card.id))).to.deep.equal([2, 3]);
+  });
+
+  it('returns an empty array when there is no path for the segment', () => {
+    const cards = getCurrentJourneyCompletedCards({
+      segment: 'unknown-segment',
+      completedCardIds: [1],
+      paths: {},
+      cardDetails: {},
+    });
+
+    expect(cards).to.deep.equal([]);
+  });
+
+  it('returns completed card details that exist in the segment path', () => {
+    const cards = getCurrentJourneyCompletedCards({
+      segment: 'demo',
+      completedCardIds: [1, 2],
+      paths: { demo: [{ id: 1, condition: null }, { id: 2, condition: null }] },
+      cardDetails: {
+        1: { id: 1, title: 'First' },
+        2: { id: 2, title: 'Second' },
+      },
+    });
+
+    expect(cards).to.deep.equal([
+      { id: 1, title: 'First' },
+      { id: 2, title: 'Second' },
+    ]);
+  });
+
+  it('flags cards as neverCompletesCard when the path marks them as neverCompletes', () => {
+    const cardData = { id: 4, title: 'Evergreen' };
+    const cards = getCurrentJourneyCompletedCards({
+      segment: 'demo',
+      completedCardIds: [4],
+      paths: { demo: [{ id: 4, condition: null, neverCompletes: true }] },
+      cardDetails: { 4: cardData },
+    });
+
+    expect(cards).to.deep.equal([{ id: 4, title: 'Evergreen', neverCompletesCard: true }]);
+  });
+
+  it('skips completed card ids that are not part of the segment path', () => {
+    const cards = getCurrentJourneyCompletedCards({
+      segment: 'demo',
+      completedCardIds: [1, 99],
+      paths: { demo: [{ id: 1, condition: null }] },
+      cardDetails: {
+        1: { id: 1, title: 'First' },
+        99: { id: 99, title: 'Not in path' },
+      },
+    });
+
+    expect(cards).to.deep.equal([{ id: 1, title: 'First' }]);
   });
 
   it('coerces DOM card ids to numbers when updating journey state', () => {

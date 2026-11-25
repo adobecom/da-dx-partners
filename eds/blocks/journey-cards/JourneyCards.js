@@ -204,7 +204,7 @@ export default class JourneyCards extends LitElement {
     (card) => card.id,
     (card, index) => this.renderCard(card, index, 0),
   )}
-      </div>` : html`<div class="journey-board" daa-ll="Journey board completed cards | ${processTrackingLabels(this.segment)}">
+      </div>` : html`<div class="journey-board" daa-ll="Journey board completed cards | ${processTrackingLabels(this.segment)} | total cards: ${this.segmentTotalCards} | completed cards: ${this.completedCards.length}">
         ${repeat(
     this.completedCards,
     (card) => card.id,
