@@ -312,17 +312,30 @@ describe('AssetVideoPlayer - handleVideoTimeUpdate()', () => {
     expect(selectChapter.called).to.be.false;
   });
 
-  it('advances to the next chapter at or after the end time', () => {
+  it('keeps highlighting the current chapter through a gap and never forces a seek', () => {
     const el = makeInstance();
     const selectChapter = sinon.stub(el, 'selectChapter');
 
-    [322.223, 322.5].forEach((currentTime) => {
+    // Chapter 3 (index 2) ends at 322.223 and chapter 4 (index 3) does not
+    // start until 322.959 - a 0.736s gap. Playback should continue through it
+    // uninterrupted, still attributed to chapter 3, with no forced seek.
+    [322.223, 322.5, 322.9].forEach((currentTime) => {
       el.handleVideoTimeUpdate({ currentTarget: { currentTime, paused: false } });
+      expect(el.selectedChapterIndex).to.equal(2);
     });
 
-    expect(selectChapter.calledTwice).to.be.true;
-    expect(selectChapter.alwaysCalledWithExactly(3)).to.be.true;
-    expect(el.currentTime).to.equal(322.5);
+    expect(selectChapter.called).to.be.false;
+    expect(el.currentTime).to.equal(322.9);
+  });
+
+  it('advances the highlighted chapter once playback naturally reaches the next chapter start', () => {
+    const el = makeInstance();
+    const selectChapter = sinon.stub(el, 'selectChapter');
+
+    el.handleVideoTimeUpdate({ currentTarget: { currentTime: 322.959, paused: false } });
+
+    expect(el.selectedChapterIndex).to.equal(3);
+    expect(selectChapter.called).to.be.false;
   });
 
   it('updates time but does not advance while paused', () => {
@@ -429,7 +442,7 @@ describe('AssetVideoPlayer - chapter progress', () => {
       const background = luminance(cardBackground === 'rgba(0, 0, 0, 0)'
         ? getComputedStyle(el.querySelector('.video-chapters')).backgroundColor
         : cardBackground);
-      ['.chapter-description', '.start-time', '.duration-time'].forEach((selector) => {
+      ['.chapter-description', '.start-time'].forEach((selector) => {
         const foreground = luminance(getComputedStyle(chapter.querySelector(selector)).color);
         const contrast = (Math.max(background, foreground) + 0.05)
           / (Math.min(background, foreground) + 0.05);
@@ -485,7 +498,12 @@ describe('AssetVideoPlayer - chapter progress', () => {
   it('preserves partial progress for the active chapter and empty future tracks', () => {
     const el = makeInstance();
     el.selectChapter(2);
-    el.currentTime = (142.906 + 322.223) / 2;
+    // Progress is now measured against the next chapter's start (322.959),
+    // not this chapter's own declared end (322.223), so it stays accurate
+    // through any gap between chapters.
+    const nextStart = 322.959;
+    const start = 142.906;
+    el.currentTime = (start + nextStart) / 2;
 
     expect(el.getChapterProgress(0)).to.equal(100);
     expect(el.getChapterProgress(1)).to.equal(100);
@@ -500,6 +518,19 @@ describe('AssetVideoPlayer - chapter progress', () => {
     expect(el.getChapterProgress(2)).to.equal(0);
     el.currentTime = 4000;
     expect(el.getChapterProgress(2)).to.equal(100);
+  });
+
+  it('still reports progress when a chapter end timecode is malformed (before its start)', () => {
+    const el = makeInstance();
+    el.chapters = [
+      { title: 'A', timerange: '00:00:00.000 - 00:00:10.000' },
+      { title: 'B', timerange: '00:00:10.000 - 00:00:05.000' },
+      { title: 'C', timerange: '00:00:20.000 - 00:00:30.000' },
+    ];
+    el.selectChapter(1);
+    el.currentTime = 15;
+
+    expect(el.getChapterProgress(1)).to.be.closeTo(50, 0.001);
   });
 });
 
@@ -1397,6 +1428,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     expect(slider.hidden).to.be.false;
     expect(slider.value).to.equal('0');
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('0%');
+    expect(slider.style.getPropertyValue('--volume-ratio').trim()).to.equal('0');
     expect(button.querySelector('img').getAttribute('src')).to.contain('/eds/img/icons/player-muted.svg');
 
     slider.value = '0.4';
@@ -1405,6 +1437,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     expect(media.volume).to.equal(0.4);
     expect(media.muted).to.be.false;
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('40%');
+    expect(slider.style.getPropertyValue('--volume-ratio').trim()).to.equal('0.4');
     expect(button.querySelector('img').getAttribute('src')).to.contain('/eds/img/icons/player-volume.svg');
 
     button.click();
@@ -1420,6 +1453,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     await player.updateComplete;
     expect(slider.value).to.equal('0.8');
     expect(slider.style.getPropertyValue('--volume').trim()).to.equal('80%');
+    expect(slider.style.getPropertyValue('--volume-ratio').trim()).to.equal('0.8');
 
     slider.value = '0';
     slider.dispatchEvent(new Event('input'));
@@ -1434,6 +1468,7 @@ describe('AssetVideoPlayer - custom video controls', () => {
     styles.textContent = css.replaceAll('::-webkit-slider-thumb', '[data-test-webkit-thumb]')
       .replaceAll('::-moz-range-thumb', '[data-test-moz-thumb]')
       .replaceAll(':hover', '[data-test-hover]')
+      .replaceAll(':active', '[data-test-active]')
       .replaceAll(':focus-visible', '[data-test-focus-visible]');
     const player = makeInstance();
     player.volumeExpanded = true;
@@ -1442,31 +1477,39 @@ describe('AssetVideoPlayer - custom video controls', () => {
     const control = player.querySelector('.player-volume');
     const button = control.querySelector('button');
     const slider = control.querySelector('input');
+    slider.style.transition = 'none';
 
     expect(getComputedStyle(slider).appearance).to.equal('none');
     expect(getComputedStyle(slider).height).to.equal('2px');
     const sliderStyle = getComputedStyle(slider);
     expect(Number.parseFloat(sliderStyle.width)
       - Number.parseFloat(sliderStyle.getPropertyValue('--volume-thumb-size'))).to.equal(54);
-    expect(getComputedStyle(control).getPropertyValue('--video-player-controls-background').trim())
-      .to.equal('26 5 39');
     const rules = [...styles.sheet.cssRules];
     ['webkit', 'moz'].forEach((engine) => {
-      const hoverColor = engine === 'webkit' ? 'rgb(41, 41, 41)' : 'rgb(80, 80, 80)';
+      const hoverColor = 'rgb(41, 41, 41)';
       const selector = `asset-video-player .player-volume input[data-test-${engine}-thumb]`;
       const thumb = rules.find((rule) => rule.selectorText === selector);
       const hoveredThumb = rules.find((rule) => rule.selectorText === `${selector}[data-test-hover]`);
-      expect(thumb.style.background).to.equal('rgb(var(--video-player-controls-background))');
+      expect(thumb.style.background).to.equal('transparent');
       expect(hoveredThumb.style.borderColor).to.equal(hoverColor);
       slider.setAttribute(`data-test-${engine}-thumb`, '');
-      expect(getComputedStyle(slider).backgroundColor).to.equal('rgb(26, 5, 39)');
+      expect(getComputedStyle(slider).backgroundColor).to.equal('rgba(0, 0, 0, 0)');
       expect(getComputedStyle(slider).borderTopColor).to.equal('rgb(255, 255, 255)');
-      expect(getComputedStyle(slider).boxShadow).to.equal('rgb(26, 5, 39) 0px 0px 0px 4px');
+      expect(getComputedStyle(slider).boxShadow).to.equal('none');
       slider.setAttribute('data-test-hover', '');
-      expect(getComputedStyle(slider).backgroundColor).to.equal('rgb(26, 5, 39)');
+      expect(getComputedStyle(slider).backgroundColor).to.equal('rgba(0, 0, 0, 0)');
       expect(getComputedStyle(slider).borderTopColor).to.equal(hoverColor);
-      expect(getComputedStyle(slider).boxShadow).to.equal('rgb(26, 5, 39) 0px 0px 0px 4px');
+      expect(getComputedStyle(slider).boxShadow).to.equal('none');
+      expect(getComputedStyle(slider).borderTopWidth).to.equal('2px');
+      slider.setAttribute('data-test-active', '');
+      expect(getComputedStyle(slider).backgroundColor).to.equal('rgba(0, 0, 0, 0)');
+      expect(getComputedStyle(slider).borderTopColor).to.equal(hoverColor);
+      expect(getComputedStyle(slider).borderTopWidth).to.equal('6px');
+      slider.removeAttribute('data-test-active');
+      expect(getComputedStyle(slider).borderTopColor).to.equal(hoverColor);
+      expect(getComputedStyle(slider).borderTopWidth).to.equal('2px');
       slider.removeAttribute('data-test-hover');
+      expect(getComputedStyle(slider).borderTopColor).to.equal('rgb(255, 255, 255)');
       slider.removeAttribute(`data-test-${engine}-thumb`);
     });
 

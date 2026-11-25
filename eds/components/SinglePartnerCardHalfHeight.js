@@ -1,4 +1,4 @@
-import { getLibs } from '../scripts/utils.js';
+import { getLibs, optimizeImageUrl } from '../scripts/utils.js';
 import { getConfig, transformCardUrl } from '../blocks/utils/utils.js';
 
 import DOMPurify from '../libs/deps/purify-wrapper.js';
@@ -30,13 +30,15 @@ class SinglePartnerCardHalfHeight extends LitElement {
   }
 
   render() {
+    const backgroundImage = optimizeImageUrl(transformCardUrl(this.data.styles?.backgroundImage));
+
     return html`
       <a
         class="single-partner-card--half-height"
         href="${this.url}"
         @click=${(e) => dispatchCustomEventOnLinkClick(e, this.url.href, this.title)}
         target="_blank" rel="nooopener noreferrer"
-        style="background-image: url(${transformCardUrl(this.data.styles?.backgroundImage)}), url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})"
+        style="background-image: url(${backgroundImage}), url(${transformCardUrl(DEFAULT_BACKGROUND_IMAGE_PATH)})"
         daa-ll="${this.title}"
       >
         <div class="card-title-wrapper">

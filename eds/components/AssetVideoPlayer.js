@@ -210,10 +210,12 @@ export default class AssetVideoPlayer extends LitElement {
     const chapter = this.chapters[index];
     if (!chapter) return 0;
 
-    const [startTime, endTime] = chapter.timerange.split(' - ');
-    const start = this.timecodeToSeconds(startTime);
-    const end = this.timecodeToSeconds(endTime);
-    if (end <= start) return 0;
+    const next = this.chapters[index + 1];
+    const start = this.timecodeToSeconds(this.getStartTime(chapter.timerange));
+    const end = next
+      ? this.timecodeToSeconds(this.getStartTime(next.timerange))
+      : this.playerDuration;
+    if (!(end > start)) return 0;
 
     const progress = ((this.currentTime - start) / (end - start)) * 100;
     return Math.max(0, Math.min(100, progress));
@@ -235,13 +237,6 @@ export default class AssetVideoPlayer extends LitElement {
       return video.currentTime >= start && video.currentTime < nextStart;
     });
     this.selectedChapterIndex = Math.max(0, index);
-
-    if (video.paused || this.selectedChapterIndex >= this.chapters.length - 1) return;
-
-    const [, endTime] = this.chapters[this.selectedChapterIndex].timerange.split(' - ');
-    if (video.currentTime >= this.timecodeToSeconds(endTime)) {
-      this.selectChapter(this.selectedChapterIndex + 1);
-    }
   }
 
   formatTimecode(timecode) {
@@ -689,7 +684,7 @@ export default class AssetVideoPlayer extends LitElement {
               <input type="range" min="0" max="1" step="0.01"
                 ?hidden="${!this.volumeExpanded}"
                 .value="${String(this.videoMuted ? 0 : this.videoVolume)}"
-                style="--volume: ${(this.videoMuted ? 0 : this.videoVolume) * 100}%"
+                style="--volume: ${(this.videoMuted ? 0 : this.videoVolume) * 100}%; --volume-ratio: ${this.videoMuted ? 0 : this.videoVolume}"
                 @input="${(event) => {
                   const video = this._video;
                   if (!video) return;
@@ -747,7 +742,7 @@ export default class AssetVideoPlayer extends LitElement {
 
   renderChapters() {
     return this.chapters.map((chapter, index) => {
-      const [startTime, endTime] = chapter.timerange.split(' - ');
+      const startTime = this.getStartTime(chapter.timerange);
       const shareLabel = this.sharedChapterIndex === index ? 'Link copied' : 'Copy link to this chapter';
 
       /* eslint-disable indent */
@@ -758,7 +753,6 @@ export default class AssetVideoPlayer extends LitElement {
         >
           <div class="chapter-time">
             <span class="start-time">${this.formatTimecode(startTime)}</span>
-            <span class="duration-time">${this.formatTimecode(endTime)}</span>
 
             <div class="chapter-actions">
               <sp-action-button

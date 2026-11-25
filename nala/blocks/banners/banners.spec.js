@@ -116,5 +116,33 @@ export default {
       name: '@uplevel-banner-not-displayed-app-under-100-progress',
       tags: '@da-dx-banners @regression @circleCi',
     },
+    {
+      tcid: '10',
+      name: '@uplevel-banner-not-displayed-gold-user-technology-app-assurances-incomplete',
+      path: '/digitalexperience/drafts/automation/regression/uplevel-banner-test-page',
+      tags: '@da-dx-banners @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-gold:',
+        userLabel: 'Gold',
+        bannerLevel: 'gold',
+        mockType: 'technology',
+        appAssurancesPercentage: 50,
+        solutionPercentage: 50,
+      },
+    },
+    {
+      tcid: '11',
+      name: '@uplevel-banner-not-displayed-silver-user-technology-app-assurances-incomplete',
+      path: '/digitalexperience/drafts/automation/regression/uplevel-banner-test-page',
+      tags: '@da-dx-banners @regression @circleCi',
+      data: {
+        partnerLevel: 'dxp-silver:',
+        userLabel: 'Silver',
+        bannerLevel: 'silver',
+        mockType: 'technology',
+        appAssurancesPercentage: 50,
+        solutionPercentage: 50,
+      },
+    },
   ],
 };

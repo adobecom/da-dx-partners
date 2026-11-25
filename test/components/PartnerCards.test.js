@@ -1,8 +1,10 @@
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { getCaasTagsUrl } from '../../eds/scripts/utils.js';
+import { getCaasTagsUrl, getLibs } from '../../eds/scripts/utils.js';
 import PartnerCards from '../../eds/components/PartnerCards.js';
 import PartnerCardsWithDateFilter from '../../eds/components/PartnerCardsWithDateFilter.js';
+
+const { render } = await import(`${getLibs()}/deps/lit-all.min.js`);
 
 if (!customElements.get('test-partner-cards')) {
   customElements.define('test-partner-cards', PartnerCards);
@@ -50,6 +52,66 @@ function makeDateInstance() {
   component.urlSearchParams = new URLSearchParams();
   return component;
 }
+
+describe('SinglePartnerCard background images', () => {
+  [
+    {
+      image: '/digitalexperience/media_image.jpg',
+      expected: '/digitalexperience/media_image.jpg?width=400&format=webp&optimize=small',
+    },
+    {
+      image: 'https://business.adobe.com/media_image.jpg?width=800&format=png&optimize=large&other=value#image',
+      expected: 'https://business.adobe.com/media_image.jpg?width=400&format=webp&optimize=small&other=value#image',
+    },
+    {
+      image: 'https://business.stage.adobe.com/media_image.jpg?other=value',
+      expected: 'https://business.stage.adobe.com/media_image.jpg?other=value&width=400&format=webp&optimize=small',
+    },
+    {
+      image: '/digitalexperience/image.jpg',
+      expected: '/digitalexperience/image.jpg',
+    },
+    {
+      image: 'https://business.adobe.com/image.jpg',
+      expected: 'https://business.adobe.com/image.jpg',
+    },
+    {
+      image: 'https://business.stage.adobe.com/image.jpg',
+      expected: 'https://business.stage.adobe.com/image.jpg',
+    },
+    {
+      image: '/images/media_image.jpg?width=800',
+      expected: '/images/media_image.jpg?width=800',
+    },
+    {
+      image: '/images/image.jpg',
+      expected: '/images/image.jpg',
+    },
+  ].forEach(({ image, expected }) => {
+    ['single-partner-card', 'single-partner-card-half-height'].forEach((tagName) => {
+      it(`renders the expected ${tagName} background URL for ${image}`, () => {
+        const component = document.createElement(tagName);
+        component.data = {
+          styles: { backgroundImage: image },
+          contentArea: { title: 'Title', description: 'Description', url: '/details' },
+          footer: [{ right: [{ text: 'Read more' }] }],
+          cardDate: '2026-01-01',
+        };
+        component.ietf = 'en-US';
+        const container = document.createElement('div');
+
+        render(component.render(), container);
+
+        const background = container.querySelector('.card-header, .single-partner-card--half-height')
+          .style.backgroundImage;
+        const expectedUrl = new URL(expected, 'https://partners.stage.adobe.com');
+        expectedUrl.protocol = window.location.protocol;
+        expect(background.split(',')[0]).to.equal(`url("${expectedUrl.href}")`);
+        expect(component.data.styles.backgroundImage).to.equal(image);
+      });
+    });
+  });
+});
 
 describe('PartnerCards unit behavior', () => {
   afterEach(() => {

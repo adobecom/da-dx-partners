@@ -2,7 +2,6 @@
 asset-video-player {
   --video-player-black: #2c2c2c;
   --video-player-white: #fff;
-  --video-player-controls-background: 26 5 39;
 
   display: block;
   min-width: 0;
@@ -91,7 +90,25 @@ asset-video-player .video-holder .player-controls {
   position: absolute;
   inset: auto 0 0;
   padding: 24px 20px 16px;
-  background: linear-gradient(to top, rgb(var(--video-player-controls-background) / 92%) 65%, transparent);
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0%) 0%,
+    rgb(0 0 0 / 1%) 8.1%,
+    rgb(0 0 0 / 4.7%) 15.5%,
+    rgb(0 0 0 / 10.6%) 22.5%,
+    rgb(0 0 0 / 17.6%) 29%,
+    rgb(0 0 0 / 26%) 35.3%,
+    rgb(0 0 0 / 35.3%) 41.2%,
+    rgb(0 0 0 / 45%) 47.1%,
+    rgb(0 0 0 / 55%) 52.9%,
+    rgb(0 0 0 / 64.7%) 58.8%,
+    rgb(0 0 0 / 74%) 64.7%,
+    rgb(0 0 0 / 82.4%) 71%,
+    rgb(0 0 0 / 89.4%) 77.5%,
+    rgb(0 0 0 / 95.3%) 84.5%,
+    rgb(0 0 0 / 99%) 91.9%,
+    #000 100%
+  ) bottom / 100% 100% no-repeat;
 }
 
 asset-video-player .player-progress {
@@ -208,6 +225,14 @@ asset-video-player .video-holder .player-volume .player-control-button:focus-vis
 
 asset-video-player .player-volume input {
   --volume-thumb-size: 16px;
+  --volume-thumb-position: calc(var(--volume) + var(--volume-thumb-size) * (0.5 - var(--volume-ratio)));
+  --volume-track-background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.35) calc(var(--volume-thumb-position) - var(--volume-thumb-size) / 2 - 4px),
+    transparent calc(var(--volume-thumb-position) - var(--volume-thumb-size) / 2 - 4px),
+    transparent calc(var(--volume-thumb-position) + var(--volume-thumb-size) / 2 + 4px),
+    rgba(255, 255, 255, 0.35) calc(var(--volume-thumb-position) + var(--volume-thumb-size) / 2 + 4px)
+  );
 
   appearance: none;
   /* stylelint-disable-next-line property-no-vendor-prefix */
@@ -224,8 +249,8 @@ asset-video-player .player-volume input {
 
 asset-video-player .player-volume input::-webkit-slider-runnable-track {
   height: 2px;
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+  background: var(--volume-track-background);
 }
 
 asset-video-player .player-volume input::-webkit-slider-thumb {
@@ -237,19 +262,24 @@ asset-video-player .player-volume input::-webkit-slider-thumb {
   margin-top: -7px;
   border: 2px solid var(--video-player-white);
   border-radius: 50%;
-  background: rgb(var(--video-player-controls-background));
-  box-shadow: 0 0 0 4px rgb(var(--video-player-controls-background));
+  background: transparent;
   box-sizing: border-box;
+  transition: border-width 0.13s ease-in-out;
 }
 
 asset-video-player .player-volume input::-webkit-slider-thumb:hover {
   border-color: #292929;
 }
 
+asset-video-player .player-volume input:active::-webkit-slider-thumb {
+  border-width: 6px;
+  border-color: #292929;
+}
+
 asset-video-player .player-volume input::-moz-range-track {
-  height: 4px;
-  border-radius: 0;
-  background: #bdbdbd;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--volume-track-background);
 }
 
 asset-video-player .player-volume input::-moz-range-thumb {
@@ -257,18 +287,23 @@ asset-video-player .player-volume input::-moz-range-thumb {
   height: var(--volume-thumb-size);
   border: 2px solid var(--video-player-white);
   border-radius: 50%;
-  background: rgb(var(--video-player-controls-background));
-  box-shadow: 0 0 0 4px rgb(var(--video-player-controls-background));
+  background: transparent;
   box-sizing: border-box;
+  transition: border-width 0.13s ease-in-out;
 }
 
 asset-video-player .player-volume input::-moz-range-thumb:hover {
-  border-color: #505050;
+  border-color: #292929;
+}
+
+asset-video-player .player-volume input:active::-moz-range-thumb {
+  border-width: 6px;
+  border-color: #292929;
 }
 
 asset-video-player .player-volume input::-moz-range-progress {
-  height: 4px;
-  background: var(--video-player-white);
+  height: 2px;
+  background: transparent;
 }
 
 asset-video-player .video-holder .player-volume input:focus-visible {
@@ -427,10 +462,6 @@ asset-video-player .chapter .chapter-time .start-time {
   font-weight: 700;
 }
 
-asset-video-player .chapter .chapter-time .duration-time {
-  margin-top: 8px;
-}
-
 asset-video-player .chapter .chapter-content {
   min-width: 0;
   width: calc(100% - 18px);
@@ -491,7 +522,7 @@ asset-video-player .chapter .chapter-actions {
   justify-content: center;
   width: 20px;
   height: 20px;
-  margin-top: 16px;
+  margin-top: 38px;
 }
 
 asset-video-player .chapter .share-button {
