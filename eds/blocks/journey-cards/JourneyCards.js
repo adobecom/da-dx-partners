@@ -80,6 +80,14 @@ export default class JourneyCards extends LitElement {
     this.cardStates = next;
   }
 
+  setAllCardsDisabled(disabled) {
+    const next = new Map();
+    this.cardStates.forEach((cardState, cardId) => {
+      next.set(cardId, { ...cardState, disabled });
+    });
+    this.cardStates = next;
+  }
+
   async handleToggle(card, event) {
     event.preventDefault();
     event.stopPropagation();
@@ -89,18 +97,18 @@ export default class JourneyCards extends LitElement {
     const currentAction = state.action;
     const nextAction = currentAction === 'complete' ? 'undo' : 'complete';
 
-    this.setCardState(card.id, { ...state, disabled: true });
+    this.setAllCardsDisabled(true);
 
     try {
       const success = await this.actionHandler(Number(card.id), currentAction);
       if (!success) {
-        this.setCardState(card.id, { ...state, disabled: false });
+        this.setAllCardsDisabled(false);
         return;
       }
-      const nextState = { ...state, action: nextAction, disabled: false };
-      this.setCardState(card.id, nextState);
+      this.setAllCardsDisabled(false);
+      this.setCardState(card.id, { ...this.cardStates.get(card.id), action: nextAction });
     } catch (error) {
-      this.setCardState(card.id, { ...state, disabled: false });
+      this.setAllCardsDisabled(false);
     }
   }
 

@@ -177,6 +177,63 @@ describe('JourneyCards', () => {
     expect(toggle.hasAttribute('disabled')).to.be.false;
   });
 
+  it('disables every card toggle on the board while a request is in flight and re-enables them after', async () => {
+    let resolveAction;
+    const actionHandler = sinon.stub().returns(new Promise((resolve) => { resolveAction = resolve; }));
+    const el = makeInstance({
+      toDoCards: [
+        { id: 20, title: 'Card A', description: 'd' },
+        { id: 21, title: 'Card B', description: 'd' },
+        { id: 22, title: 'Card C', description: 'd' },
+      ],
+      actionHandler,
+    });
+    await el.updateComplete;
+
+    const toggles = el.querySelectorAll('.journey-card-toggle');
+    expect(toggles.length).to.equal(3);
+
+    toggles[0].click();
+    await el.updateComplete;
+
+    toggles.forEach((toggle) => {
+      expect(toggle.hasAttribute('disabled')).to.be.true;
+    });
+
+    resolveAction(true);
+    await flushMicrotasks();
+    await el.updateComplete;
+
+    toggles.forEach((toggle) => {
+      expect(toggle.hasAttribute('disabled')).to.be.false;
+    });
+    expect(toggles[0].textContent.trim()).to.contain('Undo');
+    expect(toggles[1].textContent.trim()).to.contain('Mark complete');
+    expect(toggles[2].textContent.trim()).to.contain('Mark complete');
+  });
+
+  it('re-enables every card toggle on the board when the action handler reports failure', async () => {
+    const actionHandler = sinon.stub().resolves(false);
+    const el = makeInstance({
+      toDoCards: [
+        { id: 30, title: 'Card A', description: 'd' },
+        { id: 31, title: 'Card B', description: 'd' },
+      ],
+      actionHandler,
+    });
+    await el.updateComplete;
+
+    const toggles = el.querySelectorAll('.journey-card-toggle');
+    toggles[0].click();
+    await flushMicrotasks();
+    await el.updateComplete;
+
+    toggles.forEach((toggle) => {
+      expect(toggle.hasAttribute('disabled')).to.be.false;
+      expect(toggle.textContent.trim()).to.contain('Mark complete');
+    });
+  });
+
   it('switches tabs and renders the completed cards list', async () => {
     const el = makeInstance({
       toDoCards: [{ id: 1, title: 'To do card', description: 'd' }],
