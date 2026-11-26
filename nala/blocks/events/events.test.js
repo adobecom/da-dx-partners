@@ -65,8 +65,15 @@ test.describe('Validate events block', () => {
         await signInPage.signIn(page, `${data.partnerLevel}`);
         await signInPage.profileIconButton.waitFor({ state: 'visible', timeout: 10000 });
       });
-      await test.step('Verify Access Events', async () => {
+      await test.step('Search and verify visible event card', async () => {
+        await eventsPage.searchField.fill(data.visibleCardTitle);
+        await eventsPage.searchField.press('Enter');
         await eventsPage.verifyPublicCardTitle(data.visibleCardTitle);
+      });
+
+      await test.step('Search and verify restricted event card is not visible', async () => {
+        await eventsPage.searchField.fill(data.notVisibleCardTitle);
+        await eventsPage.searchField.press('Enter');
         await eventsPage.verifyCardNotVisible(data.notVisibleCardTitle);
       });
     });

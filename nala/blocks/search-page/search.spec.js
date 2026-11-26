@@ -326,7 +326,7 @@ export default {
         secondAssetTitle: 'DXP-Automation-Regions-All-Regions',
         thirdAssetTitle: 'DXP-Automation-Regions-NA',
         firstCardTags: [
-          'Px', 'Business Development',
+          'PX', 'Business Development',
         ],
         secondCardTags: [
           'PX', 'Japan', 'Australia and New Zealand', 'Europe', 'Latin America', 'North America', 'China', 'Hong Kong', 'India', 'Korea', 'UK', 'South East Asia',
@@ -372,7 +372,7 @@ export default {
         secondAssetTitle: 'DXP-Automation-Regions-All-Regions',
         thirdAssetTitle: 'DXP-Automation-Regions-China',
         thirdCardTags: [
-          'Px', 'China',
+          'PX', 'China',
         ],
         caasCollectionURL: '/digitalexperience/drafts/automation/regression/regions-caas-collection?term=DXP-Automation-Regions-',
         assetPreviewTags: 'Tags:  Community, Platinum, Gold, Silver, PX, China, Resource, Word',
@@ -392,7 +392,7 @@ export default {
         secondAssetTitle: 'DXP-Automation-Regions-All-Regions',
         thirdAssetTitle: 'DXP-Automation-Regions-India',
         thirdCardTags: [
-          'Px', 'India',
+          'PX', 'India',
         ],
         caasCollectionURL: '/digitalexperience/drafts/automation/regression/regions-caas-collection?term=DXP-Automation-Regions-',
         assetPreviewTags: 'Tags: Community, Platinum, Gold, Silver, PX, India, Resource, Image',
@@ -472,7 +472,7 @@ export default {
         secondAssetTitle: 'DXP-Automation-Regions-Untagged',
         thirdAssetTitle: 'DXP-Automation-Regions-All-Regions',
         firstCardTags: [
-          'Px', 'Europe',
+          'PX', 'Europe',
         ],
         caasCollectionURL: '/digitalexperience/drafts/automation/regression/regions-caas-collection?term=DXP-Automation-Regions-',
         assetPreviewTags: 'Tags:  Community, Platinum, Gold, Silver, PX, Europe, Resource',
@@ -492,7 +492,7 @@ export default {
         secondAssetTitle: 'DXP-Automation-Regions-Untagged',
         thirdAssetTitle: 'DXP-Automation-Regions-All-Regions',
         firstCardTags: [
-          'Px', 'Korea',
+          'PX', 'Korea',
         ],
         caasCollectionURL: '/digitalexperience/drafts/automation/regression/regions-caas-collection?term=DXP-Automation-Regions-',
         assetPreviewTags: 'Tags: Community, Platinum, Gold, Silver, PX, Korea, Resource, Image',

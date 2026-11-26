@@ -51,7 +51,7 @@ export default class SearchPage {
     this.errorHeading = page.locator('.heading-xxl');
     this.hubLogo = page.locator('a.feds-brand').filter({ has: page.locator('img[src*="px-hub-logo"]') });
     this.watchVideoButton = page.getByRole('button', { name: 'Watch Video' });
-    this.videoPlayer = page.locator('asset-preview.asset-preview-block');
+    this.videoPlayer = page.locator('asset-preview.asset-preview-block video');
     this.firstCard = page.locator('.card-header .card-title').first();
     this.secondCard = page.locator('search-card:nth-child(2) > .search-card > .card-header');
     this.thirdCard = page.locator('search-card:nth-child(3) > .search-card > .card-header');
@@ -375,5 +375,26 @@ export default class SearchPage {
     } finally {
       await previewPage.close();
     }
+  }
+
+  async isVideoPlaying() {
+    if (await this.videoPlayer.count() === 0) return false;
+    return this.videoPlayer.first().evaluate(
+      (video) => !video.paused && !video.ended && video.readyState > 2 && video.currentTime > 0,
+    );
+  }
+
+  async verifyVideoPlaying(timeout = 30000) {
+    await expect.poll(() => this.isVideoPlaying(), {
+      timeout,
+      message: 'Video is not playing',
+    }).toBe(true);
+  }
+
+  async verifyVideoNotPlaying(timeout = 10000) {
+    await expect.poll(() => this.isVideoPlaying(), {
+      timeout,
+      message: 'Video should not be playing',
+    }).toBe(false);
   }
 }
