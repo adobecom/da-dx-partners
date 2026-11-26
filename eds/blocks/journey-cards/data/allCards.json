@@ -1,0 +1,436 @@
+{
+  "1": {
+    "id": 1,
+    "title": "How the Px Hub can help you",
+    "description": "Explore how the Partner Experience Hub can help you grow, sell, and drive success",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/leveraging-pxhub",
+    "color": "Yellow"
+  },
+  "2": {
+    "id": 2,
+    "title": "How-to guides",
+    "description": "Explore our Activation guides—practical playbooks to help you unlock more value from your partnership",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/overview",
+    "color": "Light green"
+  },
+  "3": {
+    "id": 3,
+    "title": "Update your User Profile",
+    "description": "Ensure you’re accessing the right resources and opportunities to support your role and career",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/manage-profile",
+    "color": "Yellow"
+  },
+  "4": {
+    "id": 4,
+    "title": "Complete your company profile",
+    "description": "Add more information and create or update your Partner Directory listing to promote your company",
+    "actionLink": "https://partners.adobe.com/digitalexperience/m/manageprofile/companyinfo/information",
+    "color": "Light blue"
+  },
+  "5": {
+    "id": 5,
+    "title": "Need help? Start here.",
+    "description": "Access several options for partner support",
+    "actionLink": "https://partners.adobe.com/digitalexperience/support",
+    "color": "Light blue"
+  },
+  "6": {
+    "id": 6,
+    "title": "New user onboarding tips",
+    "description": "Steps and links to navigate partner resources with confidence",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/getting-started-user",
+    "color": "Yellow"
+  },
+  "7": {
+    "id": 7,
+    "title": "Admins' how-to guide",
+    "description": "Master onboarding, drive growth, and thrive in Adobe’s partner ecosystem",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/getting-started-admin",
+    "color": "Yellow"
+  },
+  "8": {
+    "id": 8,
+    "title": "Explore the Partner Directory",
+    "description": "See our global partner network, assess your company’s profile, and (Admins only) update the profile regularly",
+    "actionLink": "https://partners.adobe.com/s/directory/solution",
+    "color": "Yellow"
+  },
+  "9": {
+    "id": 9,
+    "title": "Craft your Directory profile",
+    "description": "Tips for how to make your organization stand out to customers in the Partner Directory",
+    "actionLink": "https://partners.adobe.com/digitalexperience/articles/support/partner-directory#create",
+    "color": "Yellow"
+  },
+  "10": {
+    "id": 10,
+    "title": "Invite your team to the PxHub",
+    "description": "Connect the right people across your organization to Adobe Partner resources and opportunities",
+    "actionLink": "https://partners.adobe.com/digitalexperience/m/manageprofile/companyinfo/contacts",
+    "color": "Yellow"
+  },
+  "11": {
+    "id": 11,
+    "title": "View & manage company contacts",
+    "description": "See and control (Admins only) which colleagues are listed as contacts for the Adobe Partner program",
+    "actionLink": "https://partners.adobe.com/digitalexperience/articles/support/contact-management",
+    "color": "Yellow"
+  },
+  "12": {
+    "id": 12,
+    "title": "Assign roles to team members",
+    "description": "Align your team to the right tools and resources to maximize benefits",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/getting-started-admin#team",
+    "color": "Yellow"
+  },
+  "13": {
+    "id": 13,
+    "title": "Strategic business solutions",
+    "description": "Explore Adobe’s latest innovations and strategies across five critical areas of experience personalization",
+    "actionLink": "https://partners.adobe.com/digitalexperience/solutions/overview",
+    "color": "Orange"
+  },
+  "14": {
+    "id": 14,
+    "title": "Industry-focused content",
+    "description": "Lead customer conversations with industry insight using these resources",
+    "actionLink": "https://partners.adobe.com/digitalexperience/industries/overview",
+    "color": "Orange"
+  },
+  "15": {
+    "id": 15,
+    "title": "View and request sandboxes",
+    "description": "Get hands-on experience with Adobe applications in protected environments",
+    "actionLink": "https://partners.adobe.com/digitalexperience/resources/sandboxes",
+    "color": "Light green"
+  },
+  "16": {
+    "id": 16,
+    "title": "Follow us on LinkedIn",
+    "description": "Get the latest news and opportunities and stay connected to the Adobe Partners community",
+    "actionLink": "https://www.linkedin.com/company/adobe-partners/",
+    "color": "Yellow"
+  },
+  "17": {
+    "id": 17,
+    "title": "Partner compliance requirement",
+    "description": "Learn about the mandatory compliance training and questionnaire",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/topics/compliance",
+    "color": "Yellow"
+  },
+  "18": {
+    "id": 18,
+    "title": "Explore program benefits",
+    "description": "Discover valuable resources, training, and collaboration tools to drive your growth, expertise, and market success",
+    "actionLink": "https://partners.adobe.com/digitalexperience/about/level-requirements",
+    "color": "Light blue"
+  },
+  "19": {
+    "id": 19,
+    "title": "Benefits Glossary",
+    "description": "Overview of and links to all Adobe Partner program benefits",
+    "actionLink": "https://partners.adobe.com/digitalexperience/articles/support/benefits-glossary",
+    "color": "Light blue"
+  },
+  "20": {
+    "id": 20,
+    "title": "View company entitlements",
+    "description": "See which partner benefits and entitlements your organization has earned",
+    "actionLink": "https://partners.adobe.com/digitalexperience/m/manageprofile/companyinfo/entitlements",
+    "color": "Light blue"
+  },
+  "21": {
+    "id": 21,
+    "title": "Benefits Center",
+    "description": "Adjust your partner membership level and customize your partnership with a la carte benefits",
+    "actionLink": "https://partnerbenefitscenter.adobe.com/benefits-center.html",
+    "color": "Light blue"
+  },
+  "22": {
+    "title": "Discover a la carte benefits",
+    "id": 22,
+    "description": "Adjust your partner membership level and customize your partnership with a la carte benefits",
+    "actionLink": "https://partnerbenefitscenter.adobe.com/benefits-center.html",
+    "color": "Light blue"
+  },
+  "23": {
+    "id": 23,
+    "title": "Explore our product portfolio",
+    "description": "Get to know Adobe’s wide range of complementary applications for marketing, creative, and business",
+    "actionLink": "https://partners.adobe.com/digitalexperience/products/overview",
+    "color": "Light green"
+  },
+  "24": {
+    "id": 24,
+    "title": "View product roadmaps",
+    "description": "Get early product insights that support customer planning and reinforce your value as a strategic advisor",
+    "actionLink": "https://partners.adobe.com/digitalexperience/resources/roadmaps",
+    "color": "Orange"
+  },
+  "25": {
+    "id": 25,
+    "title": "Promote our partnership",
+    "description": "Use these partner-centric marketing resources and benefits to stand out and get discovered",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/promote",
+    "color": "Light gray"
+  },
+  "26": {
+    "id": 26,
+    "title": "Review Adobe brand guidelines",
+    "description": "Understand how to use Adobe partner badges and other partner assets",
+    "actionLink": "https://partners.adobe.com/digitalexperience/preview/restricted/1/brand-guide.pdf.html",
+    "color": "Light gray"
+  },
+  "27": {
+    "id": 27,
+    "title": "Get partner badges",
+    "description": "Show off progress, credibility, and growth with company and individual badges",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/promote#badges",
+    "color": "Light gray"
+  },
+  "28": {
+    "id": 28,
+    "title": "Learning resources",
+    "description": "Find many ways to deepen your expertise, attract more clients, and advance your career",
+    "actionLink": "https://partners.adobe.com/digitalexperience/learn/overview",
+    "color": "Light green"
+  },
+  "29": {
+    "id": 29,
+    "title": "Get Adobe credentials",
+    "description": "Boost your career with verifiable evidence of your Adobe expertise",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/boost-career",
+    "color": "Light green"
+  },
+  "30": {
+    "id": 30,
+    "title": "Get your team certified",
+    "description": "Ensure your organization is building and demonstrating the skills to succeed with Adobe applications",
+    "actionLink": "https://partners.adobe.com/digitalexperience/learn/certification",
+    "color": "Light green"
+  },
+  "31": {
+    "id": 31,
+    "title": "Earn Adobe Certification",
+    "description": "Grow your career by proving your expertise and hands-on ability with Adobe applications",
+    "actionLink": "https://partners.adobe.com/digitalexperience/learn/certification",
+    "color": "Light green"
+  },
+  "32": {
+    "id": 32,
+    "title": "Certification exam study guides",
+    "description": "Help prepare yourself for certification with tailored study resources",
+    "actionLink": "https://certification.adobe.com/certifications",
+    "color": "Light green"
+  },
+  "33": {
+    "id": 33,
+    "title": "View/manage your credentials",
+    "description": "Filter and sort your current and past credentials",
+    "actionLink": "https://partners.adobe.com/digitalexperience/m/manageprofile/userprofile/credentials",
+    "color": "Light green"
+  },
+  "34": {
+    "id": 34,
+    "title": "Achieve sales accreditation",
+    "description": "Obtain an Adobe Sales Excellence accreditation to boost credibility and Adobe selling expertise",
+    "actionLink": "https://partners.adobe.com/digitalexperience/learn/accreditation/sales",
+    "color": "Light green"
+  },
+  "35": {
+    "id": 35,
+    "title": "Earn technical accreditation",
+    "description": "Obtain Adobe Technical Excellence Integration accreditation to boost credibility and integration skills",
+    "actionLink": "https://partners.adobe.com/digitalexperience/learn/accreditation/technical",
+    "color": "Light green"
+  },
+  "36": {
+    "id": 36,
+    "title": "On-demand training courses",
+    "description": "Build skills at your own pace with flexible trainings to hone your Adobe knowledge",
+    "actionLink": "https://partners.adobe.com/digitalexperience/learn/on-demand-trainings",
+    "color": "Light green"
+  },
+  "37": {
+    "id": 37,
+    "title": "Get product demos",
+    "description": "Bring Adobe solutions to life for customers",
+    "actionLink": "https://partners.adobe.com/digitalexperience/resources/demos",
+    "color": "Light green"
+  },
+  "38": {
+    "id": 38,
+    "title": "View upcoming events",
+    "description": "Learn and connect at exclusive events, including webinars, training, and workshops",
+    "actionLink": "https://partners.adobe.com/digitalexperience/events/upcoming",
+    "color": "Light green"
+  },
+  "39": {
+    "id": 39,
+    "title": "Watch event replays",
+    "description": "Get on-demand access to event recordings",
+    "actionLink": "https://partners.adobe.com/digitalexperience/events/webinar-recordings",
+    "color": "Light green"
+  },
+  "40": {
+    "id": 40,
+    "title": "Catch up on partner news",
+    "description": "Stay up to date on all the information and opportunities relevant to Adobe partners",
+    "actionLink": "https://partners.adobe.com/digitalexperience/articles/news",
+    "color": "Light green"
+  },
+  "41": {
+    "id": 41,
+    "title": "Learn how to sell with Adobe",
+    "description": "An introduction to Adobe’s go-to-market strategy and key messaging, and how to register opportunities",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/sell-with-adobe",
+    "color": "Orange"
+  },
+  "42": {
+    "id": 42,
+    "title": "Co-selling with Adobe",
+    "description": "How to optimize your go-to-market (GTM) alignment with Adobe sellers and other partners",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/guide/coselling-strategies",
+    "color": "Orange"
+  },
+  "43": {
+    "id": 43,
+    "title": "Sales Plays",
+    "description": "Master the art of positioning Adobe products with our three-tier framework of messaging and insight",
+    "actionLink": "https://partners.adobe.com/digitalexperience/salesplays/overview",
+    "color": "Orange"
+  },
+  "44": {
+    "id": 44,
+    "title": "Learn about Sales Center",
+    "description": "How to access co-selling resources and support, register leads, and manage joint opportunities",
+    "actionLink": "https://partners.adobe.com/digitalexperience/resources/sales-center",
+    "color": "Orange"
+  },
+  "45": {
+    "id": 45,
+    "title": "Deal registration training",
+    "description": "Learn how to document joint business opportunities",
+    "actionLink": "https://partners.adobe.com/digitalexperience/events/upcoming?term=deal+reg#event",
+    "color": "Orange"
+  },
+  "46": {
+    "id": 46,
+    "title": "Deal registration guidelines",
+    "description": "Learn the eligibility criteria, program benefits, and financial incentives tied to deal registration",
+    "actionLink": "https://partners.adobe.com/digitalexperience/preview/restricted/1/deal-registration-guidelines.pdf.html",
+    "color": "Orange"
+  },
+  "47": {
+    "id": 47,
+    "title": "Deal registration",
+    "description": "Document joint business opportunities and foster further collaboration with Adobe",
+    "actionLink": "https://partners.adobe.com/digitalexperience/m/salescenter/leads/create-lead",
+    "color": "Orange"
+  },
+  "48": {
+    "id": 48,
+    "title": "Map accounts with Adobe",
+    "description": "Connect with us on Crossbeam to drive go-to-market collaboration and measurable business growth",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/topics/account-mapping",
+    "color": "Orange"
+  },
+  "49": {
+    "id": 49,
+    "title": "Track your partnership",
+    "description": "Use the Track Partnership view to see your organization's progress toward program requirements",
+    "actionLink": "https://partners.adobe.com/digitalexperience/m/manageprofile/companyinfo/partnership#",
+    "color": "Light blue"
+  },
+  "50": {
+    "id": 50,
+    "title": "Monitor your partnership progress",
+    "description": "See your organization’s achievements toward program requirements, and where there’s work to do",
+    "actionLink": "https://partners.adobe.com/digitalexperience/m/manageprofile/companyinfo/partnership#",
+    "color": "Light blue"
+  },
+  "51": {
+    "id": 51,
+    "title": "Track your team’s credentials",
+    "description": "Monitor credential achievements across your organization to track progress toward program requirements",
+    "actionLink": "https://partners.adobe.com/digitalexperience/m/manageprofile/userprofile/credentials",
+    "color": "Light blue"
+  },
+  "52": {
+    "id": 52,
+    "title": "See customer inquiries",
+    "description": "Know when prospective customers are seeking your expertise",
+    "actionLink": "",
+    "color": "Light blue"
+  },
+  "53": {
+    "id": 53,
+    "title": "Submit customer deployments",
+    "description": "Advance your partnership and credibility with proven customer implementations",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/topics/submit-deployment",
+    "color": "Light blue"
+  },
+  "54": {
+    "id": 54,
+    "title": "Earn product specializations",
+    "description": "Elevate your company’s visibility by demonstrating expertise and success with one or more Adobe products",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/topics/specialization",
+    "color": "Light blue"
+  },
+  "55": {
+    "id": 55,
+    "title": "Let us Spotlight you!",
+    "description": "Showcase your customer successes on the Px Hub and Adobe Partner social channels",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/topics/spotlight",
+    "color": "Light gray"
+  },
+  "56": {
+    "id": 56,
+    "title": "Customer-facing assets",
+    "description": "Go into customer meetings prepared with presentation decks, reports, videos, and more",
+    "actionLink": "https://partners.adobe.com/digitalexperience/resources/customer-facing-materials",
+    "color": "Orange"
+  },
+  "57": {
+    "id": 57,
+    "title": "Reports & research",
+    "description": "Deepen your business insights to improve customer conversations",
+    "actionLink": "https://partners.adobe.com/digitalexperience/resources/reports-research",
+    "color": "Orange"
+  },
+  "58": {
+    "id": 58,
+    "title": "Develop solutions with Adobe",
+    "description": "Combine Adobe technology with your expertise to help shared customers meet or exceed their goals",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/partner-offerings",
+    "color": "Teal"
+  },
+  "59": {
+    "id": 59,
+    "title": "Promote your solutions",
+    "description": "Grow your business by listing your apps and integrations on Adobe Exchange Marketplace",
+    "actionLink": "https://exchange.adobe.com/apps/browse/ec?listingType=solutions&product=All&partnerLevel=All&solutionType=All&geographies=All&sort=MOST_RECENT",
+    "color": "Teal"
+  },
+  "60": {
+    "id": 60,
+    "title": "Create/update app listings",
+    "description": "Use this self-service portal to publish or update app listings on Adobe Exchange",
+    "actionLink": "https://developer.adobe.com/developer-distribution",
+    "color": "Pink"
+  },
+  "61": {
+    "id": 61,
+    "title": "Get your solutions validated",
+    "description": "Use Adobe's Solution Validation program to prove your expertise and reinforce customer trust",
+    "actionLink": "https://partners.adobe.com/digitalexperience/activation/topics/solution-validation",
+    "color": "Teal"
+  },
+  "62": {
+    "id": 62,
+    "title": "Invite your colleagues",
+    "description": "Help your teammates connect to Adobe Partner resources and opportunities",
+    "actionLink": "https://partners.adobe.com/digitalexperience/m/manageprofile/companyinfo/contacts",
+    "color": "Yellow"
+  }
+}

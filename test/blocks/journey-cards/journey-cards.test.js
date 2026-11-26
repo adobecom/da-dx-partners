@@ -1,0 +1,164 @@
+import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
+import { setLibs } from '../../../eds/scripts/utils.js';
+import {
+  buildCompletedJourneyCardState,
+  getCompletedJourneyCardIds,
+  getCurrentJourneyCompletedCards,
+  getCurrentJourneyToDoCards,
+  normalizeJourneyCardIds,
+} from '../../../eds/blocks/journey-cards/utils.js';
+
+// tiles.js (via JourneyCards.js) resolves miloLibs-relative imports at module
+// load time, so setLibs must run before the static import below executes.
+const miloLibs = setLibs('/libs');
+const { setConfig } = await import(`${miloLibs}/utils/utils.js`);
+setConfig({ locales: { '': { ietf: 'en-US' } }, miloLibs });
+const {
+  getTilesSegment,
+  handleUserAction,
+  default: init,
+} = await import('../../../eds/blocks/journey-cards/journey-cards.js');
+
+describe('tiles block logic', () => {
+  beforeEach(() => {
+    document.cookie = 'partner_data=; Path=/; Max-Age=0;';
+    document.cookie = 'partner_info=; Path=/; Max-Age=0;';
+    document.cookie = 'partner_user_state=; Path=/; Max-Age=0;';
+    document.body.innerHTML = '';
+  });
+
+  it('validates completed journey card ids from partner user state', () => {
+    expect(() => getCompletedJourneyCardIds({ completedCards: '1' })).to.throw('Invalid partner_user_state.completedCards');
+    expect(() => normalizeJourneyCardIds([1, '2', 2])).to.throw('Journey card ids must be numbers');
+  });
+
+  it('returns only the visible journey cards for the current path', () => {
+    const cards = getCurrentJourneyToDoCards({
+      segment: 'demo',
+      completedCardIds: new Set([1]),
+      maxCards: 9,
+      paths: { demo: [{ id: 1, condition: null }, { id: 2, condition: null }, { id: 3, condition: null }] },
+      cardDetails: {
+        1: { id: 1 },
+        2: { id: 2 },
+        3: { id: 3 },
+      },
+    });
+
+    expect(cards.map((card) => Number(card.id))).to.deep.equal([2, 3]);
+  });
+
+  it('returns an empty array when there is no path for the segment', () => {
+    const cards = getCurrentJourneyCompletedCards({
+      segment: 'unknown-segment',
+      completedCardIds: [1],
+      paths: {},
+      cardDetails: {},
+    });
+
+    expect(cards).to.deep.equal([]);
+  });
+
+  it('returns completed card details that exist in the segment path', () => {
+    const cards = getCurrentJourneyCompletedCards({
+      segment: 'demo',
+      completedCardIds: [1, 2],
+      paths: { demo: [{ id: 1, condition: null }, { id: 2, condition: null }] },
+      cardDetails: {
+        1: { id: 1, title: 'First' },
+        2: { id: 2, title: 'Second' },
+      },
+    });
+
+    expect(cards).to.deep.equal([
+      { id: 1, title: 'First' },
+      { id: 2, title: 'Second' },
+    ]);
+  });
+
+  it('flags cards as neverCompletesCard when the path marks them as neverCompletes', () => {
+    const cardData = { id: 4, title: 'Evergreen' };
+    const cards = getCurrentJourneyCompletedCards({
+      segment: 'demo',
+      completedCardIds: [4],
+      paths: { demo: [{ id: 4, condition: null, neverCompletes: true }] },
+      cardDetails: { 4: cardData },
+    });
+
+    expect(cards).to.deep.equal([{ id: 4, title: 'Evergreen', neverCompletesCard: true }]);
+  });
+
+  it('skips completed card ids that are not part of the segment path', () => {
+    const cards = getCurrentJourneyCompletedCards({
+      segment: 'demo',
+      completedCardIds: [1, 99],
+      paths: { demo: [{ id: 1, condition: null }] },
+      cardDetails: {
+        1: { id: 1, title: 'First' },
+        99: { id: 99, title: 'Not in path' },
+      },
+    });
+
+    expect(cards).to.deep.equal([{ id: 1, title: 'First' }]);
+  });
+
+  it('coerces DOM card ids to numbers when updating journey state', () => {
+    expect(buildCompletedJourneyCardState('3', [1, 2], 'complete')).to.deep.equal([1, 2, 3]);
+    expect(buildCompletedJourneyCardState('2', [1, 2, 3], 'remove')).to.deep.equal([1, 3]);
+  });
+
+  it('builds the correct segment from partner cookies', () => {
+    document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { level: 'gold', primarybusiness: 'dxp', accesstype: 'user' } }))}; Path=/`;
+    expect(getTilesSegment()).to.equal('user-dxp');
+  });
+
+  it('submits card state updates with a numeric card id and creates firstAction when needed', async () => {
+    const updateState = sinon.stub().resolves({ success: true });
+    const result = await handleUserAction('7', 'complete', {
+      getCompletedCardIds: () => [1, 2],
+      buildState: (cardId, completedCardIds, action) => {
+        expect(Number(cardId)).to.equal(7);
+        expect(completedCardIds).to.deep.equal([1, 2]);
+        expect(action).to.equal('complete');
+        return [1, 2, 7];
+      },
+      hasFirstAction: () => false,
+      updateState,
+    });
+
+    expect(result).to.be.true;
+    expect(updateState.calledOnce).to.be.true;
+    expect(updateState.firstCall.args[0].completedCards).to.deep.equal([1, 2, 7]);
+    expect(updateState.firstCall.args[0].firstAction).to.be.a('number');
+    expect(updateState.firstCall.args[0].lastAction).to.be.a('number');
+  });
+
+  it('renders the journey-cards component with the computed visible cards', async () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+
+    await init(host, {
+      segment: 'user-dxp',
+      getCompletedCardIds: () => [],
+      getVisibleCards: () => [],
+    });
+    expect(host.isConnected).to.be.false;
+
+    const nextHost = document.createElement('div');
+    document.body.appendChild(nextHost);
+    await init(nextHost, {
+      segment: 'user-dxp',
+      getCompletedCardIds: () => [],
+      getVisibleCards: () => [{ id: 2, title: 'Visible card', description: 'Example' }],
+    });
+    expect(nextHost.isConnected).to.be.false;
+
+    const app = document.querySelector('journey-cards');
+    expect(app).to.exist;
+    expect(app.toDoCards).to.deep.equal([{ id: 2, title: 'Visible card', description: 'Example' }]);
+    expect(app.actionHandler).to.equal(handleUserAction);
+    await app.updateComplete;
+    expect(app.querySelector('.journey-card')).to.exist;
+  });
+});
