@@ -1,4 +1,4 @@
-import { readFile } from '@web/test-runner-commands';
+import { readFile, sendKeys } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { setLibs } from '../../../eds/scripts/utils.js';
@@ -132,6 +132,13 @@ describe('feedback block', () => {
 
       const dialog = document.querySelector('.feedback-dialog');
       expect(dialog).to.exist;
+      expect(dialog.getAttribute('role')).to.equal('dialog');
+      expect(document.getElementById(dialog.getAttribute('aria-labelledby')).textContent).to.equal('Rate this page');
+      expect(document.getElementById(dialog.getAttribute('aria-describedby')).textContent).to.equal(
+        document.querySelector('.feedback-description').textContent,
+      );
+      expect(document.activeElement).to.equal(dialog);
+      expect(stickyButton.getAttribute('aria-haspopup')).to.equal('dialog');
     });
 
     it('should show email field when user is not signed in', async () => {
@@ -156,6 +163,11 @@ describe('feedback block', () => {
       expect(emailLabel.tagName).to.equal('SP-FIELD-LABEL');
       expect(emailLabel.getAttribute('for')).to.equal(emailField.id);
       expect(emailLabel.textContent).to.equal('Share your email address');
+
+      await sendKeys({ press: 'Tab' });
+      expect(document.activeElement).to.equal(emailField);
+      await sendKeys({ press: 'Tab' });
+      expect(document.activeElement).to.equal(document.querySelector('sp-action-button[data-rating="1"]'));
     });
 
     it('should hide email field when user is signed in', async () => {
@@ -170,7 +182,36 @@ describe('feedback block', () => {
       const emailField = document.querySelector('#feedback-email');
       expect(emailField).to.not.exist;
 
+      await sendKeys({ press: 'Tab' });
+      expect(document.activeElement).to.equal(document.querySelector('sp-action-button[data-rating="1"]'));
+
       document.cookie = 'partner_data=; Path=/; Max-Age=0;';
+    });
+
+    it('should close with Escape from a shadow DOM control, restore focus and retain input', async () => {
+      const { default: init } = await import('../../../eds/blocks/feedback/feedback.js');
+      await init(document.querySelector('.feedback'));
+      const stickyButton = document.querySelector('.sticky-feedback-button');
+      stickyButton.focus();
+      await sendKeys({ press: 'Enter' });
+      await waitForDialogUpdates();
+
+      const stars = document.querySelectorAll('sp-action-button[data-rating]');
+      stars[2].click();
+      const comment = document.querySelector('#feedback-comment');
+      comment.value = 'Keep this feedback';
+      comment.focus();
+      await sendKeys({ press: 'Escape' });
+
+      expect(document.querySelector('.feedback-dialog')).to.not.exist;
+      expect(stickyButton.classList.contains('hidden')).to.be.false;
+      expect(document.activeElement).to.equal(stickyButton);
+
+      await sendKeys({ press: 'Enter' });
+      await waitForDialogUpdates();
+      expect(document.activeElement).to.equal(document.querySelector('.feedback-dialog'));
+      expect(document.querySelectorAll('sp-action-button[selected]').length).to.equal(3);
+      expect(document.querySelector('#feedback-comment').value).to.equal('Keep this feedback');
     });
 
     it('should handle star hover and textarea input', async () => {
@@ -241,6 +282,7 @@ describe('feedback block', () => {
       cancelButton.click();
 
       expect(document.querySelector('.feedback-dialog')).to.not.exist;
+      expect(document.activeElement).to.equal(stickyButton);
 
       await openDialog(stickyButton);
 
@@ -251,6 +293,7 @@ describe('feedback block', () => {
       dialog.click();
 
       expect(document.querySelector('.feedback-dialog')).to.not.exist;
+      expect(document.activeElement).to.equal(stickyButton);
     });
 
     it('should submit feedback successfully', async () => {
@@ -271,6 +314,7 @@ describe('feedback block', () => {
 
       expect(fetchStub.called).to.be.true;
       expect(document.querySelector('.feedback-dialog')).to.not.exist;
+      expect(document.activeElement).to.equal(stickyButton);
       const toast = document.querySelector('.feedback-toast.spectrum-Toast--positive');
       expect(toast).to.exist;
     });
@@ -352,6 +396,7 @@ describe('feedback block', () => {
 
       const dialog = document.querySelector('.feedback-dialog');
       expect(dialog).to.exist;
+      expect(document.activeElement).to.equal(dialog);
     });
 
     it('should auto-hide success toast after 5 seconds', async () => {
@@ -573,6 +618,7 @@ describe('feedback block', () => {
 
       const dialog = document.querySelector('.feedback-dialog');
       expect(dialog).to.exist;
+      expect(document.activeElement).to.equal(dialog);
 
       const newUrl = replaceStateSpy.firstCall.args[2];
       expect(newUrl).to.not.include('feedback');
