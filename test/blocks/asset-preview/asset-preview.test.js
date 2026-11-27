@@ -605,6 +605,60 @@ describe('AssetPreview - setData() chapters', () => {
   });
 });
 
+describe('AssetPreview - restricted folder video without partner levels', () => {
+  const originalUrl = window.location.href;
+
+  beforeEach(() => {
+    window.history.replaceState(null, '', '/digitalexperience/preview/restricted/video-without-tags.html');
+  });
+
+  afterEach(() => {
+    window.history.replaceState(null, '', originalUrl);
+    sinon.restore();
+    document.body.innerHTML = '';
+  });
+
+  it('hides the player and shows the restricted message for anonymous users', async () => {
+    if (!customElements.get('asset-preview')) customElements.define('asset-preview', AssetPreview);
+    const restrictedMessage = 'Access to view or download this asset is restricted to registered partners. Login or register now.';
+    document.body.innerHTML = `<div class="fragment"><p>${restrictedMessage}</p></div>`;
+
+    const fetchStub = sinon.stub(window, 'fetch').resolves({ ok: false, status: 404 });
+    fetchStub.withArgs(getCaasTagsUrl()).resolves({
+      ok: true,
+      json: async () => ({ namespaces: { caas: { tags: { 'file-format': { tags: { video: { tagId: 'caas:file-format/video', title: 'Video' } } } } } } }),
+    });
+    fetchStub.withArgs(sinon.match((url) => String(url).includes('assetmetadata.json'))).resolves({
+      status: 200,
+      json: async () => ({
+        title: 'Video from a restricted folder without tags',
+        url: 'https://partners.stage.adobe.com/digitalexperience-assets/restricted/video-without-tags.mp4',
+        aemPath: '/content/dam/dxp/restricted/video-without-tags.mp4',
+        fileType: 'video/mp4',
+        partnerLevel: [],
+        previewImage: mockPreviewImage,
+        tags: ['caas:adobe-partners/collections/resource', 'caas:file-format/video'],
+      }),
+    });
+
+    const el = document.createElement('asset-preview');
+    el.blockData = { localizedText: {}, tableData: [], isAEM: false };
+    document.body.appendChild(el);
+
+    const deadline = Date.now() + 2000;
+    while (!el.querySelector('.asset-preview-block-details-left .fragment') && Date.now() < deadline) {
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => { setTimeout(resolve, 10); });
+    }
+
+    expect(el.isLoading).to.be.false;
+    expect(el.isVideo).to.be.true;
+    expect(el.querySelector('asset-video-player')).to.equal(null);
+    expect(el.querySelector('.asset-preview-block-actions')).to.equal(null);
+    expect(el.querySelector('.asset-preview-block-details-left').textContent).to.include(restrictedMessage);
+  });
+});
+
 describe('AssetPreview - utility methods', () => {
   afterEach(() => sinon.restore());
 
@@ -652,6 +706,28 @@ describe('AssetPreview - utility methods', () => {
     const el = makeInstance();
     el.assetPartnerLevel = ['gold'];
     expect(el.isRestrictedAssetForUser()).to.be.true;
+  });
+
+  it('isRestrictedAssetForUser restricts restricted-folder assets without partner levels for anonymous users', () => {
+    const el = makeInstance();
+    el.assetPartnerLevel = [];
+    el.aemPath = '/content/dam/dxp/restricted/video-without-tags.mp4';
+    expect(el.isRestrictedAssetForUser()).to.be.true;
+
+    el.aemPath = '/content/dam/dxp/unrestricted/video.mp4';
+    expect(el.isRestrictedAssetForUser()).to.be.false;
+  });
+
+  it('isRestrictedAssetForUser allows restricted-folder assets without partner levels for signed-in users', () => {
+    const el = makeInstance();
+    el.assetPartnerLevel = [];
+    el.aemPath = '/content/dam/dxp/restricted/video-without-tags.mp4';
+    document.cookie = `partner_data=${encodeURIComponent(JSON.stringify({ DXP: { level: 'gold' } }))}; path=/`;
+    try {
+      expect(el.isRestrictedAssetForUser()).to.be.false;
+    } finally {
+      document.cookie = 'partner_data=; path=/; Max-Age=0';
+    }
   });
 
   it('getTagsTitlesString joins tag titles with comma', () => {

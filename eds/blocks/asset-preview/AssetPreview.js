@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { getCaasTagsUrl, getLibs, prodHosts } from '../../scripts/utils.js';
+import { getCaasTagsUrl, getLibs, partnerIsSignedIn, prodHosts } from '../../scripts/utils.js';
 import {
   PARTNERS_PROD_DOMAIN,
   PARTNERS_STAGE_DOMAIN,
@@ -19,6 +19,7 @@ await import('../../components/AssetVideoPlayer.js');
 
 const PDF_RENDER_DIV_ID = 'adobe-dc-view';
 const DEFAULT_BACK_BTN_LABEL = 'Back to previous';
+const RESTRICTED_FOLDER_REGEX = /\/restricted(\/|$)/i;
 
 const PDF_VIEWER_CLIENT_ID_BY_AEM_HOST = {
   'dx-partner-author.dev02.corp.adobe.com': '39e4a6d95084446299434f49dfc62ebb',
@@ -464,9 +465,17 @@ export default class AssetPreview extends LitElement {
   isRestrictedAssetForUser() {
     if (this.blockData.isAEM) return false;
 
-    return !(!this.assetPartnerLevel.length
+    if (!this.assetPartnerLevel.length) {
+      return this.isInRestrictedFolder() && !partnerIsSignedIn();
+    }
+
+    return !(this.assetPartnerLevel.includes('public')
       || this.assetPartnerLevel.includes('public')
       || this.assetPartnerLevel.includes(PARTNER_LEVEL));
+  }
+
+  isInRestrictedFolder() {
+    return RESTRICTED_FOLDER_REGEX.test(this.aemPath || '');
   }
 
   // eslint-disable-next-line class-methods-use-this
