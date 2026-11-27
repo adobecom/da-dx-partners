@@ -426,6 +426,52 @@ describe('AssetPreview - setData() pdfPreviewUrl', () => {
   });
 });
 
+describe('AssetPreview - render() actions', () => {
+  [
+    { extension: 'docx', fileType: 'Word', label: 'Download Word' },
+    { extension: 'pdf', fileType: 'PDF', label: 'Download PDF' },
+  ].forEach(({ extension, fileType, label }) => {
+    it(`renders ${fileType} actions as standalone links without nested controls`, () => {
+      const el = makeInstance();
+      el.assetHasData = true;
+      el.isLoading = false;
+      el.title = 'Test asset';
+      el.url = `https://example.com/asset.${extension}`;
+      el.webinarPresentation = 'https://example.com/presentation.pdf';
+      el.fileFormatTags = [{ title: fileType }];
+      el.blockData.localizedText[`{{${label}}}`] = label;
+      el.blockData.localizedText['{{Download PDF}}'] = 'Download PDF';
+      const container = document.createElement('div');
+      render(el.render(), container);
+
+      const actions = container.querySelector('.asset-preview-block-actions');
+      expect(actions.querySelectorAll('button')).to.have.lengthOf(0);
+      expect(actions.querySelectorAll('a a')).to.have.lengthOf(0);
+      const downloads = actions.querySelectorAll(':scope > a.filled[download]');
+      expect(downloads).to.have.lengthOf(2);
+      expect(downloads[0].getAttribute('href')).to.equal(el.url);
+      expect(downloads[0].getAttribute('download')).to.equal(el.title);
+      expect(downloads[0].textContent).to.equal(label);
+      expect(downloads[0].getAttribute('daa-ll')).to.equal(label);
+      expect(downloads[1].getAttribute('href')).to.equal(el.webinarPresentation);
+      expect(downloads[1].getAttribute('download')).to.equal('Test asset_presentation');
+      expect(downloads[1].textContent).to.equal('Download PDF');
+      expect(downloads[1].getAttribute('daa-ll')).to.equal('Download PDF');
+
+      const view = actions.querySelector(':scope > a.outline');
+      if (fileType === 'PDF') {
+        expect(view).to.exist;
+        expect(view.getAttribute('href')).to.equal(el.url);
+        expect(view.getAttribute('target')).to.equal('_blank');
+        expect(view.getAttribute('rel')).to.equal('noopener noreferrer');
+        expect(view.getAttribute('daa-ll')).to.equal('View');
+      } else {
+        expect(view).to.equal(null);
+      }
+    });
+  });
+});
+
 describe('AssetPreview - render() metadata details', () => {
   it('marks the redundant asset thumbnail as decorative', () => {
     const el = makeInstance();
